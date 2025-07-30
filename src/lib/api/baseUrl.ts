@@ -1,1 +1,1 @@
-export const baseUrl = "https://lugabiz-api.vercel.app"
+export const baseUrl = "https://lugabiz.vercel.app"
