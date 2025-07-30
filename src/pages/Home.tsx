@@ -56,36 +56,27 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2 }}
+              <div
                 className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-500 to-tomato text-white px-6 py-3 rounded-full mb-6"
               >
                 <Sparkles className="w-5 h-5" />
                 <span className="font-medium">Descubre lugares únicos</span>
-              </motion.div>
+              </div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+              <h1
                 className="text-4xl md:text-6xl font-bold text-gray-900 mb-9"
               >
                 Encuentra los mejores
                 <span className="block bg-gradient-to-r from-primary-600 to-tomato bg-clip-text text-transparent">
                   lugares locales
                 </span>
-              </motion.h1>
+              </h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+              <p
                 className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
               >
                 Explora pequeños negocios, rincones escondidos y joyas locales recomendadas por la comunidad.
-              </motion.p>
+              </p>
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
