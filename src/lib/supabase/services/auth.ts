@@ -1,17 +1,20 @@
 import { supabase } from '../client';
+import { baseUrl } from '../../api/baseUrl';
 import { User } from '../types';
 
 export const authService = {
   // Sign up with email and password
-  async signUp(name:string,  email: string, password: string) {
+  async signUp(name: string, email: string, password: string) {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password
     });
 
-    if (authError) throw authError;
+    if (authError) throw authError.message;
 
-    await this.createUserProfile(authData.user?.id!, name, email);
+    if (!authData.user) throw new Error("Hubo un problema al crear el usuario");
+
+    await this.createUserProfile(authData.user.id, name, email);
     return authData;
   },
 
@@ -72,7 +75,7 @@ export const authService = {
         id: userId,
         name,
         email,
-        avatar: `/assets/images/avatar.png`,
+        avatar: `${baseUrl}/avatar.png`,
       });
 
     if (error) throw error;
