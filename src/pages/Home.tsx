@@ -78,10 +78,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                 Explora pequeños negocios, rincones escondidos y joyas locales recomendadas por la comunidad.
               </p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+              <div
                 className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
               >
                 <SearchInput
@@ -96,7 +93,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                   <Plus className="w-5 h-5" />
                   <span>{user ? 'Publicar lugar' : 'Iniciar sesión'}</span>
                 </button>
-              </motion.div>
+              </div>
             </div>
           </div>
         </motion.section>
