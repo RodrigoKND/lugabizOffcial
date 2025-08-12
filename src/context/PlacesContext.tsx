@@ -53,7 +53,6 @@ export const PlacesProvider: React.FC<PlacesProviderProps> = ({ children }) => {
         categoriesService.getCategories(),
         socialGroupsService.getSocialGroups()
       ]);
-      
       setPlaces(placesData);
       setCategories(categoriesData);
       setSocialGroups(socialGroupsData);
