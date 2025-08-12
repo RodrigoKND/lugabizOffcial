@@ -17,14 +17,14 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
     <motion.div
       whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
+      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group h-[420px]"
       onClick={onClick}
     >
       <div className="relative">
         <img
           loading="lazy"
-          src={place.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800'}
-          alt={place.name}
+          src={place?.image}
+          alt={place?.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 flex flex-col space-y-2">
@@ -49,7 +49,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-6 flex flex-col justify-between h-[calc(420px-192px)]">
         <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
           {place.name}
         </h3>
@@ -67,11 +67,11 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{place.rating}</span>
+              <span className="text-sm font-medium">{place?.rating}</span>
             </div>
             <div className="flex items-center space-x-1 text-gray-500">
               <UsersIcon className="w-4 h-4" />
-              <span className="text-sm">{place.reviewCount}</span>
+              <span className="text-sm">{place?.reviewCount}</span>
             </div>
           </div>
 
