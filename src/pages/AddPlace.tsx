@@ -85,7 +85,7 @@ const AddPlace: React.FC = () => {
     }
   };
 
-  const isFormValid = formData.name && formData.description && formData.address && formData.category && formData.socialGroups.length > 0;
+  const isFormValid = formData.name && formData.description && formData.address && formData.category && formData.socialGroups.length > 0 && formData.image;
 
   if (isSuccess) {
     return (
@@ -235,7 +235,7 @@ const AddPlace: React.FC = () => {
             <div>
               <label className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
                 <Upload className="w-5 h-5" />
-                <span>Imagen (opcional)</span>
+                <span>Imagen</span>
               </label>
               <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary-500 transition-colors">
                 <input
@@ -259,7 +259,7 @@ const AddPlace: React.FC = () => {
                     <div className="space-y-2">
                       <Upload className="w-12 h-12 text-gray-400 mx-auto" />
                       <p className="text-gray-500">Haz clic para subir una imagen</p>
-                      <p className="text-sm text-gray-400">PNG, JPG hasta 10MB</p>
+                      <p className="text-sm text-gray-400">PNG, JPG, WEBP hasta 10MB</p>
                     </div>
                   )}
                 </label>
