@@ -138,7 +138,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
                   <TrendingUp className="w-8 h-8 text-primary-500" />
-                  <span>Más destacados por la comunidad</span>
+                  <span>Lugares publicados por la comunidad</span>
                 </h2>
                 <p className="text-gray-600">Los lugares más guardados</p>
               </div>
