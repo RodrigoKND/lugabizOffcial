@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from "@vercel/analytics/react"
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { PlacesProvider } from './context/PlacesContext';
@@ -41,6 +42,7 @@ function App() {
           </div>
         </Router>
       </PlacesProvider>
+      <Analytics mode='production' />
     </AuthProvider>
   );
 }
