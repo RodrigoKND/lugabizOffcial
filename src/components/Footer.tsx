@@ -17,6 +17,9 @@ const Footer: React.FC = () => {
           <p className="text-gray-400 text-center max-w-md">
             Descubre lugares únicos y comparte tus favoritos con la comunidad.
           </p>
+          <p className="text-gray-400 text-center max-w-md">
+            Próximamente nuevas actualizaciones
+          </p>
           <div className="flex items-center space-x-1 text-gray-400">
             <span>Hecho con</span>
             <Heart className="w-4 h-4 text-red-500" />
