@@ -12,7 +12,7 @@ const AddPlace: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addPlace, categories, socialGroups } = usePlaces();
-  
+
   const [formData, setFormData] = useState<PlaceFormData>({
     name: '',
     description: '',
@@ -21,7 +21,7 @@ const AddPlace: React.FC = () => {
     socialGroups: [],
     image: undefined
   });
-  
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -54,7 +54,7 @@ const AddPlace: React.FC = () => {
         ...prev,
         image: file
       }));
-      
+
       const reader = new FileReader();
       reader.onload = () => {
         setImagePreview(reader.result as string);
@@ -66,15 +66,15 @@ const AddPlace: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const success = await addPlace(formData);
     if (success) {
       setIsSubmitting(false);
       setIsSuccess(true);
-      
+
       // Redirect after success
       setTimeout(() => {
         navigate('/');
@@ -175,7 +175,7 @@ const AddPlace: React.FC = () => {
                 onChange={handleInputChange}
                 rows={3}
                 maxLength={150}
-                style={{fieldSizing:"content"}}
+                style={{ fieldSizing: "content" }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all resize-none"
                 placeholder="Describe qué hace especial a este lugar..."
                 required
@@ -265,15 +265,26 @@ const AddPlace: React.FC = () => {
                 </label>
               </div>
             </div>
-
+            <details className='mt-4'>
+              <summary className='cursor-pointer w-max text-yellow-600 hover:text-yellow-800 transition-colors'>
+                Aviso de moderación
+              </summary>
+              <div className='text-md mt-4'>
+                <p>
+                  El contenido subido, será revisado periódicamente por un equipo de moderadores y podrá ser eliminado si no cumple con los requisitos.
+                </p>
+                <p className='font-bold mt-2'>
+                  Por favor, asegúrate de que el contenido sea de calidad y sea de tu interés.
+                </p>
+              </div>
+            </details>
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className={`w-full py-3 rounded-xl font-medium text-white transition-all duration-300 ${
-                isFormValid && !isSubmitting
-                  ? 'bg-gradient-to-r from-primary-500 to-tomato hover:shadow-lg transform hover:scale-105'
-                  : 'bg-gray-300 cursor-not-allowed'
-              }`}
+              className={`w-full py-3 rounded-xl font-medium text-white transition-all duration-300 ${isFormValid && !isSubmitting
+                ? 'bg-gradient-to-r from-primary-500 to-tomato hover:shadow-lg transform hover:scale-105'
+                : 'bg-gray-300 cursor-not-allowed'
+                }`}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center space-x-2">
