@@ -17,7 +17,6 @@ const Profile: React.FC = () => {
   }
 
   const savedPlacesList = places.filter(place => savedPlaces.includes(place.id));
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -105,7 +104,7 @@ const Profile: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {savedPlacesList.map((place, index) => {
                   const primarySocialGroup = place.socialGroups[0];
-                  const SocialGroupIcon = Icons[primarySocialGroup.icon as keyof typeof Icons] as React.ComponentType<{className?:string}>;
+                  const SocialGroupIcon = Icons[primarySocialGroup.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
 
                   return (
                     <motion.div
