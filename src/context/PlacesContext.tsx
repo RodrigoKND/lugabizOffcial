@@ -159,7 +159,7 @@ export const PlacesProvider: React.FC<PlacesProviderProps> = ({ children }) => {
       return count + (place?.reviews?.filter(review => review.userId === userId).length || 0);
     }, 0);
   };
-
+  
   return (
     <PlacesContext.Provider
       value={{
@@ -176,7 +176,7 @@ export const PlacesProvider: React.FC<PlacesProviderProps> = ({ children }) => {
         searchPlaces,
         refreshPlaces,
         getLengthPlacesByUserId,
-        getLengthReviewsByUserId
+        getLengthReviewsByUserId,
       }}
     >
       {children}
