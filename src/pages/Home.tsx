@@ -56,12 +56,13 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center">
-              <div
+              <a
+                href='#featured-places'
                 className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-500 to-tomato text-white px-6 py-3 rounded-full mb-6"
               >
                 <Sparkles className="w-5 h-5" />
                 <span className="font-medium">Descubre lugares únicos</span>
-              </div>
+              </a>
 
               <h1
                 className="text-4xl md:text-6xl font-bold text-gray-900 mb-9"
@@ -131,6 +132,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
+          id='featured-places'
           className="py-16 bg-white/50"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
