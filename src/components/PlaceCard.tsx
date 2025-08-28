@@ -7,17 +7,17 @@ import * as Icons from 'lucide-react';
 interface PlaceCardProps {
   place: Place;
   onClick: () => void;
+  className?: string;
 }
 
-const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
+const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className='' }) => {
   const primarySocialGroup = place.socialGroups[0];
   const SocialGroupIcon = Icons[primarySocialGroup.icon as keyof typeof Icons] as React.ComponentType<{className?: string}>;
 
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group h-[420px]"
+      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group h-[420px] ${className}`}
       onClick={onClick}
     >
       <div className="relative">
