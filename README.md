@@ -1,7 +1,7 @@
 
 # Lugabiz
 
-!["Lugabiz interfaz home"](https://rodrigo-halsey.vercel.app/lugabiz.webp)
+!["Lugabiz interfaz home"](https://lugabiz.vercel.app/welcome_to_lugabiz.webp)
 
 Lugabiz es un proyecto **MVP** enfocado en la **clasificación y recomendación de lugares cotidianos**.  
 Su objetivo es visibilizar esos espacios que forman parte de nuestra vida diaria pero que, muchas veces, pasan desapercibidos en internet.
