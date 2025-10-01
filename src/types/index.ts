@@ -57,3 +57,5 @@ export interface PlaceFormData {
   socialGroups: string[];
   image?: File;
 }
+
+export type ProvidersOauth = 'google' | 'facebook';
