@@ -14,7 +14,6 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthClick }) => {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const isActive = (path: string) => location.pathname === path;
-
   return (
     <motion.nav
       initial={{ y: -100 }}
