@@ -15,6 +15,7 @@ interface AuthContextType {
   isNewUser: boolean;
   setWelcomeShown: () => void;
   resendConfirmation: (email: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +43,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initializeAuth = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
+        await authService.isLoggedWithOauth("google");
+
         if (currentUser) {
           const userProfile = await authService.getUserProfile(currentUser.id);
           setUser(userProfile);
@@ -75,7 +78,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-  }, []);
+  }, [user]);
+
+  const loginWithGoogle = async () => {
+    setIsLoading(true);
+    try {
+      const { data: authUser } = await authService.signInGoogle();
+      if (authUser) {
+        const session = await authService.getSession();
+        if (!session) return false;
+        const { id } = session;
+        const userProfile = await authService.getUserProfile(id);
+        setUser(userProfile);
+        setIsLoading(false);
+        return true;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setIsLoading(false);
+      return false;
+    }
+    setIsLoading(false);
+    return false;
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
@@ -201,7 +226,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isSaved,
         isNewUser,
         setWelcomeShown,
-        resendConfirmation
+        resendConfirmation,
+        loginWithGoogle,
       }}
     >
       {children}

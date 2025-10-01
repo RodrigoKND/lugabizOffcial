@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
+import Google from '@components/oauth/Google';
+import Facebook from './oauth/Facebook';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,7 +25,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+    
     try {
       if (mode === 'login') {
         const success = await login(formData.email, formData.password);
@@ -43,6 +45,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
         }
       }
     } catch (err) {
+      console.error(err);
       setError('Ha ocurrido un error. Inténtalo de nuevo.');
     }
   };
@@ -83,8 +86,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
               {mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta'}
             </h2>
             <p className="text-white/90">
-              {mode === 'login' 
-                ? 'Accede a tu cuenta para publicar lugares' 
+              {mode === 'login'
+                ? 'Accede a tu cuenta para publicar lugares'
                 : 'Únete a la comunidad de Lugabiz'
               }
             </p>
@@ -174,6 +177,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
                 mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta'
               )}
             </button>
+            <Google content={mode === 'login' ? 'Iniciar Sesión con Google' : 'Crear Cuenta con Google'} />
+            <Facebook content={mode === 'login' ? 'Iniciar Sesión con Facebook' : 'Crear Cuenta con Facebook'} />
 
             <div className="text-center pt-4 border-t">
               <p className="text-gray-600">
