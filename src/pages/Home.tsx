@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, TrendingUp, Plus, Eye } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, TrendingUp, Plus } from 'lucide-react';
 import { usePlaces } from '../context/PlacesContext';
 import { useAuth } from '../context/AuthContext';
 import CategoryCard from '../components/CategoryCard';
@@ -10,7 +10,7 @@ import SearchInput from '../components/SearchInput';
 import AllPlacesModal from '../components/AllPlacesModal';
 import WelcomeMessage from '../components/WelcomeMessage';
 import { Place } from '../types';
-
+import { useSlide } from '../hooks/useSlide';
 interface HomeProps {
   onAuthClick: () => void;
 }
@@ -21,10 +21,9 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
   const { getTopPlaces, getRecentPlaces, categories } = usePlaces();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllPlacesModal, setShowAllPlacesModal] = useState(false);
-
+  const { sliderRef, slide, handleTouchStart, handleTouchMove } = useSlide();
   const topPlaces = getTopPlaces();
   const recentPlaces = getRecentPlaces();
-
   const handlePublishClick = () => {
     if (user) {
       navigate('/add-place');
@@ -37,6 +36,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
     navigate(`/place/${place.id}`);
   };
 
+  console.log(topPlaces);
   return (
     <div className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
@@ -107,22 +107,25 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
           className="py-16 bg-white/50"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
+            <header className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Explora por categorías</h2>
               <p className="text-gray-600">Encuentra exactamente lo que buscas</p>
-            </div>
+            </header>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.map((category, index) => (
-                <motion.div
-                  key={category.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                >
-                  <CategoryCard category={category} />
-                </motion.div>
-              ))}
+              {categories.map((category, index) =>
+                topPlaces.filter(place => place.category.name === category.name).length > 0 && (
+                  <motion.div
+                    key={category.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                  >
+                    <CategoryCard category={category} />
+                  </motion.div>
+                )
+              )}
+
             </div>
           </div>
         </motion.section>
@@ -146,7 +149,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex flex-wrap gap-4 justify-center">
               {topPlaces.map((place, index) => (
                 <motion.div
                   key={place.id}
@@ -173,20 +176,40 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-12">
-              <div>
+              <header>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Lugares recientes</h2>
                 <p className="text-gray-600">Los lugares más recientes publicados</p>
+              </header>
+              <div className='flex items-center '>
+                <div className='p-2 hidden md:block'>
+                  <button
+                    onClick={() => slide("left")}
+                    className='font-semibold text-xl shadow-2xl hover:bg-gray-200 p-2 rounded-full'
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => slide("right")}
+                    className='font-semibold text-xl shadow-2xl hover:bg-gray-200 p-2 rounded-full'
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowAllPlacesModal(true)}
+                  title='Ver todo'
+                  className="p-2 bg-gradient-to-r from-primary-500 to-tomato text-white rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setShowAllPlacesModal(true)}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-tomato text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-              >
-                <Eye className="w-5 h-5" />
-                <span>Ver todo</span>
-              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              ref={sliderRef}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              className="flex gap-4 overflow-x-hidden">
               {recentPlaces.map((place, index) => (
                 <motion.div
                   key={place.id}
@@ -201,6 +224,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                 </motion.div>
               ))}
             </div>
+
           </div>
         </motion.section>
       </div>
