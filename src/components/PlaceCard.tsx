@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Star, MapPin, Users as UsersIcon } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Place } from '../types';
 import * as Icons from 'lucide-react';
 
@@ -10,27 +9,23 @@ interface PlaceCardProps {
   className?: string;
 }
 
-const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className='' }) => {
+const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' }) => {
   const primarySocialGroup = place.socialGroups[0];
-  const SocialGroupIcon = Icons[primarySocialGroup.icon as keyof typeof Icons] as React.ComponentType<{className?: string}>;
+  const SocialGroupIcon = Icons[primarySocialGroup.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
 
   return (
-    <motion.div
-      whileTap={{ scale: 0.98 }}
-      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group h-[420px] ${className}`}
+    <article
+      className={`bg-white flex-shrink-0 w-80 relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group ${className}`}
       onClick={onClick}
     >
-      <div className="relative">
+      <header>
         <img
           loading="lazy"
           src={place?.image}
           alt={place?.name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
         />
         <div className="absolute top-4 right-4 flex flex-col space-y-2">
-          <div className={`px-3 py-1 rounded-full text-xs font-medium text-white`} style={{ backgroundColor: place.category.color }}>
-            {place.category.name}
-          </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium text-white flex items-center space-x-1`}
             style={{ backgroundColor: primarySocialGroup.color }}>
             <SocialGroupIcon className="w-3 h-3" />
@@ -47,40 +42,28 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className='' }) =
             </div>
           </div>
         )}
-      </div>
 
-      <div className="p-6 flex flex-col justify-between h-[calc(420px-192px)]">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-          {place.name}
-        </h3>
+      </header>
 
-        <p className="text-gray-600 mb-4 line-clamp-2">
-          {place.description}
-        </p>
-
-        <div className="flex items-center space-x-1 text-gray-500 mb-4">
-          <MapPin className="w-4 h-4" />
-          <span className="text-sm">{place.address}</span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{place?.rating}</span>
-            </div>
-            <div className="flex items-center space-x-1 text-gray-500">
-              <UsersIcon className="w-4 h-4" />
-              <span className="text-sm">{place?.reviewCount}</span>
-            </div>
+      <footer className="absolute bottom-0 p-4 w-full bg-gradient-to-t from-black/60 to-transparent">
+        <div className="flex justify-between w-full items-center">
+          <div className="flex flex-col">
+            <h4 className="font-bold text-white text-xl">
+              {place.name}
+            </h4>
+            <p className={`text-sm text-purple-200`}>
+              {
+                place.category.name
+              }
+            </p>
           </div>
-
-          <div className="text-xs text-gray-400">
-            {place.createdAt.toLocaleDateString()}
-          </div>
+          <p className='flex items-center gap-2 text-white'>
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            {place.rating}
+          </p>
         </div>
-      </div>
-    </motion.div>
+      </footer>
+    </article>
   );
 };
 
