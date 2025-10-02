@@ -5,49 +5,49 @@ import { ArrowLeft } from 'lucide-react';
 import { usePlaces } from '../context/PlacesContext';
 import PlaceCard from '../components/PlaceCard';
 import * as Icons from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
   const { getPlacesByCategory, categories } = usePlaces();
-  
+
   const category = categories.find(cat => cat.id === categoryId);
   const places = getPlacesByCategory(categoryId || '');
 
   if (!category) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 flex items-center justify-center">
-        <div className="text-center">
+      <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 flex items-center justify-center">
+        <header className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Categoría no encontrada</h2>
-          <button
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
             className="bg-primary-500 text-white px-6 py-3 rounded-xl hover:bg-primary-600 transition-colors"
           >
             Volver al inicio
-          </button>
-        </div>
-      </div>
+          </Link>
+        </header>
+      </section>
     );
   }
 
   const IconComponent = Icons[category.icon as keyof typeof Icons] as React.ComponentType<any>;
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
+    <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
+        <motion.header
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <button
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
             className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Volver</span>
-          </button>
-        </motion.div>
+          </Link>
+        </motion.header>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -56,7 +56,7 @@ const CategoryPage: React.FC = () => {
           className="text-center mb-12"
         >
           <div className={`inline-flex items-center justify-center w-20 h-20 ${category.color} rounded-2xl mb-6`}>
-            <IconComponent className="w-10 h-10 text-white" />
+            <IconComponent className="w-10 h-10" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{category.name}</h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">{category.description}</p>
@@ -93,7 +93,7 @@ const CategoryPage: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="flex flex-wrap gap-4 justify-center"
           >
             {places.map((place, index) => (
               <motion.div
@@ -102,8 +102,8 @@ const CategoryPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
               >
-                <PlaceCard 
-                  place={place} 
+                <PlaceCard
+                  place={place}
                   onClick={() => navigate(`/place/${place.id}`)}
                 />
               </motion.div>
@@ -111,7 +111,7 @@ const CategoryPage: React.FC = () => {
           </motion.div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

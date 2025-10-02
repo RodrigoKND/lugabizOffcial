@@ -12,7 +12,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   const IconComponent = Icons[category.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
 
   return (
-    <motion.div
+    <motion.section
       whileHover={{ scale: 1.05, y: -5 }}
       whileTap={{ scale: 0.95 }}
       className="cursor-pointer group"
@@ -35,7 +35,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </motion.section>
   );
 };
 export default CategoryCard;
