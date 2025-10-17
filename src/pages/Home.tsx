@@ -12,6 +12,7 @@ import WelcomeMessage from '../components/WelcomeMessage';
 import { Place } from '../types';
 import { useSlide } from '../hooks/useSlide';
 import Preferences from '../components/Preferences';
+
 interface HomeProps {
   onAuthClick: () => void;
 }
