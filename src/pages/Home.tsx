@@ -11,6 +11,7 @@ import AllPlacesModal from '../components/AllPlacesModal';
 import WelcomeMessage from '../components/WelcomeMessage';
 import { Place } from '../types';
 import { useSlide } from '../hooks/useSlide';
+import Preferences from '../components/Preferences';
 interface HomeProps {
   onAuthClick: () => void;
 }
@@ -36,13 +37,16 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
     navigate(`/place/${place.id}`);
   };
 
-  console.log(topPlaces);
+
   return (
-    <div className="relative min-h-screen bg-pink-50 overflow-hidden">
+    <section className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
       <div className="absolute top-20 right-10 w-[250px] h-[250px] bg-purple-300 opacity-30 rounded-full z-0" />
       <div className="relative z-10">
         <WelcomeMessage />
+
+        <Preferences />
+
         <AllPlacesModal
           isOpen={showAllPlacesModal}
           onClose={() => setShowAllPlacesModal(false)}
@@ -228,7 +232,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
           </div>
         </motion.section>
       </div>
-    </div>
+    </section>
   );
 };
 
