@@ -45,8 +45,8 @@ const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, onPlaceSelec
   };
 
   return (
-    <div ref={searchRef} className="relative">
-      <div className="relative">
+    <section ref={searchRef} className="relative">
+      <header className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           type="search"
@@ -56,7 +56,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, onPlaceSelec
           onFocus={() => value.trim() && suggestions.length > 0 && setIsOpen(true)}
           className="pl-10 pr-4 py-3 w-full sm:w-80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all"
         />
-      </div>
+      </header>
 
       <AnimatePresence>
         {isOpen && suggestions.length > 0 && (
@@ -111,7 +111,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, onPlaceSelec
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </section>
   );
 };
 

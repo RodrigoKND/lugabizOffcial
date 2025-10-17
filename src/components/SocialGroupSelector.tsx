@@ -20,7 +20,7 @@ const SocialGroupSelector: React.FC<SocialGroupSelectorProps> = ({ socialGroups,
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+    <article className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
       {socialGroups.map((group, index) => {
         const IconComponent = Icons[group.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
         const isSelected = selectedGroups.includes(group.id);
@@ -65,7 +65,7 @@ const SocialGroupSelector: React.FC<SocialGroupSelectorProps> = ({ socialGroups,
           </motion.button>
         );
       })}
-    </div>
+    </article>
   );
 };
 

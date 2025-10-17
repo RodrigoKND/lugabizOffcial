@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { ArrowLeft, Upload, MapPin, Type, FileText, Tag, Check, Users } from 'lucide-react';
 import { usePlaces } from '../context/PlacesContext';
 import { useAuth } from '../context/AuthContext';
 import { PlaceFormData } from '../types';
 import SocialGroupSelector from '../components/SocialGroupSelector';
-import toast from 'react-hot-toast';
+import { useForm } from '../hooks/useForm';
 
 const AddPlace: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addPlace, categories, socialGroups } = usePlaces();
-
-  const [formData, setFormData] = useState<PlaceFormData>({
+  const { formData, handleChange: handleInputChange, setFormData } = useForm<PlaceFormData>({
     name: '',
     description: '',
     address: '',
@@ -31,14 +31,6 @@ const AddPlace: React.FC = () => {
     toast.error('Debe iniciar sesión para publicar un lugar');
     return <Navigate to="/" replace />;
   }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleSocialGroupsChange = (groups: string[]) => {
     setFormData(prev => ({
@@ -175,7 +167,6 @@ const AddPlace: React.FC = () => {
                 onChange={handleInputChange}
                 rows={3}
                 maxLength={150}
-                style={{ fieldSizing: "content" }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all resize-none"
                 placeholder="Describe qué hace especial a este lugar..."
                 required
