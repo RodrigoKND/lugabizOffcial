@@ -38,7 +38,6 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
     navigate(`/place/${place.id}`);
   };
 
-
   return (
     <section className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
