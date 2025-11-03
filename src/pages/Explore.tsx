@@ -1,64 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { OSM } from "ol/source";
 import { Map, View, TileLayer } from 'react-openlayers';
-import 'react-openlayers/dist/index.css'; // for css
+import 'react-openlayers/dist/index.css';
+import { X } from 'lucide-react';
+import Modal from '../components/ui/Modal';
 
 
 const Explore: React.FC = () => {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstance = useRef<Map | null>(null);
-
-    const [location, setLocation] = useState<GeolocationPosition | null>(null);
-
-    // Obtener ubicación del usuario
-    useEffect(() => {
-        if (!navigator.geolocation) return;
-
-        const id = navigator.geolocation.watchPosition(
-            (pos) => setLocation(pos),
-            () => toast.error("GPS no disponible")
-        );
-
-        return () => navigator.geolocation.clearWatch(id);
-    }, []);
-
-    // Crear mapa solo una vez
-    useEffect(() => {
-        //DESCOMENTAR PARA SUBIR A PRODUCCIÓN
-
-        // if (mapInstance.current || !mapRef.current) return;
-
-        mapInstance.current = new Map({
-            target: mapRef.current,
-            layers: [new TileLayer({ source: new OSM() })],
-            view: new View({
-                center: fromLonLat([-64.7, -21.5]),
-                zoom: 5,
-            }),
-        });
-        return () => {
-            mapInstance.current?.setTarget(undefined);
-        };
-    }, []);
-
-    // // Actualizar vista al cambiar ubicación
-    useEffect(() => {
-        if (!location || !mapInstance.current) return;
-
-        const { latitude, longitude } = location.coords;
-
-        const marker = new Feature({
-            geometry: new Point(fromLonLat([longitude, latitude])),
-        })
-
-        mapInstance.current.getView().animate({
-            center: fromLonLat([longitude, latitude]),
-            zoom: 16,
-            duration: 1000,
-        });
-        mapInstance.current.addFeature(marker);
-
-    }, [location]);
 
     // sugerencias IA
     const suggestions = [
@@ -75,12 +23,12 @@ const Explore: React.FC = () => {
     return (
         <section className='relative'>
             {/* Render del mapa */}
-            <Map controls={[]} interactions={[]}>
+            <Map controls={[]} interactions={[]} style={{width:"100%", height:"100dvh"}}>
                 <TileLayer source={new OSM()} />
                 <View center={[-64.7, -21.5]} zoom={5} />
             </Map>
 
-            {/* Boton para mostrar el modal */}
+            {/* Boton para mostrar la modal */}
             <div className="fixed bottom-4 left-4 right-0">
                 <button className="w-14 h-14 bg-gradient-to-b from-primary-500 to-tomato rounded-full flex items-center justify-center cursor-pointer"
                     title="Chatear con Lubi"
@@ -88,7 +36,7 @@ const Explore: React.FC = () => {
                     onClick={showModal}
                 >
                     <span className="text-white text-3xl font-bold">
-                        L
+                        👀
                     </span>
                 </button>
             </div>
@@ -138,7 +86,7 @@ const Explore: React.FC = () => {
                         </search>
                     </section>
                     <footer className="flex justify-center">
-                        <button className="w-full text-white bg-purple-600 rounded-md px-4 py-2 hover:bg-purple-600/90 rounded-xl text-md font-semibold" aria-label="Confirmar" type="button">A disfrutar</button>
+                        <button className="w-full text-white bg-purple-600 rounded-md px-4 py-2 hover:bg-purple-600/90 text-md font-semibold" aria-label="Confirmar" type="button">Buscar</button>
                     </footer>
                 </form>
             </Modal>
