@@ -13,6 +13,7 @@ import AddPlace from './pages/AddPlace';
 import Profile from './pages/Profile';
 import CategoryPage from './pages/CategoryPage';
 import Confirmation from './pages/Confirmation';
+import Explore from './pages/Explore';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -31,6 +32,8 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/category/:categoryId" element={<CategoryPage />} />
                 <Route path="/confirmation" element={<Confirmation />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="*" element={<h1>404</h1>} />
               </Routes>
             </main>
             <Footer />
