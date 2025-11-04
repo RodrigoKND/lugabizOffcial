@@ -105,6 +105,7 @@ const CategoryPage: React.FC = () => {
                 <PlaceCard
                   place={place}
                   onClick={() => navigate(`/place/${place.id}`)}
+                  className='w-80'
                 />
               </motion.div>
             ))}
