@@ -164,6 +164,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                   <PlaceCard
                     place={place}
                     onClick={() => navigate(`/place/${place.id}`)}
+                    className='w-80'
                   />
                 </motion.div>
               ))}
@@ -224,6 +225,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                   <PlaceCard
                     place={place}
                     onClick={() => navigate(`/place/${place.id}`)}
+                    className='w-80'
                   />
                 </motion.div>
               ))}
