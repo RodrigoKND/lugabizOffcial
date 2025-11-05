@@ -12,6 +12,8 @@ import WelcomeMessage from '../components/WelcomeMessage';
 import { Place } from '../types';
 import { useSlide } from '../hooks/useSlide';
 import Preferences from '../components/Preferences';
+import { useNotifications } from '../hooks/useNotifications';
+import CustomToast from '../components/CustomToast';
 
 interface HomeProps {
   onAuthClick: () => void;
@@ -24,25 +26,26 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllPlacesModal, setShowAllPlacesModal] = useState(false);
   const { sliderRef, slide, handleTouchStart, handleTouchMove } = useSlide();
+  const { resultNotification } = useNotifications();
+
   const topPlaces = getTopPlaces();
   const recentPlaces = getRecentPlaces();
+
   const handlePublishClick = () => {
-    if (user) {
-      navigate('/add-place');
-    } else {
-      onAuthClick();
-    }
+    if (user) navigate('/add-place');
+    onAuthClick();
   };
 
-  const handlePlaceSelect = (place: Place) => {
-    navigate(`/place/${place.id}`);
-  };
+  const handlePlaceSelect = (place: Place) => navigate(`/place/${place.id}`);
 
   return (
     <section className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
       <div className="absolute top-20 right-10 w-[250px] h-[250px] bg-purple-300 opacity-30 rounded-full z-0" />
       <div className="relative z-10">
+        {resultNotification && (
+          <CustomToast resultNotification={resultNotification} />
+        )}
         <WelcomeMessage />
 
         <Preferences />
