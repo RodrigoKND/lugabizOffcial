@@ -37,7 +37,6 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
   };
 
   const handlePlaceSelect = (place: Place) => navigate(`/place/${place.id}`);
-
   return (
     <section className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
@@ -113,13 +112,13 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
           transition={{ delay: 0.6 }}
           className="py-16 bg-white/50"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="px-4 sm:px-6 lg:px-8">
             <header className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Explora por categorías</h2>
               <p className="text-gray-600">Encuentra exactamente lo que buscas</p>
             </header>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
               {categories.map((category, index) =>
                 topPlaces.filter(place => place.category.name === category.name).length > 0 && (
                   <motion.div
@@ -137,43 +136,6 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
           </div>
         </motion.section>
 
-        {/* Featured Places */}
-        <motion.section
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          id='featured-places'
-          className="py-16 bg-white/50"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                  <TrendingUp className="w-8 h-8 text-primary-500" />
-                  <span>Lugares publicados por la comunidad</span>
-                </h2>
-                <p className="text-gray-600">Los lugares más guardados</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4 justify-center">
-              {topPlaces.map((place, index) => (
-                <motion.div
-                  key={place.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                >
-                  <PlaceCard
-                    place={place}
-                    onClick={() => navigate(`/place/${place.id}`)}
-                    className='w-80'
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
 
         {/* Recent Places */}
         <motion.section
