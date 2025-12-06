@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, ArrowLeft, TrendingUp, Plus } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, Plus } from 'lucide-react';
 import { usePlaces } from '../context/PlacesContext';
 import { useAuth } from '../context/AuthContext';
 import CategoryCard from '../components/CategoryCard';
@@ -37,6 +37,7 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
   };
 
   const handlePlaceSelect = (place: Place) => navigate(`/place/${place.id}`);
+
   return (
     <section className="relative min-h-screen bg-pink-50 overflow-hidden">
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
