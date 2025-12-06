@@ -131,7 +131,6 @@ const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
                   </motion.div>
                 )
               )}
-
             </div>
           </div>
         </motion.section>
