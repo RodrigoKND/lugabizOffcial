@@ -57,3 +57,17 @@ export interface PlaceFormData {
   socialGroups: string[];
   image?: File;
 }
+
+export interface UserPosition {
+    lat?: number;
+    lon?: number;
+}
+
+export interface OverpassElement extends UserPosition {
+    id: number;
+    tags?: Record<string, string>;
+}
+
+export interface OverpassResponse {
+    elements: OverpassElement[];
+}
