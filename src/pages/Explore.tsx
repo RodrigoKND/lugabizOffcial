@@ -18,9 +18,9 @@ import { useUserMarker } from '../hooks/useUserMarker';
 import { OverpassElement } from '../types';
 import { useOverpassPlaces } from '../hooks/useOverpassPlaces';
 import { DragPan, defaults as defaultInteractions } from 'ol/interaction';
+import { METTERS } from '../static/data/metters';
 
 const Explore: React.FC = () => {
-    // Context y Hooks
     const { places } = usePlaces();
     const navigate = useNavigate();
 
@@ -42,7 +42,6 @@ const Explore: React.FC = () => {
 
     // Datos de Overpass (se obtendrán más abajo usando posición y distancia seleccionada)
 
-    // Distance / H3 (kept for compatibility if needed later)
     const [selectedDistance, setSelectedDistance] = useState(30000);
     const [selectedPlace, setSelectedPlace] = useState<OverpassElement | null>(null);
     const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
@@ -130,11 +129,8 @@ const Explore: React.FC = () => {
 
     // Auto-adjust zoom when selected distance changes
     const metersToZoom = (meters: number) => {
-        if (meters <= 500) return 16;
-        if (meters <= 2000) return 14;
-        if (meters <= 5000) return 13;
-        if (meters <= 10000) return 12;
-        if (meters <= 30000) return 11;
+        const zoom = METTERS.find(m => m.metters <= meters)?.zoom;
+        if (zoom) return zoom;
         return 10;
     };
 
