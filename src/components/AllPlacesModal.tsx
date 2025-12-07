@@ -36,7 +36,7 @@ const AllPlacesModal: React.FC<AllPlacesModalProps> = ({ isOpen, onClose }) => {
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-primary-500 to-tomato p-6 relative">
+          <header className="bg-gradient-to-r from-primary-500 to-tomato p-6 relative">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
@@ -45,7 +45,7 @@ const AllPlacesModal: React.FC<AllPlacesModalProps> = ({ isOpen, onClose }) => {
             </button>
             <h2 className="text-2xl font-bold text-white mb-2">Todos los lugares</h2>
             <p className="text-white/90">Explora nuestra colección completa de {filteredPlaces.length} lugares</p>
-          </div>
+          </header>
 
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
             <div className="mb-6">

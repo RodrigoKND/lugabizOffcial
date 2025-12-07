@@ -15,7 +15,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' })
 
   return (
     <article
-      className={`bg-white flex-shrink-0 w-80 relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group ${className}`}
+      className={`bg-white flex-shrink-0 relative rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group ${className}`}
       onClick={onClick}
     >
       <header>
