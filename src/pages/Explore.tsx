@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Map, TileLayer } from 'react-openlayers';
 import 'react-openlayers/dist/index.css';
-import { OSM} from 'ol/source';
+import { OSM } from 'ol/source';
 import { View } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { usePlaces } from '../context/PlacesContext';
@@ -41,11 +41,16 @@ const Explore: React.FC = () => {
     useUserMarker(map, position, view);
 
     // Datos de Overpass (se obtendrán más abajo usando posición y distancia seleccionada)
-
     const [selectedDistance, setSelectedDistance] = useState(30000);
     const [selectedPlace, setSelectedPlace] = useState<OverpassElement | null>(null);
     const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Estados de Modales
+    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+    const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
+    const [selectedQuery, setSelectedQuery] = useState<string>('');
+    const [isSearchLoading, setIsSearchLoading] = useState(false);
 
     // Fetch Overpass based on user's position and selected distance
     const { data } = useOverpassPlaces(position, selectedDistance);
@@ -54,12 +59,6 @@ const Explore: React.FC = () => {
         if (!data?.elements) return [];
         return data.elements.filter(el => el.lat && el.lon && el?.tags?.name);
     }, [data]);
-
-    // Estados de Modales
-    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-    const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
-    const [selectedQuery, setSelectedQuery] = useState<string>('');
-    const [isSearchLoading, setIsSearchLoading] = useState(false);
 
     // Manejadores de Eventos
     const handleMapInit = (mapInstance: any) => setMap(mapInstance);
@@ -109,21 +108,26 @@ const Explore: React.FC = () => {
 
     const toggleChatModal = () => setIsChatModalOpen(!isChatModalOpen);
 
+    const validCurrentZoom = (zoomMapCurrent: number | undefined, valueZoom: number, isMajor: boolean) => {
+        const isCurrentZoom = zoomMapCurrent !== undefined;
+        if (isMajor) return isCurrentZoom && zoomMapCurrent > valueZoom;
+        return isCurrentZoom && zoomMapCurrent < valueZoom;
+    };
+
     const handleZoomIn = () => {
         if (map && view) {
-            const currentZoom = view.getZoom();
-            if (currentZoom !== undefined && currentZoom < 20) {
+            const currentZoom = view.getZoom() || 0;
+            if (validCurrentZoom(currentZoom, 20, true))
                 view.setZoom(currentZoom + 1);
-            }
+
         }
     };
 
     const handleZoomOut = () => {
         if (map && view) {
-            const currentZoom = view.getZoom();
-            if (currentZoom !== undefined && currentZoom > 3) {
+            const currentZoom = view.getZoom() || 0;
+            if (validCurrentZoom(currentZoom, 3, false))
                 view.setZoom(currentZoom - 1);
-            }
         }
     };
 
