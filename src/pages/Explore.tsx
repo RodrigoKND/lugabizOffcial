@@ -106,9 +106,6 @@ const Explore: React.FC = () => {
             name: '30 km',
             value: 30000
         }] as const;
-
-    
-
     return (
         <section className='relative'>
             <Map controls={[]} interactions={[]} style={{ width: "100%", height: "100dvh" }}>
