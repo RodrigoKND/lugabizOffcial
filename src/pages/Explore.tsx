@@ -1,11 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Map, TileLayer } from 'react-openlayers';
-import 'react-openlayers/dist/index.css';
+import { useNavigate } from 'react-router-dom';
 import { OSM } from 'ol/source';
+import { Map, TileLayer } from 'react-openlayers';
 import { View } from 'ol';
 import { fromLonLat } from 'ol/proj';
+import { DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { usePlaces } from '../context/PlacesContext';
-import { useNavigate } from 'react-router-dom';
+import { useUserMarker } from '../hooks/useUserMarker';
+import { useGeolocation } from '../hooks/useGeolocation';
+import { useOverpassPlaces } from '../hooks/useOverpassPlaces';
+import { OverpassElement } from '../types';
 import DistanceFilter from '../components/DistanceFilter';
 import MapMarkers from '../components/MapMarkers';
 import ChatModal from '../components/ChatModal';
@@ -13,12 +17,8 @@ import PlacesResultsModal from '../components/PlacesResultsModal';
 import ZoomControls from '../components/ZoomControls';
 import PlaceDetailModal from '../components/PlaceDetailModal';
 import PlaceSearchFilter from '../components/PlaceSearchFilter';
-import { useGeolocation } from '../hooks/useGeolocation';
-import { useUserMarker } from '../hooks/useUserMarker';
-import { OverpassElement } from '../types';
-import { useOverpassPlaces } from '../hooks/useOverpassPlaces';
-import { DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { METTERS } from '../static/data/metters';
+import 'react-openlayers/dist/index.css';
 
 const Explore: React.FC = () => {
     const { places } = usePlaces();
