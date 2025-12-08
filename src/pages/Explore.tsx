@@ -108,16 +108,10 @@ const Explore: React.FC = () => {
 
     const toggleChatModal = () => setIsChatModalOpen(!isChatModalOpen);
 
-    const validCurrentZoom = (zoomMapCurrent: number | undefined, valueZoom: number, isMajor: boolean) => {
-        const isCurrentZoom = zoomMapCurrent !== undefined;
-        if (isMajor) return isCurrentZoom && zoomMapCurrent > valueZoom;
-        return isCurrentZoom && zoomMapCurrent < valueZoom;
-    };
-
     const handleZoomIn = () => {
         if (map && view) {
-            const currentZoom = view.getZoom() || 0;
-            if (validCurrentZoom(currentZoom, 20, true))
+            const currentZoom = view.getZoom();
+            if (currentZoom !== undefined && currentZoom < 20)
                 view.setZoom(currentZoom + 1);
 
         }
@@ -125,17 +119,17 @@ const Explore: React.FC = () => {
 
     const handleZoomOut = () => {
         if (map && view) {
-            const currentZoom = view.getZoom() || 0;
-            if (validCurrentZoom(currentZoom, 3, false))
+            const currentZoom = view.getZoom();
+            if (currentZoom !== undefined && currentZoom > 3)
                 view.setZoom(currentZoom - 1);
         }
     };
 
     // Auto-adjust zoom when selected distance changes
     const metersToZoom = (meters: number) => {
-        const zoom = METTERS.find(m => m.metters <= meters)?.zoom;
-        if (zoom) return zoom;
-        return 10;
+        // Buscar en reverse para obtener el rango de distancia correcto
+        const zoom = [...METTERS].reverse().find(m => m.metters <= meters)?.zoom || 10;
+        return zoom;
     };
 
     useEffect(() => {
