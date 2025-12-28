@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { OSM } from 'ol/source';
 import { Map, TileLayer } from 'react-openlayers';
@@ -52,6 +52,11 @@ const Explore: React.FC = () => {
     const [selectedQuery, setSelectedQuery] = useState<string>('');
     const [isSearchLoading, setIsSearchLoading] = useState(false);
 
+    // Refs para controlar el bucle de zoom
+    const hasInitialized = useRef(false);
+    const isAnimating = useRef(false);
+    const lastPosition = useRef<{ lat: number; lon: number } | null>(null);
+
     // Fetch Overpass based on user's position and selected distance
     const { data } = useOverpassPlaces(position, selectedDistance);
 
@@ -74,8 +79,10 @@ const Explore: React.FC = () => {
         }
     }, []);
 
-
-    const handleDistanceChange = (distance: number) => setSelectedDistance(distance);
+    const handleDistanceChange = (distance: number) => {
+        setSelectedDistance(distance);
+        hasInitialized.current = false; // Permitir nueva animación al cambiar distancia
+    };
 
     // Open place detail modal when marker is clicked
     const handleMarkerClick = (place: OverpassElement) => {
@@ -113,7 +120,6 @@ const Explore: React.FC = () => {
             const currentZoom = view.getZoom();
             if (currentZoom !== undefined && currentZoom < 20)
                 view.setZoom(currentZoom + 1);
-
         }
     };
 
@@ -132,15 +138,39 @@ const Explore: React.FC = () => {
         return zoom;
     };
 
+    // Efecto para centrar el mapa SOLO la primera vez o cuando cambia la distancia
     useEffect(() => {
-        if (!view || !position || !position.lat || !position.lon) return;
-        const zoom = metersToZoom(selectedDistance);
-        const coords = fromLonLat([position.lon!, position.lat!]);
-        try {
-            view.animate({ center: coords, zoom, duration: 400 });
-        } catch (e) {
-            view.setCenter(coords);
-            view.setZoom(zoom);
+        if (!view || !position || !position.lat || !position.lon || isAnimating.current) return;
+
+        // Verificar si la posición ha cambiado significativamente (más de 100 metros)
+        const hasPositionChanged = !lastPosition.current || 
+            Math.abs(lastPosition.current.lat - position.lat) > 0.001 || 
+            Math.abs(lastPosition.current.lon - position.lon) > 0.001;
+
+        // Solo animar si:
+        // 1. Es la primera vez (hasInitialized = false)
+        // 2. O si la posición cambió significativamente
+        if (!hasInitialized.current || (hasPositionChanged && !hasInitialized.current)) {
+            isAnimating.current = true;
+            const zoom = metersToZoom(selectedDistance);
+            const coords = fromLonLat([position.lon!, position.lat!]);
+            
+            try {
+                view.animate(
+                    { center: coords, zoom, duration: 400 },
+                    () => {
+                        isAnimating.current = false;
+                        hasInitialized.current = true;
+                        lastPosition.current = { lat: position.lat!, lon: position.lon! };
+                    }
+                );
+            } catch (e) {
+                view.setCenter(coords);
+                view.setZoom(zoom);
+                isAnimating.current = false;
+                hasInitialized.current = true;
+                lastPosition.current = { lat: position.lat!, lon: position.lon! };
+            }
         }
     }, [selectedDistance, position, view]);
 
