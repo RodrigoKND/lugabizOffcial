@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-// 1. SINGLE RESPONSIBILITY: Separar las responsabilidades en funciones puras
 const NOTIFICATION_SUPPORTED = "Notification" in window;
 
 const requestPermissionNotification = async (): Promise<NotificationPermission | undefined> => {
@@ -29,7 +28,7 @@ interface StorageService {
   get(key: string): string | null;
 }
 
-const localStorageService: StorageService = {
+const sessionStorageService: StorageService = {
   save: (key: string, value: string) => {
     if (!key || !value) return;
     try {
@@ -37,60 +36,78 @@ const localStorageService: StorageService = {
         value,
         timestamp: new Date().toISOString()
       };
-      localStorage.setItem(key, JSON.stringify(data));
+      sessionStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error('Error saving to sessionStorage:', error);
     }
   },
   get: (key: string) => {
     try {
-      const data = localStorage.getItem(key);
+      const data = sessionStorage.getItem(key);
       return data ? JSON.parse(data).value : null;
     } catch (error) {
-      console.error('Error reading from localStorage:', error);
+      console.error('Error reading from sessionStorage:', error);
       return null;
     }
   }
 };
 
-const saveNotification = (key: string, value: string, storage: StorageService): void => {
-  if (!key || !value) return;
-  storage.save(key, value);
-};
-
-const getNotificationStatus = (key: string, storage: StorageService): string | null => {
-  if (!key) return null;
-  return storage.get(key);
-};
-
 const createNotificationService = (storage: StorageService) => {
   return {
     savePermission: (permission: string) => {
-      saveNotification('notification_permission', permission, storage);
+      storage.save('notification_permission', permission);
     },
     getPermission: (): string | null => {
-      return getNotificationStatus('notification_permission', storage);
+      return storage.get('notification_permission');
     },
-    getMessage: (): string | null => {
-      return getNotificationStatus('notification_message', storage);
+    saveMessageShown: () => {
+      storage.save('notification_message_shown', 'true');
+    },
+    wasMessageShown: (): boolean => {
+      return storage.get('notification_message_shown') === 'true';
     }
   };
 };
 
-const notificationService = createNotificationService(localStorageService);
+const notificationService = createNotificationService(sessionStorageService);
 
 export const useNotifications = () => {
   const [resultNotification, setResultNotification] = useState<string>("");
   const [savedPermission, setSavedPermission] = useState<string | null>(null);
+  const hasRequestedPermission = useRef(false);
 
   useEffect(() => {
-    const previousPermission = notificationService.getPermission();
-    if (previousPermission) {
-      setSavedPermission(previousPermission);
+    // Si ya se mostró el mensaje en esta sesión, no hacer nada
+    if (notificationService.wasMessageShown()) {
+      const savedPerm = notificationService.getPermission();
+      if (savedPerm) {
+        setSavedPermission(savedPerm);
+      }
       return;
     }
 
+    // Si ya se solicitó en este montaje, evitar duplicados
+    if (hasRequestedPermission.current) return;
+    hasRequestedPermission.current = true;
+
     const requestPermission = async () => {
+      // Verificar si ya hay un permiso guardado
+      const previousPermission = notificationService.getPermission();
+      if (previousPermission) {
+        setSavedPermission(previousPermission);
+        notificationService.saveMessageShown();
+        return;
+      }
+
+      // Verificar el estado actual del permiso
+      if (Notification.permission !== "default") {
+        setSavedPermission(Notification.permission);
+        notificationService.savePermission(Notification.permission);
+        notificationService.saveMessageShown();
+        return;
+      }
+
+      // Solicitar permiso solo si es "default"
       const permission = await requestPermissionNotification();
       
       if (permission) {
@@ -98,7 +115,13 @@ export const useNotifications = () => {
         setResultNotification(message);
         
         notificationService.savePermission(permission);
+        notificationService.saveMessageShown();
         setSavedPermission(permission);
+
+        // Limpiar mensaje después de 5 segundos
+        setTimeout(() => {
+          setResultNotification("");
+        }, 5000);
       }
     };
 

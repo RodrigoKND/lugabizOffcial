@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import SocialGroupSelector from './SocialGroupSelector';
-import { usePlaces } from '../context/PlacesContext';
-import { useForm } from '../hooks/useForm';
-import { useAuth } from '../context/AuthContext';
+import { useForm } from '@/hooks/useForm';
+import SocialGroupSelector from '@/components/SocialGroupSelector';
+import { usePlaces } from '@/context/PlacesContext';
+import { useAuth } from '@/context/AuthContext';
 
-const Preferences: React.FC = () => {
+interface PreferencesProps {
+    openPreferences?: boolean;
+    setClosePreferences?: (value: boolean) => void;
+}
+
+const Preferences: React.FC< PreferencesProps> = ({ openPreferences = false, setClosePreferences }) => {
     const { socialGroups, categories } = usePlaces();
     const { isNewUser, setWelcomeShown } = useAuth();
     // start closed and open only when AuthContext signals a new user
     const [isShowingPreferences, setIsShowingPreferences] = useState(false);
 
     useEffect(() => {
-        if (isNewUser) setIsShowingPreferences(true);
-    }, [isNewUser]);
+        if (isNewUser || openPreferences) {
+            setIsShowingPreferences(true);
+            setClosePreferences?.(!openPreferences);
+        }
+    }, [isNewUser, openPreferences]);
+
     const { formData, setFormData } = useForm<{ socialGroups: string[], category: string[] }>({
         category: [],
         socialGroups: [],
@@ -29,6 +38,7 @@ const Preferences: React.FC = () => {
 
     const onClose = () => {
         setIsShowingPreferences(false);
+        setClosePreferences?.(false);
         // mark welcome shown so the modal won't re-open for this user
         setWelcomeShown?.();
     };

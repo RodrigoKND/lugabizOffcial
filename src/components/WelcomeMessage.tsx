@@ -15,11 +15,11 @@ const WelcomeMessage: React.FC = () => {
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 50 }}
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative"
+          className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[450px] overflow-x-hidden overflow-y-auto relative"
         >
           <button
             onClick={setWelcomeShown}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+            className="absolute top-4 right-4 text-gray-200 hover:text-gray-600 transition-colors z-10"
           >
             <X className="w-6 h-6" />
           </button>

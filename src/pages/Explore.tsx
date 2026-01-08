@@ -1,90 +1,114 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { OSM } from 'ol/source';
-import { Map, TileLayer } from 'react-openlayers';
-import { View } from 'ol';
-import { fromLonLat } from 'ol/proj';
-import { DragPan, defaults as defaultInteractions } from 'ol/interaction';
-import { usePlaces } from '../context/PlacesContext';
-import { useUserMarker } from '../hooks/useUserMarker';
-import { useGeolocation } from '../hooks/useGeolocation';
-import { useOverpassPlaces } from '../hooks/useOverpassPlaces';
-import { OverpassElement } from '../types';
-import DistanceFilter from '../components/DistanceFilter';
-import MapMarkers from '../components/MapMarkers';
-import ChatModal from '../components/ChatModal';
-import PlacesResultsModal from '../components/PlacesResultsModal';
-import ZoomControls from '../components/ZoomControls';
-import PlaceDetailModal from '../components/PlaceDetailModal';
-import PlaceSearchFilter from '../components/PlaceSearchFilter';
-import { METTERS } from '../static/data/metters';
-import 'react-openlayers/dist/index.css';
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+
+import {
+    Map,
+    MapMarker,
+    MarkerContent,
+    MapControls,
+    useMap,
+} from "@/components/ui/map";
+
+import { usePlaces } from "@/context/PlacesContext";
+import { useGeolocation, type GeoPosition } from "@/hooks/useGeolocation";
+import { useOverpassPlaces } from "@/hooks/useOverpassPlaces";
+import { useProximityNotifications } from "@/hooks/useProximityNotifications";
+
+import DistanceFilter from "@/components/DistanceFilter";
+import MapMarkers from "@/components/MapMarkers";
+import ChatModal from "@/components/ChatModal";
+import PlacesResultsModal from "@/components/PlacesResultsModal";
+import PlaceDetailModal from "@/components/PlaceDetailModal";
+import PlaceSearchFilter from "@/components/PlaceSearchFilter";
+
+import { METTERS } from "@/static/data/metters";
+import type { OverpassElement } from "@/types";
+
+function MapController({
+    position,
+    selectedDistance,
+}: {
+    position: GeoPosition | null;
+    selectedDistance: number;
+}) {
+    const { map, isLoaded } = useMap();
+    const hasInitialized = useRef(false);
+    const lastPosition = useRef<GeoPosition | null>(null);
+    const lastDistance = useRef<number | null>(null);
+
+    const metersToZoom = useCallback((meters: number) => {
+        return (
+            [...METTERS].reverse().find((m) => m.metters <= meters)?.zoom ?? 13
+        );
+    }, []);
+
+    useEffect(() => {
+        if (!map || !isLoaded || !position?.lat || !position?.lon) return;
+
+        const positionChanged =
+            !lastPosition.current ||
+            Math.abs(lastPosition.current.lat - position.lat) > 0.001 ||
+            Math.abs(lastPosition.current.lon - position.lon) > 0.001;
+
+        const distanceChanged = lastDistance.current !== selectedDistance;
+
+        // Primera inicialización o cambios detectados
+        if (!hasInitialized.current || positionChanged || distanceChanged) {
+            map.flyTo({
+                center: [position.lon, position.lat],
+                zoom: metersToZoom(selectedDistance),
+                duration: hasInitialized.current ? 800 : 0,
+            });
+
+            hasInitialized.current = true;
+            lastPosition.current = { lat: position.lat, lon: position.lon };
+            lastDistance.current = selectedDistance;
+        }
+    }, [map, isLoaded, position, selectedDistance, metersToZoom]);
+
+    return null;
+}
 
 const Explore: React.FC = () => {
-    const { places } = usePlaces();
     const navigate = useNavigate();
+    const { places } = usePlaces();
 
-    // Estados del Mapa
-    const [view] = useState<View>(
-        new View({
-            center: fromLonLat([-74.08175, 4.60971]),
-            zoom: 5,
-            maxZoom: 20,
-            minZoom: 3,
-            enableRotation: true
-        })
-    );
-    const [map, setMap] = useState<any>(null);
+    const { position, loading: geoLoading, error, retry } = useGeolocation();
 
-    // Geolocalización
-    const position = useGeolocation();
-    useUserMarker(map, position, view);
-
-    // Datos de Overpass (se obtendrán más abajo usando posición y distancia seleccionada)
-    const [selectedDistance, setSelectedDistance] = useState(30000);
-    const [selectedPlace, setSelectedPlace] = useState<OverpassElement | null>(null);
+    const [selectedDistance, setSelectedDistance] = useState(METTERS[0].metters);
+    const [selectedPlace, setSelectedPlace] =
+        useState<OverpassElement | null>(null);
     const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
 
-    // Estados de Modales
     const [isChatModalOpen, setIsChatModalOpen] = useState(false);
     const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
-    const [selectedQuery, setSelectedQuery] = useState<string>('');
+    const [selectedQuery, setSelectedQuery] = useState("");
     const [isSearchLoading, setIsSearchLoading] = useState(false);
 
-    // Refs para controlar el bucle de zoom
-    const hasInitialized = useRef(false);
-    const isAnimating = useRef(false);
-    const lastPosition = useRef<{ lat: number; lon: number } | null>(null);
+    const initialZoom = useMemo(() => {
+        return [...METTERS].reverse().find((m) => m.metters <= METTERS[0].metters)?.zoom ?? 13;
+    }, []);
 
-    // Fetch Overpass based on user's position and selected distance
     const { data } = useOverpassPlaces(position, selectedDistance);
 
     const filteredPlaces = useMemo(() => {
         if (!data?.elements) return [];
-        return data.elements.filter(el => el.lat && el.lon && el?.tags?.name);
+        return data.elements.filter(
+            (el) => el.lat && el.lon && el.tags?.name
+        );
     }, [data]);
 
-    // Manejadores de Eventos
-    const handleMapInit = (mapInstance: any) => setMap(mapInstance);
+    // Notificaciones de proximidad inteligentes
+    useProximityNotifications(position, filteredPlaces, {
+        radiusMeters: 100,
+        cooldownMinutes: 30,
+        maxNotificationsPerHour: 3,
+    });
 
-    // Construir interacciones usando las interacciones por defecto de OpenLayers
-    const interactions = useMemo(() => {
-        try {
-            const defs: any = defaultInteractions();
-            return defs;
-        } catch (e) {
-            // Fallback: al menos dejar DragPan
-            return [new DragPan()];
-        }
-    }, []);
-
-    const handleDistanceChange = (distance: number) => {
+    const handleDistanceChange = (distance: number) =>
         setSelectedDistance(distance);
-        hasInitialized.current = false; // Permitir nueva animación al cambiar distancia
-    };
 
-    // Open place detail modal when marker is clicked
     const handleMarkerClick = (place: OverpassElement) => {
         setSelectedPlace(place);
         setIsPlaceModalOpen(true);
@@ -105,137 +129,112 @@ const Explore: React.FC = () => {
         setTimeout(() => {
             setIsSearchLoading(false);
             navigate(`/place/${placeId}`);
-        }, 5000);
+        }, 1500);
     };
 
-    const handleChatAgain = () => {
-        setIsResultsModalOpen(false);
-        setIsChatModalOpen(true);
-    };
+    if (geoLoading && !position) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="text-6xl animate-bounce">🦕</div>
+                    <p className="text-lg font-medium text-muted-foreground">
+                        Obteniendo tu ubicación...
+                    </p>
+                    {error && (
+                        <p className="text-sm text-red-500 mt-2">{error}</p>
+                    )}
+                </div>
+            </div>
+        );
+    }
 
-    const toggleChatModal = () => setIsChatModalOpen(!isChatModalOpen);
-
-    const handleZoomIn = () => {
-        if (map && view) {
-            const currentZoom = view.getZoom();
-            if (currentZoom !== undefined && currentZoom < 20)
-                view.setZoom(currentZoom + 1);
-        }
-    };
-
-    const handleZoomOut = () => {
-        if (map && view) {
-            const currentZoom = view.getZoom();
-            if (currentZoom !== undefined && currentZoom > 3)
-                view.setZoom(currentZoom - 1);
-        }
-    };
-
-    // Auto-adjust zoom when selected distance changes
-    const metersToZoom = (meters: number) => {
-        // Buscar en reverse para obtener el rango de distancia correcto
-        const zoom = [...METTERS].reverse().find(m => m.metters <= meters)?.zoom || 10;
-        return zoom;
-    };
-
-    // Efecto para centrar el mapa SOLO la primera vez o cuando cambia la distancia
-    useEffect(() => {
-        if (!view || !position || !position.lat || !position.lon || isAnimating.current) return;
-
-        // Verificar si la posición ha cambiado significativamente (más de 100 metros)
-        const hasPositionChanged = !lastPosition.current || 
-            Math.abs(lastPosition.current.lat - position.lat) > 0.001 || 
-            Math.abs(lastPosition.current.lon - position.lon) > 0.001;
-
-        // Solo animar si:
-        // 1. Es la primera vez (hasInitialized = false)
-        // 2. O si la posición cambió significativamente
-        if (!hasInitialized.current || (hasPositionChanged && !hasInitialized.current)) {
-            isAnimating.current = true;
-            const zoom = metersToZoom(selectedDistance);
-            const coords = fromLonLat([position.lon!, position.lat!]);
-            
-            try {
-                view.animate(
-                    { center: coords, zoom, duration: 400 },
-                    () => {
-                        isAnimating.current = false;
-                        hasInitialized.current = true;
-                        lastPosition.current = { lat: position.lat!, lon: position.lon! };
-                    }
-                );
-            } catch (e) {
-                view.setCenter(coords);
-                view.setZoom(zoom);
-                isAnimating.current = false;
-                hasInitialized.current = true;
-                lastPosition.current = { lat: position.lat!, lon: position.lon! };
-            }
-        }
-    }, [selectedDistance, position, view]);
+    if (!position) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="text-6xl">🦕</div>
+                    <p className="text-lg font-medium text-muted-foreground">
+                        No se pudo obtener ubicación
+                    </p>
+                    <button
+                        onClick={() => retry()}
+                        className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <section className="relative w-full h-screen">
-            <Map
-                ref={handleMapInit}
-                controls={[]}
-                interactions={interactions}
-                style={{ width: "100%", height: "100%" }}
-                view={view}
-            >
-                <TileLayer source={new OSM()} />
-            </Map>
+        <section className="fixed inset-0 w-full h-full overflow-hidden">
+            <div className="absolute inset-0 z-10">
+                <Map
+                    center={[position.lon, position.lat]}
+                    zoom={initialZoom}
+                >
+                    <MapController
+                        position={position}
+                        selectedDistance={selectedDistance}
+                    />
 
-            {/* Filtro de Distancias */}
-            <div className="absolute bottom-14 left-4 z-20 w-40">
+                    {position?.lat && position?.lon && (
+                        <MapMarker
+                            longitude={position.lon}
+                            latitude={position.lat}
+                        >
+                            <MarkerContent>
+                                <div className="flex flex-col items-center" style={{ zIndex: 1000 }}>
+                                    <div className="text-3xl sm:text-4xl animate-pulse relative z-50">
+                                        🦕
+                                    </div>
+                                </div>
+                            </MarkerContent>
+                        </MapMarker>
+                    )}
+
+                    <MapMarkers
+                        filteredPlaces={filteredPlaces}
+                        searchQuery={searchQuery}
+                        onMarkerClick={handleMarkerClick}
+                    />
+
+                    <MapControls showZoom showFullscreen />
+                </Map>
+            </div>
+
+            {/* Controles UI - Responsive */}
+            <div className="fixed top-16 sm:top-20 left-2 sm:left-4 z-40 flex flex-col gap-2 sm:gap-4 w-[calc(100%-1rem)] sm:w-max max-w-[280px] sm:max-w-none">
+                <PlaceSearchFilter
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                />
                 <DistanceFilter
                     selectedDistance={selectedDistance}
                     onDistanceChange={handleDistanceChange}
                 />
             </div>
 
-            {/* Barra de Búsqueda de Lugares */}
-            <div className="absolute top-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-96 z-20">
-                <PlaceSearchFilter
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                />
-            </div>
-
-            {/* Controles de Zoom */}
-            <div className="absolute top-20 left-4 z-20">
-                <ZoomControls
-                    onZoomIn={handleZoomIn}
-                    onZoomOut={handleZoomOut}
-                />
-            </div>
-
-            {/* Marcadores de Lugares en el Mapa */}
-            <MapMarkers map={map} filteredPlaces={filteredPlaces} onMarkerClick={handleMarkerClick} searchQuery={searchQuery} />
-
-            {/* Botón Flotante para Abrir Chat */}
+            {/* Botón Chat - Responsive */}
             {!isResultsModalOpen && !isChatModalOpen && (
-                <div className="fixed bottom-4 right-4 z-30 flex justify-start">
-                    <button
-                        className="w-14 h-14 bg-gradient-to-b from-primary-500 to-tomato rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
-                        title="Chatear con Lubi"
-                        aria-label="Chatear con Lubi"
-                        onClick={toggleChatModal}
-                    >
-                        <span className="text-white text-3xl font-bold">👀</span>
-                    </button>
-                </div>
+                <button
+                    aria-label="Pregúntame"
+                    title="Pregúntame"
+                    className="fixed bottom-20 sm:top-1/2 right-2 sm:right-4 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-purple-400 hover:bg-purple-500 active:scale-95 transition-all shadow-lg text-white flex items-center justify-center text-xl sm:text-2xl"
+                    onClick={() => setIsChatModalOpen(true)}
+                >
+                    👀
+                </button>
             )}
 
-            {/* Modal de Chat */}
             <ChatModal
                 isOpen={isChatModalOpen}
-                onClose={toggleChatModal}
+                onClose={() => setIsChatModalOpen(false)}
                 onSearch={handleSearch}
                 isLoading={isSearchLoading}
             />
 
-            {/* Modal de Resultados */}
             <PlacesResultsModal
                 isOpen={isResultsModalOpen}
                 onClose={() => setIsResultsModalOpen(false)}
@@ -243,10 +242,12 @@ const Explore: React.FC = () => {
                 places={places}
                 isLoading={isSearchLoading}
                 onPlaceClick={handlePlaceClick}
-                onChatAgain={handleChatAgain}
+                onChatAgain={() => {
+                    setIsResultsModalOpen(false);
+                    setIsChatModalOpen(true);
+                }}
             />
 
-            {/* Modal de Detalle de Lugar */}
             <PlaceDetailModal
                 isOpen={isPlaceModalOpen}
                 onClose={() => setIsPlaceModalOpen(false)}
