@@ -203,9 +203,7 @@ const Explore: React.FC = () => {
                     <MapControls showZoom showFullscreen />
                 </Map>
             </div>
-
-            {/* Controles UI - Responsive */}
-            <div className="fixed top-16 sm:top-20 left-2 sm:left-4 z-40 flex flex-col gap-2 sm:gap-4 w-[calc(100%-1rem)] sm:w-max max-w-[280px] sm:max-w-none">
+            <div className="fixed md:top-20 top-24 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
                 <PlaceSearchFilter
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
@@ -221,19 +219,20 @@ const Explore: React.FC = () => {
                 <button
                     aria-label="Pregúntame"
                     title="Pregúntame"
-                    className="fixed bottom-20 sm:top-1/2 right-2 sm:right-4 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-purple-400 hover:bg-purple-500 active:scale-95 transition-all shadow-lg text-white flex items-center justify-center text-xl sm:text-2xl"
+                    className="fixed bottom-4 left-4 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-purple-400 hover:bg-purple-500 active:scale-95 transition-all shadow-lg text-white flex items-center justify-center text-xl sm:text-2xl"
                     onClick={() => setIsChatModalOpen(true)}
                 >
                     👀
                 </button>
             )}
-
-            <ChatModal
-                isOpen={isChatModalOpen}
-                onClose={() => setIsChatModalOpen(false)}
-                onSearch={handleSearch}
-                isLoading={isSearchLoading}
-            />
+            <div className={`${isChatModalOpen && "fixed inset-0 z-50 bg-gray-200/50"} z-40 flex flex-col md:gap-2 gap-4`}>
+                <ChatModal
+                    isOpen={isChatModalOpen}
+                    onClose={() => setIsChatModalOpen(false)}
+                    onSearch={handleSearch}
+                    isLoading={isSearchLoading}
+                />
+            </div>
 
             <PlacesResultsModal
                 isOpen={isResultsModalOpen}
