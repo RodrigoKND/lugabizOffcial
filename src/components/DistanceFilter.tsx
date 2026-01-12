@@ -20,7 +20,7 @@ const DistanceFilter: React.FC<DistanceFilterProps> = ({ selectedDistance, onDis
     };
 
     return (
-        <div className="relative w-full sm:w-48">
+        <div className="relative w-max">
             {/* Botón principal */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
