@@ -15,7 +15,7 @@ const PlaceSearchFilter: React.FC<PlaceSearchFilterProps> = ({ onSearchChange, s
     };
 
     return (
-        <div className="max-w-md">
+        <div className="md:max-w-md w-full">
             <div className="relative">
                 <input
                     type="text"
