@@ -1,39 +1,69 @@
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 
-export function useSlide(){
-    const sliderRef = useRef<HTMLDivElement>(null);
-    const [startX, setStartX] = useState<number>(0);
-    const [scrollLeft, setScrollLeft] = useState<number>(0);
+interface UseSlideProps {
+  data?: unknown[];
+  visibleCount?: number;
+}
 
-    const slide=(direction: "left" | "right")=>{
-        if(!sliderRef.current) return;
+export function useSlide({ data = [], visibleCount = 4 }: UseSlideProps) {
+  const [startIndex, setStartIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const isDragging = useRef(false);
 
-        const width = sliderRef.current.offsetWidth;
-        const scroll = sliderRef.current.scrollLeft;
-        const newScroll = direction === "left" ? ((width - scroll)-width): width + scroll;
-        sliderRef.current.scrollTo({
-            left: newScroll,
-            behavior: "smooth"
-        });
+  const canSlideLeft = startIndex > 0;
+  const canSlideRight = startIndex + visibleCount < data.length;
+
+  const slideLeft = () => {
+    if (canSlideLeft) setStartIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const slideRight = () => {
+    if (canSlideRight)
+      setStartIndex((prev) => Math.min(data.length - visibleCount, prev + 1));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current) return;
+
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+        return swipeDistance > 0 ? slideRight() : slideLeft();
     }
 
-    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-        if (!sliderRef.current) return;
-        setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
-        setScrollLeft(sliderRef.current.scrollLeft);
-    };
+    isDragging.current = false;
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
 
-    const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-        if (!sliderRef.current || startX === null) return;
-        const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
-        const walk = (x - startX) * 1.5; // factor para suavizar
-        sliderRef.current.scrollLeft = scrollLeft - walk;
-    };
-    
-    return {
-        sliderRef,
-        slide,
-        handleTouchStart,
-        handleTouchMove
-    }
+  const visibleData = data.slice(startIndex, startIndex + visibleCount);
+  const totalPages = Math.ceil(data.length / visibleCount);
+  const currentPage = Math.floor(startIndex / visibleCount);
+
+  return {
+    startIndex,
+    canSlideLeft,
+    canSlideRight,
+    slideLeft,
+    slideRight,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    visibleData,
+    totalPages,
+    currentPage,
+    setStartIndex,
+  };
 }

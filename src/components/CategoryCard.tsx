@@ -17,9 +17,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
       whileTap={{ scale: 0.95 }}
       className="cursor-pointer group"
     >
-      <Link to={`/category/${category.id}`} className="block">
+      <Link to={`/category/${category.id}`} className="block w-full md:w-max">
         <div
-          className="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="p-6 rounded-2xl shadow-lg hover:shadow-xl w-full transition-all duration-300"
           style={{ backgroundColor: category.color }}
         >
           <div className="flex flex-col items-center space-y-3">

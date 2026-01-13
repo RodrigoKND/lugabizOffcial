@@ -1,203 +1,160 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import CategoryCard from '@/components/CategoryCard';
+import AllPlacesModal from '@/components/AllPlacesModal';
+import WelcomeMessage from '@/components/WelcomeMessage';
+import Preferences from '@/components/Preferences';
+import CustomToast from '@/components/CustomToast';
+import EventsSection, { mockEvents } from '@/components/EventSection';
+import PlacesCarousel from '@/components/PlacesCarousel';
+import { usePlaces } from '@/context/PlacesContext';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, ArrowLeft, Plus } from 'lucide-react';
-import { usePlaces } from '../context/PlacesContext';
-import { useAuth } from '../context/AuthContext';
-import CategoryCard from '../components/CategoryCard';
-import PlaceCard from '../components/PlaceCard';
-import SearchInput from '../components/SearchInput';
-import AllPlacesModal from '../components/AllPlacesModal';
-import WelcomeMessage from '../components/WelcomeMessage';
-import { Place } from '../types';
-import { useSlide } from '../hooks/useSlide';
-import Preferences from '../components/Preferences';
-import { useNotifications } from '../hooks/useNotifications';
-import CustomToast from '../components/CustomToast';
+import { useNotifications } from '@/hooks/useNotifications';
+import PWAInstallBanner from '@/components/PWAInstallBanner';
 
-interface HomeProps {
-  onAuthClick: () => void;
-}
-
-const Home: React.FC<HomeProps> = ({ onAuthClick }) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { getTopPlaces, getRecentPlaces, categories } = usePlaces();
-  const [searchTerm, setSearchTerm] = useState('');
+const Home: React.FC = () => {
   const [showAllPlacesModal, setShowAllPlacesModal] = useState(false);
-  const { sliderRef, slide, handleTouchStart, handleTouchMove } = useSlide();
+  const { getTopPlaces, getRecentPlaces, categories } = usePlaces();
+  const navigate = useNavigate();
   const { resultNotification } = useNotifications();
 
-  const topPlaces = getTopPlaces();
+  const topPlaces = getTopPlaces().slice(0, 4);
   const recentPlaces = getRecentPlaces();
 
-  const handlePublishClick = () => {
-    if (user) navigate('/add-place');
-    onAuthClick();
-  };
-
-  const handlePlaceSelect = (place: Place) => navigate(`/place/${place.id}`);
+  const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null);
 
   return (
-    <section className="relative min-h-screen bg-pink-50 overflow-hidden">
-      <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 " />
-      <div className="absolute top-20 right-10 w-[250px] h-[250px] bg-purple-300 opacity-30 rounded-full z-0" />
+    <section className="relative min-h-screen bg-gray-100 overflow-hidden">
+      <h4 className="text-gray-600 text-md bg-red-50 p-4 text-center">
+        Esta página está en construcción - ¡Muy pronto!
+      </h4>
+      <PWAInstallBanner />
+      <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 blur-3xl" />
+      <div className="absolute top-20 right-10 w-[250px] h-[250px] bg-purple-300 opacity-30 rounded-full z-0 blur-3xl" />
+
       <div className="relative z-10">
-        {resultNotification && (
-          <CustomToast resultNotification={resultNotification} />
-        )}
+        {resultNotification && <CustomToast resultNotification={resultNotification} />}
         <WelcomeMessage />
-
         <Preferences />
+        <AllPlacesModal isOpen={showAllPlacesModal} onClose={() => setShowAllPlacesModal(false)} />
 
-        <AllPlacesModal
-          isOpen={showAllPlacesModal}
-          onClose={() => setShowAllPlacesModal(false)}
-        />
-
-        {/* Hero Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden"
+        {/* Main Content - Sin hero tradicional */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="text-center">
-              <a
-                href='#featured-places'
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-500 to-tomato text-white px-6 py-3 rounded-full mb-6"
+          <div className="flex gap-4 pb-8 overflow-x-auto"
+          >
+            {mockEvents.map((event, index) => (
+              <button
+                key={`story-${event.id}`}
+                onClick={() => setSelectedEventIndex(index)}
+                className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
               >
-                <Sparkles className="w-5 h-5" />
-                <span className="font-medium">Descubre lugares únicos</span>
-              </a>
-
-              <h1
-                className="text-4xl md:text-6xl font-bold text-gray-900 mb-9"
-              >
-                Encuentra los mejores
-                <span className="block bg-gradient-to-r from-primary-600 to-tomato bg-clip-text text-transparent">
-                  lugares locales
+                <div className={`p-[3px] rounded-full transition-transform group-active:scale-90 ${event.organizer.isNew
+                  ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500'
+                  : 'bg-gray-300'
+                  }`}>
+                  <div className="p-0.5 bg-white rounded-full">
+                    <img
+                      src={event.organizer.avatar}
+                      alt={event.organizer.name}
+                      className="w-16 h-16 rounded-full object-cover border border-gray-100"
+                    />
+                  </div>
+                </div>
+                <span className="text-[11px] font-medium text-gray-700 max-w-[75px] truncate text-center">
+                  {event.organizer.name}
                 </span>
-              </h1>
+              </button>
+            ))}
+          </div>
+          {/* Featured/Trending Places - Primera sección destacada */}
+          {topPlaces.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mt-12"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                    Comienza aquí
+                  </h2>
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Busca y conoce lugares sobresalientes
+                  </p>
+                </div>
+              </div>
+              <PlacesCarousel
+                places={topPlaces}
+                setShowAllPlacesModal={setShowAllPlacesModal}
+                onPlaceClick={(place) => navigate(`/place/${place.id}`)}
+              />
+            </motion.section>
+          )}
 
-              <p
-                className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
-              >
-                Explora pequeños negocios, rincones escondidos y joyas locales recomendadas por la comunidad.
-              </p>
+          {/* Events Section */}
+          <EventsSection
+            selectedEventIndex={selectedEventIndex}
+            setSelectedEventIndex={setSelectedEventIndex}
+          />
 
-              <div
-                className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
-              >
-                <SearchInput
-                  value={searchTerm}
-                  onChange={setSearchTerm}
-                  onPlaceSelect={handlePlaceSelect}
-                />
-                <button
-                  onClick={handlePublishClick}
-                  className="bg-gradient-to-r justify-center from-tomato to-red-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span>{user ? 'Publicar lugar' : 'Iniciar sesión'}</span>
-                </button>
+          {/* Categories - Compacto */}
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-20"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                  Explorar categorías
+                </h2>
+                <p className="text-gray-600 text-sm sm:text-base">¿Qué estás buscando hoy?</p>
               </div>
             </div>
-          </div>
-        </motion.section>
-
-        {/* Categories Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="py-16 bg-white/50"
-        >
-          <div className="px-4 sm:px-6 lg:px-8">
-            <header className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Explora por categorías</h2>
-              <p className="text-gray-600">Encuentra exactamente lo que buscas</p>
-            </header>
-
-            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
+            <div className="flex gap-4 flex-col lg:flex-row">
               {categories.map((category, index) =>
                 topPlaces.filter(place => place.category.name === category.name).length > 0 && (
                   <motion.div
                     key={category.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.05 * index }}
+                    
                   >
                     <CategoryCard category={category} />
                   </motion.div>
                 )
               )}
             </div>
-          </div>
-        </motion.section>
+          </motion.section>
 
-
-        {/* Recent Places */}
-        <motion.section
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0 }}
-          className="py-16"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-12">
-              <header>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Lugares recientes</h2>
-                <p className="text-gray-600">Los lugares más recientes publicados</p>
-              </header>
-              <div className='flex items-center '>
-                <div className='p-2 hidden md:block'>
-                  <button
-                    onClick={() => slide("left")}
-                    className='font-semibold text-xl shadow-2xl hover:bg-gray-200 p-2 rounded-full'
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => slide("right")}
-                    className='font-semibold text-xl shadow-2xl hover:bg-gray-200 p-2 rounded-full'
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
+          {/* Recent Places */}
+          {recentPlaces.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-20"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                    Recién agregados
+                  </h2>
+                  <p className="text-gray-600 text-sm sm:text-base">Lo más nuevo de tu zona</p>
                 </div>
-                <button
-                  onClick={() => setShowAllPlacesModal(true)}
-                  title='Ver todo'
-                  className="p-2 bg-gradient-to-r from-primary-500 to-tomato text-white rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
               </div>
-            </div>
-
-            <div
-              ref={sliderRef}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              className="flex gap-4 overflow-x-hidden">
-              {recentPlaces.map((place, index) => (
-                <motion.div
-                  key={place.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * index }}
-                >
-                  <PlaceCard
-                    place={place}
-                    onClick={() => navigate(`/place/${place.id}`)}
-                    className='w-80'
-                  />
-                </motion.div>
-              ))}
-            </div>
-
-          </div>
-        </motion.section>
+              <PlacesCarousel
+                setShowAllPlacesModal={setShowAllPlacesModal}
+                places={recentPlaces}
+                onPlaceClick={(place) => navigate(`/place/${place.id}`)}
+              />
+            </motion.section>
+          )}
+        </div>
       </div>
     </section>
   );
