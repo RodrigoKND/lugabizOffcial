@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthClick }) => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="bg-white/80 backdrop-blur-lg border-b border-purple-100 sticky top-0 z-50"
+      className="bg-white/80 backdrop-blur-lg border-b border-purple-100"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">

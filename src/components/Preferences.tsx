@@ -96,7 +96,7 @@ const Preferences: React.FC< PreferencesProps> = ({ openPreferences = false, set
                             </h4>
                             <p className="text-gray-800 text-md">
                                 Lugabiz se actualizará
-                                en función de lo que te guste
+                                en función a tu selección
                             </p>
                         </header>
                     </section>
