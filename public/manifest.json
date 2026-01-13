@@ -1,0 +1,15 @@
+{
+  "name": "Lugabiz",
+  "short_name": "Lugabiz",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/L.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
