@@ -18,7 +18,9 @@ import EventDetailPage from '@/pages/EventDetailPage';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
   return (
     <AuthProvider>
       <PlacesProvider>
