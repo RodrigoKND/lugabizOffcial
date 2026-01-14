@@ -147,21 +147,6 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
           </button>
         )}
 
-        {/* Swipe indicators - Mobile only */}
-        <div className="md:hidden absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none z-10">
-          {hasPrev && (
-            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-full">
-              <ChevronLeft className="w-5 h-5 text-white/60" />
-            </div>
-          )}
-          <div className="flex-1" />
-          {hasNext && (
-            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-full">
-              <ChevronRight className="w-5 h-5 text-white/60" />
-            </div>
-          )}
-        </div>
-
         {/* Main Content */}
         <div className="relative w-full h-full md:rounded-3xl overflow-hidden md:shadow-2xl">
           {/* Background */}

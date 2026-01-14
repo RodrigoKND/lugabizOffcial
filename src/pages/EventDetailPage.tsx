@@ -2,20 +2,93 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-MapPin, ArrowLeft, Share2, Heart, 
-CheckCircle2, Ticket, Info 
+  MapPin, ArrowLeft, Share2, Heart, 
+  CheckCircle2, Ticket, Info, Clock, Users, Tag
 } from 'lucide-react';
-import { mockEvents } from '@/components/EventSection'; // Ajusta la ruta
+
+// Mock data adaptado al formulario
+const mockEvents = [
+  {
+    id: '1',
+    title: 'Noche de Jazz en Vivo',
+    description: 'Una velada íntima con los mejores artistas de jazz de la región. Disfruta de música en vivo, bebidas artesanales y un ambiente acogedor perfecto para relajarte después de una larga semana.',
+    category: 'Música',
+    date: '2026-02-20',
+    time: '20:00',
+    price: 'Bs. 50',
+    capacity: '100',
+    coverImage: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800',
+    tags: ['jazz', 'musica en vivo', 'noche'],
+    location: {
+      latitude: -17.3895,
+      longitude: -66.1568,
+      address: 'Teatro Municipal, Centro Histórico'
+    },
+    organizer: {
+      name: 'Carlos Méndez',
+      avatar: 'https://i.pravatar.cc/100?img=12',
+      isNew: false
+    },
+    likes: 234,
+    comments: 45
+  },
+  {
+    id: '2',
+    title: 'Festival de Comida Callejera',
+    description: 'El evento gastronómico más esperado del año. Más de 30 food trucks con lo mejor de la cocina local e internacional. Ven con hambre y prepárate para disfrutar.',
+    category: 'Gastronomía',
+    date: '2026-02-25',
+    time: '12:00',
+    price: 'Gratis',
+    capacity: '500',
+    coverImage: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800',
+    tags: ['comida', 'festival', 'foodtruck'],
+    location: {
+      latitude: -17.3935,
+      longitude: -66.1570,
+      address: 'Plaza San Sebastián'
+    },
+    organizer: {
+      name: 'María Torres',
+      avatar: 'https://i.pravatar.cc/100?img=5',
+      isNew: true
+    },
+    likes: 892,
+    comments: 120
+  },
+  {
+    id: '3',
+    title: 'Maratón Urbana 10K',
+    description: 'Desafía tus límites en esta carrera por las principales avenidas de la ciudad. Incluye medalla finisher, hidratación y DJ en ruta. Ideal para corredores de todos los niveles.',
+    category: 'Deportes',
+    date: '2026-03-05',
+    time: '06:00',
+    price: 'Bs. 80',
+    capacity: '300',
+    coverImage: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=800',
+    tags: ['running', 'deporte', 'salud'],
+    location: {
+      latitude: -17.3850,
+      longitude: -66.1600,
+      address: 'Av. Heroínas (Salida)'
+    },
+    organizer: {
+      name: 'Club Runners CBA',
+      avatar: 'https://i.pravatar.cc/100?img=33',
+      isNew: false
+    },
+    likes: 456,
+    comments: 78
+  }
+];
 
 const EventDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
 
-  // Buscamos el evento por ID
   const event = mockEvents.find(e => e.id === id);
 
-  // Scroll al inicio al cargar
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
@@ -29,15 +102,19 @@ const EventDetailPage: React.FC = () => {
     );
   }
 
-  // Datos extra "quemados" o simulados para enriquecer la vista
-  const extraDetails = {
-    price: event.category === 'Bienestar' ? 'Gratis' : '$15.50',
-    fullAddress: `${event.location}, Sector Histórico, Ciudad Principal`,
-    capacity: "Cupo limitado",
-    amenities: ["Estacionamiento vigilado", "Zona Pet Friendly", "Acceso Wi-Fi"],
-    rating: 4.9,
-    reviews: event.comments + 12,
-  };
+  // Procesar fecha y hora
+  const eventDate = new Date(event.date + 'T' + event.time);
+  const formattedDate = eventDate.toLocaleDateString('es-ES', { 
+    day: 'numeric', 
+    month: 'long',
+    year: 'numeric'
+  });
+  const formattedTime = event.time;
+
+  // Amenities simulados
+  const amenities = ["Estacionamiento vigilado", "Zona Pet Friendly", "Acceso Wi-Fi"];
+  const rating = 4.9;
+  const reviews = event.comments + 12;
 
   return (
     <section className="min-h-screen bg-[#FDFDFD] text-slate-900 selection:bg-rose-100">
@@ -48,7 +125,7 @@ const EventDetailPage: React.FC = () => {
           className="group flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-bold tracking-tight">Volver</span>
+          <span className="text-sm font-bold">Volver</span>
         </Link>
         <div className="flex gap-2">
           <button className="p-2.5 hover:bg-slate-50 rounded-full transition-colors">
@@ -75,12 +152,12 @@ const EventDetailPage: React.FC = () => {
                 className="relative aspect-video lg:aspect-[16/10] overflow-hidden rounded-[2.5rem] shadow-2xl shadow-slate-200"
               >
                 <img 
-                  src={event.imageUrl} 
+                  src={event.coverImage} 
                   className="w-full h-full object-cover" 
                   alt={event.title} 
                 />
                 <div className="absolute bottom-6 left-6 flex gap-2">
-                  <span className="bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                  <span className="bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black uppercase shadow-sm">
                     {event.category}
                   </span>
                 </div>
@@ -89,10 +166,10 @@ const EventDetailPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-rose-600">
                   <Heart className="w-4 h-4 fill-current" />
-                  <span className="text-sm font-bold">{extraDetails.rating}</span>
-                  <span className="text-slate-400 font-medium">({extraDetails.reviews} likes)</span>
+                  <span className="text-sm font-bold">{rating}</span>
+                  <span className="text-slate-400 font-medium">({reviews} likes)</span>
                 </div>
-                <h1 className="text-4xl md:text-6xl font-black text-slate-950 tracking-tighter leading-[0.95]">
+                <h1 className="text-4xl md:text-6xl font-black text-slate-950 leading-[0.95]">
                   {event.title}
                 </h1>
               </div>
@@ -101,31 +178,46 @@ const EventDetailPage: React.FC = () => {
             {/* Grid de Información Rápida */}
             <section className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-y border-slate-100">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fecha</p>
-                <p className="text-sm font-bold">{event.startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Fecha</p>
+                <p className="text-sm font-bold">{formattedDate}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Horario</p>
-                <p className="text-sm font-bold">{event.availableHours.start} - {event.availableHours.end}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Horario</p>
+                <p className="text-sm font-bold">{formattedTime}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lugar</p>
-                <p className="text-sm font-bold">{event.location}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Capacidad</p>
+                <p className="text-sm font-bold">{event.capacity} personas</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Esfuerzo</p>
-                <p className="text-sm font-bold">Relajado</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Precio</p>
+                <p className="text-sm font-bold">{event.price}</p>
               </div>
             </section>
 
             <section className="space-y-6">
-              <h3 className="text-2xl font-bold tracking-tight">Detalles de la experiencia</h3>
+              <h3 className="text-2xl font-bold">Detalles de la experiencia</h3>
               <p className="text-slate-600 leading-relaxed text-lg font-light">
-                {event.description} Cada detalle ha sido cuidado para garantizar una atmósfera segura y vibrante. Únete a cientos de entusiastas en {event.location} para celebrar lo mejor de nuestra cultura local.
+                {event.description}
               </p>
+
+              {/* Tags del evento */}
+              {event.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-4">
+                  {event.tags.map((tag, i) => (
+                    <span 
+                      key={i} 
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-xs font-bold"
+                    >
+                      <Tag className="w-3 h-3" />
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                {extraDetails.amenities.map((item, i) => (
+                {amenities.map((item, i) => (
                   <div key={i} className="flex items-center gap-3 p-5 rounded-3xl bg-[#F8FAFC] border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
                     <div className="bg-white p-2 rounded-xl shadow-sm group-hover:text-primary-600 transition-colors">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
@@ -147,12 +239,13 @@ const EventDetailPage: React.FC = () => {
                 <div className="relative">
                   <div className="flex justify-between items-end mb-10">
                     <div>
-                      <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Entrada General</p>
-                      <h2 className="text-5xl font-black text-slate-900">{extraDetails.price}</h2>
+                      <p className="text-slate-400 text-[10px] font-black uppercase mb-2">Entrada General</p>
+                      <h2 className="text-5xl font-black text-slate-900">{event.price}</h2>
                     </div>
                     <div className="flex flex-col items-end">
-                      <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold mb-2">
-                        {extraDetails.capacity}
+                      <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold mb-2 flex items-center gap-1">
+                        <Users className="w-3 h-3" />
+                        {event.capacity} cupos
                       </div>
                       <div className="flex -space-x-2">
                         {[1, 2, 3].map(i => (
@@ -171,17 +264,31 @@ const EventDetailPage: React.FC = () => {
                         <MapPin className="w-5 h-5 text-rose-500" />
                       </div>
                       <div>
-                        <p className="font-black text-slate-900 leading-none mb-1 text-xs uppercase tracking-tighter">Cómo llegar</p>
-                        <p className="text-slate-500 font-medium">{extraDetails.fullAddress}</p>
+                        <p className="font-black text-slate-900 leading-none mb-1 text-xs uppercase">Ubicación</p>
+                        <p className="text-slate-500 font-medium">{event.location.address}</p>
+                        <p className="text-slate-400 text-xs mt-1">
+                          {event.location.latitude.toFixed(4)}, {event.location.longitude.toFixed(4)}
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-4">
                       <div className="bg-blue-50 p-2.5 rounded-2xl">
-                        <Info className="w-5 h-5 text-blue-500" />
+                        <Clock className="w-5 h-5 text-blue-500" />
                       </div>
                       <div>
-                        <p className="font-black text-slate-900 leading-none mb-1 text-xs uppercase tracking-tighter">Política</p>
+                        <p className="font-black text-slate-900 leading-none mb-1 text-xs uppercase">Fecha y Hora</p>
+                        <p className="text-slate-500 font-medium">{formattedDate}</p>
+                        <p className="text-slate-500 font-medium">{formattedTime} hrs</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="bg-purple-50 p-2.5 rounded-2xl">
+                        <Info className="w-5 h-5 text-purple-500" />
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-900 leading-none mb-1 text-xs uppercase">Política</p>
                         <p className="text-slate-500 font-medium">Presentar ticket digital en puerta. Evento para todas las edades.</p>
                       </div>
                     </div>
@@ -204,8 +311,8 @@ const EventDetailPage: React.FC = () => {
                     )}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Organiza</p>
-                    <p className="text-sm font-black text-slate-800 tracking-tight">{event.organizer.name}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase ">Organiza</p>
+                    <p className="text-sm font-black text-slate-800 ">{event.organizer.name}</p>
                   </div>
                 </div>
               </div>

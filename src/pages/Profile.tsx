@@ -1,68 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Navigate } from 'react-router-dom';
 import {
   ArrowLeft, MapPin, Palette, Plus,
-  Calendar, Camera, X, Upload,
+  Calendar, Camera, X,
   ChevronRight,
-  Utensils, Music, Sparkles, Film, Ticket, UserPlus
+  UserPlus,
+  Users, DollarSign, TrendingUp, Eye, Heart,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { usePlaces } from '@/context/PlacesContext';
 import Preferences from '@/components/Preferences';
 import PlacesCarousel from '@/components/PlacesCarousel';
+import EventForm from '@/components/EventForm';
+import { Place } from '@/types';
+
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { places, getLengthPlacesByUserId, getLengthReviewsByUserId } = usePlaces();
+  const { getLengthPlacesByUserId, getLengthReviewsByUserId, getSavedPlacesByUserId } = usePlaces();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // States
   const [openPreferencesModal, setOpenPreferencesModal] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [activeTab, setActiveTab] = useState<'saved' | 'attending' | 'friends'>('saved');
-  const [category, setCategory] = useState('Gastronomía');
+  const [activeTab, setActiveTab] = useState<'saved' | 'attending' | 'friends' | 'events'>('saved');
   const [showAttendeesModal, setShowAttendeesModal] = useState<any | null>(null);
   const [_, setShowAllPlacesModal] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  // Mock: Eventos publicados por el usuario (reemplazar con datos reales)
+  const userEvents = [
+    {
+      id: 1,
+      title: 'Noche de Tacos y Mezcal',
+      category: 'Gastronomía',
+      date: '2026-02-15',
+      attendees: 45,
+      views: 320,
+      likes: 89,
+      revenue: 1350
+    }
+  ];
+
+
+  // Manejar cambio de avatar
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+
+    // Simular upload (reemplazar con lógica real)
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // TODO: Reemplazar con lógica real
+      setIsUploadingAvatar(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Manejar cambio de portada del evento
+  // const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
+
+  const [savedPlaces, setSavedPlaces] = useState<Place[]>([]);
+
+  useEffect(() => {
+    const renderPlacesSaved = async () => {
+      if(!user) return;
+      
+      const placesSaved = await getSavedPlacesByUserId(user.id);
+      
+      if(!placesSaved) return;
+      setSavedPlaces(placesSaved);
+    }
+    renderPlacesSaved();
+    
+  }, [user]);
 
   if (!user) return <Navigate to="/" replace />;
-  // --- FORM LOGIC: Campos dinámicos por categoría ---
-  const renderCategoryFields = () => {
-    switch (category) {
-      case 'Gastronomía':
-        return (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tipo de Cocina</label>
-              <input type="text" placeholder="Ej: Fusión Japonesa, Vegana..." className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Menú / Especialidad</label>
-              <input type="text" placeholder="Platillo estrella" className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-            </div>
-            <div className="col-span-full flex gap-2 overflow-x-auto pb-2">
-              {['Degustación', 'Barra Libre', 'Pet Friendly', 'Música en vivo'].map(f => (
-                <span key={f} className="px-3 py-1 bg-white border border-gray-100 rounded-full text-xs font-bold whitespace-nowrap">+ {f}</span>
-              ))}
-            </div>
-          </motion.div>
-        );
-      case 'Fiesta/Música':
-        return (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Lineup / DJ</label>
-              <input type="text" placeholder="Artistas invitados" className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Dresscode</label>
-              <input type="text" placeholder="Ej: All White, Elegante..." className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-            </div>
-          </motion.div>
-        );
-      default: return null;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-slate-900">
@@ -77,19 +103,38 @@ const Profile: React.FC = () => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-12 gap-8">
 
           {/* USER INFO PANEL */}
           <div className="col-span-12 lg:col-span-4 space-y-6">
             <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm text-center">
               <div className="relative inline-block mb-6">
-                <img src={user.avatar || '/avatar.png'} className="w-32 h-32 rounded-[2.5rem] object-cover shadow-2xl" />
-                <button className="absolute -bottom-2 -right-2 bg-purple-500 text-white p-3 rounded-2xl hover:scale-110 transition-transform shadow-lg">
-                  <Camera className="w-4 h-4" />
+                <img
+                  src={user.avatar || '/avatar.png'}
+                  className="w-32 h-32 rounded-[2.5rem] object-cover shadow-2xl"
+                  alt={user.name}
+                />
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  className="absolute -bottom-2 -right-2 bg-purple-500 text-white p-3 rounded-2xl hover:scale-110 transition-transform shadow-lg disabled:opacity-50"
+                >
+                  {isUploadingAvatar ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4" />
+                  )}
                 </button>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </div>
-              <h1 className="text-3xl font-black tracking-tighter mb-1">{user.name}</h1>
+              <h1 className="text-3xl font-black mb-1">{user.name}</h1>
               <p className="text-gray-400 text-sm font-medium mb-8">{user.email}</p>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
@@ -114,27 +159,122 @@ const Profile: React.FC = () => {
 
           {/* MAIN CONTENT AREA */}
           <div className="col-span-12 lg:col-span-8 space-y-8">
-            <div className="flex gap-8 border-b border-gray-100">
-              {['saved', 'attending', 'friends'].map((t) => (
+            <div className="flex gap-8 border-b border-gray-100 overflow-x-auto">
+              {['saved', 'events', 'attending', 'friends'].map((t) => (
                 <button
                   key={t}
                   onClick={() => setActiveTab(t as any)}
-                  className={`pb-4 text-sm font-black tracking-tight transition-all border-b-2 ${activeTab === t ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                  className={`pb-4 text-sm font-black transition-all border-b-2 whitespace-nowrap ${activeTab === t ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
-                  {t === 'saved' ? 'Colección' : t === 'attending' ? 'Asistiré' : 'Comunidad'}
+                  {t === 'saved' ? 'Colección' : t === 'events' ? 'Mis Eventos' : t === 'attending' ? 'Asistiré' : 'Comunidad'}
                 </button>
               ))}
             </div>
 
             <AnimatePresence mode="wait">
-              {
-                activeTab === 'saved' &&
-               <PlacesCarousel 
-                setShowAllPlacesModal={setShowAllPlacesModal}
-                places={places}
-                onPlaceClick={(place) => navigate(`/place/${place.id}`)}
-              />
-              }
+              {activeTab === 'saved' && (
+                  savedPlaces.length > 0 &&
+                  <PlacesCarousel
+                    setShowAllPlacesModal={setShowAllPlacesModal}
+                    places={savedPlaces}
+                    onPlaceClick={(place) => navigate(`/place/${place.id}`)}
+                  />
+                
+              )}
+
+              {activeTab === 'events' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key="events"
+                  className="space-y-6"
+                >
+                  {userEvents.length === 0 ? (
+                    <div className="bg-white rounded-[3rem] p-16 text-center border border-gray-100">
+                      <div className="text-8xl mb-6">🦕</div>
+                      <h3 className="text-2xl font-black mb-2">Aún no has publicado eventos</h3>
+                      <p className="text-gray-400 font-medium mb-8">¡Crea tu primer evento y empieza a conectar con tu comunidad!</p>
+                      <button
+                        onClick={() => setShowEventForm(true)}
+                        className="inline-flex items-center gap-2 bg-purple-500 text-white px-8 py-4 rounded-[1.5rem] font-black hover:bg-purple-600 transition-all shadow-lg"
+                      >
+                        <Plus className="w-5 h-5" /> Crear Mi Primer Evento
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Estadísticas generales */}
+                      <div className="flex flex-col lg:flex-row gap-4">
+                        <div className="bg-white p-6 rounded-[2rem] w-1/2 border border-gray-100">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-blue-50 rounded-xl">
+                              <Eye className="w-4 h-4 text-blue-500" />
+                            </div>
+                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.views, 0)}</p>
+                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Vistas Totales</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-[2rem]  w-1/2 border border-gray-100">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-purple-50 rounded-xl">
+                              <Users className="w-4 h-4 text-purple-500" />
+                            </div>
+                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.attendees, 0)}</p>
+                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Asistentes</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-[2rem] w-1/2 border border-gray-100">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-rose-50 rounded-xl">
+                              <Heart className="w-4 h-4 text-rose-500" />
+                            </div>
+                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.likes, 0)}</p>
+                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Me Gusta</p>
+                        </div>
+                      </div>
+
+                      {/* Lista de eventos */}
+                      {userEvents.map((event) => (
+                        <div key={event.id} className="bg-white rounded-[2rem] p-6 border border-gray-100">
+                          <div className="flex items-start justify-between mb-6">
+                            <div>
+                              <span className="inline-block px-3 py-1 bg-orange-50 text-orange-600 rounded-xl text-[10px] font-black uppercase mb-3">
+                                {event.category}
+                              </span>
+                              <h3 className="text-2xl font-black mb-2">{event.title}</h3>
+                              <p className="text-sm text-gray-400 font-bold flex items-center gap-2">
+                                <Calendar className="w-4 h-4" /> {event.date}
+                              </p>
+                            </div>
+                            <button className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                              <TrendingUp className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-4 gap-4">
+                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
+                              <Eye className="w-4 h-4 text-gray-400 mx-auto mb-2" />
+                              <p className="text-lg font-black">{event.views}</p>
+                              <p className="text-[9px] text-gray-400 font-bold uppercase">Vistas</p>
+                            </div>
+                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
+                              <Users className="w-4 h-4 text-gray-400 mx-auto mb-2" />
+                              <p className="text-lg font-black">{event.attendees}</p>
+                              <p className="text-[9px] text-gray-400 font-bold uppercase">Asistentes</p>
+                            </div>
+                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
+                              <Heart className="w-4 h-4 text-gray-400 mx-auto mb-2" />
+                              <p className="text-lg font-black">{event.likes}</p>
+                              <p className="text-[9px] text-gray-400 font-bold uppercase">Me Gusta</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </motion.div>
+              )}
 
               {activeTab === 'attending' && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} key="attending" className="grid gap-4">
@@ -149,7 +289,7 @@ const Profile: React.FC = () => {
                           <img src={`https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=400`} className="w-full h-full object-cover" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-black tracking-tighter">Noche de Jazz & Bourbon</h4>
+                          <h4 className="text-xl font-black">Noche de Jazz & Bourbon</h4>
                           <div className="flex items-center gap-4 text-xs text-gray-400 font-bold mt-1">
                             <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> 15 Ene</span>
                             <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-rose-500" /> Club Central</span>
@@ -160,7 +300,7 @@ const Profile: React.FC = () => {
                         <div className="flex -space-x-2 justify-end mb-2">
                           {[1, 2, 3].map(a => <img key={a} src={`https://i.pravatar.cc/100?img=${a + 20}`} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />)}
                         </div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors">Ver quiénes van <ChevronRight className="inline w-3 h-3" /></p>
+                        <p className="text-[10px] font-black text-gray-400 uppercase group-hover:text-black transition-colors">Ver quiénes van <ChevronRight className="inline w-3 h-3" /></p>
                       </div>
                     </div>
                   ))}
@@ -172,11 +312,8 @@ const Profile: React.FC = () => {
                   {[1, 2, 3, 4, 5, 6].map(i => (
                     <div key={i} className="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center text-center">
                       <img src={`https://i.pravatar.cc/150?img=${i + 40}`} className="w-16 h-16 rounded-2xl mb-4" />
-                      <h5 className="font-black text-sm tracking-tight">Marco Tulio</h5>
-                      <p className="text-[10px] text-emerald-500 font-black uppercase mb-4 tracking-widest underline decoration-2">Confirmado en 3 eventos</p>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-[10px] font-black transition-colors">
-                        <UserPlus className="w-3 h-3" /> Perfil
-                      </button>
+                      <h5 className="font-black text-sm ">Marco Tulio</h5>
+                      <p className="text-[10px] text-emerald-500 font-black uppercase mb-4">Confirmado en 3 eventos</p>
                     </div>
                   ))}
                 </motion.div>
@@ -184,7 +321,7 @@ const Profile: React.FC = () => {
             </AnimatePresence>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* MODAL: QUIÉNES ASISTIRÁN */}
       <AnimatePresence>
@@ -196,7 +333,7 @@ const Profile: React.FC = () => {
               className="relative w-full max-w-md bg-white rounded-[2.5rem] overflow-hidden shadow-2xl"
             >
               <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="text-xl font-black tracking-tighter">Asistentes al Evento</h3>
+                <h3 className="text-xl font-black">Asistentes al Evento</h3>
                 <button onClick={() => setShowAttendeesModal(null)} className="p-2 hover:bg-gray-100 rounded-full"><X className="w-5 h-5" /></button>
               </div>
               <div className="p-4 max-h-[60vh] overflow-y-auto">
@@ -218,98 +355,7 @@ const Profile: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* MODAL: CREAR EVENTO PRO (DINÁMICO) */}
-      <AnimatePresence>
-        {showEventForm && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setShowEventForm(false)} className="fixed inset-0 bg-black/60 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl my-8">
-              <div className="p-10">
-                <div className="flex justify-between items-start mb-10">
-                  <div>
-                    <h2 className="text-4xl font-black tracking-tighter">Organizar</h2>
-                    <p className="text-gray-400 font-bold text-sm">Crea una experiencia que todos recuerden.</p>
-                  </div>
-                  <button onClick={() => setShowEventForm(false)} className="p-3 bg-gray-50 rounded-2xl"><X className="w-6 h-6" /></button>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Selector de Categoría con Estilo */}
-                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                    {[
-                      { id: 'Gastronomía', icon: Utensils, color: 'text-orange-500' },
-                      { id: 'Fiesta/Música', icon: Music, color: 'text-purple-500' },
-                      { id: 'Cine', icon: Film, color: 'text-blue-500' },
-                      { id: 'Wellness', icon: Sparkles, color: 'text-emerald-500' }
-                    ].map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setCategory(cat.id)}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs transition-all border-2 ${category === cat.id ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200'}`}
-                      >
-                        <cat.icon className={`w-4 h-4 ${category === cat.id ? 'text-white' : cat.color}`} /> {cat.id}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="grid gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Título de la experiencia</label>
-                      <input type="text" placeholder="¿Cómo se llama tu evento?" className="w-full px-6 py-4 bg-gray-50 rounded-2xl text-lg font-bold border-none focus:ring-2 focus:ring-black transition-all" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fecha</label>
-                        <input type="date" className="w-full px-6 py-4 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Ubicación</label>
-                        <div className="relative">
-                          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <input type="text" placeholder="Lugar o Link Google Maps" className="w-full pl-11 pr-6 py-4 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CAMPOS DINÁMICOS SEGÚN CATEGORÍA */}
-                    <div className="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 space-y-6">
-                      <p className="text-[10px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                        <Sparkles className="w-3 h-3 text-amber-500" /> Detalles de {category}
-                      </p>
-                      {renderCategoryFields()}
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">¿Por qué la gente debe asistir?</label>
-                        <textarea rows={3} placeholder="Describe el 'WOW factor' de tu evento..." className="w-full px-6 py-4 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black resize-none" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Precio sugerido</label>
-                        <div className="relative">
-                          <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <input type="text" placeholder="Ej: $15 o Gratis" className="w-full pl-11 pr-6 py-4 bg-gray-50 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-black" />
-                        </div>
-                      </div>
-                      <div className="space-y-2 text-center flex items-end">
-                        <label className="w-full cursor-pointer flex items-center justify-center gap-2 px-6 py-4 bg-white border-2 border-dashed border-gray-200 rounded-2xl text-[10px] font-black uppercase text-gray-400 hover:border-black hover:text-black transition-all">
-                          <Upload className="w-4 h-4" /> Portada
-                          <input type="file" className="hidden" />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button className="w-full bg-black text-white py-5 rounded-[2rem] font-black text-lg hover:bg-gray-800 transition-all shadow-2xl shadow-gray-200">
-                    Lanzar Evento
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <EventForm isOpen={showEventForm} onClose={() => setShowEventForm(false)} />
 
       <Preferences openPreferences={openPreferencesModal} setClosePreferences={setOpenPreferencesModal} />
     </div>

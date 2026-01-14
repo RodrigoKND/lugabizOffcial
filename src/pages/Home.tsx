@@ -10,7 +10,6 @@ import PlacesCarousel from '@/components/PlacesCarousel';
 import { usePlaces } from '@/context/PlacesContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '@/hooks/useNotifications';
-import PWAInstallBanner from '@/components/PWAInstallBanner';
 
 const Home: React.FC = () => {
   const [showAllPlacesModal, setShowAllPlacesModal] = useState(false);
@@ -23,12 +22,12 @@ const Home: React.FC = () => {
 
   const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null);
 
+
   return (
     <section className="relative min-h-screen bg-gray-100 overflow-hidden">
       <h4 className="text-gray-600 text-md bg-red-50 p-4 text-center">
         Esta página está en construcción - ¡Muy pronto!
       </h4>
-      <PWAInstallBanner />
       <div className="absolute top-60 left-20 w-[200px] h-[200px] bg-rose-300 opacity-30 rounded-full z-0 blur-3xl" />
       <div className="absolute top-20 right-10 w-[250px] h-[250px] bg-purple-300 opacity-30 rounded-full z-0 blur-3xl" />
 
@@ -39,9 +38,9 @@ const Home: React.FC = () => {
         <AllPlacesModal isOpen={showAllPlacesModal} onClose={() => setShowAllPlacesModal(false)} />
 
         {/* Main Content - Sin hero tradicional */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2"
         >
-          <div className="flex gap-4 pb-8 overflow-x-auto"
+          <div className="flex gap-4 overflow-x-auto"
           >
             {mockEvents.map((event, index) => (
               <button
@@ -137,7 +136,7 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="mt-20"
+              className="my-20"
             >
               <div className="flex items-center justify-between mb-6">
                 <div>

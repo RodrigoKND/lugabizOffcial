@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Plus, MapPin, User, LogOut, Menu } from 'lucide-react';
+import { Plus, MapPin, User, LogOut, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,16 +43,6 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthClick }) => {
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/"
-              className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-300 ${isActive('/')
-                ? 'bg-primary-500 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
-                }`}
-            >
-              <Home className="w-5 h-5" />
-              <span className="font-medium">Inicio</span>
-            </Link>
             <Link
               to="/explore"
               className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-300 ${isActive('/explore')
@@ -112,17 +102,6 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthClick }) => {
             }`}
         >
           <div className="flex flex-col space-y-2 pb-4">
-            <Link
-              to="/"
-              onClick={() => setMenuOpen(false)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-300 ${isActive('/')
-                ? 'bg-primary-500 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
-                }`}
-            >
-              <Home className="w-5 h-5" />
-              <span className="font-medium">Inicio</span>
-            </Link>
             <Link
               to="/explore"
               className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-300 ${isActive('/explore')

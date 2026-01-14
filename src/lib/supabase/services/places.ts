@@ -1,12 +1,13 @@
-import { supabase } from '../client';
-import { Place, CreatePlaceData } from '../types';
+import { supabase } from "../client";
+import { Place, CreatePlaceData } from "../types";
 
 export const placesService = {
   // Get all places with related data
   async getPlaces(): Promise<Place[]> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -17,19 +18,21 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .order('created_at', { ascending: false });
+      `
+      )
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    return (data || []).map(place => this.transformPlaceData(place));
+    return (data || []).map((place) => this.transformPlaceData(place));
   },
 
   // Get place by ID
   async getPlaceById(id: string): Promise<Place | null> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -40,12 +43,13 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .eq('id', id)
+      `
+      )
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null;
+      if (error.code === "PGRST116") return null;
       throw error;
     }
 
@@ -55,8 +59,9 @@ export const placesService = {
   // Get places by category
   async getPlacesByCategory(categoryId: string): Promise<Place[]> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -67,22 +72,26 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .eq('category_id', categoryId)
-      .order('created_at', { ascending: false });
+      `
+      )
+      .eq("category_id", categoryId)
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    return (data || []).map(place => this.transformPlaceData(place));
+    return (data || []).map((place) => this.transformPlaceData(place));
   },
 
   async uploadImageSupabase(file: File): Promise<string> {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const filePath = `places/${fileName}`
-    const { error } = await supabase.storage.from('images')
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}.${fileExt}`;
+    const filePath = `places/${fileName}`;
+    const { error } = await supabase.storage
+      .from("images")
       .upload(filePath, file, {
-        cacheControl: '3600',
+        cacheControl: "3600",
         upsert: false,
       });
 
@@ -90,9 +99,7 @@ export const placesService = {
       throw error;
     }
     // Obtiene la URL pública de la imagen
-    const { data } = supabase.storage
-      .from('images')
-      .getPublicUrl(filePath);
+    const { data } = supabase.storage.from("images").getPublicUrl(filePath);
 
     return data.publicUrl;
   },
@@ -100,7 +107,7 @@ export const placesService = {
   async createPlace(placeData: CreatePlaceData) {
     // Insert place
     const { data: place, error: placeError } = await supabase
-      .from('places')
+      .from("places")
       .insert({
         name: placeData.name,
         description: placeData.description,
@@ -116,13 +123,15 @@ export const placesService = {
 
     // Insert place social groups
     if (placeData.socialGroupIds.length > 0) {
-      const socialGroupInserts = placeData.socialGroupIds.map(socialGroupId => ({
-        place_id: place.id,
-        social_group_id: socialGroupId,
-      }));
+      const socialGroupInserts = placeData.socialGroupIds.map(
+        (socialGroupId) => ({
+          place_id: place.id,
+          social_group_id: socialGroupId,
+        })
+      );
 
       const { error: socialGroupError } = await supabase
-        .from('place_social_groups')
+        .from("place_social_groups")
         .insert(socialGroupInserts);
 
       if (socialGroupError) throw socialGroupError;
@@ -134,12 +143,12 @@ export const placesService = {
   // Update place
   async updatePlace(id: string, updates: Partial<CreatePlaceData>) {
     const { data, error } = await supabase
-      .from('places')
+      .from("places")
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -149,10 +158,7 @@ export const placesService = {
 
   // Delete place
   async deletePlace(id: string) {
-    const { error } = await supabase
-      .from('places')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("places").delete().eq("id", id);
 
     if (error) throw error;
   },
@@ -160,8 +166,9 @@ export const placesService = {
   // Get top places by saved count
   async getTopPlaces(limit: number = 6): Promise<Place[]> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -172,20 +179,22 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .order('saved_count', { ascending: false })
+      `
+      )
+      .order("saved_count", { ascending: false })
       .limit(limit);
 
     if (error) throw error;
 
-    return (data || []).map(place => this.transformPlaceData(place));
+    return (data || []).map((place) => this.transformPlaceData(place));
   },
 
   // Get recent places
   async getRecentPlaces(limit: number = 15): Promise<Place[]> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -196,20 +205,22 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .order('created_at', { ascending: false })
+      `
+      )
+      .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) throw error;
 
-    return (data || []).map(place => this.transformPlaceData(place));
+    return (data || []).map((place) => this.transformPlaceData(place));
   },
 
   // Search places
   async searchPlaces(query: string): Promise<Place[]> {
     const { data, error } = await supabase
-      .from('places')
-      .select(`
+      .from("places")
+      .select(
+        `
         *,
         category:categories(*),
         author:users(name, avatar),
@@ -220,13 +231,39 @@ export const placesService = {
           *,
           user:users(name, avatar)
         )
-      `)
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%,address.ilike.%${query}%`)
-      .order('saved_count', { ascending: false });
+      `
+      )
+      .or(
+        `name.ilike.%${query}%,description.ilike.%${query}%,address.ilike.%${query}%`
+      )
+      .order("saved_count", { ascending: false });
 
     if (error) throw error;
 
-    return (data || []).map(place => this.transformPlaceData(place));
+    return (data || []).map((place) => this.transformPlaceData(place));
+  },
+
+  async getSavedPlacesByUserId(userID: string): Promise<Place[] | []> {
+    const { data, error } = await supabase
+      .from("saved_places")
+      .select(`places(*, category:categories(*),
+        author:users(name, avatar),
+        place_social_groups(
+          social_group:social_groups(*)
+        ),
+        reviews(
+          *,
+          user:users(name, avatar)
+        ))`)
+      .eq("user_id", userID)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return (data || [])
+      .map((item) => item.places)
+      .filter((place) => place !== null)
+      .map((place) => this.transformPlaceData(place));
   },
 
   // Transform database place data to application format
@@ -253,15 +290,16 @@ export const placesService = {
       image: place.image,
       rating: place.rating,
       reviewCount: place.review_count,
-      reviews: place.reviews?.map((review: any) => ({
-        id: review.id,
-        userId: review.user_id,
-        userName: review.user.name,
-        userAvatar: review.user.avatar,
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: new Date(review.created_at),
-      })) || [],
+      reviews:
+        place.reviews?.map((review: any) => ({
+          id: review.id,
+          userId: review.user_id,
+          userName: review.user.name,
+          userAvatar: review.user.avatar,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: new Date(review.created_at),
+        })) || [],
       featured: place.featured,
       createdAt: new Date(place.created_at),
       authorId: place.author_id,

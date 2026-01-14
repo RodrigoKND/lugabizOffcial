@@ -18,9 +18,7 @@ import EventDetailPage from '@/pages/EventDetailPage';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
+
   return (
     <AuthProvider>
       <PlacesProvider>
@@ -41,9 +39,9 @@ if ('serviceWorker' in navigator) {
               </Routes>
             </main>
             <Footer />
-            <AuthModal 
-              isOpen={isAuthModalOpen} 
-              onClose={() => setIsAuthModalOpen(false)} 
+            <AuthModal
+              isOpen={isAuthModalOpen}
+              onClose={() => setIsAuthModalOpen(false)}
             />
             <Toaster position="top-right" />
           </div>

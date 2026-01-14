@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Place, PlaceFormData } from '../types';
-import { placesService, categoriesService, socialGroupsService, reviewsService } from '../lib/supabase';
-import { useAuth } from './AuthContext';
+import { Place, PlaceFormData } from '@/types';
+import { placesService, categoriesService, socialGroupsService, reviewsService } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 interface PlacesContextType {
   places: Place[];
@@ -18,6 +18,7 @@ interface PlacesContextType {
   refreshPlaces: () => Promise<void>;
   getLengthPlacesByUserId: (userId: string) => Place[];
   getLengthReviewsByUserId:(userId: string) => number;
+  getSavedPlacesByUserId: (userId: string) => Promise<Place[]> | [];
 }
 
 const PlacesContext = createContext<PlacesContextType | undefined>(undefined);
@@ -159,6 +160,15 @@ export const PlacesProvider: React.FC<PlacesProviderProps> = ({ children }) => {
       return count + (place?.reviews?.filter(review => review.userId === userId).length || 0);
     }, 0);
   };
+
+  const getSavedPlacesByUserId = async (userId: string) : Promise<Place[] | []> => {    
+    try {
+      return await placesService.getSavedPlacesByUserId(userId);
+    }catch(error) {
+      console.error('Error getting saved places by user id:', error);
+      return [];
+    }
+  };
   
   return (
     <PlacesContext.Provider
@@ -177,6 +187,7 @@ export const PlacesProvider: React.FC<PlacesProviderProps> = ({ children }) => {
         refreshPlaces,
         getLengthPlacesByUserId,
         getLengthReviewsByUserId,
+        getSavedPlacesByUserId,
       }}
     >
       {children}

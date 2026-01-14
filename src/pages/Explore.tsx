@@ -23,6 +23,8 @@ import PlaceSearchFilter from "@/components/PlaceSearchFilter";
 
 import { METTERS } from "@/static/data/metters";
 import type { OverpassElement } from "@/types";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 function MapController({
     position,
@@ -101,9 +103,9 @@ const Explore: React.FC = () => {
 
     // Notificaciones de proximidad inteligentes
     useProximityNotifications(position, filteredPlaces, {
-        radiusMeters: 100,
+        radiusMeters: 500,
         cooldownMinutes: 30,
-        maxNotificationsPerHour: 3,
+        maxNotificationsPerHour: 5,
     });
 
     const handleDistanceChange = (distance: number) =>
@@ -203,11 +205,16 @@ const Explore: React.FC = () => {
                     <MapControls showZoom showFullscreen />
                 </Map>
             </div>
-            <div className="fixed md:top-20 top-24 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
+            <div className="fixed md:top-12 top-24 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
+                <div className="flex gap-4 items-center">
+                <Link to="/" className="bg-white border p-2 rounded-md font-bold text-sm text-gray-500 hover:text-black transition-colors">
+                    <ArrowLeft className="w-6 h-6" /> 
+                </Link>
                 <PlaceSearchFilter
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                 />
+                </div>
                 <DistanceFilter
                     selectedDistance={selectedDistance}
                     onDistanceChange={handleDistanceChange}
