@@ -52,22 +52,31 @@ export const useOverpassPlaces = (
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
+    const lastFetchKey = useRef<string>("");
 
     useEffect(() => {
         const fetchPlaces = async () => {
             if (!position?.lat || !position?.lon) return;
+
+            // Generar clave única para esta búsqueda
+            const cacheKey = `${position.lat.toFixed(4)}_${position.lon.toFixed(4)}_${radiusMeters}`;
+            
+            // Si es la misma búsqueda que la anterior, no hacer nada
+            if (cacheKey === lastFetchKey.current && data !== null) {
+                return;
+            }
 
             // Cancelar petición anterior si existe
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
             }
 
-            const cacheKey = `${position.lat.toFixed(3)}_${position.lon.toFixed(3)}_${radiusMeters}`;
             const cached = cache.get(cacheKey);
 
             // Usar cache si es reciente
             if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
                 setData(cached.data);
+                lastFetchKey.current = cacheKey;
                 return;
             }
 
@@ -120,6 +129,7 @@ export const useOverpassPlaces = (
 
                 // Guardar en cache
                 cache.set(cacheKey, { data: result, timestamp: Date.now() });
+                lastFetchKey.current = cacheKey;
 
                 setData(result);
             } catch (error: any) {
@@ -139,7 +149,7 @@ export const useOverpassPlaces = (
                 abortControllerRef.current.abort();
             }
         };
-    }, [position?.lat, position?.lon, radiusMeters]);
+    }, [position?.lat, position?.lon, radiusMeters, data]);
 
     return { data, loading, error };
 };
