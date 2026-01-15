@@ -1,32 +1,15 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OverpassElement } from "@/types";
 import type { GeoPosition } from "@/hooks/useGeolocation";
-import { createNotification, ExtendedNotificationOptions } from "@/types/notification.types";
 
-interface ProximityConfig {
-  radiusMeters: number;
-  cooldownMinutes: number;
-  maxNotificationsPerHour: number;
-}
-
-const DEFAULT_CONFIG: ProximityConfig = {
-  radiusMeters: 1000,
-  cooldownMinutes: 30,
-  maxNotificationsPerHour: 5,
-};
-
-interface NotificationRecord {
-  placeId: string;
-  timestamp: number;
-}
-
-const calculateDistance = (
+// Calcular distancia entre dos puntos
+const getDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
 ): number => {
-  const R = 6371e3; // Radio de la Tierra en metros
+  const R = 6371e3;
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
   const Δφ = ((lat2 - lat1) * Math.PI) / 180;
@@ -40,218 +23,93 @@ const calculateDistance = (
   return R * c;
 };
 
-const categoryPlaces = [
-  { amenity: "restaurant", emoji: "🍽️" },
-  { amenity: "cafe", emoji: "☕" },
-  { amenity: "bar", emoji: "🍺" },
-  { amenity: "pub", emoji: "🍺" },
-  { amenity: "fast_food", emoji: "🍕" },
-  { amenity: "ice_cream", emoji: "🍦" },
-  { tourism: "museum", emoji: "🏛️" },
-  { tourism: "gallery", emoji: "🏛️" },
-  { tourism: "attraction", emoji: "🎨" },
-  { tourism: "artwork", emoji: "🎨" },
-  { tourism: "hotel", emoji: "🏨" },
-  { shop: "mall", emoji: "🛍️" }
-];
-
-const getPlaceEmoji = (place: OverpassElement): string => {
+// Emojis por categoría
+const getEmoji = (place: OverpassElement): string => {
   const amenity = place.tags?.amenity;
   const tourism = place.tags?.tourism;
-  const shop = place.tags?.shop;
 
-  // CORRECCIÓN: forEach no retorna valores, usar find
-  const category = categoryPlaces.find(cat => 
-    cat.amenity === amenity || 
-    cat.tourism === tourism || 
-    cat.shop === shop
-  );
+  if (amenity === "restaurant") return "🍽️";
+  if (amenity === "cafe") return "☕";
+  if (amenity === "bar" || amenity === "pub") return "🍺";
+  if (amenity === "fast_food") return "🍕";
+  if (amenity === "ice_cream") return "🍦";
+  if (tourism === "museum" || tourism === "gallery") return "🏛️";
+  if (tourism === "attraction" || tourism === "artwork") return "🎨";
   
-  return category?.emoji || "📍";
+  return "📍";
 };
+
+interface NearbyPlace {
+  emoji: string;
+  name: string;
+  distance: number;
+  place: OverpassElement;
+}
 
 export const useProximityNotifications = (
   position: GeoPosition | null,
-  places: OverpassElement[],
-  config: Partial<ProximityConfig> = {}
+  places: OverpassElement[]
 ) => {
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
-  const notificationHistory = useRef<NotificationRecord[]>([]);
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [permissionDenied, setPermissionDenied] = useState(false);
-  const lastCheckTime = useRef<number>(0);
-  const isCheckingRef = useRef(false);
+  const [nearbyPlace, setNearbyPlace] = useState<NearbyPlace | null>(null);
+  const notifiedPlaces = useRef<Set<string>>(new Set());
+  const lastCheck = useRef<number>(0);
 
-  // Solicitar permisos
-  const requestPermission = useCallback(async () => {
-    if (!("Notification" in window)) {
-      console.warn("Este navegador no soporta notificaciones");
-      return false;
-    }
-
-    if (Notification.permission === "granted") {
-      setPermissionGranted(true);
-      return true;
-    }
-
-    if (Notification.permission === "denied") {
-      setPermissionDenied(true);
-      return false;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      
-      if (permission === "granted") {
-        setPermissionGranted(true);
-        return true;
-      } else {
-        setPermissionDenied(true);
-        return false;
-      }
-    } catch (error) {
-      console.error("Error al solicitar permisos:", error);
-      return false;
-    }
-  }, []);
-
-  // Solicitar permisos al montar
   useEffect(() => {
-    requestPermission();
-  }, [requestPermission]);
-
-  // Limpiar historial antiguo
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const oneHourAgo = now - 60 * 60 * 1000;
-      
-      notificationHistory.current = notificationHistory.current.filter(
-        (record) => record.timestamp > oneHourAgo
-      );
-    }, 5 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Verificar proximidad
-  useEffect(() => {
-    // Validaciones iniciales
-    if (!position || !permissionGranted || places.length === 0) return;
-    if (isCheckingRef.current) return; // Prevenir ejecución concurrente
+    if (!position || places.length === 0) return;
 
     const now = Date.now();
     
-    // Throttle: solo verificar cada 10 segundos
-    if (now - lastCheckTime.current < 10000) return;
+    // Solo revisar cada 15 segundos
+    if (now - lastCheck.current < 15000) return;
     
-    isCheckingRef.current = true;
-    lastCheckTime.current = now;
+    lastCheck.current = now;
 
-    try {
-      // Contar notificaciones recientes
-      const oneHourAgo = now - 60 * 60 * 1000;
-      const recentNotifications = notificationHistory.current.filter(
-        (record) => record.timestamp > oneHourAgo
+    // Buscar lugar más cercano (menos de 100m)
+    const nearby = places.find((place) => {
+      if (!place.lat || !place.lon || !place.tags?.name) return false;
+      
+      // Si ya notificamos este lugar, ignorar
+      if (notifiedPlaces.current.has(String(place.id))) return false;
+
+      const distance = getDistance(
+        position.lat,
+        position.lon,
+        place.lat,
+        place.lon
       );
 
-      if (recentNotifications.length >= finalConfig.maxNotificationsPerHour) {
-        return;
-      }
+      return distance <= 100;
+    });
 
-      const cooldownMs = finalConfig.cooldownMinutes * 60 * 1000;
+    if (nearby) {
+      const distance = Math.round(
+        getDistance(position.lat, position.lon, nearby.lat!, nearby.lon!)
+      );
 
-      // Encontrar lugares cercanos
-      const nearbyPlaces = places.filter((place) => {
-        if (!place.lat || !place.lon) return false;
+      const emoji = getEmoji(nearby);
+      const name = nearby.tags!.name;
 
-        const distance = calculateDistance(
-          position.lat,
-          position.lon,
-          place.lat,
-          place.lon
-        );
-
-        // Verificar cooldown
-        const lastNotification = notificationHistory.current.find(
-          (record) => record.placeId === String(place.id)
-        );
-
-        if (lastNotification && now - lastNotification.timestamp < cooldownMs) {
-          return false;
-        }
-
-        return distance <= finalConfig.radiusMeters;
-      });
-
-      // Notificar solo el lugar más cercano
-      if (nearbyPlaces.length > 0) {
-        const closest = nearbyPlaces.reduce((prev, curr) => {
-          const prevDist = calculateDistance(
-            position.lat,
-            position.lon,
-            prev.lat!,
-            prev.lon!
-          );
-          const currDist = calculateDistance(
-            position.lat,
-            position.lon,
-            curr.lat!,
-            curr.lon!
-          );
-          return currDist < prevDist ? curr : prev;
-        });
-
-        const emoji = getPlaceEmoji(closest);
-        const placeName = closest.tags?.name || "un lugar interesante";
-        const distance = Math.round(
-          calculateDistance(
-            position.lat,
-            position.lon,
-            closest.lat!,
-            closest.lon!
-          )
-        );
-
-        // CORRECCIÓN: Variable mal nombrada y paréntesis extra
-        const notificationOptions: ExtendedNotificationOptions = {
-          body: `Estás a ${distance}m de ${placeName}. ¡Descúbrelo!`,
-          icon: "/L.ico",
-          badge: "/L.ico",
-          tag: `place-${closest.id}`,
-          requireInteraction: false,
-          silent: false,
-          vibrate: [200, 100, 200],
-        };
-
-        const notification = createNotification(`${emoji} ${placeName}`, notificationOptions);
-
-        // Agregar evento click
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-        };
-
-        // Auto-cerrar después de 5 segundos
-        setTimeout(() => notification.close(), 5000);
-
-        // CORRECCIÓN: Faltaba registrar la notificación en el historial
-        notificationHistory.current.push({
-          placeId: String(closest.id),
-          timestamp: now,
-        });
-      }
-    } catch (error) {
-      console.error("Error al verificar proximidad:", error);
-    } finally {
-      isCheckingRef.current = false;
+      // Mostrar notificación
+      setNearbyPlace({ emoji, name, distance, place: nearby });
+      
+      // Marcar como notificado
+      notifiedPlaces.current.add(String(nearby.id));
+      
+      // Auto-cerrar después de 5 segundos
+      setTimeout(() => setNearbyPlace(null), 5000);
+      
+      // Permitir notificar nuevamente después de 10 minutos
+      setTimeout(() => {
+        notifiedPlaces.current.delete(String(nearby.id));
+      }, 10 * 60 * 1000);
     }
-  }, [position, places, permissionGranted, finalConfig]);
+  }, [position, places]);
+
+  const closeNotification = () => setNearbyPlace(null);
 
   return {
-    permissionGranted,
-    permissionDenied,
-    notificationCount: notificationHistory.current.length,
-    requestPermission,
+    nearbyPlace,
+    closeNotification,
+    notifiedCount: notifiedPlaces.current.size
   };
 };
