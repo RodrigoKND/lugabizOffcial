@@ -103,7 +103,7 @@ const Explore: React.FC = () => {
 
     // Notificaciones de proximidad inteligentes
     useProximityNotifications(position, filteredPlaces, {
-        radiusMeters: 500,
+        radiusMeters: 1000,
         cooldownMinutes: 30,
         maxNotificationsPerHour: 5,
     });
