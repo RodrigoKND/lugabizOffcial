@@ -1,266 +1,115 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { OverpassElement } from "@/types";
+import type { GeoPosition } from "@/hooks/useGeolocation";
 
-import {
-    Map,
-    MapMarker,
-    MarkerContent,
-    MapControls,
-    useMap,
-} from "@/components/ui/map";
+// Calcular distancia entre dos puntos
+const getDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
+  const R = 6371e3;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-import { usePlaces } from "@/context/PlacesContext";
-import { useGeolocation, type GeoPosition } from "@/hooks/useGeolocation";
-import { useOverpassPlaces } from "@/hooks/useOverpassPlaces";
-import { useProximityNotifications } from "@/hooks/useProximityNotifications";
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-import DistanceFilter from "@/components/DistanceFilter";
-import MapMarkers from "@/components/MapMarkers";
-import ChatModal from "@/components/ChatModal";
-import PlacesResultsModal from "@/components/PlacesResultsModal";
-import PlaceDetailModal from "@/components/PlaceDetailModal";
-import PlaceSearchFilter from "@/components/PlaceSearchFilter";
-
-import { METTERS } from "@/static/data/metters";
-import type { OverpassElement } from "@/types";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-
-function MapController({
-    position,
-    selectedDistance,
-}: {
-    position: GeoPosition | null;
-    selectedDistance: number;
-}) {
-    const { map, isLoaded } = useMap();
-    const hasInitialized = useRef(false);
-    const lastPosition = useRef<GeoPosition | null>(null);
-    const lastDistance = useRef<number | null>(null);
-
-    const metersToZoom = useCallback((meters: number) => {
-        return (
-            [...METTERS].reverse().find((m) => m.metters <= meters)?.zoom ?? 13
-        );
-    }, []);
-
-    useEffect(() => {
-        if (!map || !isLoaded || !position?.lat || !position?.lon) return;
-
-        const positionChanged =
-            !lastPosition.current ||
-            Math.abs(lastPosition.current.lat - position.lat) > 0.001 ||
-            Math.abs(lastPosition.current.lon - position.lon) > 0.001;
-
-        const distanceChanged = lastDistance.current !== selectedDistance;
-
-        // Primera inicialización o cambios detectados
-        if (!hasInitialized.current || positionChanged || distanceChanged) {
-            map.flyTo({
-                center: [position.lon, position.lat],
-                zoom: metersToZoom(selectedDistance),
-                duration: hasInitialized.current ? 800 : 0,
-            });
-
-            hasInitialized.current = true;
-            lastPosition.current = { lat: position.lat, lon: position.lon };
-            lastDistance.current = selectedDistance;
-        }
-    }, [map, isLoaded, position, selectedDistance, metersToZoom]);
-
-    return null;
-}
-
-const Explore: React.FC = () => {
-    const navigate = useNavigate();
-    const { places } = usePlaces();
-
-    const { position, loading: geoLoading, error, retry } = useGeolocation();
-
-    const [selectedDistance, setSelectedDistance] = useState(METTERS[0].metters);
-    const [selectedPlace, setSelectedPlace] =
-        useState<OverpassElement | null>(null);
-    const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-
-    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-    const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
-    const [selectedQuery, setSelectedQuery] = useState("");
-    const [isSearchLoading, setIsSearchLoading] = useState(false);
-
-    const initialZoom = useMemo(() => {
-        return [...METTERS].reverse().find((m) => m.metters <= METTERS[0].metters)?.zoom ?? 13;
-    }, []);
-
-    const { data } = useOverpassPlaces(position, selectedDistance);
-
-    const filteredPlaces = useMemo(() => {
-        if (!data?.elements) return [];
-        return data.elements.filter(
-            (el) => el.lat && el.lon && el.tags?.name
-        );
-    }, [data]);
-
-    // Notificaciones de proximidad inteligentes
-    useProximityNotifications(position, filteredPlaces, {
-        radiusMeters: 1000,
-        cooldownMinutes: 30,
-        maxNotificationsPerHour: 5,
-    });
-
-    const handleDistanceChange = (distance: number) =>
-        setSelectedDistance(distance);
-
-    const handleMarkerClick = (place: OverpassElement) => {
-        setSelectedPlace(place);
-        setIsPlaceModalOpen(true);
-    };
-
-    const handleSearch = (query: string) => {
-        setSelectedQuery(query);
-        setIsSearchLoading(true);
-        setTimeout(() => {
-            setIsSearchLoading(false);
-            setIsResultsModalOpen(true);
-        }, 2000);
-        setIsChatModalOpen(false);
-    };
-
-    const handlePlaceClick = (placeId: string) => {
-        setIsSearchLoading(true);
-        setTimeout(() => {
-            setIsSearchLoading(false);
-            navigate(`/place/${placeId}`);
-        }, 1500);
-    };
-
-    if (geoLoading && !position) {
-        return (
-            <div className="fixed inset-0 flex items-center justify-center bg-background">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="text-6xl animate-bounce">🦕</div>
-                    <p className="text-lg font-medium text-muted-foreground">
-                        Obteniendo tu ubicación...
-                    </p>
-                    {error && (
-                        <p className="text-sm text-red-500 mt-2">{error}</p>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    if (!position) {
-        return (
-            <div className="fixed inset-0 flex items-center justify-center bg-background">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="text-6xl">🦕</div>
-                    <p className="text-lg font-medium text-muted-foreground">
-                        No se pudo obtener ubicación
-                    </p>
-                    <button
-                        onClick={() => retry()}
-                        className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
-                    >
-                        Reintentar
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <section className="fixed inset-0 w-full h-full overflow-hidden">
-            <div className="absolute inset-0 z-10">
-                <Map
-                    center={[position.lon, position.lat]}
-                    zoom={initialZoom}
-                >
-                    <MapController
-                        position={position}
-                        selectedDistance={selectedDistance}
-                    />
-
-                    {position?.lat && position?.lon && (
-                        <MapMarker
-                            longitude={position.lon}
-                            latitude={position.lat}
-                        >
-                            <MarkerContent>
-                                <div className="flex flex-col items-center" style={{ zIndex: 1000 }}>
-                                    <div className="text-3xl sm:text-4xl animate-pulse relative z-50">
-                                        🦕
-                                    </div>
-                                </div>
-                            </MarkerContent>
-                        </MapMarker>
-                    )}
-
-                    <MapMarkers
-                        filteredPlaces={filteredPlaces}
-                        searchQuery={searchQuery}
-                        onMarkerClick={handleMarkerClick}
-                    />
-
-                    <MapControls showZoom showFullscreen />
-                </Map>
-            </div>
-            <div className="fixed md:top-12 top-24 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
-                <div className="flex gap-4 items-center">
-                <Link to="/" className="bg-white border p-2 rounded-md font-bold text-sm text-gray-500 hover:text-black transition-colors">
-                    <ArrowLeft className="w-6 h-6" /> 
-                </Link>
-                <PlaceSearchFilter
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                />
-                </div>
-                <DistanceFilter
-                    selectedDistance={selectedDistance}
-                    onDistanceChange={handleDistanceChange}
-                />
-            </div>
-
-            {/* Botón Chat - Responsive */}
-            {!isResultsModalOpen && !isChatModalOpen && (
-                <button
-                    aria-label="Pregúntame"
-                    title="Pregúntame"
-                    className="fixed bottom-4 left-4 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-purple-400 hover:bg-purple-500 active:scale-95 transition-all shadow-lg text-white flex items-center justify-center text-xl sm:text-2xl"
-                    onClick={() => setIsChatModalOpen(true)}
-                >
-                    👀
-                </button>
-            )}
-            <div className={`${isChatModalOpen && "fixed inset-0 z-50 bg-gray-200/50"} z-40 flex flex-col md:gap-2 gap-4`}>
-                <ChatModal
-                    isOpen={isChatModalOpen}
-                    onClose={() => setIsChatModalOpen(false)}
-                    onSearch={handleSearch}
-                    isLoading={isSearchLoading}
-                />
-            </div>
-
-            <PlacesResultsModal
-                isOpen={isResultsModalOpen}
-                onClose={() => setIsResultsModalOpen(false)}
-                query={selectedQuery}
-                places={places}
-                isLoading={isSearchLoading}
-                onPlaceClick={handlePlaceClick}
-                onChatAgain={() => {
-                    setIsResultsModalOpen(false);
-                    setIsChatModalOpen(true);
-                }}
-            />
-
-            <PlaceDetailModal
-                isOpen={isPlaceModalOpen}
-                onClose={() => setIsPlaceModalOpen(false)}
-                place={selectedPlace}
-            />
-        </section>
-    );
+  return R * c;
 };
 
-export default Explore;
+// Emojis por categoría
+const getEmoji = (place: OverpassElement): string => {
+  const amenity = place.tags?.amenity;
+  const tourism = place.tags?.tourism;
+
+  if (amenity === "restaurant") return "🍽️";
+  if (amenity === "cafe") return "☕";
+  if (amenity === "bar" || amenity === "pub") return "🍺";
+  if (amenity === "fast_food") return "🍕";
+  if (amenity === "ice_cream") return "🍦";
+  if (tourism === "museum" || tourism === "gallery") return "🏛️";
+  if (tourism === "attraction" || tourism === "artwork") return "🎨";
+  
+  return "📍";
+};
+
+interface NearbyPlace {
+  emoji: string;
+  name: string;
+  distance: number;
+  place: OverpassElement;
+}
+
+export const useProximityNotifications = (
+  position: GeoPosition | null,
+  places: OverpassElement[]
+) => {
+  const [nearbyPlace, setNearbyPlace] = useState<NearbyPlace | null>(null);
+  const notifiedPlaces = useRef<Set<string>>(new Set());
+  const lastCheck = useRef<number>(0);
+
+  useEffect(() => {
+    if (!position || places.length === 0) return;
+
+    const now = Date.now();
+    
+    // Solo revisar cada 15 segundos
+    if (now - lastCheck.current < 15000) return;
+    
+    lastCheck.current = now;
+
+    // Buscar lugar más cercano (menos de 100m)
+    const nearby = places.find((place) => {
+      if (!place.lat || !place.lon || !place.tags?.name) return false;
+      
+      // Si ya notificamos este lugar, ignorar
+      if (notifiedPlaces.current.has(String(place.id))) return false;
+
+      const distance = getDistance(
+        position.lat,
+        position.lon,
+        place.lat,
+        place.lon
+      );
+
+      return distance <= 100;
+    });
+
+    if (nearby) {
+      const distance = Math.round(
+        getDistance(position.lat, position.lon, nearby.lat!, nearby.lon!)
+      );
+
+      const emoji = getEmoji(nearby);
+      const name = nearby.tags!.name;
+
+      // Mostrar notificación
+      setNearbyPlace({ emoji, name, distance, place: nearby });
+      
+      // Marcar como notificado
+      notifiedPlaces.current.add(String(nearby.id));
+      
+      // Auto-cerrar después de 5 segundos
+      setTimeout(() => setNearbyPlace(null), 5000);
+      
+      // Permitir notificar nuevamente después de 10 minutos
+      setTimeout(() => {
+        notifiedPlaces.current.delete(String(nearby.id));
+      }, 10 * 60 * 1000);
+    }
+  }, [position, places]);
+
+  const closeNotification = () => setNearbyPlace(null);
+
+  return {
+    nearbyPlace,
+    closeNotification,
+    notifiedCount: notifiedPlaces.current.size
+  };
+};
