@@ -6,7 +6,7 @@ import {
   Calendar, Camera, X,
   ChevronRight,
   UserPlus,
-  Users, DollarSign, TrendingUp, Eye, Heart,
+  Users, TrendingUp, Eye, Heart,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { usePlaces } from '@/context/PlacesContext';
@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
   const [_, setShowAllPlacesModal] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
-  // Mock: Eventos publicados por el usuario (reemplazar con datos reales)
+  // Mock: Eventos publicados por el usuario
   const userEvents = [
     {
       id: 1,
