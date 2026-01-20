@@ -213,7 +213,7 @@ const Explore: React.FC = () => {
                 </div>
             )}
 
-            <div className="fixed md:top-12 top-24 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
+            <div className="fixed md:top-12 top-8 md:left-2 left-4 z-40 flex flex-col md:gap-2 gap-4 md:w-[calc(100%-1rem)] w-max">
                 <div className="flex gap-4 items-center">
                     <Link
                         to="/"
