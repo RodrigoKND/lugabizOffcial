@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import CategoryCard from '@/components/CategoryCard';
 import AllPlacesModal from '@/components/AllPlacesModal';
-import WelcomeMessage from '@/components/WelcomeMessage';
 import Preferences from '@/components/Preferences';
 import CustomToast from '@/components/CustomToast';
 import EventsSection, { mockEvents } from '@/components/EventSection';
@@ -33,7 +32,6 @@ const Home: React.FC = () => {
 
       <div className="relative z-10">
         {resultNotification && <CustomToast resultNotification={resultNotification} />}
-        <WelcomeMessage />
         <Preferences />
         <AllPlacesModal isOpen={showAllPlacesModal} onClose={() => setShowAllPlacesModal(false)} />
 
