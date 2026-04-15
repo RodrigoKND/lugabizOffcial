@@ -24,7 +24,7 @@ const Home: React.FC = () => {
 
 
   return (
-    <section className="relative min-h-screen bg-gray-100 overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden">
       <h4 className="text-gray-600 text-md bg-red-50 p-4 text-center">
         Esta página está en construcción - ¡Muy pronto!
       </h4>
@@ -38,25 +38,25 @@ const Home: React.FC = () => {
         <AllPlacesModal isOpen={showAllPlacesModal} onClose={() => setShowAllPlacesModal(false)} />
 
         {/* Main Content - Sin hero tradicional */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2"
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-2"
         >
-          <div className="flex gap-4 overflow-x-auto"
+          <div className="flex gap-4 overflow-x-auto justify-center"
           >
             {mockEvents.map((event, index) => (
               <button
                 key={`story-${event.id}`}
                 onClick={() => setSelectedEventIndex(index)}
-                className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                className="flex flex-col items-center gap-4 flex-shrink-0 group"
               >
-                <div className={`p-[3px] rounded-full transition-transform group-active:scale-90 ${event.organizer.isNew
+                <div className={`p-[3px] rounded-md transition-transform group-active:scale-90 ${event.organizer.isNew
                   ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500'
                   : 'bg-gray-300'
                   }`}>
-                  <div className="p-0.5 bg-white rounded-full">
+                  <div className="p-0.5 bg-white rounded-md">
                     <img
                       src={event.organizer.avatar}
                       alt={event.organizer.name}
-                      className="w-16 h-16 rounded-full object-cover border border-gray-100"
+                      className="w-16 h-16 rounded-md object-cover border border-gray-100"
                     />
                   </div>
                 </div>

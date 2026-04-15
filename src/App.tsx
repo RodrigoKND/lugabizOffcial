@@ -23,9 +23,9 @@ function App() {
     <AuthProvider>
       <PlacesProvider>
         <Router>
-          <div className="min-h-screen flex flex-col">
             <Navbar onAuthClick={() => setIsAuthModalOpen(true)} />
-            <main className="flex-1">
+          <main className="min-h-screen flex flex-col max-w-6xl mx-auto w-full">
+            <div className="flex-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/place/:id" element={<PlaceDetail />} />
@@ -37,14 +37,14 @@ function App() {
                 <Route path="/explore" element={<Explore />} />
                 <Route path="*" element={<Home />} />
               </Routes>
-            </main>
-            <Footer />
+            </div>
             <AuthModal
               isOpen={isAuthModalOpen}
               onClose={() => setIsAuthModalOpen(false)}
             />
             <Toaster position="top-right" />
-          </div>
+          </main>
+            <Footer />
         </Router>
       </PlacesProvider>
       <Analytics mode='production' />
