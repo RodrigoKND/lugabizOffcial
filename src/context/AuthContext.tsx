@@ -49,23 +49,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Load saved places
           const userSavedPlaces = await savedPlacesService.getSavedPlaces(currentUser.id);
           setSavedPlaces(userSavedPlaces);
-
-          // Check if returning user
-          const isReturningUser = localStorage.getItem(`lugabiz_user_${currentUser.id}_welcomed`);
-          if (isReturningUser) {
-            toast.success(`¡Bienvenido de vuelta, ${userProfile.name}! 🦕`, {
-              duration: 4000,
-              style: {
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #FF6347 100%)',
-                color: 'white',
-                fontWeight: '600',
-                borderRadius: '12px',
-                padding: '16px 20px',
-              },
-            });
-          } else {
-            setIsNewUser(true);
-          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
