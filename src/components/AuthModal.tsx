@@ -70,7 +70,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center md:p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +88,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           <div className="grid md:grid-cols-2 max-h-[600px] overflow-y-auto">
             {/* Left Side - Welcome Section */}
-            <div className="relative bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 p-12 flex flex-col justify-center items-center text-white overflow-hidden">
+            <div className="relative hidden bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 p-12 lg:flex flex-col justify-center items-center text-white overflow-hidden">
               {/* Animated Background Elements */}
               <div className="absolute inset-0 overflow-hidden">
                 <motion.div
