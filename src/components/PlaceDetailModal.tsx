@@ -1,268 +1,141 @@
-import React, { useEffect, useState } from 'react';
-import supabase from '../lib/supabase';
-
-interface OverpassElement {
-    id: number;
-    lat?: number;
-    lon?: number;
-    tags?: Record<string, string> | null;
-}
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, MapPin, Star, ExternalLink, Phone, Globe } from 'lucide-react';
+import type { OverpassElement } from '@/types';
 
 interface PlaceDetailModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    place: OverpassElement | null;
+  isOpen: boolean;
+  onClose: () => void;
+  place: OverpassElement | null;
 }
 
-// Mapeo de amenities/tourism a emojis
-const getEmojiForType = (tags?: Record<string, string> | null): string => {
-    if (!tags) return '📍';
-    
-    const amenity = tags.amenity?.toLowerCase() || '';
-    const tourism = tags.tourism?.toLowerCase() || '';
-    const cuisine = tags.cuisine?.toLowerCase() || '';
-
-    if (amenity.includes('restaurant')) return '🍽️';
-    if (amenity.includes('cafe') || amenity.includes('coffee')) return '☕';
-    if (amenity.includes('bar') || amenity.includes('pub')) return '🍺';
-    if (amenity.includes('fast_food')) return '🍔';
-    if (amenity.includes('pizza')) return '🍕';
-    if (tourism.includes('museum')) return '🏛️';
-    if (tourism.includes('gallery')) return '🎨';
-    if (tourism.includes('attraction')) return '✨';
-    if (amenity.includes('hotel') || amenity.includes('guest_house')) return '🏨';
-    if (amenity.includes('pharmacy')) return '💊';
-    if (amenity.includes('hospital')) return '🏥';
-    if (amenity.includes('bank')) return '🏦';
-    if (amenity.includes('library')) return '📚';
-    if (cuisine.includes('pizza')) return '🍕';
-    if (cuisine.includes('burger')) return '🍔';
-    if (cuisine.includes('sushi') || cuisine.includes('japanese')) return '🍱';
-    if (cuisine.includes('chinese')) return '🥡';
-    if (cuisine.includes('mexican')) return '🌮';
-
-    return '📍';
-};
-
-// Traducir tipos de amenity/tourism
-const translateType = (tags?: Record<string, string> | null): string => {
-    if (!tags) return 'Lugar';
-
-    const amenity = tags.amenity || '';
-    const tourism = tags.tourism || '';
-
-    const translations: Record<string, string> = {
-        restaurant: 'Restaurante',
-        cafe: 'Café',
-        coffee_shop: 'Cafetería',
-        bar: 'Bar',
-        pub: 'Pub',
-        fast_food: 'Comida Rápida',
-        pizza: 'Pizzería',
-        museum: 'Museo',
-        gallery: 'Galería',
-        attraction: 'Atracción Turística',
-        hotel: 'Hotel',
-        guest_house: 'Hospedaje',
-        pharmacy: 'Farmacia',
-        hospital: 'Hospital',
-        bank: 'Banco',
-        library: 'Biblioteca',
-    };
-
-    return translations[amenity] || translations[tourism] || 'Lugar';
-};
-
 const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({ isOpen, onClose, place }) => {
-    const [loading, setLoading] = useState(false);
-    const [supabaseData, setSupabaseData] = useState<any | null>(null);
-    const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
-    // useEffect(() => {
-    //     const fetchSupabase = async () => {
-    //         setSupabaseData(null);
-    //         setError(null);
-    //         if (!place) return;
+  if (!place) return null;
 
-    //         try {
-    //             setLoading(true);
-    //             const { data, error } = await supabase
-    //                 .from('places')
-    //                 .select('*')
-    //                 .eq('osm_id', String(place.id))
-    //                 .maybeSingle();
+  const lat = place.lat;
+  const lon = place.lon;
+  const name = place.tags?.name || 'Sin nombre';
+  const category = place.tags?.category || place.tags?.amenity || 'lugar';
+  const address = place.tags?.['addr:street'] ? 
+    `${place.tags['addr:housenumber'] || ''} ${place.tags['addr:street']}`.trim() : 
+    place.tags?.address || 'Dirección no disponible';
+  const description = place.tags?.description || place.tags?.['addr:city'] || '';
+  const website = place.tags?.website || place.tags?.url;
+  const phone = place.tags?.phone;
+  const openingHours = place.tags?.opening_hours;
+  const price = place.tags?.price;
 
-    //             if (error) {
-    //                 setError(error.message);
-    //             } else {
-    //                 setSupabaseData(data || null);
-    //             }
-    //         } catch (err: any) {
-    //             setError(err?.message || 'Error al obtener detalles');
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+  const handleExternalLink = () => {
+    if (lat && lon) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+    }
+  };
 
-    //     fetchSupabase();
-    // }, [place]);
-
-    if (!isOpen || !place) return null;
-
-    const name = place.tags?.name || supabaseData?.name || 'Lugar sin nombre';
-    const type = translateType(place.tags);
-    const emoji = getEmojiForType(place.tags);
-    
-    const address =
-        place.tags?.['addr:full'] ||
-        place.tags?.['addr:street'] ||
-        supabaseData?.address ||
-        '';
-
-    const phone = place.tags?.phone || supabaseData?.phone || '';
-    const website = place.tags?.website || place.tags?.url || supabaseData?.website || '';
-    const hours = place.tags?.['opening_hours'] || '';
-    const rating = supabaseData?.rating || place.tags?.rating || '';
-
-    return (
-        <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-            
-            <div className="relative z-50 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-                {/* Encabezado con fondo gradiente */}
-                <div className="h-48 bg-gradient-to-br from-primary-500 via-primary-600 to-tomato relative flex items-end p-6">
-                    <div className="flex items-end gap-4">
-                        <div className="text-6xl">{emoji}</div>
-                        <div className="flex-1">
-                            <p className="text-white/80 text-sm font-medium">{type}</p>
-                            <h2 className="text-white text-2xl font-bold line-clamp-2">{name}</h2>
-                        </div>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        aria-label="Cerrar"
-                        className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white backdrop-blur-sm transition"
-                    >
-                        ✕
-                    </button>
-                </div>
-
-                {/* Contenido */}
-                <div className="p-6 max-h-96 overflow-y-auto space-y-4">
-                    {/* Dirección */}
-                    {address && (
-                        <div className="flex gap-3">
-                            <span className="text-xl flex-shrink-0">📍</span>
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Dirección</p>
-                                <p className="text-gray-800">{address}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Teléfono */}
-                    {phone && (
-                        <div className="flex gap-3">
-                            <span className="text-xl flex-shrink-0">📱</span>
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Teléfono</p>
-                                <a href={`tel:${phone}`} className="text-primary-600 hover:underline">
-                                    {phone}
-                                </a>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Horario */}
-                    {hours && (
-                        <div className="flex gap-3">
-                            <span className="text-xl flex-shrink-0">🕐</span>
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Horario</p>
-                                <p className="text-gray-800 text-sm">{hours}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Sitio Web */}
-                    {website && (
-                        <div className="flex gap-3">
-                            <span className="text-xl flex-shrink-0">🌐</span>
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Sitio Web</p>
-                                <a
-                                    href={website}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-primary-600 hover:underline text-sm break-all"
-                                >
-                                    {website}
-                                </a>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Calificación */}
-                    {rating && (
-                        <div className="flex gap-3">
-                            <span className="text-xl flex-shrink-0">⭐</span>
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Calificación</p>
-                                <p className="text-gray-800 font-semibold">{rating}/5</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Detalles adicionales (si hay) */}
-                    {loading && (
-                        <div className="flex items-center justify-center py-4">
-                            <div className="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
-                        </div>
-                    )}
-
-                    {error && (
-                        <p className="text-xs text-amber-600 bg-amber-50 p-3 rounded">
-                            ℹ️ No se pudieron obtener detalles adicionales
-                        </p>
-                    )}
-
-                    {!loading && !address && !phone && !website && !hours && !rating && (
-                        <p className="text-center text-gray-500 text-sm py-4">
-                            Sin información adicional disponible
-                        </p>
-                    )}
-                </div>
-
-                {/* Botones de acción */}
-                <div className="border-t bg-gray-50 px-6 py-4 flex gap-3">
-                    {website && (
-                        <a
-                            href={website}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex-1 bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition text-center text-sm"
-                        >
-                            Visitar
-                        </a>
-                    )}
-                    {phone && (
-                        <a
-                            href={`tel:${phone}`}
-                            className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold py-2 px-4 rounded-lg transition text-center text-sm"
-                        >
-                            Llamar
-                        </a>
-                    )}
-                    <button
-                        onClick={onClose}
-                        className={`${website || phone ? 'flex-1' : 'w-full'} bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold py-2 px-4 rounded-lg transition text-center text-sm`}
-                    >
-                        Cerrar
-                    </button>
-                </div>
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/50 flex items-end md:items-center justify-center"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="bg-white md:rounded-3xl w-full md:max-w-lg md:max-h-[85vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-48 md:h-56 bg-gradient-to-br from-purple-400 to-orange-400">
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              
+              <div className="absolute bottom-4 left-4 right-4">
+                <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium uppercase tracking-wider mb-2">
+                  {category}
+                </span>
+                <h2 className="text-2xl font-bold text-white line-clamp-2">{name}</h2>
+              </div>
             </div>
-        </div>
-    );
+
+            <div className="p-4 md:p-6 space-y-4 overflow-y-auto max-h-[calc(85vh-14rem)]">
+              <div className="flex items-center gap-2 text-gray-600">
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm">{address}</span>
+              </div>
+
+              {openingHours && (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Star className="w-4 h-4 flex-shrink-0 text-yellow-500" />
+                  <span className="text-sm">{openingHours}</span>
+                </div>
+              )}
+
+              {description && (
+                <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+              )}
+
+              {price && (
+                <div className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                  {price}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={handleExternalLink}
+                  className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-500 to-tomato text-white rounded-xl font-medium hover:shadow-lg transition-all"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Cómo Llegar
+                </button>
+
+                {phone && (
+                  <a
+                    href={`tel:${phone}`}
+                    className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    Llamar
+                  </a>
+                )}
+
+                {website && (
+                  <a
+                    href={website.startsWith('http') ? website : `https://${website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Web
+                  </a>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 export default PlaceDetailModal;
