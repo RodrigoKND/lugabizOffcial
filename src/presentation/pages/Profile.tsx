@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Navigate } from 'react-router-dom';
 import {
-  ArrowLeft, MapPin, Palette, Plus,
+  MapPin, Plus,
   Calendar, Camera, X,
   ChevronRight,
   UserPlus,
@@ -10,10 +10,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { usePlaces } from '@/presentation/context/PlacesContext';
-import Preferences from '@/presentation/components/features/Preferences';
 import PlacesCarousel from '@/presentation/components/features/PlacesCarousel';
 import EventForm from '@/presentation/components/features/EventForm';
-import { Place } from '@/types';
+import type { Place } from '@/types';
 
 
 const Profile: React.FC = () => {
@@ -23,7 +22,6 @@ const Profile: React.FC = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // States
-  const [openPreferencesModal, setOpenPreferencesModal] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'saved' | 'attending' | 'friends' | 'events'>('saved');
   const [showAttendeesModal, setShowAttendeesModal] = useState<any | null>(null);
@@ -61,17 +59,6 @@ const Profile: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // Manejar cambio de portada del evento
-  // const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-
-  //   const reader = new FileReader();
-  //   reader.onloadend = () => {
-  //     setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
 
   const [savedPlaces, setSavedPlaces] = useState<Place[]>([]);
 
@@ -92,16 +79,6 @@ const Profile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-slate-900">
-      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 font-bold text-sm text-gray-500 hover:text-black transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Inicio
-          </button>
-          <div className="flex gap-4">
-            <button onClick={() => setOpenPreferencesModal(true)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><Palette className="w-5 h-5" /></button>
-          </div>
-        </div>
-      </nav>
 
       <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-12 gap-8">
@@ -357,7 +334,6 @@ const Profile: React.FC = () => {
 
       <EventForm isOpen={showEventForm} onClose={() => setShowEventForm(false)} />
 
-      <Preferences openPreferences={openPreferencesModal} setClosePreferences={setOpenPreferencesModal} />
     </div>
   );
 };

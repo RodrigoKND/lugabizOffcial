@@ -13,9 +13,9 @@ const DistanceFilter: React.FC<DistanceFilterProps> = ({ selectedDistance, onDis
   const selectedOption = DISTANCES_PLACES.find(d => d.value === selectedDistance) || DISTANCES_PLACES[0];
 
   return (
-    <div className="relative w-max">
+    <div className="relative w-full">
       <button onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-white/95 backdrop-blur-sm px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between group border-2 border-transparent hover:border-purple-200">
+        className="w-full backdrop-blur-sm px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between group border-2 border-transparent hover:border-purple-200">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse" />
           <span className="font-semibold text-gray-800 text-sm sm:text-base">{selectedOption.name}</span>

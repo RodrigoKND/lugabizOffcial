@@ -14,7 +14,7 @@ const ERROR_MESSAGES: Record<number, string> = {
 export function useGeolocation() {
   const [position, setPosition] = useState<GeoPosition | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
   
   const watchIdRef = useRef<number | null>(null);
   const hasStarted = useRef(false);
@@ -25,7 +25,7 @@ export function useGeolocation() {
       lon: geoPosition.coords.longitude,
     });
     setLoading(false);
-    setError(null);
+    setError(undefined);
   }, []);
 
   const handleError = useCallback((err: GeolocationPositionError) => {
@@ -83,7 +83,7 @@ export function useGeolocation() {
 
   const retry = useCallback(() => {
     setLoading(true);
-    setError(null);
+    setError(undefined);
     setPosition(null);
     
     if (watchIdRef.current !== null) {
