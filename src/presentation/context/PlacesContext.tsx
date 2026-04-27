@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Place, PlaceFormData, Category, SocialGroup } from '@/domain/entities';
-import { placesService, categoriesService, socialGroupsService, reviewsService } from '@/data/supabase';
+import { placesService, categoriesService, socialGroupsService, reviewsService } from '@/lib/supabase';
 import { useAuth } from '@/presentation/context/AuthContext';
 
 interface PlacesContextType {
@@ -78,7 +78,7 @@ export function PlacesProvider({ children }: PlacesProviderProps) {
     
     try {
       const imageUrl = placeData.image 
-        ? await placesService.uploadImage(placeData.image)
+        ? await placesService.uploadImageSupabase(placeData.image)
         : undefined;
 
       const createPlaceData = {
