@@ -1,13 +1,13 @@
 // Main exports
-import { supabase } from './client';
-import { authService } from './services/auth';
-import { categoriesService } from './services/categories';
-import { socialGroupsService } from './services/socialGroups';
-import { placesService } from './services/places';
-import { reviewsService } from './services/reviews';
-import { savedPlacesService } from './services/savedPlaces';
-import { storageService } from './services/storage';
-import { realtimeService } from './services/realtime';
+import { supabase } from '@lib/supabase/client';
+import { authService } from '@lib/supabase//services/auth';
+import { categoriesService } from '@lib/supabase//services/categories';
+import { socialGroupsService } from '@lib/supabase//services/socialGroups';
+import { placesService } from '@lib/supabase//services/places';
+import { reviewsService } from '@lib/supabase//services/reviews';
+import { savedPlacesService } from '@lib/supabase//services/savedPlaces';
+import { storageService } from '@lib/supabase//services/storage';
+import { realtimeService } from '@lib/supabase//services/realtime';
 
 // Re-export everything
 export { supabase };
