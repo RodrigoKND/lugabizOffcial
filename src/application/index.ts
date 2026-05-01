@@ -1,0 +1,1 @@
+export { AppProviders } from '@application/providers/AppProviders';
