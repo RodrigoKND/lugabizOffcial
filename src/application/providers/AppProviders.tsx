@@ -1,5 +1,5 @@
-import { AuthProvider } from '@/presentation/context/AuthContext';
-import { PlacesProvider } from '@/presentation/context/PlacesContext';
+import { AuthProvider } from '@presentation/context/AuthContext';
+import { PlacesProvider } from '@presentation/context/PlacesContext';
 
 interface AppProvidersProps {
   children: React.ReactNode;

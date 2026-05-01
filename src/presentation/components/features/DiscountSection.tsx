@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tag, Percent, Gift, DollarSign } from 'lucide-react';
+import { Tag, Percent, Gift } from 'lucide-react';
 
 interface DiscountInfo {
   hasDiscount: boolean;
