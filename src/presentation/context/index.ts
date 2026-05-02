@@ -1,2 +1,2 @@
-export { AuthProvider, useAuth } from './AuthContext';
-export { PlacesProvider, usePlaces } from './PlacesContext';
+export { AuthProvider, useAuth } from '@presentation/context/AuthContext';
+export { PlacesProvider, usePlaces } from '@presentation/context/PlacesContext';
