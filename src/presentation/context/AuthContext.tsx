@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User } from '@/domain/entities';
-import { authService, savedPlacesService } from '@/lib/supabase';
+import { User } from '@domain/entities';
+import { authService, savedPlacesService } from '@lib/supabase';
 
 interface AuthContextType {
   user: User | null;

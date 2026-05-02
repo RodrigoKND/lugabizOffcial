@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Place, PlaceFormData, Category, SocialGroup } from '@/domain/entities';
-import { placesService, categoriesService, socialGroupsService, reviewsService } from '@/lib/supabase';
-import { useAuth } from '@/presentation/context/AuthContext';
+import { Place, PlaceFormData, Category, SocialGroup } from '@domain/entities';
+import { placesService, categoriesService, socialGroupsService, reviewsService } from '@lib/supabase';
+import { useAuth } from '@presentation/context';
 
 interface PlacesContextType {
   places: Place[];
@@ -46,7 +46,12 @@ export function PlacesProvider({ children }: PlacesProviderProps) {
     loadInitialData();
   }, []);
 
+  useEffect(() => {
+    console.log('PlacesContext changed - places:', places.length, 'isLoading:', isLoading);
+  }, [places, isLoading]);
+
   const loadInitialData = async () => {
+    console.log('PlacesContext: loadInitialData called');
     try {
       setIsLoading(true);
       const [placesData, categoriesData, socialGroupsData] = await Promise.all([
@@ -119,12 +124,12 @@ export function PlacesProvider({ children }: PlacesProviderProps) {
     places.filter(place => place.category.id === categoryId);
 
   const getTopPlaces = () =>
-    places
+    [...places]
       .sort((a, b) => (b.savedCount || 0) - (a.savedCount || 0))
       .slice(0, 6);
 
   const getRecentPlaces = (limit: number = 15) =>
-    places
+    [...places]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit);
 
