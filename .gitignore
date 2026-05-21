@@ -26,4 +26,4 @@ dist-ssr
 .env
 supabase/
 skills-lock.json
-.agents/*
+.agents
