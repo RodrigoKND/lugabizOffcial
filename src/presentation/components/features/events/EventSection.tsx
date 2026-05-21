@@ -1,19 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import EventCard from '@presentation/components/features/events/EventCard';
 import EventModal from '@presentation/components/features/events/modal/EventModal';
 import { useSlide } from '@presentation/hooks';
-import { mockEvents } from '@constants/mockEvents';
+import { usePlaces } from '@presentation/context';
+import { Event } from '@domain/entities';
+
+const mapToMockEvent = (event: Event) => ({
+  id: event.id,
+  title: event.name,
+  description: event.description,
+  location: event.address,
+  imageUrl: event.image || '',
+  startDate: event.dateStart,
+  endDate: event.dateStart,
+  availableDays: [],
+  availableHours: { start: event.timeStart, end: event.timeEnd || '' },
+  category: event.category?.name || 'General',
+  organizer: {
+    name: event.user?.name || 'Organizer',
+    avatar: event.user?.avatar || '',
+    isNew: false,
+  },
+  likes: event.attendeesCount || 0,
+  comments: 0,
+});
 
 const EventsSection = ({
   selectedEventIndex,
   setSelectedEventIndex,
+  onEventView,
 }: {
   selectedEventIndex: number | null;
   setSelectedEventIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  onEventView?: (eventId: string) => void;
 }) => {
+  const { events } = usePlaces();
   const [showAllEvents, setShowAllEvents] = useState(false);
+
+  const mappedEvents = useMemo(() => events.map(mapToMockEvent), [events]);
 
   const {
     canSlideLeft,
@@ -24,9 +50,14 @@ const EventsSection = ({
     handleTouchMove,
     handleTouchEnd,
     visibleData
-  } = useSlide({ data: mockEvents, visibleCount: 4 });
+  } = useSlide({ data: mappedEvents, visibleCount: 4 });
 
-  const displayedEvents = showAllEvents ? mockEvents : visibleData;
+  const displayedEvents = showAllEvents ? mappedEvents : visibleData;
+
+  const handleEventClick = (eventId: string) => {
+    onEventView?.(eventId);
+    setSelectedEventIndex(mappedEvents.findIndex(e => e.id === eventId));
+  };
 
   return (
     <>
@@ -45,7 +76,7 @@ const EventsSection = ({
               <p className="text-gray-600">Te aconsejamos estos eventos</p>
             </header>
 
-            {mockEvents.length > 4 && !showAllEvents && (
+            {mappedEvents.length > 4 && !showAllEvents && (
               <div className="hidden lg:flex items-center gap-2">
                 <button onClick={slideLeft} disabled={!canSlideLeft}
                   className={`p-2 rounded-full shadow-lg transition-all ${canSlideLeft ? 'hover:bg-gray-200 text-gray-900' : 'opacity-40 cursor-not-allowed text-gray-400'}`}>
@@ -69,7 +100,7 @@ const EventsSection = ({
               {displayedEvents.map((event, idx) => (
                 <motion.div key={event.id}
                   transition={{ delay: 0.05 * idx }}>
-                  <EventCard event={event} onClick={() => setSelectedEventIndex(mockEvents.findIndex(e => e.id === event.id))} />
+                  <EventCard event={event} onClick={() => handleEventClick(event.id)} />
                 </motion.div>
               ))}
             </div>
@@ -80,7 +111,7 @@ const EventsSection = ({
               {displayedEvents.map((event, idx) => (
                 <motion.div key={event.id}
                   transition={{ delay: 0.05 * idx }}>
-                  <EventCard event={event} onClick={() => setSelectedEventIndex(mockEvents.findIndex(e => e.id === event.id))} />
+                  <EventCard event={event} onClick={() => handleEventClick(event.id)} />
                 </motion.div>
               ))}
             </div>
@@ -88,10 +119,10 @@ const EventsSection = ({
 
           <div className="md:hidden">
             <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
-              {mockEvents.map((event, idx) => (
+              {displayedEvents.map((event, idx) => (
                 <motion.div key={event.id}
                   transition={{ delay: 0.05 * idx }} className="snap-start shrink-0 w-[70vw] max-w-70">
-                  <EventCard event={event} onClick={() => setSelectedEventIndex(mockEvents.findIndex(e => e.id === event.id))} />
+                  <EventCard event={event} onClick={() => handleEventClick(event.id)} />
                 </motion.div>
               ))}
             </div>
@@ -107,13 +138,13 @@ const EventsSection = ({
         </div>
       </motion.section>
 
-      {selectedEventIndex !== null && (
+      {selectedEventIndex !== null && mappedEvents[selectedEventIndex] && (
         <EventModal
-          event={mockEvents[selectedEventIndex]}
+          event={mappedEvents[selectedEventIndex]}
           onClose={() => setSelectedEventIndex(null)}
-          onNext={() => setSelectedEventIndex((selectedEventIndex + 1) % mockEvents.length)}
-          onPrev={() => setSelectedEventIndex((selectedEventIndex - 1 + mockEvents.length) % mockEvents.length)}
-          hasNext={selectedEventIndex < mockEvents.length - 1}
+          onNext={() => setSelectedEventIndex((selectedEventIndex + 1) % mappedEvents.length)}
+          onPrev={() => setSelectedEventIndex((selectedEventIndex - 1 + mappedEvents.length) % mappedEvents.length)}
+          hasNext={selectedEventIndex < mappedEvents.length - 1}
           hasPrev={selectedEventIndex > 0}
         />
       )}

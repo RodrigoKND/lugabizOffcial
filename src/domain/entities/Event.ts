@@ -1,50 +1,68 @@
 export interface Event {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  location: string;
-  imageUrl: string;
-  startDate: Date;
-  endDate?: Date;
-  availableDays?: string[];
-  availableHours?: { start: string; end: string };
-  category: string;
-  organizer: {
+  address: string;
+  categoryId: string;
+  category?: {
+    id: string;
     name: string;
-    avatar: string;
-    isNew: boolean;
+    icon: string;
+    color: string;
+    description: string;
   };
-  price?: string;
-  capacity?: string;
+  image?: string;
+  dateStart: Date;
+  timeStart: string;
+  timeEnd?: string;
+  price?: number;
+  capacity?: number;
+  isFree: boolean;
   tags?: string[];
-  locationCoords?: {
-    latitude: number;
-    longitude: number;
+  coords: number[];
+  userId: string;
+  user?: {
+    name: string;
+    avatar?: string;
   };
-  coverImage?: string | null;
-  likes: number;
-  comments: number;
+  attendeesCount: number;
+  attendeeAvatars?: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateEventData {
-  title: string;
+  name: string;
   description: string;
-  category: string;
-  date: string;
-  time: string;
-  price?: string;
-  capacity?: string;
-  coverImage?: string | null;
-  tags: string[];
-  location: {
-    latitude: number;
-    longitude: number;
-  } | null;
+  address: string;
+  categoryId: string;
+  image?: string;
+  dateStart: string;
+  timeStart: string;
+  timeEnd?: string;
+  price?: number;
+  capacity?: number;
+  isFree: boolean;
+  tags?: string[];
+  coords: number[];
+  userId: string;
 }
 
 export interface EventAttendance {
   id: string;
   eventId: string;
   userId: string;
+  userName?: string;
+  userAvatar?: string;
+  sharedBy?: string;
+  confirmed: boolean;
+  createdAt: Date;
+}
+
+export interface EventShare {
+  id: string;
+  eventId: string;
+  sharedBy: string;
+  sharedUrl: string;
   createdAt: Date;
 }

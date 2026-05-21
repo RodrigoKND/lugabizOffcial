@@ -53,7 +53,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, onSearch, isLoad
             ))}
           </ul>
           <search>
-            <textarea itemType="search" placeholder="Quiero lugares para pasar el tiempo con amigos"
+            <textarea placeholder="Quiero lugares para pasar el tiempo con amigos"
               className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:border-purple-500 overflow-y-auto"
               cols={5} onChange={(e) => setSelectedOption(e.target.value)} value={selectedOption} required maxLength={250} />
           </search>

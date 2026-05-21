@@ -1,245 +1,242 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import {
-  MapPin, Plus,
-  Calendar, Camera, X,
-  ChevronRight,
-  UserPlus,
-  Users, TrendingUp, Eye, Heart,
+  MapPin, Plus, Calendar, Camera, X, ChevronRight, UserPlus,
+  Users, TrendingUp, Eye, Heart, BarChart3, LogOut,
+  CheckCircle2, Clock, Star, Loader2, Bell, Ticket, Pencil
 } from 'lucide-react';
 import { useAuth, usePlaces } from '@presentation/context';
-import {PlacesCarousel, EventForm} from '@presentation/components/features';
-
+import { PlacesCarousel, EventForm } from '@presentation/components/features';
+import { Event } from '@domain/entities';
+import { eventsService } from '@lib/supabase';
+import { useSEO } from '@presentation/hooks/seo/useSEO';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { getLengthPlacesByUserId, getLengthReviewsByUserId, getSavedPlacesByUserId } = usePlaces();
+  const { user, logout, uploadAvatar, updateProfile, isAdmin } = useAuth();
+  const { getLengthPlacesByUserId, getLengthReviewsByUserId, getSavedPlacesByUserId, getUserEvents, getEventsAttending } = usePlaces();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  // States
   const [showEventForm, setShowEventForm] = useState(false);
-  const [activeTab, setActiveTab] = useState<'saved' | 'attending' | 'friends' | 'events'>('saved');
-  const [showAttendeesModal, setShowAttendeesModal] = useState<any | null>(null);
-  const [_, setShowAllPlacesModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('saved');
+  const [savedPlaces, setSavedPlaces] = useState<any[]>([]);
+  const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [showOwnerPanel, setShowOwnerPanel] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ name: '', phone: '', bio: '', ownerBusinessName: '' });
 
-  // Mock: Eventos publicados por el usuario
-  const userEvents = [
-    {
-      id: 1,
-      title: 'Noche de Tacos y Mezcal',
-      category: 'Gastronomía',
-      date: '2026-02-15',
-      attendees: 45,
-      views: 320,
-      likes: 89,
-      revenue: 1350
-    }
-  ];
-
-
-  // Manejar cambio de avatar
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploadingAvatar(true);
-
-    // Simular upload (reemplazar con lógica real)
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      // TODO: Reemplazar con lógica real
-      setIsUploadingAvatar(false);
-    };
-    reader.readAsDataURL(file);
-  };
-
-
-  const [savedPlaces, setSavedPlaces] = useState([]);
+  useSEO({
+    title: user?.name || 'Perfil',
+    description: 'Perfil de usuario en Lugabiz',
+  });
 
   useEffect(() => {
-    const renderPlacesSaved = async () => {
-      if(!user) return;
-      
-      const placesSaved = await getSavedPlacesByUserId(user.id);
-      
-      if(!placesSaved) return;
-      setSavedPlaces(placesSaved);
-    }
-    renderPlacesSaved();
-    
+    if (!user) return;
+    const init = async () => {
+      setEditData({
+        name: user.name || '',
+        phone: user.phone || '',
+        bio: user.bio || '',
+        ownerBusinessName: user.ownerBusinessName || '',
+      });
+
+      const saved = await getSavedPlacesByUserId(user.id);
+      if (saved) setSavedPlaces(saved);
+
+      const events = getUserEvents(user.id);
+      setMyEvents(events);
+
+      const attending = await getEventsAttending(user.id);
+      setAttendingEvents(attending);
+    };
+    init();
   }, [user]);
 
   if (!user) return <Navigate to="/" replace />;
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    await uploadAvatar(file);
+    setIsUploadingAvatar(false);
+  };
+
+  const handleSaveProfile = async () => {
+    await updateProfile(editData);
+    setIsEditing(false);
+  };
+
+  const handleSubmitEventForm = () => {
+    setShowEventForm(false);
+  };
+
+  const tabs = [
+    { id: 'saved', label: 'Colección', icon: Heart },
+    { id: 'events', label: 'Mis Eventos', icon: Calendar },
+    { id: 'attending', label: 'Asistiré', icon: CheckCircle2 },
+  ];
+
+  if (user.isOwner) tabs.push({ id: 'owner', label: 'Dashboard', icon: BarChart3 });
+
+  const myPlacesCount = getLengthPlacesByUserId(user.id).length;
+  const reviewsCount = getLengthReviewsByUserId(user.id);
+
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-slate-900">
-
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-12 gap-8">
-
-          {/* USER INFO PANEL */}
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm text-center">
-              <div className="relative inline-block mb-6">
-                <img
-                  src={user.avatar || '/avatar.png'}
-                  className="w-32 h-32 rounded-[2.5rem] object-cover shadow-2xl"
-                  alt={user.name}
-                />
-                <button
-                  onClick={() => avatarInputRef.current?.click()}
-                  disabled={isUploadingAvatar}
-                  className="absolute -bottom-2 -right-2 bg-purple-500 text-white p-3 rounded-2xl hover:scale-110 transition-transform shadow-lg disabled:opacity-50"
-                >
-                  {isUploadingAvatar ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Camera className="w-4 h-4" />
-                  )}
+    <div className="min-h-screen bg-[#FDFCFB] text-stone-800">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="space-y-4">
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm text-center">
+              <div className="relative inline-block mb-4">
+                <img src={user.avatar || '/avatar.png'}
+                  className="w-24 h-24 rounded-2xl object-cover shadow-md" alt={user.name} />
+                <button onClick={() => avatarInputRef.current?.click()} disabled={isUploadingAvatar}
+                  className="absolute -bottom-1 -right-1 bg-amber-500 text-white p-2 rounded-xl hover:scale-110 transition-transform shadow-md disabled:opacity-50">
+                  {isUploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                 </button>
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="hidden"
-                />
+                <input ref={avatarInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
               </div>
-              <h1 className="text-3xl font-black mb-1">{user.name}</h1>
-              <p className="text-gray-400 text-sm font-medium mb-8">{user.email}</p>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                  <p className="text-2xl font-black">{getLengthPlacesByUserId(user.id).length}</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Lugares</p>
+              <h1 className="text-xl font-bold mb-1">{user.name}</h1>
+              <p className="text-stone-400 text-sm mb-4">{user.email}</p>
+              {user.bio && <p className="text-stone-500 text-sm mb-4">{user.bio}</p>}
+              {user.isOwner && user.ownerBusinessName && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-semibold mb-4">
+                  <Star className="w-3 h-3" /> {user.ownerBusinessName}
                 </div>
-                <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                  <p className="text-2xl font-black">{getLengthReviewsByUserId(user.id)}</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Reseñas</p>
+              )}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="bg-stone-50 p-3 rounded-2xl">
+                  <p className="text-xl font-bold">{myPlacesCount}</p>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase">Lugares</p>
+                </div>
+                <div className="bg-stone-50 p-3 rounded-2xl">
+                  <p className="text-xl font-bold">{reviewsCount}</p>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase">Reseñas</p>
                 </div>
               </div>
-
-              <button
-                onClick={() => setShowEventForm(true)}
-                className="w-full bg-purple-500 text-white py-4 rounded-3xl font-black text-sm flex items-center justify-center gap-2 hover:bg-purple-600 transition-all shadow-xl shadow-gray-200"
-              >
-                <Plus className="w-5 h-5" /> Crear Evento
+              <button onClick={() => setShowEventForm(true)}
+                className="w-full bg-amber-500 text-white py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-amber-600 transition-all shadow-sm">
+                <Plus className="w-4 h-4" /> Crear Evento
               </button>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-sm text-stone-700">Configuración</h3>
+                <button onClick={() => setIsEditing(true)}
+                  className="p-2 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors text-amber-600">
+                  <Pencil className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {isAdmin && (
+                  <Link to="/admin"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-stone-50 transition-colors text-sm text-stone-600">
+                    <BarChart3 className="w-4 h-4" /> Panel Admin
+                  </Link>
+                )}
+                <button onClick={logout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors text-sm text-red-500">
+                  <LogOut className="w-4 h-4" /> Cerrar Sesión
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* MAIN CONTENT AREA */}
-          <div className="col-span-12 lg:col-span-8 space-y-8">
-            <div className="flex gap-8 border-b border-gray-100 overflow-x-auto">
-              {['saved', 'events', 'attending', 'friends'].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTab(t as any)}
-                  className={`pb-4 text-sm cursor-pointer font-black transition-all border-b-2 whitespace-nowrap ${activeTab === t ? 'border-black text-purple-500' : 'border-transparent text-gray-400'}`}
-                >
-                  {t === 'saved' ? 'Colección' : t === 'events' ? 'Mis Eventos' : t === 'attending' ? 'Asistiré' : 'Comunidad'}
-                </button>
-              ))}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="flex gap-6 border-b border-stone-100 overflow-x-auto">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`pb-3 text-sm font-semibold transition-all border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                      activeTab === tab.id ? 'border-amber-500 text-amber-600' : 'border-transparent text-stone-400 hover:text-stone-600'
+                    }`}>
+                    <Icon className="w-4 h-4" /> {tab.label}
+                  </button>
+                );
+              })}
             </div>
 
             <AnimatePresence mode="wait">
               {activeTab === 'saved' && (
-                  savedPlaces.length > 0 &&
-                  <PlacesCarousel
-                    setShowAllPlacesModal={setShowAllPlacesModal}
-                    places={savedPlaces}
-                    onPlaceClick={(place) => navigate(`/place/${place.id}`)}
-                  />
-                
+                <motion.div key="saved" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {savedPlaces.length > 0 ? (
+                    <PlacesCarousel setShowAllPlacesModal={() => {}} places={savedPlaces} onPlaceClick={(p) => navigate(`/place/${p.id}`)} />
+                  ) : (
+                    <div className="bg-white rounded-3xl p-12 text-center border border-stone-100">
+                      <div className="text-5xl mb-4">🦕</div>
+                      <h3 className="text-lg font-bold mb-2">Aún no tienes lugares guardados</h3>
+                      <p className="text-stone-400 text-sm mb-6">Explora y guarda tus lugares favoritos</p>
+                      <Link to="/" className="inline-flex items-center gap-2 bg-amber-500 text-white px-6 py-3 rounded-2xl font-medium text-sm hover:bg-amber-600">
+                        Explorar lugares
+                      </Link>
+                    </div>
+                  )}
+                </motion.div>
               )}
 
               {activeTab === 'events' && (
-                <motion.div
-                  key="events"
-                  className="space-y-6"
-                >
-                  {userEvents.length === 0 ? (
-                    <div className="bg-white rounded-[3rem] p-16 text-center border border-gray-100">
-                      <div className="text-8xl mb-6">🦕</div>
-                      <h3 className="text-2xl font-black mb-2">Aún no has publicado eventos</h3>
-                      <p className="text-gray-400 font-medium mb-8">¡Crea tu primer evento y empieza a conectar con tu comunidad!</p>
-                      <button
-                        onClick={() => setShowEventForm(true)}
-                        className="inline-flex items-center gap-2 bg-purple-500 text-white px-8 py-4 rounded-3xl font-black hover:bg-purple-600 transition-all shadow-lg"
-                      >
-                        <Plus className="w-5 h-5" /> Crear Mi Primer Evento
+                <motion.div key="events" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                  {myEvents.length === 0 ? (
+                    <div className="bg-white rounded-3xl p-12 text-center border border-stone-100">
+                      <div className="text-5xl mb-4">🦕</div>
+                      <h3 className="text-lg font-bold mb-2">Aún no has publicado eventos</h3>
+                      <button onClick={() => setShowEventForm(true)}
+                        className="inline-flex items-center gap-2 bg-amber-500 text-white px-6 py-3 rounded-2xl font-medium text-sm hover:bg-amber-600">
+                        <Plus className="w-4 h-4" /> Crear Evento
                       </button>
                     </div>
                   ) : (
                     <>
-                      {/* Estadísticas generales */}
-                      <div className="flex flex-col lg:flex-row gap-4">
-                        <div className="bg-white p-6 rounded-4xl w-1/2 border border-gray-100">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-blue-50 rounded-xl">
-                              <Eye className="w-4 h-4 text-blue-500" />
-                            </div>
-                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.views, 0)}</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white p-4 rounded-2xl border border-stone-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Eye className="w-4 h-4 text-stone-400" />
+                            <span className="text-lg font-bold">{myEvents.reduce((a, e) => a + e.attendeesCount, 0)}</span>
                           </div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Vistas Totales</p>
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase">Asistentes</p>
                         </div>
-                        <div className="bg-white p-6 rounded-4xl  w-1/2 border border-gray-100">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-purple-50 rounded-xl">
-                              <Users className="w-4 h-4 text-purple-500" />
-                            </div>
-                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.attendees, 0)}</p>
+                        <div className="bg-white p-4 rounded-2xl border border-stone-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Users className="w-4 h-4 text-stone-400" />
+                            <span className="text-lg font-bold">{myEvents.length}</span>
                           </div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Asistentes</p>
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase">Eventos</p>
                         </div>
-                        <div className="bg-white p-6 rounded-4xl w-1/2 border border-gray-100">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-rose-50 rounded-xl">
-                              <Heart className="w-4 h-4 text-rose-500" />
-                            </div>
-                            <p className="text-2xl font-black">{userEvents.reduce((acc, e) => acc + e.likes, 0)}</p>
+                        <div className="bg-white p-4 rounded-2xl border border-stone-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Calendar className="w-4 h-4 text-stone-400" />
+                            <span className="text-lg font-bold">{myEvents.filter(e => new Date(e.dateStart) > new Date()).length}</span>
                           </div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Me Gusta</p>
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase">Próximos</p>
                         </div>
                       </div>
 
-                      {/* Lista de eventos */}
-                      {userEvents.map((event) => (
-                        <div key={event.id} className="bg-white rounded-4xl p-6 border border-gray-100">
-                          <div className="flex items-start justify-between mb-6">
+                      {myEvents.map(event => (
+                        <div key={event.id} className="bg-white rounded-2xl p-5 border border-stone-100 hover:shadow-sm transition-shadow">
+                          <div className="flex items-start justify-between mb-4">
                             <div>
-                              <span className="inline-block px-3 py-1 bg-orange-50 text-orange-600 rounded-xl text-[10px] font-black uppercase mb-3">
-                                {event.category}
-                              </span>
-                              <h3 className="text-2xl font-black mb-2">{event.title}</h3>
-                              <p className="text-sm text-gray-400 font-bold flex items-center gap-2">
-                                <Calendar className="w-4 h-4" /> {event.date}
+                              {event.category && (
+                                <span className="inline-block px-2.5 py-1 bg-amber-50 text-amber-700 rounded-xl text-[10px] font-semibold uppercase mb-2">
+                                  {event.category.name}
+                                </span>
+                              )}
+                              <Link to={`/event/${event.id}`} className="text-lg font-bold text-stone-800 hover:text-amber-600 transition-colors block">
+                                {event.name}
+                              </Link>
+                              <p className="text-xs text-stone-400 flex items-center gap-1.5 mt-1">
+                                <Calendar className="w-3 h-3" /> {event.dateStart.toLocaleDateString()}
                               </p>
                             </div>
-                            <button className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                              <TrendingUp className="w-5 h-5" />
-                            </button>
                           </div>
-
-                          <div className="grid grid-cols-4 gap-4">
-                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
-                              <Eye className="w-4 h-4 text-gray-400 mx-auto mb-2" />
-                              <p className="text-lg font-black">{event.views}</p>
-                              <p className="text-[9px] text-gray-400 font-bold uppercase">Vistas</p>
-                            </div>
-                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
-                              <Users className="w-4 h-4 text-gray-400 mx-auto mb-2" />
-                              <p className="text-lg font-black">{event.attendees}</p>
-                              <p className="text-[9px] text-gray-400 font-bold uppercase">Asistentes</p>
-                            </div>
-                            <div className="text-center p-4 bg-gray-50 rounded-2xl">
-                              <Heart className="w-4 h-4 text-gray-400 mx-auto mb-2" />
-                              <p className="text-lg font-black">{event.likes}</p>
-                              <p className="text-[9px] text-gray-400 font-bold uppercase">Me Gusta</p>
-                            </div>
+                          <div className="flex items-center gap-4 text-xs text-stone-500">
+                            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.attendeesCount} asistentes</span>
+                            <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {event.address}</span>
                           </div>
                         </div>
                       ))}
@@ -249,45 +246,68 @@ const Profile: React.FC = () => {
               )}
 
               {activeTab === 'attending' && (
-                <motion.div key="attending" className="grid gap-4">
-                  {[1, 2].map((i) => (
-                    <div
-                      key={i}
-                      onClick={() => setShowAttendeesModal({ title: 'Festival de Jazz', attendees: 24 })}
-                      className="group bg-white p-6 rounded-4xl border border-gray-100 flex items-center justify-between hover:shadow-xl hover:scale-[1.01] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 bg-gray-100 rounded-3xl overflow-hidden shadow-inner">
-                          <img src={`https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=400`} className="w-full h-full object-cover" />
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-black">Noche de Jazz & Bourbon</h4>
-                          <div className="flex items-center gap-4 text-xs text-gray-400 font-bold mt-1">
-                            <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> 15 Ene</span>
-                            <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-rose-500" /> Club Central</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex -space-x-2 justify-end mb-2">
-                          {[1, 2, 3].map(a => <img key={a} src={`https://i.pravatar.cc/100?img=${a + 20}`} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />)}
-                        </div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase group-hover:text-black transition-colors">Ver quiénes van <ChevronRight className="inline w-3 h-3" /></p>
-                      </div>
+                <motion.div key="attending" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                  {attendingEvents.length === 0 ? (
+                    <div className="bg-white rounded-3xl p-12 text-center border border-stone-100">
+                      <div className="text-5xl mb-4">🦕</div>
+                      <h3 className="text-lg font-bold mb-2">No asistes a ningún evento</h3>
+                      <p className="text-stone-400 text-sm mb-6">Confirma tu asistencia a eventos</p>
+                      <Link to="/" className="inline-flex items-center gap-2 bg-amber-500 text-white px-6 py-3 rounded-2xl font-medium text-sm hover:bg-amber-600">
+                        Ver eventos
+                      </Link>
                     </div>
-                  ))}
+                  ) : (
+                    attendingEvents.map(event => (
+                      <Link key={event.id} to={`/event/${event.id}`}
+                        className="block bg-white p-5 rounded-2xl border border-stone-100 hover:shadow-sm transition-shadow">
+                        <div className="flex items-center gap-4">
+                          {event.image && (
+                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 shrink-0">
+                              <img src={event.image} className="w-full h-full object-cover" alt="" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-stone-800 truncate">{event.name}</h4>
+                            <p className="text-xs text-stone-400 flex items-center gap-1 mt-1">
+                              <Calendar className="w-3 h-3" /> {event.dateStart.toLocaleDateString()} | {event.timeStart}
+                            </p>
+                          </div>
+                          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                        </div>
+                      </Link>
+                    ))
+                  )}
                 </motion.div>
               )}
 
-              {activeTab === 'friends' && (
-                <motion.div key="friends" className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} className="bg-white p-6 rounded-4xl border border-gray-100 flex flex-col items-center text-center">
-                      <img src={`https://i.pravatar.cc/150?img=${i + 40}`} className="w-16 h-16 rounded-2xl mb-4" />
-                      <h5 className="font-black text-sm ">Marco Tulio</h5>
-                      <p className="text-[10px] text-emerald-500 font-black uppercase mb-4">Confirmado en 3 eventos</p>
+              {activeTab === 'owner' && (
+                <motion.div key="owner" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-2xl p-5 border border-stone-100">
+                      <p className="text-2xl font-bold text-stone-800">{myPlacesCount}</p>
+                      <p className="text-xs text-stone-400 font-semibold uppercase mt-1">Lugares publicados</p>
                     </div>
-                  ))}
+                    <div className="bg-white rounded-2xl p-5 border border-stone-100">
+                      <p className="text-2xl font-bold text-stone-800">{myEvents.length}</p>
+                      <p className="text-xs text-stone-400 font-semibold uppercase mt-1">Eventos creados</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-stone-100">
+                      <p className="text-2xl font-bold text-stone-800">{reviewsCount}</p>
+                      <p className="text-xs text-stone-400 font-semibold uppercase mt-1">Reseñas recibidas</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-stone-100">
+                      <p className="text-2xl font-bold text-stone-800">{savedPlaces.length}</p>
+                      <p className="text-xs text-stone-400 font-semibold uppercase mt-1">Veces guardado</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 border border-stone-100">
+                    <h3 className="font-bold text-stone-800 mb-4">Tus lugares publicados</h3>
+                    {myPlacesCount > 0 ? (
+                      <PlacesCarousel setShowAllPlacesModal={() => {}} places={getLengthPlacesByUserId(user.id)} onPlaceClick={(p) => navigate(`/place/${p.id}`)} />
+                    ) : (
+                      <p className="text-stone-400 text-sm">Aún no has publicado lugares</p>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -295,40 +315,62 @@ const Profile: React.FC = () => {
         </div>
       </section>
 
-      {/* MODAL: QUIÉNES ASISTIRÁN */}
-      <AnimatePresence>
-        {showAttendeesModal && (
-          <div className="fixed inset-0 z-70 flex items-end md:items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAttendeesModal(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div
-              initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
-              className="relative w-full max-w-md bg-white rounded-[2.5rem] overflow-hidden shadow-2xl"
-            >
-              <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="text-xl font-black">Asistentes al Evento</h3>
-                <button onClick={() => setShowAttendeesModal(null)} className="p-2 hover:bg-gray-100 rounded-full"><X className="w-5 h-5" /></button>
-              </div>
-              <div className="p-4 max-h-[60vh] overflow-y-auto">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                  <div key={i} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-3xl transition-colors">
-                    <div className="flex items-center gap-4">
-                      <img src={`https://i.pravatar.cc/100?img=${i + 50}`} className="w-12 h-12 rounded-2xl object-cover" />
-                      <div>
-                        <p className="font-black text-sm">Carla Jiménez</p>
-                        <p className="text-[10px] font-bold text-gray-400">Amigo común</p>
-                      </div>
-                    </div>
-                    <button className="p-2 bg-primary-50 text-primary-600 rounded-xl hover:bg-primary-100"><UserPlus className="w-4 h-4" /></button>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
       <EventForm isOpen={showEventForm} onClose={() => setShowEventForm(false)} />
 
+      <AnimatePresence>
+        {isEditing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsEditing(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-stone-100">
+                <h3 className="text-lg font-bold text-stone-800">Editar Perfil</h3>
+                <button onClick={() => setIsEditing(false)} className="p-2 rounded-full bg-stone-100 hover:bg-stone-200 transition-colors">
+                  <X className="w-4 h-4 text-stone-500" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-1.5">Nombre</label>
+                  <input type="text" value={editData.name} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))}
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm focus:border-amber-400 focus:bg-white transition-all outline-none" placeholder="Nombre" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-1.5">Teléfono</label>
+                  <input type="text" value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))}
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm focus:border-amber-400 focus:bg-white transition-all outline-none" placeholder="Teléfono" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-1.5">Bio</label>
+                  <textarea value={editData.bio} onChange={e => setEditData(p => ({ ...p, bio: e.target.value }))}
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm focus:border-amber-400 focus:bg-white transition-all outline-none resize-none" placeholder="Bio" rows={3} />
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-stone-50 rounded-2xl">
+                  <input type="checkbox" checked={!!editData.ownerBusinessName}
+                    onChange={e => setEditData(p => ({ ...p, ownerBusinessName: e.target.checked ? p.ownerBusinessName || 'Mi Negocio' : '' }))}
+                    className="w-4 h-4 rounded border-stone-300 text-amber-500 focus:ring-amber-400" />
+                  <span className="text-sm text-stone-600 font-medium">Soy dueño de negocio</span>
+                </label>
+                {editData.ownerBusinessName && (
+                  <div>
+                    <label className="block text-sm font-medium text-stone-600 mb-1.5">Nombre del negocio</label>
+                    <input type="text" value={editData.ownerBusinessName} onChange={e => setEditData(p => ({ ...p, ownerBusinessName: e.target.value }))}
+                      className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm focus:border-amber-400 focus:bg-white transition-all outline-none" placeholder="Nombre del negocio" />
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3 p-6 border-t border-stone-100">
+                <button onClick={handleSaveProfile} disabled={!editData.name.trim()}
+                  className="flex-1 py-3 bg-amber-500 text-white rounded-2xl font-semibold text-sm hover:bg-amber-600 transition-all disabled:opacity-50">Guardar Cambios</button>
+                <button onClick={() => setIsEditing(false)}
+                  className="flex-1 py-3 bg-stone-100 text-stone-600 rounded-2xl font-semibold text-sm hover:bg-stone-200 transition-all">Cancelar</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
