@@ -24,7 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
-supabase/
 skills-lock.json
 .agents
 NEW_DB_SCHEMA.md
