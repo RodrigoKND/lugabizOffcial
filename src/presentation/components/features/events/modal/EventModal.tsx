@@ -1,7 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Bookmark, MapPin, Clock, Send, MoreHorizontal } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Bookmark, MapPin, Clock, Send, MoreHorizontal, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useAuth } from '@presentation/context';
+import { eventSharesService } from '@lib/supabase';
+
+interface Comment {
+  id: string;
+  user: string;
+  avatar: string;
+  text: string;
+  likes: number;
+}
 
 interface Event {
   id: string;
@@ -28,59 +39,121 @@ interface EventModalProps {
   hasPrev: boolean;
 }
 
-const mockComments = [
-  { id: 1, user: 'Ana López', avatar: 'https://i.pravatar.cc/150?img=10', text: '¡Se ve increíble! 😍', likes: 12 },
-  { id: 2, user: 'Carlos Ruiz', avatar: 'https://i.pravatar.cc/150?img=11', text: 'Ya tengo mis boletos 🎉', likes: 8 },
-  { id: 3, user: 'María García', avatar: 'https://i.pravatar.cc/150?img=12', text: '¿A qué hora empieza?', likes: 3 },
-  { id: 4, user: 'Pedro Sánchez', avatar: 'https://i.pravatar.cc/150?img=13', text: 'Nos vemos ahí!', likes: 5 }
-];
+function useEventComments(eventId: string) {
+  const [comments, setComments] = useState<Comment[]>(() => {
+    try {
+      const saved = localStorage.getItem(`ev_comments_${eventId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const addComment = useCallback((userName: string, userAvatar: string, text: string) => {
+    const newComment: Comment = {
+      id: crypto.randomUUID(),
+      user: userName,
+      avatar: userAvatar,
+      text,
+      likes: 0,
+    };
+    setComments(prev => {
+      const updated = [newComment, ...prev];
+      try { localStorage.setItem(`ev_comments_${eventId}`, JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  }, [eventId]);
+
+  return { comments, addComment };
+}
 
 const CountdownTimer = ({ endDate }: { endDate: Date }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const update = () => {
       const now = new Date().getTime();
       const distance = endDate.getTime() - now;
-      if (distance < 0) return;
-
+      if (distance <= 0) {
+        setExpired(true);
+        return;
+      }
+      setExpired(false);
       setTimeLeft({
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
         hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
         minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
       });
-    }, 1000);
+    };
 
+    update();
+    const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, [endDate]);
 
+  if (expired) return null;
+
   return (
-    <div className="flex gap-1.5">
-      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-        <div className="text-base font-bold text-white">{timeLeft.days}</div>
-        <div className="text-[9px] text-white/80 font-medium">días</div>
-      </div>
-      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-        <div className="text-base font-bold text-white">{timeLeft.hours}</div>
-        <div className="text-[9px] text-white/80 font-medium">hrs</div>
-      </div>
-      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-        <div className="text-base font-bold text-white">{timeLeft.minutes}</div>
-        <div className="text-[9px] text-white/80 font-medium">min</div>
+    <div>
+      <p className="text-white/80 text-xs mb-2 font-medium">Comienza en:</p>
+      <div className="flex gap-1.5">
+        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-white">{timeLeft.days}</div>
+          <div className="text-[9px] text-white/80 font-medium">días</div>
+        </div>
+        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-white">{timeLeft.hours}</div>
+          <div className="text-[9px] text-white/80 font-medium">hrs</div>
+        </div>
+        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-white">{timeLeft.minutes}</div>
+          <div className="text-[9px] text-white/80 font-medium">min</div>
+        </div>
       </div>
     </div>
   );
 };
 
 const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev, hasNext, hasPrev }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const { comments: eventComments, addComment } = useEventComments(event.id);
 
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+
+  const handleShare = async () => {
+    if (!user) {
+      toast.error('Inicia sesión para compartir');
+      return;
+    }
+    setIsSharing(true);
+    try {
+      const share = await eventSharesService.createShare(event.id, user.id);
+      await navigator.clipboard.writeText(share.sharedUrl);
+      toast.success('Enlace de invitación copiado!');
+    } catch {
+      toast.error('Error al compartir');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const handleAttend = () => {
+    if (!user) {
+      toast.error('Inicia sesión para confirmar asistencia');
+      return;
+    }
+    navigate(`/event/${event.id}`);
+    onClose();
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchMove = (e: React.TouchEvent) => { touchEndX.current = e.touches[0].clientX; };
@@ -142,7 +215,6 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
 
             <div className="space-y-3 pb-safe">
               <div>
-                <p className="text-white/80 text-xs mb-2 font-medium">Comienza en:</p>
                 <CountdownTimer endDate={event.startDate} />
               </div>
 
@@ -171,7 +243,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
                   <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/60 uppercase tracking-wider">{event.category}</span>
                 </div>
               </div>
-              <button className="w-full bg-linear-to-r cursor-pointer from-primary-500 to-tomato text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all active:scale-95">
+              <button onClick={handleAttend} className="w-full bg-linear-to-r cursor-pointer from-primary-500 to-tomato text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all active:scale-95">
                 Asistiré
               </button>
             </div>
@@ -189,7 +261,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
               <div className={`p-2.5 rounded-full backdrop-blur-sm transition-all ${showComments ? 'bg-primary-500' : 'bg-white/20'}`}>
                 <MessageCircle className={`w-6 h-6 ${showComments ? 'text-white fill-white' : 'text-white'}`} />
               </div>
-              <span className="text-white text-xs font-bold">{event.comments}</span>
+              <span className="text-white text-xs font-bold">{eventComments.length}</span>
             </button>
 
             <button onClick={() => setSaved(!saved)} className="flex flex-col cursor-pointer items-center gap-1">
@@ -198,9 +270,9 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
               </div>
             </button>
 
-            <button className="flex flex-col cursor-pointer items-center gap-1">
-              <div className="p-2.5 rounded-full bg-white/20 backdrop-blur-sm">
-                <Share2 className="w-6 h-6 text-white" />
+            <button onClick={handleShare} disabled={isSharing} className="flex flex-col cursor-pointer items-center gap-1">
+              <div className="p-2.5 rounded-full bg-white/20 backdrop-blur-sm transition-all hover:bg-white/30">
+                {isSharing ? <Loader2 className="w-6 h-6 text-white animate-spin" /> : <Share2 className="w-6 h-6 text-white" />}
               </div>
             </button>
           </div>
@@ -214,31 +286,34 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
               onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-center py-2"><div className="w-10 h-1 bg-gray-300 rounded-full" /></div>
               <div className="px-4 py-3 border-b flex items-center justify-between">
-                <h3 className="font-bold text-gray-900">{event.comments} comentarios</h3>
+                <h3 className="font-bold text-gray-900">{eventComments.length} comentarios</h3>
                 <button onClick={() => setShowComments(false)}><X className="w-5 h-5 text-gray-600" /></button>
               </div>
               <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-                {mockComments.map(c => (
-                  <div key={c.id} className="flex gap-3">
-                    <img src={c.avatar} alt={c.user} className="w-8 h-8 rounded-full shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm text-gray-900">{c.user}</p>
-                      <p className="text-sm text-gray-700 mt-0.5">{c.text}</p>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                        <button className="cursor-pointer hover:text-gray-700">Responder</button>
-                        <span>{c.likes} me gusta</span>
+                {eventComments.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400 text-sm">No hay comentarios aún. ¡Sé el primero!</div>
+                ) : (
+                  eventComments.map(c => (
+                    <div key={c.id} className="flex gap-3">
+                      <img src={c.avatar || '/avatar.png'} alt={c.user} className="w-8 h-8 rounded-full shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm text-gray-900">{c.user}</p>
+                        <p className="text-sm text-gray-700 mt-0.5">{c.text}</p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                          <span>{c.likes} me gusta</span>
+                        </div>
                       </div>
                     </div>
-                    <button className="text-gray-400 hover:text-tomato"><Heart className="w-4 h-4" /></button>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
               <div className="p-4 border-t bg-white safe-bottom">
                 <div className="flex items-center gap-2">
                   <input type="text" value={comment} onChange={(e) => setComment(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && comment.trim()) { addComment(user?.name || 'Anónimo', user?.avatar || '', comment.trim()); setComment(''); } }}
                     placeholder="Añade un comentario..."
                     className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  <button disabled={!comment.trim()}
+                  <button onClick={() => { if (comment.trim()) { addComment(user?.name || 'Anónimo', user?.avatar || '', comment.trim()); setComment(''); } }} disabled={!comment.trim()}
                     className={`p-2 rounded-full cursor-pointer transition-all ${comment.trim() ? 'bg-linear-to-r from-primary-500 to-tomato text-white' : 'bg-gray-200 text-gray-400'}`}>
                     <Send className="w-5 h-5" />
                   </button>

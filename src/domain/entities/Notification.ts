@@ -1,25 +1,28 @@
-export interface NotificationOptions {
-  vibrate?: number[];
-  badge?: string;
-  image?: string;
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system';
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+  read: boolean;
+  createdAt: Date;
 }
 
-export interface ExtendedNotificationOptions extends NotificationOptions {
-  vibrate?: number[];
-  badge?: string;
-  image?: string;
+export interface PlaceSurvey {
+  id: string;
+  userId: string;
+  placeId: string;
+  isNearby: boolean;
+  rating?: number;
+  wouldRecommend?: boolean;
+  comment?: string;
+  createdAt: Date;
 }
 
 export interface NearbyPlace {
-  emoji: string;
   name: string;
   distance: number;
-  place: OverpassElement;
-}
-
-export interface OverpassElement {
-  id: number;
-  lat?: number;
-  lon?: number;
-  tags?: Record<string, string>;
+  lat: number;
+  lon: number;
 }

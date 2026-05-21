@@ -13,7 +13,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ onClick, isVisible }) => {
     <button
       aria-label="Pregúntame sobre lugares"
       title="Pregúntame sobre lugares"
-      className="fixed bottom-3 left-6 z-40 group cursor-pointer"
+      className="fixed bottom-3 right-6 z-40 group cursor-pointer"
       onClick={onClick}
     >
       <div className="relative">

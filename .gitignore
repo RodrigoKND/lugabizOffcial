@@ -27,3 +27,8 @@ dist-ssr
 supabase/
 skills-lock.json
 .agents
+NEW_DB_SCHEMA.md
+skills-lock.json
+Supabase Snippet Public Schema Column Inventory.csv
+AGENTS.md
+supabase_schema.sql

@@ -6,6 +6,8 @@ export interface PlaceFormData {
   socialGroups: string[];
   amenities: string[];
   image?: File;
+  latitude?: number;
+  longitude?: number;
   discountInfo?: {
     hasDiscount: boolean;
     description?: string;

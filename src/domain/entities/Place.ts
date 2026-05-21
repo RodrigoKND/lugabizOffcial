@@ -17,6 +17,12 @@ export interface Place {
   createdAt: Date;
   authorId: string;
   savedCount: number;
+  latitude?: number;
+  longitude?: number;
+  coords?: number[];
+  amenities?: string[];
+  gallery?: string[];
+  viewsCount?: number;
 }
 
 export interface CreatePlaceData {
@@ -27,6 +33,10 @@ export interface CreatePlaceData {
   socialGroupIds: string[];
   image?: string;
   authorId: string;
+  latitude?: number;
+  longitude?: number;
+  coords?: number[];
+  amenities?: string[];
 }
 
 export interface UpdatePlaceData {
@@ -37,4 +47,6 @@ export interface UpdatePlaceData {
   socialGroupIds?: string[];
   image?: string;
   featured?: boolean;
+  latitude?: number;
+  longitude?: number;
 }

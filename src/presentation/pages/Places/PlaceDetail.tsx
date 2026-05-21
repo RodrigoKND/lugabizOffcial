@@ -1,28 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Calendar, Share2, Heart, HeartOff } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye, Navigation } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import { ReviewSection } from '@presentation/components/features';
+import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
+import { useSEO } from '@presentation/hooks/seo/useSEO';
+import { surveysService } from '@lib/supabase';
 
 const PlaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getPlaceById } = usePlaces();
   const { user, isSaved, toggleSavedPlace } = useAuth();
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [survey, setSurvey] = useState({ isNearby: false, rating: 0, wouldRecommend: false, comment: '' });
 
   const place = getPlaceById(id || '');
 
+  useSEO({
+    title: place?.name || 'Lugar',
+    description: place?.description || 'Detalles del lugar',
+    image: place?.image,
+    type: 'article',
+    schema: place ? {
+      '@type': 'LocalBusiness',
+      name: place.name,
+      description: place.description,
+      address: { '@type': 'PostalAddress', streetAddress: place.address },
+      image: place.image,
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: place.rating,
+        reviewCount: place.reviewCount,
+      },
+    } : undefined,
+  });
+
+  const handleSurvey = async () => {
+    if (!user || !place) return;
+    try {
+      await surveysService.submitSurvey({
+        userId: user.id,
+        placeId: place.id,
+        ...survey,
+      });
+      toast.success('Gracias por tu opinión!');
+      setShowSurvey(false);
+    } catch {
+      toast.error('Error al enviar encuesta');
+    }
+  };
+
   if (!place) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Lugar no encontrado</h2>
-          <Link
-            to={'/'}
-            className="bg-primary-500 text-white px-6 py-3 rounded-xl hover:bg-primary-600 transition-colors"
-          >
+          <div className="text-6xl mb-4">🦕</div>
+          <h2 className="text-xl font-bold text-stone-800 mb-4">Lugar no encontrado</h2>
+          <Link to="/" className="bg-amber-500 text-white px-6 py-3 rounded-2xl font-medium hover:bg-amber-600 transition-colors">
             Volver al inicio
           </Link>
         </div>
@@ -30,187 +67,228 @@ const PlaceDetail: React.FC = () => {
     );
   }
 
-  const copyToClipboard = async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success('Enlace copiado al portapapeles');
-    } catch (error) {
-      console.error('Error al copiar al portapapeles:', error);
-      toast.error('No se pudo copiar el enlace');
-    }
-  };
+  const hasCoords = place.latitude && place.longitude;
 
-  const shareWithWebAPI = async (place: { name: string; description: string }) => {
+  const sharePlace = async () => {
+    const url = window.location.href;
     try {
-      await navigator.share({
-        title: place.name,
-        text: place.description,
-        url: window.location.href,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error al compartir:', error.name);
+      if (navigator.share) {
+        await navigator.share({ title: place.name, text: place.description, url });
       } else {
-        console.error('Error desconocido al compartir:', error);
+        await navigator.clipboard.writeText(url);
+        toast.success('Enlace copiado!');
       }
-      await copyToClipboard(window.location.href); // Fallback
+    } catch {
+      await navigator.clipboard.writeText(url);
+      toast.success('Enlace copiado!');
     }
-  };
-
-  const handleShare = async () => {
-    if (navigator.canShare({
-      title: place.name,
-      text: place.description
-    })) {
-      await shareWithWebAPI(place);
-    } else {
-      await copyToClipboard(window.location.href);
-    }
-  };
-
-
-  const handleToggleSaved = () => {
-    if (!user) {
-      alert('Debes iniciar sesión para guardar lugares');
-      return;
-    }
-    toggleSavedPlace(place.id);
   };
 
   const isPlaceSaved = user && isSaved(place.id);
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-orange-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ y: 30 }}
-          animate={{ y: 0 }}
-          className="mb-6"
-        >
-          <Link
-            to={'/'}
-            className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors"
-          >
+    <div className="min-h-screen bg-[#FDFCFB]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-700 transition-colors font-medium">
             <ArrowLeft className="w-5 h-5" />
-            <span>Volver</span>
+            Volver
           </Link>
         </motion.div>
 
-        <motion.div
-          initial={{ y: 30 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden"
-        >
-          <div className="relative">
-            <img
-              src={place.image}
-              alt={place.name}
-              className="w-full h-64 md:h-96 object-cover"
-            />
-            <div className="absolute top-6 right-6 flex flex-col space-y-3">
-              {place.featured && (
-                <div className="bg-tomato text-white px-4 py-2 rounded-full text-sm font-medium">
-                  Destacado
-                </div>
-              )}
-              <div className={`px-4 py-2 rounded-full text-sm font-medium text-white`}
-                style={{ backgroundColor: place.category.color }}>
-                {place.category.name}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-3 space-y-4">
+            <div className="relative rounded-3xl overflow-hidden bg-stone-100 aspect-[4/3] lg:aspect-auto lg:h-[500px]">
+              <img src={place.image} alt={place.name}
+                className="w-full h-full object-cover" loading="lazy" />
+              <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                {place.featured && (
+                  <span className="bg-amber-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+                    Destacado
+                  </span>
+                )}
+                <span className="px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-lg"
+                  style={{ backgroundColor: place.category.color }}>
+                  {place.category.name}
+                </span>
               </div>
-              {place.socialGroups.map((group) => {
-                const SocialGroupIcon = Icons[group.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
-                return (
-                  <div key={group.id} className={`px-4 py-2 rounded-full text-sm font-medium text-white flex items-center space-x-2`} style={{
-                    backgroundColor: group.color
-                  }}>
-                    <SocialGroupIcon className="w-4 h-4" />
-                    <span>{group.name}</span>
-                  </div>
-                );
-              })}
             </div>
-          </div>
 
-          <div className="p-8">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
-              <div className="flex-1">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            {place.reviews && place.reviews.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {place.reviews.slice(0, 5).map((review) => (
+                  <div key={review.id} className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2 border border-stone-100 shrink-0">
+                    <img src={review.userAvatar || '/avatar.png'} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    <div>
+                      <p className="text-xs font-semibold text-stone-700">{review.userName}</p>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        <span className="text-xs text-stone-500">{review.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <ReviewSection placeId={place.id} reviews={place.reviews || []} />
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2 space-y-4">
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-2xl lg:text-3xl font-bold text-stone-800 leading-tight">
                   {place.name}
                 </h1>
+              </div>
 
-                <div className="flex items-center space-x-6 mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    <span className="text-lg font-medium">{place.rating}</span>
-                    <span className="text-gray-500">({place.reviewCount} reseñas)</span>
-                  </div>
-
-                  <div className="flex items-center space-x-2 text-gray-500">
-                    <Calendar className="w-5 h-5" />
-                    <span>{place.createdAt.toLocaleDateString()}</span>
-                  </div>
+              <div className="flex items-center gap-4 mb-5">
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  <span className="font-semibold text-stone-700">{place.rating}</span>
+                  <span className="text-stone-400 text-sm">({place.reviewCount})</span>
                 </div>
+                <div className="flex items-center gap-1.5 text-stone-400 text-sm">
+                  <Calendar className="w-4 h-4" />
+                  <span>{place.createdAt.toLocaleDateString()}</span>
+                </div>
+                {place.viewsCount !== undefined && (
+                  <div className="flex items-center gap-1.5 text-stone-400 text-sm">
+                    <Eye className="w-4 h-4" />
+                    <span>{place.viewsCount}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex space-x-3">
-                <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                  onClick={handleShare}>
-                  <Share2 className="w-5 h-5" />
-                  <span>Compartir</span>
-                </button>
-                <button
-                  onClick={handleToggleSaved}
-                  className={`flex items-center space-x-2 px-4 py-2 border rounded-xl transition-colors ${isPlaceSaved
-                    ? 'border-red-300 bg-red-50 text-red-600 hover:bg-red-100'
-                    : 'border-gray-300 hover:bg-gray-50'
-                    }`}
-                >
-                  {isPlaceSaved ? <HeartOff className="w-5 h-5" /> : <Heart className="w-5 h-5" />}
-                  <span>{isPlaceSaved ? 'Quitar' : 'Guardar'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Descripción</h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
+              <p className="text-stone-600 leading-relaxed mb-6">
                 {place.description}
               </p>
-            </div>
 
-            <div className="border-t pt-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Ubicación</h3>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <MapPin className="w-5 h-5 text-primary-500" />
-                <span className="text-lg">{place.address}</span>
+              {place.socialGroups.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {place.socialGroups.map((group) => {
+                    const Icon = Icons[group.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+                    return (
+                      <span key={group.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white"
+                        style={{ backgroundColor: group.color }}>
+                        {Icon && <Icon className="w-3 h-3" />}
+                        {group.name}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button onClick={sharePlace}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm">
+                  <Share2 className="w-4 h-4" /> Compartir
+                </button>
+                <button onClick={() => {
+                  if (!user) { toast.error('Inicia sesión para guardar'); return; }
+                  toggleSavedPlace(place.id);
+                }}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border font-medium transition-all text-sm ${
+                    isPlaceSaved
+                      ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
+                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+                  }`}>
+                  {isPlaceSaved ? <HeartOff className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+                  {isPlaceSaved ? 'Guardado' : 'Guardar'}
+                </button>
               </div>
             </div>
-          </div>
-        </motion.div>
 
-        <motion.div
-          initial={{ y: 30 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8"
-        >
-          <ReviewSection placeId={place.id} reviews={place.reviews || []} />
-        </motion.div>
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+              <h3 className="font-semibold text-stone-800 mb-3">Ubicación</h3>
+              <div className="flex items-start gap-3 mb-4">
+                <MapPin className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <span className="text-stone-600">{place.address}</span>
+              </div>
 
-        <motion.div
-          initial={{ y: 30 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-8 bg-white rounded-2xl shadow-lg p-6"
-        >
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Información adicional</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-primary-500" />
-              <span className="text-gray-700">Publicado el {place.createdAt.toLocaleDateString()}</span>
+              {hasCoords && (
+                <div className="rounded-2xl overflow-hidden border border-stone-100" style={{ height: '200px' }}>
+                  <Map
+                    center={[place.longitude!, place.latitude!]}
+                    zoom={15}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    <MapMarker longitude={place.longitude!} latitude={place.latitude!}>
+                      <MarkerContent>
+                        <div style={{
+                          width: 40, height: 40,
+                          filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+                        }}>
+                          <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C"/>
+                            <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white"/>
+                            <circle cx="24" cy="10" r="4" fill="#D4785C"/>
+                          </svg>
+                        </div>
+                      </MarkerContent>
+                    </MapMarker>
+                  </Map>
+                </div>
+              )}
             </div>
-          </div>
-        </motion.div>
+
+            {user && !showSurvey && (
+              <button onClick={() => setShowSurvey(true)}
+                className="w-full py-4 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex items-center justify-center gap-2">
+                <Navigation className="w-4 h-4" /> ¿Estuviste aquí? Deja tu opinión
+              </button>
+            )}
+
+            {showSurvey && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-4">
+                <h3 className="font-semibold text-stone-800">¿Estuviste cerca de este lugar?</h3>
+                <div className="flex gap-3">
+                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: true }))}
+                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${survey.isNearby ? 'bg-green-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
+                    Sí, estuve cerca
+                  </button>
+                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: false }))}
+                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${!survey.isNearby && survey.isNearby !== undefined ? 'bg-red-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
+                    No
+                  </button>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-stone-500 mb-2">Calificación</p>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button key={n} onClick={() => setSurvey(s => ({ ...s, rating: n }))}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${survey.rating >= n ? 'bg-amber-400 text-white' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}>
+                        <Star className="w-5 h-5" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={survey.wouldRecommend}
+                    onChange={e => setSurvey(s => ({ ...s, wouldRecommend: e.target.checked }))}
+                    className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-400" />
+                  <span className="text-sm text-stone-600">Lo recomendaría</span>
+                </label>
+                <textarea value={survey.comment} onChange={e => setSurvey(s => ({ ...s, comment: e.target.value }))}
+                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:border-amber-400 focus:bg-white focus:ring-0 transition-all text-stone-800 placeholder:text-stone-400 text-sm resize-none"
+                  placeholder="Comentario adicional..." rows={3} />
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSurvey(false)}
+                    className="flex-1 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 font-medium text-sm hover:bg-stone-100">
+                    Cancelar
+                  </button>
+                  <button onClick={handleSurvey}
+                    className="flex-1 py-3 bg-amber-500 text-white rounded-2xl font-medium text-sm hover:bg-amber-600">
+                    Enviar
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
       </div>
     </div>
   );

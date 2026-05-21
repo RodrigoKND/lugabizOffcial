@@ -1,23 +1,32 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@application': path.resolve(__dirname, './src/application'),
-      '@presentation': path.resolve(__dirname, './src/presentation'),
-      '@lib': path.resolve(__dirname, './src/lib'),
-      '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
       '@domain': path.resolve(__dirname, './src/domain'),
+      '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+      '@presentation': path.resolve(__dirname, './src/presentation'),
       '@constants': path.resolve(__dirname, './src/constants'),
+      '@application': path.resolve(__dirname, './src/application'),
     },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'maplibre': ['maplibre-gl'],
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['framer-motion', 'lucide-react'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 400,
+    sourcemap: false,
   },
 });
