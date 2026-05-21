@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export { default as Navbar } from '@presentation/components/features/home/Navbar';
 export { default as Footer } from '@presentation/components/features/home/Footer';
 export { default as AuthModal } from '@presentation/components/features/users/modal/AuthModal';
@@ -16,3 +17,32 @@ export { default as ChatModal } from '@presentation/components/features/chatbot/
 export { default as PlaceSearchFilter } from '@presentation/components/features/places/PlaceSearchFilter';
 export { default as ChatButton } from '@presentation/components/features/chatbot/ChatButton';
 export { default as AmenitySelector } from '@presentation/components/features/places/formPublishNewPlace/AmenitySelector';
+=======
+export { default as Navbar } from './Navbar';
+export { default as Footer } from './Footer';
+export { default as AuthModal } from './AuthModal';
+export { default as PlaceCard } from './PlaceCard';
+export { default as PlacesCarousel } from './PlacesCarousel';
+export { default as SocialGroupSelector } from './SocialGroupSelector';
+export { default as Preferences } from './Preferences';
+export { default as ReviewSection } from './ReviewSection';
+export { default as EventsSection, mockEvents } from './EventSection';
+export { default as EventCard } from './EventCard';
+export { default as EventModal } from './EventModal';
+export { default as EventForm } from './EventForm';
+export { default as SearchInput } from './SearchInput';
+export { default as AllPlacesModal } from './AllPlacesModal';
+export { default as PlaceDetailModal } from './PlaceDetailModal';
+export { default as PlacesResultsModal } from './PlacesResultsModal';
+export { default as CustomToast } from './CustomToast';
+export { default as ChatModal } from './ChatModal';
+export { default as DistanceFilter } from './DistanceFilter';
+export { default as PlaceSearchFilter } from './PlaceSearchFilter';
+export { default as MapMarkers } from './MapMarkers';
+export { default as LoadingScreen } from './LoadingScreen';
+export { default as ProximityToast } from './ProximityToast';
+export { default as MapSection } from './MapSection';
+export { default as ControlsSection } from './ControlsSection';
+export { default as ChatButton } from './ChatButton';
+export { default as MapController } from './MapController';
+>>>>>>> 037fe10393e5d6eb4b1e2628dae21f503c421fc8

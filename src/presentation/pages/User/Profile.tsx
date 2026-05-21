@@ -8,8 +8,16 @@ import {
   UserPlus,
   Users, TrendingUp, Eye, Heart,
 } from 'lucide-react';
+<<<<<<< HEAD:src/presentation/pages/User/Profile.tsx
 import { useAuth, usePlaces } from '@presentation/context';
 import {PlacesCarousel, EventForm} from '@presentation/components/features';
+=======
+import { useAuth } from '@/presentation/context/AuthContext';
+import { usePlaces } from '@/presentation/context/PlacesContext';
+import PlacesCarousel from '@/presentation/components/features/PlacesCarousel';
+import EventForm from '@/presentation/components/features/EventForm';
+import type { Place } from '@/types';
+>>>>>>> 037fe10393e5d6eb4b1e2628dae21f503c421fc8:src/presentation/pages/Profile.tsx
 
 
 const Profile: React.FC = () => {
@@ -57,7 +65,11 @@ const Profile: React.FC = () => {
   };
 
 
+<<<<<<< HEAD:src/presentation/pages/User/Profile.tsx
   const [savedPlaces, setSavedPlaces] = useState([]);
+=======
+  const [savedPlaces, setSavedPlaces] = useState<Place[]>([]);
+>>>>>>> 037fe10393e5d6eb4b1e2628dae21f503c421fc8:src/presentation/pages/Profile.tsx
 
   useEffect(() => {
     const renderPlacesSaved = async () => {
