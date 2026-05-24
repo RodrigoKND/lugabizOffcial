@@ -15,8 +15,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2
-              xl font-bold text-primary-800">Lugabiz</span>
+              <span className="text-2xl font-bold text-primary-800">Lugabiz</span>
             </Link>
             <div className="flex items-center gap-3">
               <Link to="/"
