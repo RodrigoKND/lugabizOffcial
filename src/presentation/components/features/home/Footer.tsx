@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="shadow-sm bg-gray-900">
+    <footer className="shadow-sm bg-gray-900 hidden lg:block">
       <div className="w-full py-8 px-4">
         <div className="flex flex-col lg:flex-row gap-4 items-center lg:justify-between justify-center flex-wrap">
           <a href="#" className="text-2xl font-semibold text-white">
