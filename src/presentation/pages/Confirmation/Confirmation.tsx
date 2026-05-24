@@ -56,7 +56,7 @@ const Confirmation: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-primary-500 to-tomato flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-400 via-primary-500 to-tomato flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -103,7 +103,7 @@ const Confirmation: React.FC = () => {
               <button
                 onClick={handleResendConfirmation}
                 disabled={!email.trim() || isResending}
-                className="w-full bg-gradient-to-r from-primary-500 to-tomato text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full bg-linear-to-r from-primary-500 to-tomato text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {isResending ? (
                   <>
