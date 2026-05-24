@@ -16,6 +16,8 @@ export interface Place {
   featured: boolean;
   createdAt: Date;
   authorId: string;
+  authorName?: string;
+  authorAvatar?: string;
   savedCount: number;
   latitude?: number;
   longitude?: number;

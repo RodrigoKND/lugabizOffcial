@@ -23,21 +23,31 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  /* --- Custom colors --- */
+  /* --- Custom Soft Purple Palette (Social Network Style) --- */
   --color-tomato: #ff6347;
-  --color-primary-50: #f5f3ff;
-  --color-primary-100: #ede9fe;
-  --color-primary-200: #ddd6fe;
-  --color-primary-300: #c4b5fd;
-  --color-primary-400: #a78bfa;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #7c3aed;
-  --color-primary-700: #6d28d9;
-  --color-primary-800: #5b21b6;
-  --color-primary-900: #4c1d95;
+  --color-primary-50: #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7e22ce;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #581c87;
   
   --color-secondary-50: #fef2f2;
   --color-secondary-500: #ef4444;
+
+  /* --- Social Feed Colors --- */
+  --color-feed-bg: #faf9fb;
+  --color-card-bg: #ffffff;
+  --color-card-border: #f0edf4;
+  --color-accent-purple: #a855f7;
+  --color-accent-pink: #ec4899;
+  --color-text-primary: #1e1b2e;
+  --color-text-secondary: #6b6580;
+  --color-story-ring: linear-gradient(135deg, #a855f7, #ec4899, #f97316);
 
   /* --- Radius --- */
   --radius-lg: var(--radius);
@@ -60,8 +70,31 @@
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background-color: var(--color-feed-bg);
+  color: var(--color-text-primary);
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+::selection {
+  background-color: var(--color-primary-200);
+  color: var(--color-primary-800);
+}
+
+/* Smooth card transitions */
+.feed-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.feed-card:active {
+  transform: scale(0.98);
+}
+
+/* Purple blur decorations */
+.purple-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
 }

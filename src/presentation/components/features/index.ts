@@ -16,3 +16,4 @@ export { default as ChatModal } from '@presentation/components/features/chatbot/
 export { default as PlaceSearchFilter } from '@presentation/components/features/places/PlaceSearchFilter';
 export { default as ChatButton } from '@presentation/components/features/chatbot/ChatButton';
 export { default as AmenitySelector } from '@presentation/components/features/places/formPublishNewPlace/AmenitySelector';
+export { default as OwnerAnnouncement } from '@presentation/components/features/notifications/OwnerAnnouncement';

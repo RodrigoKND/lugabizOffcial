@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode, useEffect, useCallback 
 import { User } from '@domain/entities';
 import { authService, savedPlacesService, notificationsService } from '@lib/supabase';
 import { AppNotification } from '@domain/entities';
+import { tracking } from '@infrastructure/utils/tracking';
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +15,8 @@ interface AuthContextType {
   toggleSavedPlace: (placeId: string) => void;
   isSaved: (placeId: string) => boolean;
   isNewUser: boolean;
+  showPreferences: boolean;
+  setShowPreferences: (v: boolean) => void;
   isAdmin: boolean;
   resendConfirmation: (email: string) => Promise<boolean>;
   updateProfile: (updates: Partial<User>) => Promise<boolean>;
@@ -39,6 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -60,6 +64,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const userNotifs = await notificationsService.getNotifications(currentUser.id);
           setNotifications(userNotifs);
           setUnreadCount(userNotifs.filter(n => !n.read).length);
+
+          if (tracking.isNewUserRegistration()) {
+            setShowPreferences(true);
+            tracking.markRegistered();
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -142,6 +151,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         window.location.href = '/confirmation';
         return { success: true };
       }
+      tracking.trackAction('register', { userId: authUser.id });
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error);
@@ -238,6 +248,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toggleSavedPlace,
         isSaved,
         isNewUser,
+        showPreferences,
+        setShowPreferences,
         isAdmin,
         resendConfirmation,
         updateProfile,

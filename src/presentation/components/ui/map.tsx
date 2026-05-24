@@ -50,6 +50,9 @@ type MapProps = {
     light?: MapStyleOption;
     dark?: MapStyleOption;
   };
+  className?: string;
+  style?: React.CSSProperties;
+  onClick?: (e: MapLibreGL.MapMouseEvent) => void;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 type MapRef = MapLibreGL.Map;
@@ -65,7 +68,7 @@ const DefaultLoader = () => (
 );
 
 const Map = forwardRef<MapRef, MapProps>(function Map(
-  { children, styles, ...props },
+  { children, styles, className, style, onClick, ...props },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -107,11 +110,17 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
     map.on("load", loadHandler);
     map.on("styledata", styleDataHandler);
+
+    if (onClick) {
+      map.on("click", onClick);
+    }
+
     setMapInstance(map);
 
     return () => {
       map.off("load", loadHandler);
       map.off("styledata", styleDataHandler);
+      if (onClick) map.off("click", onClick);
       map.remove();
       setIsLoaded(false);
       setIsStyleLoaded(false);
@@ -150,9 +159,8 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
   return (
     <MapContext.Provider value={contextValue}>
-      <div ref={containerRef} className="relative w-full h-full">
+      <div ref={containerRef} className={cn("relative w-full h-full", className)} style={style}>
         {isLoading && <DefaultLoader />}
-        {/* SSR-safe: children render only when map is loaded on client */}
         {mapInstance && children}
       </div>
     </MapContext.Provider>
