@@ -1,38 +1,15 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye } from 'lucide-react';
-=======
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye, Navigation } from 'lucide-react';
->>>>>>> main
-=======
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye, Navigation } from 'lucide-react';
->>>>>>> main
+import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Calendar, Eye, Navigation } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import { ReviewSection } from '@presentation/components/features';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { realtimeService } from '@lib/supabase/services/notifications/websocket';
-=======
 import { surveysService } from '@lib/supabase';
->>>>>>> main
-=======
-import { surveysService } from '@lib/supabase';
->>>>>>> main
 
 const PlaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,8 +39,6 @@ const PlaceDetail: React.FC = () => {
     } : undefined,
   });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   useEffect(() => {
     if (!place?.latitude || !place?.longitude) return;
     if (!('geolocation' in navigator)) return;
@@ -94,9 +69,7 @@ const PlaceDetail: React.FC = () => {
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, [place?.id, place?.latitude, place?.longitude, place?.name]);
-=======
-=======
->>>>>>> main
+
   const handleSurvey = async () => {
     if (!user || !place) return;
     try {
@@ -111,10 +84,6 @@ const PlaceDetail: React.FC = () => {
       toast.error('Error al enviar encuesta');
     }
   };
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main
 
   if (!place) {
     return (
@@ -134,8 +103,6 @@ const PlaceDetail: React.FC = () => {
 
   const sharePlace = async () => {
     const url = window.location.href;
-<<<<<<< HEAD
-<<<<<<< HEAD
     const shareData: ShareData = {
       title: `${place.name} | Lugabiz`,
       text: `${place.description}\n\n📍 ${place.address}`,
@@ -150,28 +117,6 @@ const PlaceDetail: React.FC = () => {
       }
     } catch {
       await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${url}`);
-=======
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: place.name, text: place.description, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast.success('Enlace copiado!');
-      }
-    } catch {
-      await navigator.clipboard.writeText(url);
->>>>>>> main
-=======
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: place.name, text: place.description, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast.success('Enlace copiado!');
-      }
-    } catch {
-      await navigator.clipboard.writeText(url);
->>>>>>> main
       toast.success('Enlace copiado!');
     }
   };
@@ -326,8 +271,6 @@ const PlaceDetail: React.FC = () => {
               )}
             </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             {place.latitude && place.longitude && 'geolocation' in navigator && (
               <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-4 border border-purple-100">
                 <p className="text-xs text-purple-600 font-medium flex items-center gap-2">
@@ -335,9 +278,7 @@ const PlaceDetail: React.FC = () => {
                   La geolocalización detectará cuando estés cerca
                 </p>
               </div>
-=======
-=======
->>>>>>> main
+            )}
             {user && !showSurvey && (
               <button onClick={() => setShowSurvey(true)}
                 className="w-full py-4 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex items-center justify-center gap-2">
@@ -390,10 +331,6 @@ const PlaceDetail: React.FC = () => {
                   </button>
                 </div>
               </motion.div>
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main
             )}
           </motion.div>
         </div>
