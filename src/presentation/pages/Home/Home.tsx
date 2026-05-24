@@ -6,7 +6,7 @@ import { usePlaces, useAuth } from '@presentation/context';
 import { eventViewsService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import {
-  Preferences, ChatModal, StoryCard, CompactCard,
+  Preferences, StoryCard, CompactCard,
   EventCardSmall, HeroBanner, ScrollRow, TrendBanner,
 } from '@presentation/components/features';
 
@@ -15,7 +15,6 @@ const Home: React.FC = () => {
   const { user, showPreferences, setShowPreferences } = useAuth();
   const navigate = useNavigate();
 
-  const [showChatModal] = useState(false);
   const [viewedEvents, setViewedEvents] = useState<Set<string>>(new Set());
   const [trendingPlaces, setTrendingPlaces] = useState<Place[]>([]);
   const [trendingLoading, setTrendingLoading] = useState(true);
@@ -95,7 +94,7 @@ const Home: React.FC = () => {
                   key={event.id}
                   image={event.image}
                   name={event.name}
-                  onClick={() => { markEventViewed(event.id); navigate(`/event/${event.id}`); }}
+                  onClick={() => { markEventViewed(event.id); navigate(`/events/feed?start=${event.id}`); }}
                 />
               ))}
             </div>
@@ -128,7 +127,7 @@ const Home: React.FC = () => {
               date={new Date(heroEvent.dateStart).toLocaleDateString('es', { day: 'numeric', month: 'long' })}
               time={heroEvent.timeStart}
               address={heroEvent.address}
-              onClick={() => navigate(`/event/${heroEvent.id}`)}
+              onClick={() => { markEventViewed(heroEvent.id); navigate(`/event/${heroEvent.id}`); }}
             />
           </div>
         )}
@@ -189,7 +188,6 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      <ChatModal isOpen={showChatModal} onClose={() => {}} />
     </section>
   );
 };

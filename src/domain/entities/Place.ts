@@ -34,6 +34,7 @@ export interface CreatePlaceData {
   categoryId: string;
   socialGroupIds: string[];
   image?: string;
+  gallery?: string[];
   authorId: string;
   latitude?: number;
   longitude?: number;

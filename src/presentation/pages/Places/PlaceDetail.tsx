@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Calendar, Eye, Navigation } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Calendar, Eye, Pencil, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
-import { ReviewSection } from '@presentation/components/features';
+import { ReviewSection, ChatButton, ChatModal } from '@presentation/components/features';
+import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { realtimeService } from '@lib/supabase/services/notifications/websocket';
-import { surveysService } from '@lib/supabase';
 
 const PlaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { getPlaceById } = usePlaces();
   const { user, isSaved, toggleSavedPlace } = useAuth();
-  const [showSurvey, setShowSurvey] = useState(false);
-  const [survey, setSurvey] = useState({ isNearby: false, rating: 0, wouldRecommend: false, comment: '' });
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [galleryIdx, setGalleryIdx] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const place = getPlaceById(id || '');
 
@@ -24,6 +26,7 @@ const PlaceDetail: React.FC = () => {
     title: place?.name || 'Lugar',
     description: place?.description || 'Detalles del lugar',
     image: place?.image,
+    url: window.location.href,
     type: 'article',
     schema: place ? {
       '@type': 'LocalBusiness',
@@ -40,50 +43,12 @@ const PlaceDetail: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!place?.latitude || !place?.longitude) return;
-    if (!('geolocation' in navigator)) return;
-
-    const checkProximity = (pos: GeolocationPosition) => {
-      const { latitude, longitude } = pos.coords;
-      const R = 6371;
-      const dLat = ((place.latitude! - latitude) * Math.PI) / 180;
-      const dLon = ((place.longitude! - longitude) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos((latitude * Math.PI) / 180) *
-          Math.cos((place.latitude! * Math.PI) / 180) *
-          Math.sin(dLon / 2) ** 2;
-      const distance = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-      if (distance < 1) {
-        localStorage.setItem(`nearby_${place.id}`, 'true');
-        toast.success(`Estás cerca de ${place.name}!`);
-      }
-    };
-
-    const watchId = navigator.geolocation.watchPosition(checkProximity, () => {}, {
-      enableHighAccuracy: true,
-      maximumAge: 30000,
-      timeout: 10000,
-    });
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [place?.id, place?.latitude, place?.longitude, place?.name]);
-
-  const handleSurvey = async () => {
-    if (!user || !place) return;
-    try {
-      await surveysService.submitSurvey({
-        userId: user.id,
-        placeId: place.id,
-        ...survey,
-      });
-      toast.success('Gracias por tu opinión!');
-      setShowSurvey(false);
-    } catch {
-      toast.error('Error al enviar encuesta');
-    }
-  };
+    if (!id) return;
+    const unsubscribe = realtimeService.subscribeToReviews(() => {
+      console.log('New review received');
+    }, id);
+    return unsubscribe;
+  }, [id]);
 
   if (!place) {
     return (
@@ -125,6 +90,8 @@ const PlaceDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
+      <ChatButton onClick={() => setIsChatOpen(true)} isVisible />
+      <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
           <Link to="/" className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-700 transition-colors font-medium">
@@ -133,10 +100,10 @@ const PlaceDetail: React.FC = () => {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-3 space-y-4">
-            <div className="relative rounded-3xl overflow-hidden bg-stone-100 aspect-[4/3] lg:aspect-auto lg:h-[500px]">
+            <div className="relative rounded-3xl overflow-hidden bg-stone-100 aspect-4/3 lg:aspect-auto lg:h-125">
               <img src={place.image} alt={place.name}
                 className="w-full h-full object-cover" loading="lazy" />
               <div className="absolute top-4 left-4 flex flex-wrap gap-2">
@@ -149,8 +116,64 @@ const PlaceDetail: React.FC = () => {
                   style={{ backgroundColor: place.category.color }}>
                   {place.category.name}
                 </span>
+                {user?.id === place.authorId && (
+                  <div className="flex gap-1.5 ml-auto">
+                    <button onClick={() => navigate(`/edit-place/${place.id}`)}
+                      className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all shadow-md">
+                      <Pencil className="w-4 h-4 text-stone-700" />
+                    </button>
+                    <button onClick={() => setShowDeleteConfirm(true)}
+                      className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all shadow-md">
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
+
+            {place.gallery && place.gallery.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+                {place.gallery.map((url, i) => (
+                  <button key={i} onClick={() => setGalleryIdx(i)}
+                    className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all hover:opacity-90 ${url === place.image ? 'border-amber-400' : 'border-transparent'}`}>
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {galleryIdx !== null && place.gallery && (
+              <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={() => setGalleryIdx(null)}>
+                <div className="relative max-w-4xl max-h-[90vh] mx-4" onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => setGalleryIdx(null)}
+                    className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors">
+                    <X className="w-6 h-6" />
+                  </button>
+                  <img src={place.gallery[galleryIdx]} alt="" className="max-w-full max-h-[85vh] object-contain rounded-2xl" />
+                  <div className="absolute inset-y-0 left-0 flex items-center">
+                    {galleryIdx > 0 && (
+                      <button onClick={() => setGalleryIdx(i => i - 1)}
+                        className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all -ml-12">
+                        <ChevronLeft className="w-5 h-5 text-white" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="absolute inset-y-0 right-0 flex items-center">
+                    {galleryIdx < place.gallery.length - 1 && (
+                      <button onClick={() => setGalleryIdx(i => i + 1)}
+                        className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all -mr-12">
+                        <ChevronRight className="w-5 h-5 text-white" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {place.gallery.map((_, i) => (
+                      <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === galleryIdx ? 'bg-white w-4' : 'bg-white/40'}`} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {place.reviews && place.reviews.length > 0 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
@@ -181,7 +204,7 @@ const PlaceDetail: React.FC = () => {
                 </h1>
               </div>
 
-              <div className="flex items-center gap-4 mb-5">
+              <div className="flex items-center gap-4 mb-5 flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
                   <span className="font-semibold text-stone-700">{place.rating}</span>
@@ -203,7 +226,7 @@ const PlaceDetail: React.FC = () => {
                 {place.description}
               </p>
 
-              {place.socialGroups.length > 0 && (
+              {place.socialGroups && place.socialGroups.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {place.socialGroups.map((group) => {
                     const Icon = Icons[group.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
@@ -218,16 +241,16 @@ const PlaceDetail: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={sharePlace}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm">
+                  className="flex items-center justify-center gap-2 px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex-1">
                   <Share2 className="w-4 h-4" /> Compartir
                 </button>
                 <button onClick={() => {
                   if (!user) { toast.error('Inicia sesión para guardar'); return; }
                   toggleSavedPlace(place.id);
                 }}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border font-medium transition-all text-sm ${
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border font-medium transition-all text-sm flex-1 ${
                     isPlaceSaved
                       ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
                       : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
@@ -270,71 +293,26 @@ const PlaceDetail: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {place.latitude && place.longitude && 'geolocation' in navigator && (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-4 border border-purple-100">
-                <p className="text-xs text-purple-600 font-medium flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  La geolocalización detectará cuando estés cerca
-                </p>
-              </div>
-            )}
-            {user && !showSurvey && (
-              <button onClick={() => setShowSurvey(true)}
-                className="w-full py-4 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex items-center justify-center gap-2">
-                <Navigation className="w-4 h-4" /> ¿Estuviste aquí? Deja tu opinión
-              </button>
-            )}
-
-            {showSurvey && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-4">
-                <h3 className="font-semibold text-stone-800">¿Estuviste cerca de este lugar?</h3>
-                <div className="flex gap-3">
-                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: true }))}
-                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${survey.isNearby ? 'bg-green-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
-                    Sí, estuve cerca
-                  </button>
-                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: false }))}
-                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${!survey.isNearby && survey.isNearby !== undefined ? 'bg-red-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
-                    No
-                  </button>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-stone-500 mb-2">Calificación</p>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(n => (
-                      <button key={n} onClick={() => setSurvey(s => ({ ...s, rating: n }))}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${survey.rating >= n ? 'bg-amber-400 text-white' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}>
-                        <Star className="w-5 h-5" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" checked={survey.wouldRecommend}
-                    onChange={e => setSurvey(s => ({ ...s, wouldRecommend: e.target.checked }))}
-                    className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-400" />
-                  <span className="text-sm text-stone-600">Lo recomendaría</span>
-                </label>
-                <textarea value={survey.comment} onChange={e => setSurvey(s => ({ ...s, comment: e.target.value }))}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:border-amber-400 focus:bg-white focus:ring-0 transition-all text-stone-800 placeholder:text-stone-400 text-sm resize-none"
-                  placeholder="Comentario adicional..." rows={3} />
-                <div className="flex gap-3">
-                  <button onClick={() => setShowSurvey(false)}
-                    className="flex-1 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 font-medium text-sm hover:bg-stone-100">
-                    Cancelar
-                  </button>
-                  <button onClick={handleSurvey}
-                    className="flex-1 py-3 bg-amber-500 text-white rounded-2xl font-medium text-sm hover:bg-amber-600">
-                    Enviar
-                  </button>
-                </div>
-              </motion.div>
-            )}
           </motion.div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          try {
+            const { placesService } = await import('@lib/supabase');
+            await placesService.deletePlace(place.id);
+            toast.success('Lugar eliminado');
+            navigate('/');
+          } catch { toast.error('Error al eliminar'); }
+        }}
+        title="Eliminar lugar"
+        message={`¿Estás seguro de eliminar "${place.name}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        variant="danger"
+      />
     </div>
   );
 };

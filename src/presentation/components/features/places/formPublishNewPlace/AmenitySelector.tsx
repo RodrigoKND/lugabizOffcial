@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Tag as TagIcon, Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin, Cctv, Waves } from 'lucide-react';
+import { Tag as TagIcon, Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin, Cctv, Waves, Music, Tv, Wind, Trees, Bike, Tent, Bed, Bath, Dumbbell } from 'lucide-react';
 
 export interface Tag {
   id: string;
@@ -18,6 +18,14 @@ export const AMENITIES: Tag[] = [
   { id: 'accessible', name: 'Accesible', icon: 'Accessibility', color: '#06B6D4' },
   { id: 'hours', name: 'Horario 24h', icon: 'Clock', color: '#6366F1' },
   { id: 'card', name: 'Tarjeta', icon: 'CreditCard', color: '#14B8A6' },
+  { id: 'music', name: 'Música en vivo', icon: 'Music', color: '#D946EF' },
+  { id: 'tv', name: 'TV / Pantallas', icon: 'Tv', color: '#0EA5E9' },
+  { id: 'ac', name: 'Aire acondicionado', icon: 'Wind', color: '#06B6D4' },
+  { id: 'outdoor', name: 'Área al aire libre', icon: 'Trees', color: '#22C55E' },
+  { id: 'security', name: 'Seguridad 24h', icon: 'Cctv', color: '#64748B' },
+  { id: 'bike', name: 'Estacionamiento bicis', icon: 'Bike', color: '#F97316' },
+  { id: 'events', name: 'Eventos privados', icon: 'Tent', color: '#A855F7' },
+  { id: 'delivery', name: 'Delivery / Rappi', icon: 'Bike', color: '#E11D48' },
 ];
 
 interface TagSelectorProps {
@@ -38,6 +46,7 @@ const AmenitySelector: React.FC<TagSelectorProps> = ({ tags = AMENITIES, selecte
   const getIcon = (iconName: string) => {
     const icons: Record<string, React.ComponentType<{ className?: string }>> = {
       Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin,
+      Music, Tv, Wind, Trees, Cctv, Bike, Tent, Bed, Bath, Dumbbell,
     };
     return icons[iconName] || TagIcon;
   };

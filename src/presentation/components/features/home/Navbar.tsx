@@ -1,11 +1,14 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Plus, User, Bell, Home, Search } from 'lucide-react';
 import { useAuth } from '@presentation/context/AuthContext';
+import { useUnreadSurveys } from '@presentation/hooks/useSurveys';
 
 const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, unreadCount } = useAuth();
+  const { unreadCount: surveyUnread } = useUnreadSurveys();
+  const totalUnread = unreadCount + surveyUnread;
   const isActive = (path: string) => location.pathname === path;
   return (
     <>
@@ -34,9 +37,9 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
                   <button onClick={() => navigate('/profile')}
                     className="relative p-2.5 rounded-xl hover:bg-primary-50 transition-colors">
                     <Bell className="w-5 h-5 text-text-secondary" />
-                    {unreadCount > 0 && (
+                    {totalUnread > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
-                        {unreadCount > 9 ? '9+' : unreadCount}
+                        {totalUnread > 9 ? '9+' : totalUnread}
                       </span>
                     )}
                   </button>
@@ -83,9 +86,9 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
               }`}>
             <Bell className="w-5 h-5" />
             <span className="text-[10px] font-medium">Notis</span>
-            {unreadCount > 0 && (
+            {totalUnread > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 bg-pink-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
+                {totalUnread > 9 ? '9+' : totalUnread}
               </span>
             )}
           </Link>

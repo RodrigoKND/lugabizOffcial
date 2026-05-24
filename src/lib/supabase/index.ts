@@ -15,3 +15,4 @@ export { eventViewsService } from '@lib/supabase/services/events/eventViews';
 export { notificationsService } from '@lib/supabase/services/notifications/notifications';
 export { surveysService } from '@lib/supabase/services/notifications/surveys';
 export { adminService } from '@lib/supabase/services/admin/admin';
+export { marketSurveysService } from '@lib/supabase/services/surveys/marketSurveys';

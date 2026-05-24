@@ -24,3 +24,6 @@ export { default as HeroBanner } from '@presentation/components/features/home/He
 export { default as ScrollRow } from '@presentation/components/features/home/ScrollRow';
 export { default as TrendBanner } from '@presentation/components/features/home/TrendBanner';
 export { getCategoryColor } from '@presentation/components/features/home/categoryColors';
+export { default as CreateSurveyModal } from '@presentation/components/features/surveys/CreateSurveyModal';
+export { default as SurveyCard } from '@presentation/components/features/surveys/SurveyCard';
+export { default as SurveyStats } from '@presentation/components/features/surveys/SurveyStats';

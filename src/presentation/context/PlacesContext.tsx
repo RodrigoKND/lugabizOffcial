@@ -89,17 +89,14 @@ export function PlacesProvider({ children }: PlacesProviderProps) {
   const addPlace = async (placeData: PlaceFormData): Promise<boolean> => {
     if (!user) return false;
     try {
-      const imageUrl = placeData.image
-        ? await placesService.uploadImageSupabase(placeData.image)
-        : undefined;
-
       const createPlaceData = {
         name: placeData.name,
         description: placeData.description,
         address: placeData.address,
         categoryId: placeData.category,
         socialGroupIds: placeData.socialGroups,
-        image: imageUrl,
+        image: placeData.image,
+        gallery: placeData.gallery,
         authorId: user.id,
         latitude: placeData.latitude,
         longitude: placeData.longitude,

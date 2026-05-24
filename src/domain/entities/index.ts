@@ -7,3 +7,4 @@ export { type Event, type CreateEventData, type EventAttendance, type EventShare
 export { type GeoPosition, type OverpassElement, type OverpassResponse, type UserPosition } from './Geo';
 export { type PlaceFormData } from './PlaceFormData';
 export { type AppNotification, type PlaceSurvey, type NearbyPlace } from './Notification';
+export { type MarketSurvey, type SurveyResponse, type SurveyNotification, type CreateSurveyData } from './MarketSurvey';

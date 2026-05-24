@@ -110,6 +110,7 @@ export const placesService = {
         longitude: placeData.longitude,
         coords: placeData.coords,
         amenities: placeData.amenities,
+        gallery: placeData.gallery,
       })
       .select()
       .single();
@@ -135,12 +136,21 @@ export const placesService = {
   },
 
   async updatePlace(id: string, updates: Partial<CreatePlaceData>) {
+    const fieldMap: Record<string, string> = {
+      name: 'name', description: 'description', address: 'address',
+      categoryId: 'category_id', image: 'image', gallery: 'gallery',
+      latitude: 'latitude', longitude: 'longitude', coords: 'coords',
+      amenities: 'amenities', authorId: 'author_id',
+    };
+    const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    for (const [key, dbKey] of Object.entries(fieldMap)) {
+      if ((updates as any)[key] !== undefined) {
+        dbUpdates[dbKey] = (updates as any)[key];
+      }
+    }
     const { data, error } = await supabase
       .from('places')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      .update(dbUpdates)
       .eq('id', id)
       .select()
       .single();

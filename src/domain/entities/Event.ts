@@ -12,6 +12,7 @@ export interface Event {
     description: string;
   };
   image?: string;
+  gallery?: string[];
   dateStart: Date;
   timeStart: string;
   timeEnd?: string;
@@ -37,6 +38,7 @@ export interface CreateEventData {
   address: string;
   categoryId: string;
   image?: string;
+  gallery?: string[];
   dateStart: string;
   timeStart: string;
   timeEnd?: string;

@@ -27,7 +27,7 @@ dist-ssr
 skills-lock.json
 .agents
 NEW_DB_SCHEMA.md
-skills-lock.json
 Supabase Snippet Public Schema Column Inventory.csv
 AGENTS.md
 supabase_schema.sql
+supabase_migration_surveys.sql

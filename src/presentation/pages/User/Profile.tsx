@@ -8,9 +8,10 @@ import {
   ChevronRight, Menu
 } from 'lucide-react';
 import { useAuth, usePlaces } from '@presentation/context';
-import { EventForm, OwnerAnnouncement } from '@presentation/components/features';
-import { Event, Place } from '@domain/entities';
-import { eventsService } from '@lib/supabase';
+import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
+import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
+import { Event, Place, MarketSurvey } from '@domain/entities';
+import { eventsService, marketSurveysService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import toast from 'react-hot-toast';
@@ -33,6 +34,10 @@ const Profile: React.FC = () => {
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
+  const [statsTarget, setStatsTarget] = useState<MarketSurvey | null>(null);
+  const [mySurveys, setMySurveys] = useState<MarketSurvey[]>([]);
 
   useSEO({ title: user?.name || 'Perfil', description: 'Perfil de usuario en Lugabiz' });
 
@@ -58,6 +63,11 @@ const Profile: React.FC = () => {
 
       const ownerNotifs = notifications.filter(n => n.type === 'owner_announcement');
       setAnnouncements(ownerNotifs);
+
+      try {
+        const surveys = await marketSurveysService.getByUser(user.id);
+        setMySurveys(surveys);
+      } catch {}
     };
     init();
   }, [user]);
@@ -186,14 +196,7 @@ const Profile: React.FC = () => {
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {event.address}</span>
                       </div>
                     </div>
-                    <button onClick={async () => {
-                      if (!confirm('¿Eliminar evento?')) return;
-                      try {
-                        await eventsService.deleteEvent(event.id);
-                        setMyEvents(prev => prev.filter(e => e.id !== event.id));
-                        toast.success('Evento eliminado');
-                      } catch { toast.error('Error'); }
-                    }}
+                    <button onClick={() => setDeleteConfirmId(event.id)}
                       className="p-2 hover:bg-red-50 rounded-lg transition-colors shrink-0">
                       <X className="w-3.5 h-3.5 text-red-400" />
                     </button>
@@ -254,6 +257,29 @@ const Profile: React.FC = () => {
               className="w-full py-3 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all flex items-center justify-center gap-2 shadow-xs">
               <Megaphone className="w-4 h-4" /> Enviar Anuncio a Usuarios
             </button>
+            <button onClick={() => setShowSurveyModal(true)}
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2 shadow-xs">
+              <BarChart3 className="w-4 h-4" /> Crear Encuesta de Mercado
+            </button>
+            {mySurveys.length > 0 && (
+              <div className="bg-white rounded-xl p-4 border border-stone-200">
+                <h3 className="font-semibold text-sm text-stone-800 mb-3">Tus Encuestas ({mySurveys.length})</h3>
+                <div className="space-y-2">
+                  {mySurveys.map(s => (
+                    <div key={s.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-stone-700 truncate">{s.title}</p>
+                        <p className="text-[11px] text-stone-400">{s.responseCount} respuestas</p>
+                      </div>
+                      <button onClick={() => setStatsTarget(s)}
+                        className="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg text-xs font-semibold hover:bg-amber-200 transition-colors shrink-0">
+                        Ver Stats
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {myPlaces.length > 0 && (
               <div className="bg-white rounded-xl p-4 border border-primary-100/40">
                 <h3 className="font-semibold text-sm text-text-primary mb-3">Tus lugares</h3>
@@ -490,6 +516,34 @@ const Profile: React.FC = () => {
           <LogOut className="w-4 h-4" /> Salir
         </button>
       </div>
+
+      <CreateSurveyModal
+        open={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onCreated={() => {
+          if (user) marketSurveysService.getByUser(user.id).then(setMySurveys).catch(() => {});
+        }}
+      />
+      {statsTarget && (
+        <SurveyStats survey={statsTarget} onClose={() => setStatsTarget(null)} />
+      )}
+      <ConfirmDialog
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={async () => {
+          if (!deleteConfirmId) return;
+          try {
+            await eventsService.deleteEvent(deleteConfirmId);
+            setMyEvents(prev => prev.filter(e => e.id !== deleteConfirmId));
+            toast.success('Evento eliminado');
+          } catch { toast.error('Error al eliminar'); }
+          setDeleteConfirmId(null);
+        }}
+        title="Eliminar evento"
+        message="¿Estás seguro de eliminar este evento? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        variant="danger"
+      />
     </div>
   );
 };

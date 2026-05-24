@@ -3,9 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   MapPin, ArrowLeft, Share2, Heart, CheckCircle2, Ticket,
-  Info, Clock, Users, Tag, Calendar, Loader2
+  Info, Clock, Users, Tag, Calendar, Loader2, Pencil, Trash2
 } from 'lucide-react';
 import { useAuth } from '@presentation/context';
+import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { eventsService, eventSharesService } from '@lib/supabase';
 import { Event } from '@domain/entities';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
@@ -23,6 +24,7 @@ const EventDetailPage: React.FC = () => {
   const [attendees, setAttendees] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const shareRef = new URLSearchParams(window.location.search).get('ref');
 
@@ -166,6 +168,16 @@ const EventDetailPage: React.FC = () => {
           <button onClick={() => setIsLiked(!isLiked)} className="p-2.5 hover:bg-stone-50 rounded-xl transition-colors">
             <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400 text-red-400' : 'text-stone-600'}`} />
           </button>
+          {user?.id === event.userId && (
+            <>
+              <button onClick={() => navigate(`/edit-event/${event.id}`)} className="p-2.5 hover:bg-stone-50 rounded-xl transition-colors">
+                <Pencil className="w-5 h-5 text-stone-600" />
+              </button>
+              <button onClick={() => setShowDeleteConfirm(true)} className="p-2.5 hover:bg-red-50 rounded-xl transition-colors">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </button>
+            </>
+          )}
         </div>
       </nav>
       <div className="max-w-5xl mx-auto px-6 py-8">
@@ -185,6 +197,16 @@ const EventDetailPage: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {event.gallery && event.gallery.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {event.gallery.map((url, i) => (
+                  <div key={i} className="shrink-0 w-24 h-24 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <h1 className="text-3xl md:text-4xl font-bold text-stone-800 leading-tight">
               {event.name}
@@ -314,6 +336,22 @@ const EventDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          try {
+            await eventsService.deleteEvent(event.id);
+            toast.success('Evento eliminado');
+            navigate('/');
+          } catch { toast.error('Error al eliminar'); }
+        }}
+        title="Eliminar evento"
+        message={`¿Estás seguro de eliminar "${event.name}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        variant="danger"
+      />
     </section>
   );
 };

@@ -246,6 +246,7 @@ export const eventsService = {
         description: event.category.description,
       } : undefined,
       image: event.image,
+      gallery: event.gallery || [],
       dateStart: new Date(event.date_start),
       timeStart: event.time_start,
       timeEnd: event.time_end,
@@ -256,7 +257,7 @@ export const eventsService = {
       coords: event.coords || [],
       userId: event.user_id,
       user: event.user ? { name: event.user.name, avatar: event.user.avatar } : undefined,
-      attendeesCount: event.attendees_count || uniqueAttendees.size,
+      attendeesCount: event.attendees_count ?? uniqueAttendees.size,
       createdAt: new Date(event.created_at),
       updatedAt: new Date(event.updated_at || event.created_at),
     };

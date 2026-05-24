@@ -5,7 +5,8 @@ export interface PlaceFormData {
   category: string;
   socialGroups: string[];
   amenities: string[];
-  image?: File;
+  image?: string;
+  gallery?: string[];
   latitude?: number;
   longitude?: number;
   discountInfo?: {
