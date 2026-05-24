@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+<<<<<<< HEAD
 import toast from 'react-hot-toast';
 import {
   MapPin, ArrowLeft, Share2, CheckCircle2, Ticket,
   Info, Clock, Users, Tag, Calendar, Loader2
 } from 'lucide-react';
 import { useAuth } from '@presentation/context';
+=======
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import {
+  MapPin, ArrowLeft, Share2, Heart, CheckCircle2, Ticket,
+  Info, Clock, Users, Tag, Calendar, Loader2
+} from 'lucide-react';
+import { usePlaces, useAuth } from '@presentation/context';
+>>>>>>> main
 import { eventsService, eventSharesService } from '@lib/supabase';
 import { Event } from '@domain/entities';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
@@ -16,11 +26,19 @@ const EventDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+<<<<<<< HEAD
+=======
+  const { events } = usePlaces();
+>>>>>>> main
   const [event, setEvent] = useState<Event | null>(null);
   const [isAttending, setIsAttending] = useState(false);
   const [attendeeCount, setAttendeeCount] = useState(0);
   const [attendees, setAttendees] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+<<<<<<< HEAD
+=======
+  const [isLiked, setIsLiked] = useState(false);
+>>>>>>> main
 
   const shareRef = new URLSearchParams(window.location.search).get('ref');
 
@@ -110,6 +128,7 @@ const EventDetailPage: React.FC = () => {
     }
     try {
       const share = await eventSharesService.createShare(event.id, user.id);
+<<<<<<< HEAD
       const shareText = `🎉 ${event.name}\n📅 ${formattedDate} | ${event.timeStart}\n📍 ${event.address}\n\n${share.sharedUrl}`;
       if (navigator.share) {
         await navigator.share({
@@ -121,6 +140,10 @@ const EventDetailPage: React.FC = () => {
         await navigator.clipboard.writeText(shareText);
         toast.success('Enlace de invitación copiado!');
       }
+=======
+      await navigator.clipboard.writeText(share.sharedUrl);
+      toast.success('Enlace de invitación copiado!');
+>>>>>>> main
     } catch {
       toast.error('Error al compartir');
     }
@@ -152,16 +175,38 @@ const EventDetailPage: React.FC = () => {
 
   return (
     <section className="min-h-screen bg-[#FDFCFB] text-stone-800">
+<<<<<<< HEAD
+=======
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-stone-100 px-6 py-4 flex justify-between items-center">
+        <Link to="/" className="group flex items-center gap-2 text-stone-500 hover:text-stone-700 transition-colors">
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-semibold">Volver</span>
+        </Link>
+        <div className="flex gap-2">
+          <button onClick={handleShare} className="p-2.5 hover:bg-stone-50 rounded-xl transition-colors">
+            <Share2 className="w-5 h-5 text-stone-600" />
+          </button>
+          <button onClick={() => setIsLiked(!isLiked)} className="p-2.5 hover:bg-stone-50 rounded-xl transition-colors">
+            <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400 text-red-400' : 'text-stone-600'}`} />
+          </button>
+        </div>
+      </nav>
+
+>>>>>>> main
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-3 space-y-6">
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-stone-100 shadow-sm">
               <img src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
                 className="w-full h-full object-cover" alt={event.name} />
+<<<<<<< HEAD
               <div className="absolute bottom-4 left-4 flex items-center gap-3">
                 <button onClick={handleShare} className=" bg-white/90 backdrop-blur-sm p-2 rounded-full">
                   <Share2 className="w-5 h-5 text-stone-600" />
                 </button>
+=======
+              <div className="absolute bottom-4 left-4">
+>>>>>>> main
                 {event.category && (
                   <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-semibold text-stone-700 shadow-sm">
                     {event.category.name}
@@ -248,9 +293,15 @@ const EventDetailPage: React.FC = () => {
                         <MarkerContent>
                           <div style={{ width: 36, height: 36, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
                             <svg viewBox="0 0 48 48" fill="none">
+<<<<<<< HEAD
                               <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C" />
                               <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white" />
                               <circle cx="24" cy="10" r="4" fill="#D4785C" />
+=======
+                              <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C"/>
+                              <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white"/>
+                              <circle cx="24" cy="10" r="4" fill="#D4785C"/>
+>>>>>>> main
                             </svg>
                           </div>
                         </MarkerContent>
@@ -288,10 +339,18 @@ const EventDetailPage: React.FC = () => {
               </div>
 
               <button onClick={handleAttend}
+<<<<<<< HEAD
                 className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-3 ${isAttending
                   ? 'bg-stone-100 text-stone-600 border border-stone-200 hover:bg-stone-200'
                   : 'bg-amber-500 text-white hover:bg-amber-600 shadow-md'
                   }`}>
+=======
+                className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-3 ${
+                  isAttending
+                    ? 'bg-stone-100 text-stone-600 border border-stone-200 hover:bg-stone-200'
+                    : 'bg-amber-500 text-white hover:bg-amber-600 shadow-md'
+                }`}>
+>>>>>>> main
                 {isAttending ? <><CheckCircle2 className="w-5 h-5" /> Asistiré</> : <><Ticket className="w-5 h-5" /> Confirmar Asistencia</>}
               </button>
             </div>

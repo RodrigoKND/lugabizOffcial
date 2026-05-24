@@ -201,6 +201,7 @@ export const eventsService = {
     return count || 0;
   },
 
+<<<<<<< HEAD
   async updateEvent(id: string, updates: Partial<CreateEventData>): Promise<Event> {
     const dbUpdates: any = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) dbUpdates.name = updates.name;
@@ -228,6 +229,8 @@ export const eventsService = {
     return this.transformEventData(data);
   },
 
+=======
+>>>>>>> main
   async deleteEvent(id: string): Promise<void> {
     const { error } = await supabase.from('events').delete().eq('id', id);
     if (error) throw error;
