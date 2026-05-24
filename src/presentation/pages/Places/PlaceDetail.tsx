@@ -14,6 +14,8 @@ const PlaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getPlaceById } = usePlaces();
   const { user, isSaved, toggleSavedPlace } = useAuth();
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [survey, setSurvey] = useState({ isNearby: false, rating: 0, wouldRecommend: false, comment: '' });
 
   const place = getPlaceById(id || '');
 
