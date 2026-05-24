@@ -7,7 +7,6 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
   const navigate = useNavigate();
   const { user, unreadCount } = useAuth();
   const isActive = (path: string) => location.pathname === path;
-
   return (
     <>
       {/* Desktop Top Navbar */}
