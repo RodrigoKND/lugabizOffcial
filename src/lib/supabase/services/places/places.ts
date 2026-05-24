@@ -286,8 +286,6 @@ export const placesService = {
       featured: place.featured,
       createdAt: new Date(place.created_at),
       authorId: place.author_id,
-      authorName: place.author?.name,
-      authorAvatar: place.author?.avatar,
       savedCount: place.saved_count,
       latitude: place.latitude,
       longitude: place.longitude,

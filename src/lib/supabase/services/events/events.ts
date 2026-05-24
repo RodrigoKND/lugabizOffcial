@@ -201,33 +201,6 @@ export const eventsService = {
     return count || 0;
   },
 
-  async updateEvent(id: string, updates: Partial<CreateEventData>): Promise<Event> {
-    const dbUpdates: any = { updated_at: new Date().toISOString() };
-    if (updates.name !== undefined) dbUpdates.name = updates.name;
-    if (updates.description !== undefined) dbUpdates.description = updates.description;
-    if (updates.address !== undefined) dbUpdates.address = updates.address;
-    if (updates.categoryId !== undefined) dbUpdates.category_id = updates.categoryId;
-    if (updates.image !== undefined) dbUpdates.image = updates.image;
-    if (updates.dateStart !== undefined) dbUpdates.date_start = updates.dateStart;
-    if (updates.timeStart !== undefined) dbUpdates.time_start = updates.timeStart;
-    if (updates.timeEnd !== undefined) dbUpdates.time_end = updates.timeEnd;
-    if (updates.price !== undefined) dbUpdates.price = updates.price;
-    if (updates.capacity !== undefined) dbUpdates.capacity = updates.capacity;
-    if (updates.isFree !== undefined) dbUpdates.is_free = updates.isFree;
-    if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
-    if (updates.coords !== undefined) dbUpdates.coords = updates.coords;
-
-    const { data, error } = await supabase
-      .from('events')
-      .update(dbUpdates)
-      .eq('id', id)
-      .select('*, category:categories(*)')
-      .single();
-
-    if (error) throw error;
-    return this.transformEventData(data);
-  },
-
   async deleteEvent(id: string): Promise<void> {
     const { error } = await supabase.from('events').delete().eq('id', id);
     if (error) throw error;

@@ -1,7 +1,7 @@
 export interface AppNotification {
   id: string;
   userId: string;
-  type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system' | 'owner_announcement';
+  type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system';
   title: string;
   body: string;
   data?: Record<string, unknown>;

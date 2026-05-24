@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Share2, Heart, HeartOff, Clock, Calendar, Eye, Navigation } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import { ReviewSection } from '@presentation/components/features';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
-import { realtimeService } from '@lib/supabase/services/notifications/websocket';
+import { surveysService } from '@lib/supabase';
 
 const PlaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getPlaceById } = usePlaces();
   const { user, isSaved, toggleSavedPlace } = useAuth();
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [survey, setSurvey] = useState({ isNearby: false, rating: 0, wouldRecommend: false, comment: '' });
 
   const place = getPlaceById(id || '');
 
@@ -36,36 +38,20 @@ const PlaceDetail: React.FC = () => {
     } : undefined,
   });
 
-  useEffect(() => {
-    if (!place?.latitude || !place?.longitude) return;
-    if (!('geolocation' in navigator)) return;
-
-    const checkProximity = (pos: GeolocationPosition) => {
-      const { latitude, longitude } = pos.coords;
-      const R = 6371;
-      const dLat = ((place.latitude! - latitude) * Math.PI) / 180;
-      const dLon = ((place.longitude! - longitude) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos((latitude * Math.PI) / 180) *
-          Math.cos((place.latitude! * Math.PI) / 180) *
-          Math.sin(dLon / 2) ** 2;
-      const distance = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-      if (distance < 1) {
-        localStorage.setItem(`nearby_${place.id}`, 'true');
-        toast.success(`Estás cerca de ${place.name}!`);
-      }
-    };
-
-    const watchId = navigator.geolocation.watchPosition(checkProximity, () => {}, {
-      enableHighAccuracy: true,
-      maximumAge: 30000,
-      timeout: 10000,
-    });
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [place?.id, place?.latitude, place?.longitude, place?.name]);
+  const handleSurvey = async () => {
+    if (!user || !place) return;
+    try {
+      await surveysService.submitSurvey({
+        userId: user.id,
+        placeId: place.id,
+        ...survey,
+      });
+      toast.success('Gracias por tu opinión!');
+      setShowSurvey(false);
+    } catch {
+      toast.error('Error al enviar encuesta');
+    }
+  };
 
   if (!place) {
     return (
@@ -85,20 +71,15 @@ const PlaceDetail: React.FC = () => {
 
   const sharePlace = async () => {
     const url = window.location.href;
-    const shareData: ShareData = {
-      title: `${place.name} | Lugabiz`,
-      text: `${place.description}\n\n📍 ${place.address}`,
-      url,
-    };
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({ title: place.name, text: place.description, url });
       } else {
-        await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${url}`);
+        await navigator.clipboard.writeText(url);
         toast.success('Enlace copiado!');
       }
     } catch {
-      await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${url}`);
+      await navigator.clipboard.writeText(url);
       toast.success('Enlace copiado!');
     }
   };
@@ -253,13 +234,58 @@ const PlaceDetail: React.FC = () => {
               )}
             </div>
 
-            {place.latitude && place.longitude && 'geolocation' in navigator && (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-4 border border-purple-100">
-                <p className="text-xs text-purple-600 font-medium flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  La geolocalización detectará cuando estés cerca
-                </p>
-              </div>
+            {user && !showSurvey && (
+              <button onClick={() => setShowSurvey(true)}
+                className="w-full py-4 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex items-center justify-center gap-2">
+                <Navigation className="w-4 h-4" /> ¿Estuviste aquí? Deja tu opinión
+              </button>
+            )}
+
+            {showSurvey && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-4">
+                <h3 className="font-semibold text-stone-800">¿Estuviste cerca de este lugar?</h3>
+                <div className="flex gap-3">
+                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: true }))}
+                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${survey.isNearby ? 'bg-green-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
+                    Sí, estuve cerca
+                  </button>
+                  <button onClick={() => setSurvey(s => ({ ...s, isNearby: false }))}
+                    className={`flex-1 py-3 rounded-2xl font-medium transition-all text-sm ${!survey.isNearby && survey.isNearby !== undefined ? 'bg-red-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100'}`}>
+                    No
+                  </button>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-stone-500 mb-2">Calificación</p>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button key={n} onClick={() => setSurvey(s => ({ ...s, rating: n }))}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${survey.rating >= n ? 'bg-amber-400 text-white' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}>
+                        <Star className="w-5 h-5" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={survey.wouldRecommend}
+                    onChange={e => setSurvey(s => ({ ...s, wouldRecommend: e.target.checked }))}
+                    className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-400" />
+                  <span className="text-sm text-stone-600">Lo recomendaría</span>
+                </label>
+                <textarea value={survey.comment} onChange={e => setSurvey(s => ({ ...s, comment: e.target.value }))}
+                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:border-amber-400 focus:bg-white focus:ring-0 transition-all text-stone-800 placeholder:text-stone-400 text-sm resize-none"
+                  placeholder="Comentario adicional..." rows={3} />
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSurvey(false)}
+                    className="flex-1 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 font-medium text-sm hover:bg-stone-100">
+                    Cancelar
+                  </button>
+                  <button onClick={handleSurvey}
+                    className="flex-1 py-3 bg-amber-500 text-white rounded-2xl font-medium text-sm hover:bg-amber-600">
+                    Enviar
+                  </button>
+                </div>
+              </motion.div>
             )}
           </motion.div>
         </div>
