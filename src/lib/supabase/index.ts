@@ -9,10 +9,13 @@ export { storageService } from '@lib/supabase/services/storageImages/storageImag
 export { eventsService } from '@lib/supabase/services/events/events';
 export { eventSharesService } from '@lib/supabase/services/events/eventShares';
 <<<<<<< HEAD
+<<<<<<< HEAD
 export { eventCommentsService } from '@lib/supabase/services/events/eventComments';
 export { eventLikesService } from '@lib/supabase/services/events/eventLikes';
 export { eventSavesService } from '@lib/supabase/services/events/eventSaves';
 export { eventViewsService } from '@lib/supabase/services/events/eventViews';
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 export { notificationsService } from '@lib/supabase/services/notifications/notifications';

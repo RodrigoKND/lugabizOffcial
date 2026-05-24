@@ -1,6 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Plus, User, Bell, Home, Search } from 'lucide-react';
+=======
+import { Plus, User, LogOut, Menu, Bell } from 'lucide-react';
+>>>>>>> main
 =======
 import { Plus, User, LogOut, Menu, Bell } from 'lucide-react';
 >>>>>>> main
@@ -10,13 +14,17 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
   const location = useLocation();
   const navigate = useNavigate();
 <<<<<<< HEAD
+<<<<<<< HEAD
   const { user, unreadCount } = useAuth();
 =======
+=======
+>>>>>>> main
   const { user, logout, unreadCount, markAllNotifsAsRead } = useAuth();
   const [menuOpen, setMenuOpen] = React.useState(false);
 >>>>>>> main
   const isActive = (path: string) => location.pathname === path;
   return (
+<<<<<<< HEAD
 <<<<<<< HEAD
     <>
       {/* Desktop Top Navbar */}
@@ -114,6 +122,8 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
       </nav>
     </>
 =======
+=======
+>>>>>>> main
     <nav
       className="bg-white/80 backdrop-blur-lg border-b border-stone-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -208,6 +218,9 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         )}
       </div>
     </nav>
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
   );
 };

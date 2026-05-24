@@ -3,7 +3,10 @@ import { User } from '@domain/entities';
 import { authService, savedPlacesService, notificationsService } from '@lib/supabase';
 import { AppNotification } from '@domain/entities';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { tracking } from '@infrastructure/utils/tracking';
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 
@@ -19,8 +22,11 @@ interface AuthContextType {
   isSaved: (placeId: string) => boolean;
   isNewUser: boolean;
 <<<<<<< HEAD
+<<<<<<< HEAD
   showPreferences: boolean;
   setShowPreferences: (v: boolean) => void;
+=======
+>>>>>>> main
 =======
 >>>>>>> main
   isAdmin: boolean;
@@ -49,7 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
   const [isNewUser, setIsNewUser] = useState(false);
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [showPreferences, setShowPreferences] = useState(false);
+=======
+>>>>>>> main
 =======
 >>>>>>> main
   const [isAdmin, setIsAdmin] = useState(false);
@@ -74,11 +83,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setNotifications(userNotifs);
           setUnreadCount(userNotifs.filter(n => !n.read).length);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
           if (tracking.isNewUserRegistration()) {
             setShowPreferences(true);
             tracking.markRegistered();
           }
+=======
+>>>>>>> main
 =======
 >>>>>>> main
         }
@@ -261,8 +273,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isSaved,
         isNewUser,
 <<<<<<< HEAD
+<<<<<<< HEAD
         showPreferences,
         setShowPreferences,
+=======
+>>>>>>> main
 =======
 >>>>>>> main
         isAdmin,

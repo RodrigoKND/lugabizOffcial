@@ -1,6 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+=======
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+>>>>>>> main
 =======
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,11 +16,14 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@presentation/context';
 import { eventSharesService } from '@lib/supabase';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { CountdownTimer } from './CountdownTimer';
 import { useEventComments } from '@presentation/hooks/useEventComments';
 import { useEventLikes } from '@presentation/hooks/useEventLikes';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
 =======
+=======
+>>>>>>> main
 
 interface Comment {
   id: string;
@@ -24,6 +32,9 @@ interface Comment {
   text: string;
   likes: number;
 }
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 
 interface Event {
@@ -52,10 +63,13 @@ interface EventModalProps {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev, hasNext, hasPrev }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 =======
+=======
+>>>>>>> main
 function useEventComments(eventId: string) {
   const [comments, setComments] = useState<Comment[]>(() => {
     try {
@@ -144,11 +158,15 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [sendingComment, setSendingComment] = useState(false);
 
   const { comments, addComment } = useEventComments(event.id);
   const { liked, likesCount, toggleLike } = useEventLikes(event.id, user?.id);
   const { saved, toggleSave } = useEventSaves(event.id, user?.id);
+=======
+  const { comments: eventComments, addComment } = useEventComments(event.id);
+>>>>>>> main
 =======
   const { comments: eventComments, addComment } = useEventComments(event.id);
 >>>>>>> main
@@ -158,12 +176,18 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
 
   const handleShare = async () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!user) { toast.error('Inicia sesión para compartir'); return; }
 =======
+=======
+>>>>>>> main
     if (!user) {
       toast.error('Inicia sesión para compartir');
       return;
     }
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     setIsSharing(true);
     try {
@@ -179,17 +203,24 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
 
   const handleAttend = () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!user) { toast.error('Inicia sesión para confirmar asistencia'); return; }
 =======
+=======
+>>>>>>> main
     if (!user) {
       toast.error('Inicia sesión para confirmar asistencia');
       return;
     }
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     navigate(`/event/${event.id}`);
     onClose();
   };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   const handleSendComment = async () => {
     if (!user) { toast.error('Inicia sesión para comentar'); return; }
@@ -206,6 +237,8 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
     }
   };
 
+=======
+>>>>>>> main
 =======
 >>>>>>> main
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
@@ -315,7 +348,11 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
                 <MessageCircle className={`w-6 h-6 ${showComments ? 'text-white fill-white' : 'text-white'}`} />
               </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
               <span className="text-white text-xs font-bold">{comments.length}</span>
+=======
+              <span className="text-white text-xs font-bold">{eventComments.length}</span>
+>>>>>>> main
 =======
               <span className="text-white text-xs font-bold">{eventComments.length}</span>
 >>>>>>> main

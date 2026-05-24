@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import {
 <<<<<<< HEAD
+<<<<<<< HEAD
   MapPin, Plus, Calendar, Camera, X, Users, TrendingUp, Eye, Heart, BarChart3, LogOut,
   CheckCircle2, Clock, Star, Loader2, Bell, Ticket, Pencil, Megaphone,
   MessageCircle, Share2, Bookmark, Activity, UserCheck, Award, ExternalLink,
@@ -34,10 +35,26 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout, uploadAvatar, updateProfile, isAdmin } = useAuth();
 >>>>>>> main
+=======
+  MapPin, Plus, Calendar, Camera, X, ChevronRight, UserPlus,
+  Users, TrendingUp, Eye, Heart, BarChart3, LogOut,
+  CheckCircle2, Clock, Star, Loader2, Bell, Ticket, Pencil
+} from 'lucide-react';
+import { useAuth, usePlaces } from '@presentation/context';
+import { PlacesCarousel, EventForm } from '@presentation/components/features';
+import { Event } from '@domain/entities';
+import { eventsService } from '@lib/supabase';
+import { useSEO } from '@presentation/hooks/seo/useSEO';
+
+const Profile: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, logout, uploadAvatar, updateProfile, isAdmin } = useAuth();
+>>>>>>> main
   const { getLengthPlacesByUserId, getLengthReviewsByUserId, getSavedPlacesByUserId, getUserEvents, getEventsAttending } = usePlaces();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [showEventForm, setShowEventForm] = useState(false);
+<<<<<<< HEAD
 <<<<<<< HEAD
   const [activeTab, setActiveTab] = useState('saved');
   const [savedPlaces, setSavedPlaces] = useState<Place[]>([]);
@@ -62,10 +79,24 @@ const Profile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ name: '', phone: '', bio: '', ownerBusinessName: '' });
 
+=======
+  const [activeTab, setActiveTab] = useState<string>('saved');
+  const [savedPlaces, setSavedPlaces] = useState<any[]>([]);
+  const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [showOwnerPanel, setShowOwnerPanel] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ name: '', phone: '', bio: '', ownerBusinessName: '' });
+
+>>>>>>> main
   useSEO({
     title: user?.name || 'Perfil',
     description: 'Perfil de usuario en Lugabiz',
   });
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 
   useEffect(() => {
@@ -75,6 +106,7 @@ const Profile: React.FC = () => {
         name: user.name || '',
         phone: user.phone || '',
         bio: user.bio || '',
+<<<<<<< HEAD
 <<<<<<< HEAD
         isOwner: user.isOwner || false,
         ownerBusinessName: user.ownerBusinessName || '',
@@ -92,6 +124,8 @@ const Profile: React.FC = () => {
       const ownerNotifs = notifications.filter(n => n.type === 'owner_announcement');
       setAnnouncements(ownerNotifs);
 =======
+=======
+>>>>>>> main
         ownerBusinessName: user.ownerBusinessName || '',
       });
 
@@ -103,6 +137,9 @@ const Profile: React.FC = () => {
 
       const attending = await getEventsAttending(user.id);
       setAttendingEvents(attending);
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     };
     init();
@@ -125,6 +162,7 @@ const Profile: React.FC = () => {
   };
 
   const handleSaveProfile = async () => {
+<<<<<<< HEAD
 <<<<<<< HEAD
     const isOwner = !!editData.ownerBusinessName;
     await updateProfile({ ...editData, isOwner });
@@ -606,6 +644,89 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
+=======
+    await updateProfile(editData);
+    setIsEditing(false);
+  };
+
+  const handleSubmitEventForm = () => {
+    setShowEventForm(false);
+  };
+
+  const tabs = [
+    { id: 'saved', label: 'Colección', icon: Heart },
+    { id: 'events', label: 'Mis Eventos', icon: Calendar },
+    { id: 'attending', label: 'Asistiré', icon: CheckCircle2 },
+  ];
+
+  if (user.isOwner) tabs.push({ id: 'owner', label: 'Dashboard', icon: BarChart3 });
+
+  const myPlacesCount = getLengthPlacesByUserId(user.id).length;
+  const reviewsCount = getLengthReviewsByUserId(user.id);
+
+  return (
+    <div className="min-h-screen bg-[#FDFCFB] text-stone-800">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="space-y-4">
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm text-center">
+              <div className="relative inline-block mb-4">
+                <img src={user.avatar || '/avatar.png'}
+                  className="w-24 h-24 rounded-2xl object-cover shadow-md" alt={user.name} />
+                <button onClick={() => avatarInputRef.current?.click()} disabled={isUploadingAvatar}
+                  className="absolute -bottom-1 -right-1 bg-amber-500 text-white p-2 rounded-xl hover:scale-110 transition-transform shadow-md disabled:opacity-50">
+                  {isUploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                </button>
+                <input ref={avatarInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+              </div>
+              <h1 className="text-xl font-bold mb-1">{user.name}</h1>
+              <p className="text-stone-400 text-sm mb-4">{user.email}</p>
+              {user.bio && <p className="text-stone-500 text-sm mb-4">{user.bio}</p>}
+              {user.isOwner && user.ownerBusinessName && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-semibold mb-4">
+                  <Star className="w-3 h-3" /> {user.ownerBusinessName}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="bg-stone-50 p-3 rounded-2xl">
+                  <p className="text-xl font-bold">{myPlacesCount}</p>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase">Lugares</p>
+                </div>
+                <div className="bg-stone-50 p-3 rounded-2xl">
+                  <p className="text-xl font-bold">{reviewsCount}</p>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase">Reseñas</p>
+                </div>
+              </div>
+              <button onClick={() => setShowEventForm(true)}
+                className="w-full bg-amber-500 text-white py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-amber-600 transition-all shadow-sm">
+                <Plus className="w-4 h-4" /> Crear Evento
+              </button>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-sm text-stone-700">Configuración</h3>
+                <button onClick={() => setIsEditing(true)}
+                  className="p-2 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors text-amber-600">
+                  <Pencil className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {isAdmin && (
+                  <Link to="/admin"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-stone-50 transition-colors text-sm text-stone-600">
+                    <BarChart3 className="w-4 h-4" /> Panel Admin
+                  </Link>
+                )}
+                <button onClick={logout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors text-sm text-red-500">
+                  <LogOut className="w-4 h-4" /> Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+
+>>>>>>> main
           <div className="lg:col-span-3 space-y-6">
             <div className="flex gap-6 border-b border-stone-100 overflow-x-auto">
               {tabs.map(tab => {
@@ -825,12 +946,16 @@ const Profile: React.FC = () => {
                   className="flex-1 py-3 bg-amber-500 text-white rounded-2xl font-semibold text-sm hover:bg-amber-600 transition-all disabled:opacity-50">Guardar Cambios</button>
                 <button onClick={() => setIsEditing(false)}
                   className="flex-1 py-3 bg-stone-100 text-stone-600 rounded-2xl font-semibold text-sm hover:bg-stone-200 transition-all">Cancelar</button>
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+<<<<<<< HEAD
 <<<<<<< HEAD
 
       {/* Desktop Logout */}
@@ -840,6 +965,8 @@ const Profile: React.FC = () => {
           <LogOut className="w-4 h-4" /> Salir
         </button>
       </div>
+=======
+>>>>>>> main
 =======
 >>>>>>> main
     </div>

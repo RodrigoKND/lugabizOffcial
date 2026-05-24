@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, MapPin, Calendar, Clock, ChevronRight, TrendingUp, Zap, Sparkles } from 'lucide-react';
@@ -21,6 +22,8 @@ function getCategoryColor(name: string) {
   return colors[name] || colors.default;
 }
 =======
+=======
+>>>>>>> main
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

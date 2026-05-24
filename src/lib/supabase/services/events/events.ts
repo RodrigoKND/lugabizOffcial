@@ -202,6 +202,7 @@ export const eventsService = {
   },
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   async updateEvent(id: string, updates: Partial<CreateEventData>): Promise<Event> {
     const dbUpdates: any = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) dbUpdates.name = updates.name;
@@ -229,6 +230,8 @@ export const eventsService = {
     return this.transformEventData(data);
   },
 
+=======
+>>>>>>> main
 =======
 >>>>>>> main
   async deleteEvent(id: string): Promise<void> {

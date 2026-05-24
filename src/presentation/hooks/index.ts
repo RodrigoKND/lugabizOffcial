@@ -3,8 +3,11 @@ export { useGeolocation } from './geo/useGeolocation';
 export { useSlide } from './slides/useSlide';
 export { useSEO } from './seo/useSEO';
 <<<<<<< HEAD
+<<<<<<< HEAD
 export { useEventComments } from './useEventComments';
 export { useEventLikes } from './useEventLikes';
 export { useEventSaves } from './useEventSaves';
+=======
+>>>>>>> main
 =======
 >>>>>>> main

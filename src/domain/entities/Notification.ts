@@ -2,7 +2,11 @@ export interface AppNotification {
   id: string;
   userId: string;
 <<<<<<< HEAD
+<<<<<<< HEAD
   type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system' | 'owner_announcement';
+=======
+  type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system';
+>>>>>>> main
 =======
   type: 'nearby' | 'event_invite' | 'new_place' | 'new_review' | 'survey' | 'system';
 >>>>>>> main
