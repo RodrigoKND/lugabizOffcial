@@ -11,43 +11,71 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
+  let data = {};
   try {
-    const data = event.data.json();
-    const options = {
-      body: data.body || '',
-      icon: data.icon || '/L.ico',
-      badge: '/L.ico',
-      vibrate: [200, 100, 200],
-      data: { url: data.url || '/' },
-      actions: [
-        { action: 'open', title: 'Ver' },
-        { action: 'close', title: 'Cerrar' },
-      ],
-    };
-    event.waitUntil(
-      self.registration.showNotification(data.title || 'Lugabiz', options)
-    );
+    data = event.data.json();
   } catch {
-    event.waitUntil(
-      self.registration.showNotification('Lugabiz', {
-        body: event.data.text(),
-        icon: '/L.ico',
-      })
-    );
+    data = { title: 'Lugabiz', body: event.data.text() };
   }
+
+  const title = data.title || 'Lugabiz';
+  const options = {
+    body: data.body || '',
+    icon: data.icon || '/L.ico',
+    badge: '/L.ico',
+    vibrate: data.vibrate || [200, 100, 200],
+    tag: data.data?.surveyId
+      ? `survey-${data.data.surveyId}`
+      : data.data?.place_id
+        ? `nearby-${data.data.place_id}`
+        : undefined,
+    renotify: true,
+    data: {
+      url: data.data?.url || '/',
+      surveyId: data.data?.surveyId || null,
+    },
+    actions: [
+      { action: 'open', title: 'Ver' },
+      { action: 'close', title: 'Cerrar' },
+    ],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/';
+
+  if (event.action === 'close') return;
+
+  const notifData = event.notification.data || {};
+  const targetUrl = notifData.url || '/';
+
+  const urlToOpen = targetUrl.startsWith('/')
+    ? self.location.origin + targetUrl
+    : targetUrl;
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientsList) => {
+      // Si ya hay una ventana abierta de la app, enfoca y navega
       for (const client of clientsList) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          return client.focus().then(() => client.navigate(url));
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          return client.focus().then(() => {
+            if ('navigate' in client) return client.navigate(urlToOpen);
+          });
         }
       }
-      if (clients.openWindow) return clients.openWindow(url);
+      // Si no hay ventana abierta, abre una nueva
+      if (clients.openWindow) return clients.openWindow(urlToOpen);
     })
   );
+});
+
+// Escuchar mensajes de la página para forzar actualización del SW
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

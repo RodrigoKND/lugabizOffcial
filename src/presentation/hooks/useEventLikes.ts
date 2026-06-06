@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { eventLikesService } from '@lib/supabase/services/events/eventLikes';
 
 export function useEventLikes(eventId: string, userId?: string) {
@@ -25,13 +26,17 @@ export function useEventLikes(eventId: string, userId?: string) {
   }, [eventId, userId]);
 
   const toggleLike = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      toast.error('Inicia sesión para dar like');
+      return;
+    }
     try {
       const result = await eventLikesService.toggleLike(eventId, userId);
       setLiked(result.liked);
       setLikesCount(result.count);
     } catch (e) {
       console.error('Error toggling like:', e);
+      toast.error('Error al actualizar like');
     }
   }, [eventId, userId]);
 

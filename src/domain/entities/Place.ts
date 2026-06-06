@@ -49,7 +49,18 @@ export interface UpdatePlaceData {
   categoryId?: string;
   socialGroupIds?: string[];
   image?: string;
+  gallery?: string[];
   featured?: boolean;
   latitude?: number;
   longitude?: number;
+}
+
+export interface PlaceShareConfirmation {
+  id: string;
+  shareId: string;
+  userId: string;
+  userName?: string;
+  userAvatar?: string;
+  confirmed: boolean;
+  createdAt: Date;
 }

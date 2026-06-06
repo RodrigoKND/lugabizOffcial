@@ -1,17 +1,21 @@
 import { Star, Zap } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { Place } from '@domain/entities';
 
 interface TrendBannerProps {
   places: Place[];
-  onClick: (id: string) => void;
 }
 
-const TrendBanner: React.FC<TrendBannerProps> = ({ places, onClick }) => {
+const TrendBanner: React.FC<TrendBannerProps> = ({ places }) => {
+  const location = useLocation();
   if (places.length === 0) return null;
   const top = places[0];
   return (
-    <div onClick={() => onClick(top.id)}
-      className="relative rounded-2xl overflow-hidden cursor-pointer group mb-7 aspect-2/1 sm:aspect-4/1">
+    <Link
+      to={`/place/${top.id}`}
+      state={{ background: location }}
+      className="relative rounded-2xl overflow-hidden cursor-pointer group mb-7 aspect-2/1 sm:aspect-4/1 block"
+    >
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat group-hover:scale-105 transition-transform duration-500"
         style={{ backgroundImage: `url(${top.image || ''})` }} />
       <div className="absolute inset-0 bg-linear-to-r from-primary-900/80 via-primary-800/40 to-transparent" />
@@ -32,7 +36,7 @@ const TrendBanner: React.FC<TrendBannerProps> = ({ places, onClick }) => {
           <span className="text-white/40 text-[10px]">· {top.category?.name}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

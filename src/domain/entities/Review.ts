@@ -5,7 +5,10 @@ export interface Review {
   userAvatar?: string;
   rating: number;
   comment: string;
+  parentId?: string;
   createdAt: Date;
+  replies?: Review[];
+  replyCount?: number;
 }
 
 export interface CreateReviewData {
@@ -13,6 +16,7 @@ export interface CreateReviewData {
   userId: string;
   rating: number;
   comment: string;
+  parentId?: string;
 }
 
 export interface UpdateReviewData {

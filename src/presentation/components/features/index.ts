@@ -27,3 +27,8 @@ export { getCategoryColor } from '@presentation/components/features/home/categor
 export { default as CreateSurveyModal } from '@presentation/components/features/surveys/CreateSurveyModal';
 export { default as SurveyCard } from '@presentation/components/features/surveys/SurveyCard';
 export { default as SurveyStats } from '@presentation/components/features/surveys/SurveyStats';
+export { default as SurveyDeck } from '@presentation/components/features/surveys/SurveyDeck';
+export { default as LoadingSkeleton } from '@presentation/components/features/home/LoadingSkeleton';
+export { default as EmptyHomeState } from '@presentation/components/features/home/EmptyHomeState';
+export { default as StoriesRow } from '@presentation/components/features/home/StoriesRow';
+export { default as FeaturedHeroSection } from '@presentation/components/features/home/FeaturedHeroSection';

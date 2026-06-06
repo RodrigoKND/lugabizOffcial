@@ -1,11 +1,17 @@
+export interface SurveyQuestion {
+  id: string;
+  question: string;
+  options: string[];
+}
+
 export interface MarketSurvey {
   id: string;
   userId: string;
   title: string;
   description: string;
   about: string;
-  benefit: string;
   problemSolved: string;
+  questions: SurveyQuestion[];
   categoryIds: string[];
   categories?: { id: string; name: string; icon: string; color: string }[];
   responseCount: number;
@@ -18,6 +24,7 @@ export interface SurveyResponse {
   userId: string;
   userName?: string;
   userAvatar?: string;
+  answers: { questionId: string; answer: string }[];
   createdAt: Date;
 }
 
@@ -34,7 +41,7 @@ export interface CreateSurveyData {
   title: string;
   description: string;
   about: string;
-  benefit: string;
   problemSolved: string;
+  questions: { question: string; options: string[] }[];
   categoryIds: string[];
 }

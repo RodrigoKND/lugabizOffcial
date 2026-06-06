@@ -36,7 +36,7 @@ const SurveyStats: React.FC<SurveyStatsProps> = ({ survey, onClose }) => {
       >
         <div className="flex items-center justify-between p-6 pb-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -74,7 +74,7 @@ const SurveyStats: React.FC<SurveyStatsProps> = ({ survey, onClose }) => {
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(survey.responseCount / 50 * 100, 100)}%` }}
-                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full"
               />
             </div>
             <p className="text-[11px] text-stone-400 mt-1.5">

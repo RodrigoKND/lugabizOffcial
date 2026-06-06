@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { eventCommentsService, EventComment } from '@lib/supabase/services/events/eventComments';
 
 export function useEventComments(eventId: string) {
@@ -22,20 +23,22 @@ export function useEventComments(eventId: string) {
 
   const addComment = useCallback(async (userId: string, text: string, parentId?: string) => {
     try {
-      const comment = await eventCommentsService.addComment(eventId, userId, text, parentId);
+      const dbComment = await eventCommentsService.addComment(eventId, userId, text, parentId);
       if (parentId) {
         setComments(prev =>
           prev.map(c =>
             c.id === parentId
-              ? { ...c, replies: [...(c.replies || []), comment] }
+              ? { ...c, replies: [...(c.replies || []), dbComment] }
               : c
           )
         );
       } else {
-        setComments(prev => [comment, ...prev]);
+        setComments(prev => [dbComment, ...prev]);
       }
+      return dbComment;
     } catch (e) {
       console.error('Error adding comment:', e);
+      toast.error('Error al enviar comentario');
       throw e;
     }
   }, [eventId]);

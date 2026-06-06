@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MessageCircle, Search, Sparkles } from 'lucide-react';
+import { X, Search, Sparkles, Compass } from 'lucide-react';
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -17,13 +17,13 @@ const SUGGESTIONS = [
 ];
 
 const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, onSearch, isLoading }) => {
-  const [selectedOption, setSelectedOption] = useState('');
+  const [query, setQuery] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (selectedOption.trim()) {
-      onSearch?.(selectedOption);
-      setSelectedOption('');
+    if (query.trim()) {
+      onSearch?.(query);
+      setQuery('');
     }
   };
 
@@ -34,46 +34,42 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, onSearch, isLoad
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-200 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
         >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="relative w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden sm:mx-4"
           >
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400" />
+            <div className="absolute inset-x-0 top-0 h-2 bg-linear-to-r from-purple-400 via-purple-500 to-purple-400" />
 
             <button onClick={onClose}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors z-10">
-              <X className="w-4 h-4 text-stone-500" />
+              className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center hover:bg-purple-100 transition-colors z-10">
+              <X className="w-4 h-4 text-purple-600" />
             </button>
 
-            <div className="p-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200">
-                  <MessageCircle className="w-6 h-6 text-white" />
-                </div>
+            <div className="p-6 sm:p-8 pt-8 sm:pt-8">
+              <div className="flex items-center gap-4 mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-stone-800">Hola, soy <span className="text-amber-600">Lubi</span></h2>
-                  <p className="text-sm text-stone-500">¿Qué tienes planeado hoy?</p>
+                  <h2 className="text-xl font-bold text-slate-800">
+                    <Compass className="w-8 h-8 mr-2 inline" />
+                    ¿Qué planes tienes hoy?
+                  </h2>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-2">
-                <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Sugerencias</p>
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3" />
+                  Ideas rápidas
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s, i) => (
-                    <button key={i} type="button" onClick={() => setSelectedOption(s.name)}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
-                        selectedOption === s.name
-                          ? 'bg-amber-50 border-amber-300 text-amber-700'
-                          : 'bg-stone-50 border-stone-200 text-stone-600 hover:border-amber-200 hover:bg-amber-50/50'
-                      }`}>
-                      <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
+                    <button key={i} type="button" onClick={() => setQuery(s.name)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${query === s.name
+                          ? 'bg-purple-50 border-purple-300 text-purple-700 shadow-sm'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-purple-200 hover:bg-purple-50/50'
+                        }`}>
                       {s.name}
                     </button>
                   ))}
@@ -82,34 +78,33 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, onSearch, isLoad
 
               <form onSubmit={handleSubmit} className="mt-6">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                  <Search className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
                   <textarea
-                    placeholder="Quiero lugares para pasar el tiempo con amigos..."
-                    value={selectedOption}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-all"
+                    placeholder="Busca lugares para salir con amigos..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400/30 focus:border-emerald-400 transition-all"
                     rows={3} maxLength={250}
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('chat-submit')?.click(); } }}
                   />
                 </div>
                 <div className="flex justify-between items-center mt-3">
-                  <span className="text-[11px] text-stone-400">{selectedOption.length}/250</span>
-                  <button id="chat-submit" type="submit" disabled={!selectedOption.trim() || isLoading}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
-                      selectedOption.trim() && !isLoading
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'
-                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                    }`}>
+                  <span className="text-[11px] text-slate-400">{query.length}/250</span>
+                  <button id="chat-submit" type="submit" disabled={!query.trim() || isLoading}
+                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${query.trim() && !isLoading
+                        ? 'bg-linear-to-r from-purple-500 to-violet-500 text-white shadow-md shadow-purple-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}>
                     {isLoading ? (
                       <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Buscando...</>
                     ) : (
-                      <><Search className="w-4 h-4" /> Buscar lugares</>
+                      <><Search className="w-4 h-4" /> Descubrir</>
                     )}
                   </button>
                 </div>
               </form>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

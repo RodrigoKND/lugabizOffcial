@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { usePlaces } from '@presentation/context';
+import { usePlaces, useAuth } from '@presentation/context';
 import { useForm } from '@presentation/hooks';
 import { SocialGroupSelector } from '@presentation/components/features';
+import { authService } from '@lib/supabase';
+import toast from 'react-hot-toast';
 
 interface PreferencesProps {
   openPreferences?: boolean;
@@ -12,6 +14,7 @@ interface PreferencesProps {
 
 const Preferences: React.FC<PreferencesProps> = ({ openPreferences = false, setClosePreferences }) => {
   const { socialGroups, categories } = usePlaces();
+  const { user } = useAuth();
   const [isShowingPreferences, setIsShowingPreferences] = useState(false);
 
   useEffect(() => {
@@ -38,9 +41,19 @@ const Preferences: React.FC<PreferencesProps> = ({ openPreferences = false, setC
     setClosePreferences?.(false);
   };
 
-  const handleSubmitPreferences = (e: React.FormEvent) => {
+  const handleSubmitPreferences = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(JSON.stringify(formData));
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+    try {
+      await authService.saveUserPreferences(user.id, formData.category, formData.socialGroups);
+      toast.success('Preferencias guardadas');
+      onClose();
+    } catch {
+      toast.error('Error al guardar preferencias');
+    }
   };
 
   if (!isShowingPreferences) return null;

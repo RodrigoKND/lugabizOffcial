@@ -8,7 +8,13 @@ export interface User {
   isOwner?: boolean;
   ownerBusinessName?: string;
   role?: 'admin' | 'owner' | 'user';
+  banned?: boolean;
+  banReason?: string;
   createdAt: Date;
+  // Onboarding state (persisted in DB)
+  onboardingStep?: string;
+  notifDismissed?: boolean;
+  geoDismissed?: boolean;
 }
 
 export interface CreateUserData {

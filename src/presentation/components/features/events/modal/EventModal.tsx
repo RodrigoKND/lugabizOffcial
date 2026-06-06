@@ -1,290 +1,378 @@
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Bookmark, MapPin, Clock, Send, MoreHorizontal, Loader2 } from 'lucide-react';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Heart, MessageCircle, Bookmark, Share2, Send,
+  MapPin, Clock, X, ChevronLeft, ChevronRight, Loader2,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { useAuth } from '@presentation/context';
-import { eventSharesService } from '@lib/supabase';
+import { useEventModal } from '@presentation/hooks/events/useEventModal';
 import { CountdownTimer } from './CountdownTimer';
-import { useEventComments } from '@presentation/hooks/useEventComments';
-import { useEventLikes } from '@presentation/hooks/useEventLikes';
-import { useEventSaves } from '@presentation/hooks/useEventSaves';
-
-interface Comment {
-  id: string;
-  user: string;
-  avatar: string;
-  text: string;
-  likes: number;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  imageUrl: string;
-  startDate: Date;
-  endDate?: Date;
-  availableDays?: string[];
-  availableHours?: { start: string; end: string };
-  category: string;
-  organizer: { name: string; avatar: string; isNew: boolean };
-  likes: number;
-  comments: number;
-}
-
-interface EventModalProps {
-  event: Event;
-  onClose: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+import { CommentItem } from './CommentItem';
+import type { EventModalProps } from './EventModal.types';
+import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 
 const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev, hasNext, hasPrev }) => {
-  const { user } = useAuth();
-  const [showComments, setShowComments] = useState(false);
-  const [comment, setComment] = useState('');
-  const [replyTo, setReplyTo] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-  const [sendingComment, setSendingComment] = useState(false);
-
-  const { comments, addComment } = useEventComments(event.id);
-  const { liked, likesCount, toggleLike } = useEventLikes(event.id, user?.id);
-  const { saved, toggleSave } = useEventSaves(event.id, user?.id);
+  const {
+    user, comment, setComment, replyTo, setReplyTo,
+    isExpanded, setIsExpanded, isSharing, sendingComment,
+    comments, liked, likesCount, toggleLike,
+    saved, toggleSave, handleShare, handleSendComment,
+  } = useEventModal(event.id);
 
   const touchStart = useRef(0);
-  const touchEnd = useRef(0);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const eventEndHandledRef = useRef(false);
+  const [showComments, setShowComments] = useState(false);
 
-  const handleShare = async () => {
-    if (!user) { toast.error('Inicia sesión para compartir'); return; }
-    setIsSharing(true);
-    try {
-      const share = await eventSharesService.createShare(event.id, user.id);
-      await navigator.clipboard.writeText(share.sharedUrl);
-      toast.success('Enlace de invitación copiado!');
-    } catch {
-      toast.error('Error al compartir');
-    } finally {
-      setIsSharing(false);
+  const handleEventEnd = useCallback(() => {
+    if (eventEndHandledRef.current) return;
+    const key = `event_start_push_${event.id}`;
+    if (localStorage.getItem(key)) return;
+    eventEndHandledRef.current = true;
+    localStorage.setItem(key, '1');
+    edgeService.sendEventStartPush(event.id).catch(() => {});
+  }, [event.id]);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const images = event.images?.length ? event.images : [event.imageUrl];
+  const [imgIdx, setImgIdx] = useState(0);
+
+  useEffect(() => {
+    setImgIdx(0);
+    setImgLoaded(false);
+    setImgError(false);
+  }, [event.id]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
+    if ((!isMobile || showComments) && commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
+  }, [comments, isMobile, showComments]);
+
+  // Focus input when reply is set
+  useEffect(() => {
+    if (replyTo) inputRef.current?.focus();
+  }, [replyTo]);
+
+  const prevImage = () => {
+    if (imgIdx > 0) { setImgIdx(i => i - 1); setImgLoaded(false); setImgError(false); }
+    else if (hasPrev) onPrev();
   };
-
-  const handleSendComment = async () => {
-    if (!user) { toast.error('Inicia sesión para comentar'); return; }
-    if (!comment.trim() || sendingComment) return;
-    setSendingComment(true);
-    try {
-      await addComment(user.id, comment.trim(), replyTo || undefined);
-      setComment('');
-      setReplyTo(null);
-    } catch {
-      toast.error('Error al enviar comentario');
-    } finally {
-      setSendingComment(false);
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => { touchStart.current = e.touches[0].clientX; };
-  const handleTouchMove = (e: React.TouchEvent) => { touchEnd.current = e.touches[0].clientX; };
-  const handleTouchEnd = () => {
-    const d = touchStart.current - touchEnd.current;
-    if (Math.abs(d) > 50) {
-      if (d > 0 && hasNext) onNext();
-      else if (d < 0 && hasPrev) onPrev();
-    }
-    touchStart.current = 0;
-    touchEnd.current = 0;
+  const nextImage = () => {
+    if (imgIdx < images.length - 1) { setImgIdx(i => i + 1); setImgLoaded(false); setImgError(false); }
+    else if (hasNext) onNext();
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2 md:p-4"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+      className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-0 md:p-4"
       onClick={onClose}
     >
-      <div className="relative flex items-center gap-4">
+      <div className="relative flex items-center justify-center w-full h-full max-w-5xl mx-auto">
+
         {hasPrev && (
-          <button onClick={(e) => { e.stopPropagation(); onPrev(); }}
-            className="hidden md:flex cursor-pointer items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/25 transition-all text-white shrink-0">
+          <button onClick={e => { e.stopPropagation(); onPrev(); }}
+            className="hidden md:flex absolute -left-5 z-20 w-10 h-10 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all border border-white/10 backdrop-blur-sm shadow-lg">
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
 
+        {/* ── Main container ── */}
         <div
-          onClick={(e) => e.stopPropagation()}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className="relative w-full max-w-sm mx-auto aspect-[9/16] md:h-[85vh] md:aspect-auto rounded-2xl overflow-hidden shadow-2xl"
+          onClick={e => e.stopPropagation()}
+          className="relative w-full h-full md:h-[90vh] md:max-h-[800px] md:rounded-2xl overflow-hidden bg-black md:bg-[#0a0a0a] shadow-2xl flex flex-col md:flex-row"
+          onTouchStart={e => { touchStart.current = e.touches[0].clientX; }}
+          onTouchEnd={e => {
+            const d = touchStart.current - e.changedTouches[0].clientX;
+            if (Math.abs(d) > 50) { d > 0 ? nextImage() : prevImage(); }
+          }}
         >
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${event.imageUrl})`, filter: 'brightness(0.55)' }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent via-45% to-black/90" />
 
-          <button onClick={onClose} className="absolute top-3 right-3 z-20 bg-black/40 backdrop-blur-sm p-1.5 rounded-full hover:bg-black/60 transition-all">
-            <X className="w-4 h-4 text-white" />
-          </button>
+          {/* ── IMAGE PANEL ── */}
+          <div className="relative md:w-[58%] lg:w-[60%] h-[46vh] md:h-full bg-black flex items-center justify-center overflow-hidden">
 
-          <div className="relative h-full flex flex-col justify-between p-4">
-            <div className="flex items-center gap-2.5">
-              <div className={`p-[1.5px] rounded-full ${event.organizer.isNew ? 'bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-500' : 'bg-stone-500'}`}>
-                <div className="p-[1.5px] bg-black rounded-full">
-                  <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name} className="w-8 h-8 rounded-full object-cover" />
+            {/* Image progress bars */}
+            {images.length > 1 && (
+              <div className="absolute top-3 inset-x-3 flex gap-1 z-10">
+                {images.map((_, i) => (
+                  <div key={i} className="flex-1 h-0.5 rounded-full bg-white/25 overflow-hidden">
+                    <div className="h-full bg-white/80 rounded-full transition-all duration-300"
+                      style={{ width: i === imgIdx ? '100%' : i < imgIdx ? '100%' : '0%' }} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Image */}
+            {!imgLoaded && !imgError && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-white/10 border-t-amber-500 rounded-full animate-spin" />
+              </div>
+            )}
+            {imgError ? (
+              <div className="flex flex-col items-center gap-2 text-white/25">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
+                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-xs">Imagen no disponible</p>
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={imgIdx}
+                  src={images[imgIdx]}
+                  alt={event.title}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgError(true)}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`w-full h-full object-contain ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                />
+              </AnimatePresence>
+            )}
+
+            {/* Gallery nav */}
+            {images.length > 1 && imgIdx > 0 && (
+              <button onClick={e => { e.stopPropagation(); prevImage(); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
+            {images.length > 1 && imgIdx < images.length - 1 && (
+              <button onClick={e => { e.stopPropagation(); nextImage(); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* Mobile top bar */}
+            <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 z-10 md:hidden">
+              <div className="flex items-center gap-2.5">
+                <div className="ring-2 ring-amber-400/60 rounded-full p-[1.5px]">
+                  <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name}
+                    className="w-7 h-7 rounded-full object-cover ring-1 ring-black" />
+                </div>
+                <div>
+                  <p className="text-white text-xs font-bold drop-shadow">{event.organizer.name}</p>
+                  <p className="text-white/50 text-[9px]">{event.category}</p>
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-xs truncate">{event.organizer.name}</p>
-                <p className="text-white/60 text-[10px]">{event.category}</p>
-              </div>
-              <button className="text-white/60 hover:text-white"><MoreHorizontal className="w-4 h-4" /></button>
+              <button onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:bg-black/60 hover:text-white transition-all backdrop-blur-sm">
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="space-y-2.5">
-              <CountdownTimer endDate={event.startDate} />
-
-              <div>
-                <h3 className="text-xl font-bold text-white leading-tight">{event.title}</h3>
-                <div className="relative mt-1">
-                  <p className={`text-white/80 text-xs leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>{event.description}</p>
-                  <div className="flex gap-2 mt-1">
-                    {!isExpanded && event.description.length > 100 && (
-                      <button onClick={() => setIsExpanded(true)} className="text-amber-400 text-[10px] font-bold hover:underline">ver más</button>
-                    )}
-                    <Link to={`/event/${event.id}`} onClick={onClose} className="text-white/50 text-[10px] font-medium hover:text-white transition-colors">detalle</Link>
-                  </div>
+            {/* Mobile bottom info */}
+            <div className="md:hidden absolute bottom-0 inset-x-0 p-4 pt-14 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
+              <CountdownTimer endDate={event.startDate} onExpired={handleEventEnd} />
+              <h3 className="text-white font-bold text-sm mt-1">{event.title}</h3>
+              <p className={`text-white/70 text-xs mt-0.5 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                {event.description}
+              </p>
+              {event.description.length > 100 && (
+                <button onClick={() => setIsExpanded(v => !v)} className="text-amber-400 text-[10px] font-bold mt-0.5">
+                  {isExpanded ? 'ver menos' : 'ver más'}
+                </button>
+              )}
+              <div className="flex items-center gap-3 mt-1.5">
+                <div className="flex items-center gap-1 text-white/50">
+                  <MapPin className="w-3 h-3 text-amber-400" />
+                  <span className="text-[10px] truncate max-w-[130px]">{event.location}</span>
+                </div>
+                <div className="flex items-center gap-1 text-white/50">
+                  <Clock className="w-3 h-3 text-amber-400" />
+                  <span className="text-[10px]">{event.availableHours?.start}</span>
                 </div>
               </div>
-
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 space-y-1.5 border border-white/5">
-                <div className="flex items-center gap-2 text-white/80">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span className="text-[11px] font-medium truncate">{event.location}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-white/80">
-                    <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span className="text-[11px]">{event.availableHours?.start} - {event.availableHours?.end}</span>
-                  </div>
-                  <span className="text-[9px] bg-white/10 px-2 py-0.5 rounded text-white/50 uppercase tracking-wider">{event.category}</span>
-                </div>
-              </div>
-
               <Link to={`/event/${event.id}`} onClick={onClose}
-                className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg active:scale-[0.97] transition-all">
+                className="mt-2 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
                 Asistiré
               </Link>
             </div>
           </div>
 
-          <div className="absolute right-2 bottom-28 flex flex-col items-center gap-3">
-            <button onClick={toggleLike} className="flex flex-col items-center gap-0.5">
-              <div className={`p-2 rounded-full backdrop-blur-sm transition-all ${liked ? 'bg-pink-500/40' : 'bg-white/15'}`}>
-                <Heart className={`w-5 h-5 ${liked ? 'text-pink-400 fill-pink-400' : 'text-white'}`} />
-              </div>
-              <span className="text-white text-[10px] font-bold">{likesCount}</span>
-            </button>
+          {/* ── SIDE PANEL ── */}
+          <div className={`md:w-[42%] lg:w-[40%] flex flex-col bg-[#0a0a0a] border-l border-white/5 ${showComments ? 'flex' : 'hidden md:flex'}`}>
 
-            <button onClick={() => setShowComments(!showComments)} className="flex flex-col items-center gap-0.5">
-              <div className={`p-2 rounded-full backdrop-blur-sm transition-all ${showComments ? 'bg-amber-500/40' : 'bg-white/15'}`}>
-                <MessageCircle className={`w-5 h-5 ${showComments ? 'text-amber-400' : 'text-white'}`} />
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="ring-2 ring-amber-400/50 rounded-full p-[2px]">
+                  <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name}
+                    className="w-8 h-8 rounded-full object-cover" />
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm leading-tight">{event.organizer.name}</p>
+                  <p className="text-white/35 text-[10px]">{event.category}</p>
+                </div>
               </div>
-              <span className="text-white text-[10px] font-bold">{comments.length}</span>
-            </button>
+              <button onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-            <button onClick={toggleSave} className="flex flex-col items-center gap-0.5">
-              <div className={`p-2 rounded-full backdrop-blur-sm transition-all ${saved ? 'bg-amber-500/40' : 'bg-white/15'}`}>
-                <Bookmark className={`w-5 h-5 ${saved ? 'text-amber-400 fill-amber-400' : 'text-white'}`} />
+            {/* Description */}
+            <div className="px-4 pt-3 pb-3 border-b border-white/5">
+              <CountdownTimer endDate={event.startDate} onExpired={handleEventEnd} />
+              <h2 className="text-white font-bold text-sm mt-2 leading-snug">{event.title}</h2>
+              <p className={`text-white/55 text-xs mt-1 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                {event.description}
+              </p>
+              {event.description.length > 120 && (
+                <button onClick={() => setIsExpanded(v => !v)}
+                  className="text-amber-400 text-[10px] font-semibold hover:underline mt-0.5">
+                  {isExpanded ? 'ver menos' : 'ver más'}
+                </button>
+              )}
+              <div className="flex items-center gap-3 mt-2 text-white/30 text-[10px]">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-amber-400/70" />
+                  <span className="truncate max-w-[140px]">{event.location}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-amber-400/70" />
+                  <span>{event.availableHours?.start} – {event.availableHours?.end}</span>
+                </div>
               </div>
-            </button>
+            </div>
 
-            <button onClick={handleShare} disabled={isSharing} className="flex flex-col items-center gap-0.5">
-              <div className="p-2 rounded-full bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all">
-                {isSharing ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Share2 className="w-5 h-5 text-white" />}
+            {/* Comments list */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+              {comments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full py-10 text-white/20">
+                  <MessageCircle className="w-9 h-9 mb-2" />
+                  <p className="text-xs font-medium">Sin comentarios aún</p>
+                  <p className="text-[10px] mt-0.5 text-white/15">Sé el primero en comentar</p>
+                </div>
+              ) : (
+                <div className="px-4 pb-3">
+                  {comments.map(c => (
+                    <CommentItem key={c.id} comment={c} onReply={t => setReplyTo(t)} userId={user?.id} />
+                  ))}
+                </div>
+              )}
+              <div ref={commentsEndRef} />
+            </div>
+
+            {/* Actions bar */}
+            <div className="border-t border-white/5 px-4 py-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <button onClick={toggleLike} className="flex items-center gap-1.5 group">
+                    <Heart className={`w-5 h-5 transition-all duration-200 ${liked ? 'text-rose-500 fill-rose-500 scale-110' : 'text-white/50 group-hover:text-white'}`} />
+                    <span className="text-[11px] font-medium text-white/40">{likesCount}</span>
+                  </button>
+                  <button onClick={() => { setShowComments(v => !v); inputRef.current?.focus(); }}
+                    className="flex items-center gap-1.5 group">
+                    <MessageCircle className="w-5 h-5 text-white/50 group-hover:text-white transition-colors" />
+                    <span className="text-[11px] font-medium text-white/40">{comments.length}</span>
+                  </button>
+                  <button onClick={handleShare} disabled={isSharing} className="group">
+                    {isSharing
+                      ? <Loader2 className="w-5 h-5 text-white/40 animate-spin" />
+                      : <Share2 className="w-5 h-5 text-white/50 group-hover:text-white transition-colors" />}
+                  </button>
+                </div>
+                <button onClick={toggleSave} className="group">
+                  <Bookmark className={`w-5 h-5 transition-all duration-200 ${saved ? 'text-amber-500 fill-amber-500' : 'text-white/50 group-hover:text-white'}`} />
+                </button>
               </div>
-            </button>
+              <p className="text-white/40 text-[10px] mt-1.5">
+                {likesCount > 0 ? `${likesCount} me gusta` : ''}
+              </p>
+            </div>
+
+            {/* Reply indicator */}
+            <AnimatePresence>
+              {replyTo && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-t border-white/5">
+                    <span className="text-[11px] text-white/50">
+                      Respondiendo a <span className="font-bold text-amber-400">@{replyTo.userName}</span>
+                    </span>
+                    <button onClick={() => setReplyTo(null)} className="text-white/30 hover:text-white/60 transition-colors">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Comment input */}
+            <div className="border-t border-white/5 px-4 py-3">
+              <div className="flex items-center gap-2">
+                {user?.id && (
+                  <img src={(user as any).avatarUrl || '/avatar.png'} alt=""
+                    className="w-7 h-7 rounded-full object-cover shrink-0" />
+                )}
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendComment(); } }}
+                  placeholder={
+                    !user ? 'Inicia sesión para comentar'
+                    : replyTo ? `Responder a @${replyTo.userName}...`
+                    : 'Añade un comentario...'
+                  }
+                  disabled={!user}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-3.5 py-2 text-xs text-white placeholder-white/25 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all disabled:opacity-40"
+                />
+                <button
+                  onClick={handleSendComment}
+                  disabled={!user || !comment.trim() || sendingComment}
+                  className={`p-2 rounded-xl transition-all ${comment.trim() && user ? 'text-amber-400 hover:text-amber-300' : 'text-white/20'}`}
+                >
+                  {sendingComment ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="border-t border-white/5 px-4 py-3">
+              <Link to={`/event/${event.id}`} onClick={onClose}
+                className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
+                Asistiré
+              </Link>
+            </div>
           </div>
+
+          {/* Mobile comments overlay backdrop */}
+          {showComments && isMobile && (
+            <button onClick={() => setShowComments(false)}
+              className="absolute inset-0 bg-black/40 z-[-1]" />
+          )}
         </div>
 
         {hasNext && (
-          <button onClick={(e) => { e.stopPropagation(); onNext(); }}
-            className="hidden md:flex cursor-pointer items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/25 transition-all text-white shrink-0">
+          <button onClick={e => { e.stopPropagation(); onNext(); }}
+            className="hidden md:flex absolute -right-5 z-20 w-10 h-10 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all border border-white/10 backdrop-blur-sm shadow-lg">
             <ChevronRight className="w-5 h-5" />
           </button>
         )}
       </div>
-
-      {showComments && (
-        <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-sm bg-white rounded-t-2xl max-h-[50vh] flex flex-col z-30 shadow-2xl"
-          onClick={(e) => e.stopPropagation()}>
-          <div className="flex justify-center py-1.5"><div className="w-8 h-1 bg-stone-300 rounded-full" /></div>
-          <div className="px-4 py-2.5 border-b flex items-center justify-between">
-            <h3 className="font-bold text-sm text-stone-900">{comments.length} comentarios</h3>
-            <button onClick={() => { setShowComments(false); setReplyTo(null); }}><X className="w-4 h-4 text-stone-500" /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-            {comments.length === 0 ? (
-              <div className="text-center py-6 text-stone-400 text-xs">Sin comentarios aún</div>
-            ) : (
-              comments.map(c => (
-                <div key={c.id}>
-                  <div className="flex gap-2.5">
-                    <img src={c.userAvatar || '/avatar.png'} alt={c.userName} className="w-7 h-7 rounded-full shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-semibold text-xs text-stone-900">{c.userName}</span>
-                        {c.isOrganizer && <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Org</span>}
-                      </div>
-                      <p className="text-xs text-stone-700 mt-0.5">{c.text}</p>
-                      <button onClick={() => setReplyTo(c.id)} className="text-[10px] text-stone-500 hover:text-stone-700 font-medium mt-0.5">Responder</button>
-                      {c.replies && c.replies.length > 0 && (
-                        <div className="mt-1.5 ml-2 pl-3 border-l-2 border-stone-200 space-y-1.5">
-                          {c.replies.map(r => (
-                            <div key={r.id} className="flex gap-2">
-                              <img src={r.userAvatar || '/avatar.png'} alt={r.userName} className="w-5 h-5 rounded-full shrink-0" />
-                              <div>
-                                <div className="flex items-center gap-1 flex-wrap">
-                                  <span className="font-semibold text-[11px] text-stone-900">{r.userName}</span>
-                                  {r.isOrganizer && <span className="text-[8px] font-bold bg-amber-100 text-amber-700 px-1 py-0.5 rounded">Org</span>}
-                                </div>
-                                <p className="text-[11px] text-stone-700 mt-0.5">{r.text}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="p-3 border-t bg-white">
-            {replyTo && (
-              <div className="flex items-center justify-between mb-1.5 px-1">
-                <span className="text-[10px] text-stone-500">Respondiendo comentario</span>
-                <button onClick={() => setReplyTo(null)} className="text-stone-400 hover:text-stone-600"><X className="w-3 h-3" /></button>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <input type="text" value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendComment(); } }}
-                placeholder={user ? (replyTo ? 'Escribe una respuesta...' : 'Añade un comentario...') : 'Inicia sesión para comentar'}
-                disabled={!user}
-                className="flex-1 px-3.5 py-2 bg-stone-100 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-50" />
-              <button onClick={handleSendComment} disabled={!user || !comment.trim() || sendingComment}
-                className={`p-2 rounded-full transition-all ${comment.trim() && user ? 'bg-amber-500 text-white' : 'bg-stone-200 text-stone-400'}`}>
-                {sendingComment ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 };

@@ -12,9 +12,9 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewe
   const gradient = getCategoryColor(event.category?.name || '');
   return (
     <button onClick={onClick}
-      className="shrink-0 w-48 snap-start group relative rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97]">
+      className={`shrink-0 w-48 snap-start group relative rounded-xl overflow-hidden bg-white border shadow-xs hover:shadow-md transition-all active:scale-[0.97] ${isViewed ? 'border-stone-200/60 opacity-60 grayscale-[30%]' : 'border-primary-100/40'}`}>
       <div className="aspect-16/10 relative overflow-hidden">
-        <div className={`absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300 ${isViewed ? 'opacity-70' : ''}`}
+        <div className={`absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300`}
           style={{ backgroundImage: `url(${event.image || ''})` }} />
         <div className="absolute inset-0 bg-lienar-to-t from-black/70 via-black/10 to-transparent" />
         <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white bg-linear-to-r ${gradient} shadow-xs z-10`}>

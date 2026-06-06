@@ -1,45 +1,53 @@
 import { useEffect, useRef } from 'react';
+import { supabase } from '@lib/supabase/client';
+import { useAuth } from '@presentation/context';
 
 const PUBLIC_VAPID_KEY = 'BIGu7eYIOEKFEb75vP4Jj4GIFalj2Sx_Y3y-R8bZzg6wHXFJKMlGQKyBQSYEW0aJWqM2K8eHIyDNEFZBh8f-G_U';
 
 export function usePushNotifications() {
   const registered = useRef(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (registered.current) return;
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
     if (Notification.permission === 'denied') return;
+    if (!user) return;
 
     const init = async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
         registered.current = true;
 
-        const sub = await reg.pushManager.getSubscription();
-        if (sub) return;
+        let sub = await reg.pushManager.getSubscription();
 
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') return;
+        if (!sub) {
+          if (Notification.permission === 'default') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') return;
+          }
 
-        const newSub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
-        });
+          sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+          });
+        }
 
-        console.log('Push subscribed:', newSub.toJSON());
+        if (sub && user) {
+          await supabase
+            .from('push_subscriptions')
+            .upsert({
+              user_id: user.id,
+              subscription: JSON.parse(JSON.stringify(sub)),
+            }, { onConflict: 'user_id' });
+        }
       } catch (err) {
         console.error('Push registration error:', err);
       }
     };
 
-    if (Notification.permission === 'default') {
-      Notification.requestPermission().then((perm) => {
-        if (perm === 'granted') init();
-      });
-    } else if (Notification.permission === 'granted') {
-      init();
-    }
-  }, []);
+    init();
+  }, [user]);
 }
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {

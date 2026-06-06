@@ -13,7 +13,7 @@ const ERROR_MESSAGES: Record<number, string> = {
 
 export function useGeolocation() {
   const [position, setPosition] = useState<GeoPosition | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   
   const watchIdRef = useRef<number | null>(null);
@@ -68,32 +68,21 @@ export function useGeolocation() {
     );
   }, [handleSuccess, handleError]);
 
-  useEffect(() => {
-    if (hasStarted.current) return;
-    hasStarted.current = true;
-    startWatching();
-
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-    };
-  }, [startWatching]);
+  const stopWatching = useCallback(() => {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    hasStarted.current = false;
+  }, []);
 
   const retry = useCallback(() => {
     setLoading(true);
     setError(undefined);
     setPosition(null);
-    
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-    
-    hasStarted.current = false;
+    stopWatching();
     startWatching();
-  }, [startWatching]);
+  }, [startWatching, stopWatching]);
 
-  return { position, loading, error, retry };
+  return { position, loading, error, retry, startWatching, stopWatching };
 }

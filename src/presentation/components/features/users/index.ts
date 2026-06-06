@@ -1,0 +1,9 @@
+export { default as StatCard } from './StatCard';
+export { default as ProfileHeader } from './ProfileHeader';
+export { default as ProfileTabs } from './ProfileTabs';
+export { default as SavedPlacesTab } from './SavedPlacesTab';
+export { default as MyEventsTab } from './MyEventsTab';
+export { default as AttendingEventsTab } from './AttendingEventsTab';
+export { default as DashboardTab } from './DashboardTab';
+export { default as AdminTab } from './AdminTab';
+export { default as EditProfileModal } from './EditProfileModal';

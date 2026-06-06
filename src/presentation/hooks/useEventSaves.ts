@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { eventSavesService } from '@lib/supabase/services/events/eventSaves';
 
 export function useEventSaves(eventId: string, userId?: string) {
@@ -21,12 +22,17 @@ export function useEventSaves(eventId: string, userId?: string) {
   }, [eventId, userId]);
 
   const toggleSave = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      toast.error('Inicia sesión para guardar');
+      return;
+    }
     try {
       const newStatus = await eventSavesService.toggleSave(eventId, userId);
       setSaved(newStatus);
+      toast.success(newStatus ? 'Evento guardado' : 'Evento eliminado de guardados');
     } catch (e) {
       console.error('Error toggling save:', e);
+      toast.error('Error al guardar el evento');
     }
   }, [eventId, userId]);
 

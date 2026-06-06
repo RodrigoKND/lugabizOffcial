@@ -27,7 +27,14 @@ dist-ssr
 skills-lock.json
 .agents
 NEW_DB_SCHEMA.md
-Supabase Snippet Public Schema Column Inventory.csv
-AGENTS.md
+
 supabase_schema.sql
 supabase_migration_surveys.sql
+
+AGENTS.md
+ANCHORED_SUMMARY.md
+LUGABIZ_MOBILE_APP.md
+
+supabase/functions/*
+supabase/migrations/*
+supabase/lugabiz_complete_schema.sql

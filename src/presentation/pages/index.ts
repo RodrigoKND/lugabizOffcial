@@ -6,5 +6,7 @@ export { default as EventDetailPage } from '@presentation/pages/Events/EventDeta
 export { default as EventFeedPage } from '@presentation/pages/Events/EventFeedPage';
 export { default as EditEventPage } from '@presentation/pages/Events/EditEventPage';
 export { default as EditPlacePage } from '@presentation/pages/Places/EditPlacePage';
+export { default as SharedPlacePage } from '@presentation/pages/Places/SharedPlacePage';
 export { default as Confirmation } from '@presentation/pages/Confirmation/Confirmation';
 export { default as AdminPanel } from '@presentation/pages/Admin/AdminPanel';
+export { default as CommunityPage } from '@presentation/pages/Community/CommunityPage';

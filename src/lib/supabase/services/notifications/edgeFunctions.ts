@@ -22,4 +22,36 @@ export const edgeService = {
     if (error) throw error
     return data as any[]
   },
+
+  async sendSurveyPush(surveyId: string, title: string, body: string, categoryIds: string[]) {
+    const { data: result, error } = await supabase.functions.invoke('send-survey-push', {
+      body: { surveyId, title, body, categoryIds },
+    })
+    if (error) throw error
+    return result as { sent: number }
+  },
+
+  async sendEventStartPush(eventId: string) {
+    const { data: result, error } = await supabase.functions.invoke('send-event-start-push', {
+      body: { eventId },
+    })
+    if (error) throw error
+    return result as { sent: number; already_sent?: boolean }
+  },
+
+  async banUserWithPush(userId: string, reason: string) {
+    const { data: result, error } = await supabase.functions.invoke('ban-user-push', {
+      body: { userId, reason },
+    })
+    if (error) throw error
+    return result as { sent: number }
+  },
+
+  async sendAttendancePush(eventId: string, attendeeCount: number) {
+    const { data: result, error } = await supabase.functions.invoke('send-event-attendance-push', {
+      body: { eventId, attendeeCount },
+    })
+    if (error) throw error
+    return result as { sent: number }
+  },
 }

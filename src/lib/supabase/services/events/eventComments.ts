@@ -79,6 +79,9 @@ export const eventCommentsService = {
   },
 
   async addComment(eventId: string, userId: string, text: string, parentId?: string): Promise<EventComment> {
+    const { data: userCheck } = await supabase.from('users').select('banned').eq('id', userId).single();
+    if (userCheck?.banned) throw new Error('Usuario suspendido');
+
     const { data, error } = await supabase
       .from('event_comments')
       .insert({

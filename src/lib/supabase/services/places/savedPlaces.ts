@@ -12,34 +12,19 @@ export const savedPlacesService = {
     return (data || []).map(item => item.place_id);
   },
 
-  // Save place
+  // Save place (instant - uses DB trigger to update count)
   async savePlace(userId: string, placeId: string) {
-    // Check if already saved
-    const { data: existing } = await supabase
-      .from('saved_places')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('place_id', placeId)
-      .single();
-
-    if (existing) {
-      throw new Error('Place already saved');
-    }
-
     const { error } = await supabase
       .from('saved_places')
-      .insert({
+      .upsert({
         user_id: userId,
         place_id: placeId,
-      });
+      }, { onConflict: 'user_id,place_id', ignoreDuplicates: true });
 
     if (error) throw error;
-
-    // Increment saved count
-    await this.updateSavedCount(placeId);
   },
 
-  // Unsave place
+  // Unsave place (instant - uses DB trigger to update count)
   async unsavePlace(userId: string, placeId: string) {
     const { error } = await supabase
       .from('saved_places')
@@ -48,9 +33,6 @@ export const savedPlacesService = {
       .eq('place_id', placeId);
 
     if (error) throw error;
-
-    // Decrement saved count
-    await this.updateSavedCount(placeId);
   },
 
   // Toggle save status

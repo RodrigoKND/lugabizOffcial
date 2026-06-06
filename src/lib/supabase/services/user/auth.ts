@@ -93,6 +93,14 @@ export const authService = {
       .single();
 
     if (error) throw error;
+
+    if (updates.isOwner !== undefined) {
+      await supabase.from('user_roles').upsert(
+        { user_id: userId, role: updates.isOwner ? 'owner' : 'user' },
+        { onConflict: 'user_id' }
+      );
+    }
+
     return this.transformUserData(data);
   },
 
@@ -112,6 +120,25 @@ export const authService = {
     return data.publicUrl;
   },
 
+  async saveUserPreferences(userId: string, categories: string[], socialGroups: string[]) {
+    await supabase.from('user_category_preferences').delete().eq('user_id', userId);
+    await supabase.from('user_social_group_preferences').delete().eq('user_id', userId);
+
+    if (categories.length > 0) {
+      const { error } = await supabase.from('user_category_preferences').insert(
+        categories.map(category_id => ({ user_id: userId, category_id }))
+      );
+      if (error) throw error;
+    }
+
+    if (socialGroups.length > 0) {
+      const { error } = await supabase.from('user_social_group_preferences').insert(
+        socialGroups.map(social_group_id => ({ user_id: userId, social_group_id }))
+      );
+      if (error) throw error;
+    }
+  },
+
   async getUserRole(userId: string): Promise<string | null> {
     const { data, error } = await supabase
       .from('user_roles')
@@ -121,6 +148,13 @@ export const authService = {
 
     if (error) throw error;
     return data?.role || null;
+  },
+
+  async updateOnboardingState(userId: string, step: string, notifDismissed: boolean, geoDismissed: boolean): Promise<void> {
+    await supabase
+      .from('users')
+      .update({ onboarding_step: step, notif_dismissed: notifDismissed, geo_dismissed: geoDismissed })
+      .eq('id', userId);
   },
 
   transformUserData(data: any): User {
@@ -133,7 +167,12 @@ export const authService = {
       bio: data.bio,
       isOwner: data.is_owner || false,
       ownerBusinessName: data.owner_business_name,
+      banned: data.banned || false,
+      banReason: data.ban_reason,
       createdAt: new Date(data.created_at),
+      onboardingStep: data.onboarding_step ?? 'login',
+      notifDismissed: data.notif_dismissed ?? false,
+      geoDismissed: data.geo_dismissed ?? false,
     };
   },
 };
