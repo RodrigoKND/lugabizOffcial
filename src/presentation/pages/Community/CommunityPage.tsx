@@ -370,7 +370,7 @@ const CommunityPage: React.FC = () => {
           </aside>
 
           {/* ── RIGHT RESULTS ─────────────────────────── */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 max-w-3xl">
             {/* Active filter chips */}
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">

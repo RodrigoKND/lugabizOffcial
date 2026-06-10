@@ -7,7 +7,7 @@ import { useAuth } from '@presentation/context';
 import BusinessPostCard from './BusinessPostCard';
 import CreatePostModal from './CreatePostModal';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 9;
 
 interface PostsFeedProps {
   compact?: boolean;
@@ -63,20 +63,14 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
 
       {/* Loading skeleton */}
       {loading && posts.length === 0 && (
-        <div className="space-y-3">
-          {[1, 2].map(i => (
-            <div key={i} className="bg-white rounded-2xl border border-primary-100/40 overflow-hidden animate-pulse">
-              <div className="flex items-center gap-3 px-4 py-4">
-                <div className="w-10 h-10 rounded-full bg-stone-200" />
-                <div className="space-y-1.5 flex-1">
-                  <div className="h-3 bg-stone-200 rounded w-1/3" />
-                  <div className="h-2.5 bg-stone-100 rounded w-1/4" />
-                </div>
-              </div>
-              <div className="h-48 bg-stone-100" />
-              <div className="px-4 py-3 space-y-2">
-                <div className="h-3 bg-stone-100 rounded w-full" />
-                <div className="h-3 bg-stone-100 rounded w-3/4" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="bg-white rounded-xl border border-primary-100/40 overflow-hidden animate-pulse">
+              <div style={{ aspectRatio: '4/3' }} className="bg-stone-100" />
+              <div className="px-3 py-2.5 space-y-2">
+                <div className="h-2.5 bg-stone-200 rounded w-1/2" />
+                <div className="h-2 bg-stone-100 rounded w-full" />
+                <div className="h-2 bg-stone-100 rounded w-3/4" />
               </div>
             </div>
           ))}
@@ -84,8 +78,8 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       )}
 
       {/* Posts */}
-      <div className="space-y-4">
-        {(compact ? posts.slice(0, 3) : posts).map(post => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start">
+        {(compact ? posts.slice(0, 6) : posts).map(post => (
           <BusinessPostCard key={post.id} post={post} />
         ))}
       </div>
@@ -95,7 +89,7 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
         compact && posts.length > 3 ? (
           <motion.button
             whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors"
+            className="w-auto p-2 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors"
             onClick={() => {}}
           >
             Ver todos los posts

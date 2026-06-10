@@ -13,10 +13,12 @@ import LoadingSkeleton from '@presentation/components/features/home/LoadingSkele
 import EmptyHomeState from '@presentation/components/features/home/EmptyHomeState';
 import StoriesRow from '@presentation/components/features/home/StoriesRow';
 import FeaturedHeroSection from '@presentation/components/features/home/FeaturedHeroSection';
+import PersonalizedSections from '@presentation/components/features/home/PersonalizedSections';
 import { useHomeEvents } from '@presentation/hooks/home/useHomeEvents';
 import { useTrendingPlaces } from '@presentation/hooks/home/useTrendingPlaces';
 import { useOnboardingAlerts } from '@presentation/hooks/onboarding/useOnboardingAlerts';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
+import { usePersonalizedSections } from '@presentation/hooks/home/usePersonalizedSections';
 import PostsFeed from '@presentation/components/features/posts/PostsFeed';
 
 const Home: React.FC = () => {
@@ -36,6 +38,13 @@ const Home: React.FC = () => {
   const hasContent = places.length > 0 || events.length > 0 || trendingPlaces.length > 0;
 
   const { surveys: pendingSurveys, refresh: refreshSurveys } = usePendingsurveys();
+
+  const storedCity = useMemo(() => {
+    try { return localStorage.getItem('_lugabiz_city') || undefined; } catch { return undefined; }
+  }, []);
+  const { sections: personalizedSections, loading: sectionsLoading } = usePersonalizedSections(
+    places, user?.id ?? null, storedCity,
+  );
 
   const handleStoryClick = (eventId: string) => {
     markEventViewed(eventId);
@@ -144,6 +153,8 @@ const Home: React.FC = () => {
             ))}
           </ScrollRow>
         )}
+
+        <PersonalizedSections sections={personalizedSections} loading={sectionsLoading} />
 
         <PostsFeed compact />
       </motion.div>

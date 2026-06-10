@@ -126,20 +126,12 @@ export async function reactToPost(
   }
 }
 
-export async function claimFlashOffer(postId: string): Promise<void> {
-  const { data: row } = await supabase
-    .from('business_posts')
-    .select('flash_offer')
-    .eq('id', postId)
-    .maybeSingle();
-
-  if (!row?.flash_offer) return;
-  const offer = row.flash_offer;
-  const newCount = (offer.claimedSlots ?? 0) + 1;
-  await supabase
-    .from('business_posts')
-    .update({ flash_offer: { ...offer, claimedSlots: newCount } })
-    .eq('id', postId);
+export async function claimFlashOffer(postId: string): Promise<{ claimedSlots: number }> {
+  const { data, error } = await supabase.rpc('claim_flash_offer', { p_post_id: postId })
+  if (error) throw error
+  const result = data as { success?: boolean; error?: string; claimedSlots?: number }
+  if (result.error) throw new Error(result.error)
+  return { claimedSlots: result.claimedSlots ?? 0 }
 }
 
 export async function uploadPostImage(file: File): Promise<string> {

@@ -1,26 +1,15 @@
-import { supabase } from '@lib/supabase/client';
-
 export async function sendBrowserPush(title: string, body: string, url?: string, data?: Record<string, unknown>) {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('serviceWorker' in navigator)) return;
   if (Notification.permission !== 'granted') return;
 
   try {
     const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    if (!sub) return;
-
-    const payload = JSON.stringify({
-      title,
+    await reg.showNotification(title, {
       body,
       icon: '/L.ico',
       badge: '/L.ico',
       vibrate: [200, 100, 200],
       data: { url: url || '/', ...data },
-    });
-
-    await supabase.from('push_notifications').insert({
-      subscription: JSON.parse(JSON.stringify(sub)),
-      payload,
     });
   } catch {}
 }

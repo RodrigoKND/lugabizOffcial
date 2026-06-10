@@ -14,7 +14,6 @@ export function usePlaceDetail() {
   const cachedPlace = getPlaceById(id || '');
   const [place, setPlace] = useState<Place | null>(cachedPlace || null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [reviewPage, setReviewPage] = useState(0);
   const [hasMoreReviews, setHasMoreReviews] = useState(true);
@@ -120,8 +119,6 @@ export function usePlaceDetail() {
     reviews,
     hasMoreReviews,
     loadMoreReviews,
-    isChatOpen,
-    setIsChatOpen,
     showDeleteConfirm,
     setShowDeleteConfirm,
     sharePlace,

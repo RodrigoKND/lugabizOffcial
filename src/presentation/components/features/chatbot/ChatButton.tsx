@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MessageCircle, Sparkles } from 'lucide-react';
 
 interface ChatButtonProps {
-  onClick: () => void;
   isVisible: boolean;
 }
 
-const ChatButton: React.FC<ChatButtonProps> = ({ onClick, isVisible }) => {
+const ChatButton: React.FC<ChatButtonProps> = ({ isVisible }) => {
+  const navigate = useNavigate();
   const [hover, setHover] = useState(false);
 
   if (!isVisible) return null;
@@ -19,7 +20,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ onClick, isVisible }) => {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         className="group relative cursor-pointer"
-        onClick={onClick}
+        onClick={() => navigate('/chat')}
       >
         <div className="relative w-14 h-14 sm:w-15 sm:h-15 rounded-2xl bg-white border border-purple-100 shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 hover:border-purple-200">
           <MessageCircle className="w-6 h-6 text-purple-600 group-hover:scale-110 transition-transform duration-300" />

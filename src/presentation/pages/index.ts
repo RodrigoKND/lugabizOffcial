@@ -10,3 +10,4 @@ export { default as SharedPlacePage } from '@presentation/pages/Places/SharedPla
 export { default as Confirmation } from '@presentation/pages/Confirmation/Confirmation';
 export { default as AdminPanel } from '@presentation/pages/Admin/AdminPanel';
 export { default as CommunityPage } from '@presentation/pages/Community/CommunityPage';
+export { default as ChatPage } from '@presentation/pages/Chat/ChatPage';

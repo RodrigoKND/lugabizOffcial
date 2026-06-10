@@ -140,6 +140,7 @@ export async function getResponses(surveyId: string): Promise<any[]> {
     userId: r.user_id,
     userName: userMap[r.user_id]?.name || 'Usuario',
     userAvatar: userMap[r.user_id]?.avatar || null,
+    answers: r.answers || [],
     createdAt: new Date(r.created_at),
   }));
 }

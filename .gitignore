@@ -37,4 +37,5 @@ LUGABIZ_MOBILE_APP.md
 
 supabase/functions/*
 supabase/migrations/*
+supabase/config.toml
 supabase/lugabiz_complete_schema.sql

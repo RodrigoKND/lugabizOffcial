@@ -12,7 +12,6 @@ export { default as EventModal } from '@presentation/components/features/events/
 export { default as EventForm } from '@presentation/components/features/events/formNewEvent/EventForm';
 export { default as AllPlacesModal } from '@presentation/components/features/places/modal/AllPlacesModal';
 export { default as PlacesResultsModal } from '@presentation/components/features/places/modal/PlacesResultsModal';
-export { default as ChatModal } from '@presentation/components/features/chatbot/modal/ChatModal';
 export { default as PlaceSearchFilter } from '@presentation/components/features/places/PlaceSearchFilter';
 export { default as ChatButton } from '@presentation/components/features/chatbot/ChatButton';
 export { default as AmenitySelector } from '@presentation/components/features/places/formPublishNewPlace/AmenitySelector';

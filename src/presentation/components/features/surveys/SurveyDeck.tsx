@@ -272,7 +272,7 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
                     background: i === 0 ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.65)',
                     border: `1px solid rgba(139,92,246,${i === 0 ? 0.18 : 0.1})`,
                     boxShadow: '0 4px 24px -4px rgba(109,40,217,0.1)',
-                    transform: `translateX(${(i + 1) * 11}px) translateY(${-(i + 1) * 3}px) rotate(${(i + 1) * 3}deg) scale(${1 - (i + 1) * 0.025})`,
+                    transform: `translateX(${-(i + 1) * 8}px) translateY(${(i + 1) * 4}px) rotate(${-(i + 1) * 2}deg) scale(${1 - (i + 1) * 0.025})`,
                   }}
                 >
                   <div className="h-1.5 bg-gradient-to-r from-violet-400/50 to-purple-500/50" />

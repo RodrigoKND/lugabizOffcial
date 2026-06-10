@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, PlacesProvider, useAuth } from '@presentation/context';
-import { Navbar, Footer, AuthModal, ChatButton, ChatModal, SurveyCard, Preferences } from '@presentation/components/features';
+import { Navbar, Footer, AuthModal, ChatButton, SurveyCard, Preferences } from '@presentation/components/features';
 import BannedAccountModal from '@presentation/components/features/users/modal/BannedAccountModal';
-import { Home, PlaceDetail, AddPlace, Profile, EventDetailPage, EventFeedPage, EditEventPage, EditPlacePage, Confirmation, SharedPlacePage, CommunityPage } from '@presentation/pages';
+import { Home, PlaceDetail, AddPlace, Profile, EventDetailPage, EventFeedPage, EditEventPage, EditPlacePage, Confirmation, SharedPlacePage, CommunityPage, ChatPage } from '@presentation/pages';
 import { useEventNotifications } from '@presentation/hooks/useEventNotifications';
 import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
@@ -106,11 +106,6 @@ const LoadingSpinner = () => (
 // ── Inner app — must live inside <Router> to access hooks ────────────────────
 function AppRoutes() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-
-  const handleChatSearch = useCallback((query: string) => {
-    console.log('Chat search:', query);
-  }, []);
 
   const location = useLocation();
   // Background location is set when navigating to /place/:id from the feed
@@ -142,12 +137,12 @@ function AppRoutes() {
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/confirmation" element={<Confirmation />} />
               <Route path="/comunidad" element={<CommunityPage />} />
+              <Route path="/chat" element={<ChatPage />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>
         </div>
-        <ChatButton onClick={() => setIsChatOpen(true)} isVisible />
-        <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} onSearch={handleChatSearch} />
+        <ChatButton isVisible />
         <PendingSurveys />
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         <Toaster position="top-right" toastOptions={{

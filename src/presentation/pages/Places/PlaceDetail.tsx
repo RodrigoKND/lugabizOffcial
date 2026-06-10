@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useSmartBack } from '@presentation/hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, X, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Star, X, TrendingUp, BarChart3 } from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
-import { ReviewSection, ChatButton, ChatModal } from '@presentation/components/features';
+import { ReviewSection, ChatButton } from '@presentation/components/features';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { usePlaceDetail } from '@presentation/hooks/places/usePlaceDetail';
@@ -16,6 +16,7 @@ import PlaceGallery from '@presentation/components/features/places/detail/PlaceG
 import PlaceInfoCard from '@presentation/components/features/places/detail/PlaceInfoCard';
 import PlaceLocationCard from '@presentation/components/features/places/detail/PlaceLocationCard';
 import PlaceSurveyModal from '@presentation/components/features/places/detail/PlaceSurveyModal';
+import PlaceSurveyStats from '@presentation/components/features/places/detail/PlaceSurveyStats';
 
 const PlaceDetail: React.FC = () => {
   const goBack = useSmartBack('/');
@@ -25,7 +26,6 @@ const PlaceDetail: React.FC = () => {
   const {
     place, user, isPlaceSaved, navigate, toggleSavedPlace,
     reviews, hasMoreReviews, loadMoreReviews,
-    isChatOpen, setIsChatOpen,
     showDeleteConfirm, setShowDeleteConfirm, sharePlace, handleDelete,
   } = usePlaceDetail();
   const { galleryIdx, openGallery, closeGallery, prevImage, nextImage } = usePlaceGallery();
@@ -87,7 +87,6 @@ const PlaceDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
       <ChatButton onClick={() => setIsChatOpen(true)} isVisible />
-      <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
           {isModal ? (
@@ -155,6 +154,17 @@ const PlaceDetail: React.FC = () => {
               latitude={place.latitude}
               longitude={place.longitude}
             />
+
+            {/* Stats de encuestas — visible solo para el dueño del lugar */}
+            {user?.id === place.userId && (
+              <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-4 h-4 text-amber-500" />
+                  <h3 className="font-bold text-sm text-stone-700">Estadísticas de encuestas</h3>
+                </div>
+                <PlaceSurveyStats placeId={place.id} />
+              </div>
+            )}
           </motion.div>
         </div>
 
