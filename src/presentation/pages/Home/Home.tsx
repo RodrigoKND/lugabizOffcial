@@ -42,8 +42,16 @@ const Home: React.FC = () => {
   const storedCity = useMemo(() => {
     try { return localStorage.getItem('_lugabiz_city') || undefined; } catch { return undefined; }
   }, []);
+  const storedCoords = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem('_lugabiz_last_pos');
+      if (!raw) return { lat: undefined, lng: undefined };
+      const { lat, lng } = JSON.parse(raw);
+      return { lat: lat as number | undefined, lng: lng as number | undefined };
+    } catch { return { lat: undefined, lng: undefined }; }
+  }, []);
   const { sections: personalizedSections, loading: sectionsLoading } = usePersonalizedSections(
-    places, user?.id ?? null, storedCity,
+    places, events, user?.id ?? null, storedCity, storedCoords.lat, storedCoords.lng,
   );
 
   const handleStoryClick = (eventId: string) => {

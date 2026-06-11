@@ -16,7 +16,8 @@ export function getAdjacentCells(hex: string): string[] {
 
 export function getNearbyCells(lat: number, lng: number, radiusKm: number = 1): string[] {
   const origin = latLngToCell(lat, lng);
-  const ringK = Math.max(1, Math.round(radiusKm / 0.6));
+  // H3 res 9: ~300 m between cell centers → ~0.3 km per ring step
+  const ringK = Math.max(1, Math.round(radiusKm / 0.3));
   const cells = new Set<string>();
   cells.add(origin);
   try {
@@ -33,5 +34,5 @@ export function getNearbyCells(lat: number, lng: number, radiusKm: number = 1): 
 export function areCellsNearby(cellA: string, cellB: string, maxDistKm: number = 1): boolean {
   const dist = h3.gridDistance(cellA, cellB);
   if (dist === -1) return false;
-  return dist * 0.6 <= maxDistKm;
+  return dist * 0.3 <= maxDistKm;
 }

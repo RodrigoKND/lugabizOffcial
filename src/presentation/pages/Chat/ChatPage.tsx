@@ -177,6 +177,20 @@ const ChatPage: React.FC = () => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    // Auto-expand verticalmente
+    e.target.style.height = 'auto'
+    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+  }
+
+  // Reset height cuando se envía el mensaje
+  useEffect(() => {
+    if (!input && inputRef.current) {
+      inputRef.current.style.height = 'auto'
+    }
+  }, [input])
+
   const openVideo = useCallback((v: VideoEmbed) => setActiveVideo(v), [])
   const closeVideo = useCallback(() => setActiveVideo(null), [])
 
@@ -367,13 +381,12 @@ const ChatPage: React.FC = () => {
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={hasConversation ? 'Escribe algo más...' : '¿Qué plan buscas hoy?'}
                 rows={1}
                 maxLength={250}
-                className="flex-1 resize-none bg-transparent text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none min-h-[24px] max-h-[120px] leading-6"
-                style={{ overflowY: input.split('\n').length > 4 ? 'auto' : 'hidden' }}
+                className="flex-1 resize-none bg-transparent text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none min-h-[24px] max-h-[120px] leading-6 overflow-hidden"
               />
               <button
                 type="submit"

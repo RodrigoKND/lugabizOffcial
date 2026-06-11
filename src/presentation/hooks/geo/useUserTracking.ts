@@ -21,6 +21,14 @@ export function useUserTracking() {
     return stopWatching;
   }, [startWatching, stopWatching]);
 
+  // Persist latest position for personalized sections (no sensitive data)
+  useEffect(() => {
+    if (!position) return;
+    try {
+      sessionStorage.setItem('_lugabiz_last_pos', JSON.stringify({ lat: position.lat, lng: position.lon }));
+    } catch {}
+  }, [position?.lat, position?.lon]);
+
   useEffect(() => {
     if (!user?.id || !position) return;
 
@@ -35,7 +43,7 @@ export function useUserTracking() {
         // Registrar actividad de ubicación en DB (best-effort)
         userActivityService.trackLocation(user.id, position.lat, position.lon).catch(() => {});
 
-        const nearbyCells = getNearbyCells(position.lat, position.lon, 1);
+        const nearbyCells = getNearbyCells(position.lat, position.lon, 3);
         const { data: places } = await supabase
           .from('places')
           .select('id, name, latitude, longitude')

@@ -52,6 +52,30 @@ serve(async (req) => {
     })
   }
 
+  // Rate limiting: máximo 1 anuncio cada 5 minutos por usuario
+  const RATE_LIMIT_MS = 5 * 60 * 1000
+  const { data: lastAnnouncement } = await supabaseClient
+    .from('notifications')
+    .select('created_at')
+    .eq('data->>owner_id', user.id)
+    .eq('type', 'owner_announcement')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (lastAnnouncement) {
+    const msSinceLastAnnouncement = Date.now() - new Date(lastAnnouncement.created_at).getTime()
+    if (msSinceLastAnnouncement < RATE_LIMIT_MS) {
+      const remaining = Math.ceil((RATE_LIMIT_MS - msSinceLastAnnouncement) / 60000)
+      return new Response(JSON.stringify({
+        error: `Espera ${remaining} minuto${remaining !== 1 ? 's' : ''} antes de enviar otro anuncio`,
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  }
+
   const { title, body, data: notifData, targetUsers, categoryIds } = await req.json()
 
   if (!title || !body) {

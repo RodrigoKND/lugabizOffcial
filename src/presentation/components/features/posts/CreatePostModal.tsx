@@ -4,6 +4,7 @@ import { X, Image, Zap, Plus, Trash2, Clock, AlertCircle } from 'lucide-react';
 import { postsService } from '@lib/supabase/services/posts/posts';
 import { useAuth } from '@presentation/context';
 import { BusinessPost, FlashOffer } from '@domain/entities/Post';
+import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 import toast from 'react-hot-toast';
 
 interface CreatePostModalProps {
@@ -15,6 +16,12 @@ interface CreatePostModalProps {
 const MAX_IMAGES = 4;
 const MAX_TOTAL_MB = 10;
 const MAX_DESC = 280;
+
+function toLocalDatetimeInput(isoStr: string): string {
+  const d = new Date(isoStr);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreated }) => {
   const { user } = useAuth();
@@ -69,6 +76,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
     if (withOffer && !offer.title?.trim()) { toast.error('La oferta necesita un título'); return; }
     if (withOffer && !offer.expiresAt) { toast.error('Define cuándo expira la oferta'); return; }
 
+    const contentToCheck = `${description} ${offer.title ?? ''}`.trim();
+    const modResult = await moderateContent(contentToCheck, 'post', user.id, user.name);
+    if (!modResult.approved) {
+      toast.error(`Contenido no permitido: ${modResult.reason ?? 'Infringe las normas de la comunidad'}`);
+      return;
+    }
+
     setLoading(true);
     try {
       const urls: string[] = [];
@@ -107,7 +121,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 pb-14 sm:pb-0">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
 
@@ -231,9 +245,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                             </label>
                             <input
                               type="datetime-local"
-                              value={offer.expiresAt ? offer.expiresAt.slice(0, 16) : ''}
-                              onChange={e => setOffer(o => ({ ...o, expiresAt: new Date(e.target.value).toISOString() }))}
-                              min={new Date().toISOString().slice(0, 16)}
+                              value={offer.expiresAt ? toLocalDatetimeInput(offer.expiresAt) : ''}
+                              onChange={e => setOffer(o => ({ ...o, expiresAt: e.target.value ? new Date(e.target.value).toISOString() : '' }))}
+                              min={toLocalDatetimeInput(new Date().toISOString())}
                               className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
                             />
                           </div>

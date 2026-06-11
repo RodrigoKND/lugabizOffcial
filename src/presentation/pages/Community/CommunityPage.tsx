@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Store, Calendar, X, Star, SlidersHorizontal, Filter, Loader2, Check } from 'lucide-react';
+import { Search, Store, Calendar, X, Star, SlidersHorizontal, Filter, Loader2, Check, ChevronDown } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { Place, Event } from '@domain/entities';
@@ -83,6 +83,235 @@ const EVENT_SORT: { key: EventSort; label: string }[] = [
   { key: 'attendees', label: 'Más asistentes' },
   { key: 'newest', label: 'Más recientes' },
 ];
+
+// ── Mobile filter bottom sheet ───────────────────────────────────────────────
+interface FilterSheetProps {
+  open: boolean;
+  onClose: () => void;
+  tab: Tab;
+  sortOptions: { key: string; label: string }[];
+  currentSort: string;
+  onSort: (key: string) => void;
+  categories: { id: string; name: string; icon: string; color: string }[];
+  selectedCategory: string;
+  onCategory: (id: string) => void;
+  socialGroups: { id: string; name: string; icon: string }[];
+  selectedSocialGroup: string;
+  onSocialGroup: (id: string) => void;
+  minRating: number;
+  onRating: (r: number) => void;
+  activeCount: number;
+  onReset: () => void;
+}
+
+const FilterBottomSheet: React.FC<FilterSheetProps> = ({
+  open, onClose, tab, sortOptions, currentSort, onSort,
+  categories, selectedCategory, onCategory,
+  socialGroups, selectedSocialGroup, onSocialGroup,
+  minRating, onRating, activeCount, onReset,
+}) => {
+  const [catQuery, setCatQuery] = useState('');
+  const visibleCats = catQuery
+    ? categories.filter(c => c.name.toLowerCase().includes(catQuery.toLowerCase()))
+    : categories;
+
+  return (
+    <>
+      {/* AnimatePresence separados para que cada motion.div tenga su propio key */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="filter-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/40"
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="filter-sheet"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            className="fixed inset-x-0 bottom-0 z-[201] bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-stone-200" />
+            </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100 shrink-0">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-primary-500" />
+                <span className="font-bold text-stone-800 text-sm">Filtros</span>
+                {activeCount > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-primary-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {activeCount}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                {activeCount > 0 && (
+                  <button onClick={onReset} className="text-xs text-primary-500 font-semibold">
+                    Limpiar
+                  </button>
+                )}
+                <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
+                  <X className="w-3.5 h-3.5 text-stone-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 pb-safe">
+              {/* Sort */}
+              <div>
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Ordenar por</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key}
+                      onClick={() => onSort(opt.key)}
+                      className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left ${
+                        currentSort === opt.key
+                          ? 'bg-primary-50 border-primary-300 text-primary-600'
+                          : 'bg-stone-50 border-stone-200 text-stone-600'
+                      }`}
+                    >
+                      {currentSort === opt.key && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category */}
+              {categories.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Categoría</p>
+                  {categories.length > 6 && (
+                    <div className="relative mb-2">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                      <input
+                        value={catQuery}
+                        onChange={e => setCatQuery(e.target.value)}
+                        placeholder="Buscar categoría…"
+                        className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-stone-200 focus:outline-none focus:ring-1 focus:ring-primary-300 bg-stone-50"
+                      />
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto">
+                    <button
+                      onClick={() => onCategory('all')}
+                      className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left ${
+                        selectedCategory === 'all'
+                          ? 'bg-primary-50 border-primary-300 text-primary-600'
+                          : 'bg-stone-50 border-stone-200 text-stone-600'
+                      }`}
+                    >
+                      {selectedCategory === 'all' && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
+                      Todas
+                    </button>
+                    {visibleCats.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => onCategory(selectedCategory === cat.id ? 'all' : cat.id)}
+                        className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left truncate ${
+                          selectedCategory === cat.id
+                            ? 'bg-primary-50 border-primary-300 text-primary-600'
+                            : 'bg-stone-50 border-stone-200 text-stone-600'
+                        }`}
+                      >
+                        {selectedCategory === cat.id && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Social group */}
+              {socialGroups.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Grupo social</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => onSocialGroup('all')}
+                      className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+                        selectedSocialGroup === 'all'
+                          ? 'bg-primary-500 text-white border-primary-500'
+                          : 'bg-white text-stone-600 border-stone-200'
+                      }`}
+                    >
+                      Todos
+                    </button>
+                    {socialGroups.map(sg => {
+                      const IconComp = Icons[sg.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }> | undefined;
+                      const isSelected = selectedSocialGroup === sg.id;
+                      return (
+                        <button
+                          key={sg.id}
+                          onClick={() => onSocialGroup(isSelected ? 'all' : sg.id)}
+                          className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+                            isSelected
+                              ? 'bg-primary-500 text-white border-primary-500'
+                              : 'bg-white text-stone-600 border-stone-200'
+                          }`}
+                        >
+                          {IconComp && <IconComp className="w-3.5 h-3.5" />}
+                          {sg.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Rating */}
+              {tab === 'places' && (
+                <div>
+                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Calificación mínima</p>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        onClick={() => onRating(minRating === star ? 0 : star)}
+                        className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-sm font-bold border transition-all ${
+                          minRating === star
+                            ? 'bg-amber-50 text-amber-600 border-amber-300'
+                            : 'bg-stone-50 text-stone-400 border-stone-200'
+                        }`}
+                      >
+                        <Star className={`w-3.5 h-3.5 ${minRating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        {star}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Apply button */}
+            <div className="px-5 py-4 border-t border-stone-100 shrink-0">
+              <button
+                onClick={onClose}
+                className="w-full py-3.5 bg-primary-500 text-white rounded-2xl font-bold text-sm hover:bg-primary-600 transition-colors"
+              >
+                Aplicar filtros{activeCount > 0 ? ` (${activeCount})` : ''}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
 
 const CommunityPage: React.FC = () => {
   const { categories, socialGroups } = usePlaces();
@@ -266,9 +495,29 @@ const CommunityPage: React.FC = () => {
           </button>
         </div>
 
+        {/* Mobile filter bottom sheet */}
+        <FilterBottomSheet
+          open={showFilters}
+          onClose={() => setShowFilters(false)}
+          tab={tab}
+          sortOptions={sortOptions}
+          currentSort={currentSort}
+          onSort={setSort}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategory={setSelectedCategory}
+          socialGroups={socialGroups}
+          selectedSocialGroup={selectedSocialGroup}
+          onSocialGroup={setSelectedSocialGroup}
+          minRating={minRating}
+          onRating={setMinRating}
+          activeCount={activeFiltersCount}
+          onReset={resetFilters}
+        />
+
         <div className="flex gap-6">
-          {/* ── LEFT SIDEBAR ──────────────────────────── */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-64 shrink-0`}>
+          {/* ── LEFT SIDEBAR (desktop only) ───────────── */}
+          <aside className="hidden md:block w-64 shrink-0">
             <div className="sticky top-20 space-y-4">
               <div className="bg-white rounded-2xl border border-primary-100/40 shadow-xs p-4 space-y-5">
 

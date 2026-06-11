@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lugabiz — Autenticando...</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f5f3ff; }
+    .box { text-align: center; padding: 40px 24px; }
+    .icon { width: 56px; height: 56px; background: #7C3AED; border-radius: 18px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+    h2 { color: #1f2937; font-size: 20px; margin: 0 0 8px; }
+    p  { color: #6b7280; font-size: 14px; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      </svg>
+    </div>
+    <h2>Volviendo a Lugabiz...</h2>
+    <p>Si la app no se abre automáticamente, cierra esta ventana.</p>
+  </div>
+
+  <script>
+    (function () {
+      var search = new URLSearchParams(window.location.search);
+      var code = search.get('code');
+
+      // PKCE flow: ?code=...
+      if (code) {
+        window.location.replace('lugabiz://auth/callback?code=' + encodeURIComponent(code));
+        return;
+      }
+
+      // Implicit flow: #access_token=...
+      if (window.location.hash) {
+        var hash = new URLSearchParams(window.location.hash.slice(1));
+        var accessToken = hash.get('access_token');
+        if (accessToken) {
+          window.location.replace(
+            'lugabiz://auth/callback#access_token=' + encodeURIComponent(accessToken) +
+            '&refresh_token=' + encodeURIComponent(hash.get('refresh_token') || '')
+          );
+          return;
+        }
+      }
+
+      // Nada encontrado — volver al inicio de la web
+      window.location.replace('/');
+    })();
+  </script>
+</body>
+</html>

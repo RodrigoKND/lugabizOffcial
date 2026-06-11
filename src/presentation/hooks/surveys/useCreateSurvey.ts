@@ -2,6 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { marketSurveysService } from '@lib/supabase';
 import { sendSurveyPushNotification } from '@lib/supabase/services/push/sendPush';
+import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 import { useAuth, usePlaces } from '@presentation/context';
 import type { SurveyQuestion } from '@domain/entities';
 import type { SurveyFormData } from '@presentation/components/features/surveys/CreateSurveyModal.types';
@@ -101,6 +102,13 @@ export function useCreateSurvey(onCreated: () => void, onClose: () => void) {
     }
     if (!form.title.trim()) {
       toast.error('El título es obligatorio');
+      return;
+    }
+
+    const contentToCheck = `${form.title} ${form.description ?? ''}`.trim();
+    const modResult = await moderateContent(contentToCheck, 'survey', user.id, user.name);
+    if (!modResult.approved) {
+      toast.error(`Contenido no permitido: ${modResult.reason ?? 'Infringe las normas de la comunidad'}`);
       return;
     }
     const validQuestions = questions.filter(

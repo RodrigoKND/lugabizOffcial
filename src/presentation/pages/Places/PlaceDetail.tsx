@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useSmartBack } from '@presentation/hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, X, TrendingUp, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2 } from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
 import { ReviewSection, ChatButton } from '@presentation/components/features';
@@ -24,7 +24,7 @@ const PlaceDetail: React.FC = () => {
   const isModal = !!routerLocation.state?.background;
   const { places } = usePlaces();
   const {
-    place, user, isPlaceSaved, navigate, toggleSavedPlace,
+    place, isLoadingPlace, user, isPlaceSaved, navigate, toggleSavedPlace,
     reviews, hasMoreReviews, loadMoreReviews,
     showDeleteConfirm, setShowDeleteConfirm, sharePlace, handleDelete,
   } = usePlaceDetail();
@@ -82,6 +82,11 @@ const PlaceDetail: React.FC = () => {
     } : undefined,
   });
 
+  if (isLoadingPlace) return (
+    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-primary-400" />
+    </div>
+  );
   if (!place) return <PlaceNotFound />;
 
   return (

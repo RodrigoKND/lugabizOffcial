@@ -24,7 +24,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClose, onResponded })
   const handleAnswer = async (question: SurveyQuestion, answer: string) => {
     const { marketSurveysService } = await import('@lib/supabase');
     if (!user) return;
-    const newAnswers = [...answers, { questionId: question.id || question.question, answer }];
+    const newAnswers = [...answers, { questionId: question.id ?? question.question, answer }];
     setAnswers(newAnswers);
 
     const qIdx = validQuestions.indexOf(question);

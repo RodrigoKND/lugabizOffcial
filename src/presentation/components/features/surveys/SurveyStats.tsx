@@ -11,9 +11,13 @@ interface SurveyStatsProps {
 
 function QuestionChart({ question, responses }: { question: SurveyQuestion; responses: SurveyResponse[] }) {
   const total = responses.length;
+  // Comparar por id o por texto de pregunta (compatibilidad con respuestas antiguas)
+  const questionKey = question.id ?? question.question;
   const counts: Record<string, number> = {};
   for (const r of responses) {
-    const ans = (r.answers ?? []).find(a => a.questionId === question.id);
+    const ans = (r.answers ?? []).find(
+      a => a.questionId === question.id || a.questionId === question.question || a.questionId === questionKey,
+    );
     if (ans?.answer) counts[ans.answer] = (counts[ans.answer] ?? 0) + 1;
   }
   const maxCount = Math.max(1, ...Object.values(counts));

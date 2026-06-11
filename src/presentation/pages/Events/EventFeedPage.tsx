@@ -206,15 +206,42 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
               <span className="text-[10px]">{timeStr}</span>
             </div>
           </div>
+
+          {/* Acciones sociales — visibles en móvil */}
+          <div className="flex items-center justify-between mt-2 mb-1">
+            <div className="flex items-center gap-4">
+              <button onClick={toggleLike} className="flex items-center gap-1">
+                <Heart className={`w-5 h-5 transition-all ${liked ? 'fill-pink-400 text-pink-400' : 'text-white/70'}`} />
+                <span className="text-[11px] text-white/60">{likesCount}</span>
+              </button>
+              <button onClick={() => setShowComments(true)} className="flex items-center gap-1">
+                <MessageCircle className="w-5 h-5 text-white/70" />
+                <span className="text-[11px] text-white/60">{comments.length}</span>
+              </button>
+              <button onClick={handleShare} className="flex items-center gap-1">
+                <Share2 className="w-5 h-5 text-white/70" />
+              </button>
+            </div>
+            <button onClick={toggleSave}>
+              <Bookmark className={`w-5 h-5 transition-all ${saved ? 'fill-amber-400 text-amber-400' : 'text-white/70'}`} />
+            </button>
+          </div>
+
           <Link to={`/event/${event?.id}`}
-            className="mt-2 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
+            className="mt-1 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
             Asistiré
           </Link>
         </div>
       </div>
 
-      {/* ── SIDE PANEL ── */}
-      <div className={`md:w-[42%] lg:w-[40%] flex flex-col bg-[#0a0a0a] border-l border-white/5 ${showComments ? 'flex' : 'hidden md:flex'}`}>
+      {/* ── SIDE PANEL — desktop: columna derecha | mobile: overlay desde abajo ── */}
+      <div className={`
+        md:w-[42%] lg:w-[40%] flex flex-col bg-[#0a0a0a] border-l border-white/5
+        md:relative md:translate-y-0 md:opacity-100
+        ${showComments
+          ? 'fixed inset-x-0 bottom-0 z-30 h-[70vh] rounded-t-2xl md:h-full md:rounded-none md:static'
+          : 'hidden md:flex'}
+      `}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
@@ -370,9 +397,9 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
         </div>
       </div>
 
-      {/* Mobile overlay */}
+      {/* Mobile overlay — toca fuera del panel para cerrar comentarios */}
       {showComments && (
-        <button onClick={() => setShowComments(false)} className="absolute inset-0 bg-black/40 z-[-1] md:hidden" />
+        <button onClick={() => setShowComments(false)} className="fixed inset-0 bg-black/50 z-20 md:hidden" />
       )}
     </div>
   );

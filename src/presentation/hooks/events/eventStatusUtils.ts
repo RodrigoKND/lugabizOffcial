@@ -2,7 +2,9 @@ import type { EventStatus } from '@domain/entities/EventDetailTypes';
 
 export function getEventStatus(dateStart: Date, timeStart: string, timeEnd?: string): EventStatus {
   const now = new Date();
-  const eventDay = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate());
+  // Use UTC methods: DB stores date-only strings (e.g. "2026-06-11") which JS parses as UTC midnight.
+  // getFullYear/Month/Date return local time, causing off-by-one in UTC-negative timezones.
+  const eventDay = new Date(dateStart.getUTCFullYear(), dateStart.getUTCMonth(), dateStart.getUTCDate());
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   if (eventDay < today) return 'finished';

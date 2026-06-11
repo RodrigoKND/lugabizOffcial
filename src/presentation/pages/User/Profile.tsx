@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navigate } from 'react-router-dom';
-import { Bookmark, Calendar, CheckCircle2, BarChart3, Activity, LogOut } from 'lucide-react';
+import { Bookmark, Calendar, CheckCircle2, BarChart3, Activity } from 'lucide-react';
 import { useAuth, usePlaces } from '@presentation/context';
 import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
 import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal } from '@presentation/components/features/users';
@@ -123,13 +123,6 @@ const Profile: React.FC = () => {
         onChange={setEditData}
         onSave={handleSaveProfile}
       />
-
-      <div className="hidden sm:block fixed bottom-6 right-6 z-40">
-        <button onClick={logout}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-red-100 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-50 transition-all shadow-xs">
-          <LogOut className="w-4 h-4" /> Salir
-        </button>
-      </div>
 
       <CreateSurveyModal
         open={showSurveyModal}

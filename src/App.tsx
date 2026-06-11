@@ -17,7 +17,7 @@ const AdminPanel = lazy(() => import('@presentation/pages/Admin/AdminPanel'));
 
 // ── Scroll restoration for BrowserRouter (no data-router needed) ─────────────
 function ScrollRestorer() {
-  const { pathname, key } = useLocation();
+  const { pathname, key, state } = useLocation();
   const navType = useNavigationType();
 
   useEffect(() => {
@@ -28,8 +28,11 @@ function ScrollRestorer() {
         return;
       }
     }
-    window.scrollTo(0, 0);
-  }, [pathname, key, navType]);
+    // Skip scroll reset when opening a modal sheet (background state present)
+    if (!(state as any)?.background) {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, key, navType, (state as any)?.background]);
 
   useEffect(() => {
     const save = () => sessionStorage.setItem(`scroll:${pathname}:${key}`, String(window.scrollY));

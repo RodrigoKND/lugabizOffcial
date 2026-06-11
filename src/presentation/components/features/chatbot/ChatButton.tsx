@@ -13,7 +13,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ isVisible }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed md:bottom-6 bottom-28 left-6 z-40">
+    <div className="fixed md:bottom-6 bottom-28 right-6 z-40">
       <div className={`absolute -bottom-2 left-0 right-0 h-0.5 bg-linear-to-r from-emerald-400/0 via-emerald-400/60 to-emerald-400/0 rounded-full transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`} />
       <button
         aria-label="Pregúntame sobre lugares"

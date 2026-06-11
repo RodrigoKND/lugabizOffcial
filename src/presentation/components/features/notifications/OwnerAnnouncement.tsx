@@ -6,29 +6,7 @@ import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions'
 import { supabase } from '@lib/supabase/client';
 import { useAuth } from '@presentation/context';
 import { sendAnnouncementPushNotification } from '@lib/supabase/services/push/sendPush';
-
-const RATE_LIMIT_KEY = '_lugabiz_announcement_last';
-const RATE_LIMIT_MS = 5 * 60 * 1000; // 5 minutes between announcements
-
-function isRateLimited(): boolean {
-  try {
-    const last = localStorage.getItem(RATE_LIMIT_KEY);
-    if (!last) return false;
-    return Date.now() - parseInt(last, 10) < RATE_LIMIT_MS;
-  } catch { return false; }
-}
-
-function markAnnouncementSent() {
-  try { localStorage.setItem(RATE_LIMIT_KEY, Date.now().toString()); } catch {}
-}
-
-function getRemainingMinutes(): number {
-  try {
-    const last = localStorage.getItem(RATE_LIMIT_KEY);
-    if (!last) return 0;
-    return Math.ceil((parseInt(last, 10) + RATE_LIMIT_MS - Date.now()) / 60000);
-  } catch { return 0; }
-}
+import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 
 interface OwnerAnnouncementProps {
   isOpen: boolean;
@@ -47,28 +25,31 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
       toast.error('Completa todos los campos');
       return;
     }
-    if (isRateLimited()) {
-      const remaining = getRemainingMinutes();
-      toast.error(`Espera ${remaining} minuto${remaining !== 1 ? 's' : ''} antes de enviar otro anuncio`);
-      return;
-    }
     setSending(true);
     try {
-      // 1. Try the edge function (handles push notifications server-side)
-      await edgeService.createOwnerAnnouncement(title.trim(), body.trim());
-    } catch {
-      // Edge function not available — will deliver via in-app notifications
-    }
+      // Moderación de contenido
+      const modResult = await moderateContent(`${title} ${body}`, 'announcement', user?.id, user?.name);
+      if (!modResult.approved) {
+        toast.error(`Contenido no permitido: ${modResult.reason ?? 'Infringe las normas de la comunidad'}`);
+        return;
+      }
 
-    try {
-      // 2. Always insert into notifications table (in-app + Realtime browser notifications)
-      const { data: users } = await supabase
-        .from('users')
-        .select('id')
-        .limit(1000);
+      // Edge function — maneja rate limiting en el backend
+      try {
+        await edgeService.createOwnerAnnouncement(title.trim(), body.trim());
+      } catch (edgeErr: any) {
+        const msg = edgeErr?.message ?? '';
+        if (msg.includes('Espera') || msg.includes('429')) {
+          toast.error(msg || 'Espera antes de enviar otro anuncio');
+          return;
+        }
+        // Otro error: continuar con fallback in-app
+      }
 
+      // Fallback in-app: insertar notificaciones directo en la tabla
+      const { data: users } = await supabase.from('users').select('id').limit(1000);
       if (users && users.length > 0) {
-        const { error } = await supabase.from('notifications').insert(
+        await supabase.from('notifications').insert(
           users.map(u => ({
             user_id: u.id,
             type: 'owner_announcement',
@@ -77,13 +58,9 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
             data: { announced_by: user?.id, announced_at: new Date().toISOString() },
           }))
         );
-        if (error) throw error;
       }
 
-      // 3. Attempt browser push for the admin (confirmation)
       sendAnnouncementPushNotification(title.trim(), body.trim());
-
-      markAnnouncementSent();
       toast.success('Anuncio publicado en la plataforma');
       setTitle('');
       setBody('');

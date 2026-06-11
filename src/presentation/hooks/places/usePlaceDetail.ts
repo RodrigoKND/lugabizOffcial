@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { usePlaces, useAuth } from '@presentation/context';
 import { placesService, placeSharesService, reviewsService } from '@lib/supabase';
 import { realtimeService } from '@lib/supabase/services/notifications/websocket';
+import { userActivityService } from '@lib/supabase/services/places/userActivity';
 import { Place, Review } from '@domain/entities';
 
 export function usePlaceDetail() {
@@ -11,8 +12,8 @@ export function usePlaceDetail() {
   const navigate = useNavigate();
   const { getPlaceById, places } = usePlaces();
   const { user, isSaved, toggleSavedPlace } = useAuth();
-  const cachedPlace = getPlaceById(id || '');
-  const [place, setPlace] = useState<Place | null>(cachedPlace || null);
+  const [place, setPlace] = useState<Place | null>(() => getPlaceById(id || '') || null);
+  const [isLoadingPlace, setIsLoadingPlace] = useState(!getPlaceById(id || ''));
   const [reviews, setReviews] = useState<Review[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [reviewPage, setReviewPage] = useState(0);
@@ -23,12 +24,36 @@ export function usePlaceDetail() {
 
   useEffect(() => {
     if (!id) return;
-    const updated = getPlaceById(id);
-    if (updated) { setPlace(updated); return }
-    if (!cachedPlace) {
-      placesService.getPlaceById(id).then(setPlace).catch(console.error);
+    const found = getPlaceById(id);
+    if (found) {
+      setPlace(found);
+      setIsLoadingPlace(false);
+      if (user?.id) {
+        userActivityService.trackAction(user.id, 'view_place', {
+          place: id,
+          placeName: found.name,
+          category: found.category?.name,
+          socialGroups: (found.socialGroups ?? []).map((sg: any) => sg.name),
+        }).catch(() => {});
+      }
+      return;
     }
-  }, [id, places, cachedPlace]);
+    setIsLoadingPlace(true);
+    placesService.getPlaceById(id)
+      .then(p => {
+        setPlace(p);
+        if (p && user?.id) {
+          userActivityService.trackAction(user.id, 'view_place', {
+            place: id,
+            placeName: p.name,
+            category: p.category?.name,
+            socialGroups: (p.socialGroups ?? []).map((sg: any) => sg.name),
+          }).catch(() => {});
+        }
+      })
+      .catch(() => { setPlace(null); })
+      .finally(() => setIsLoadingPlace(false));
+  }, [id, places]);
 
   const loadReviews = useCallback(async (page: number, append: boolean = false) => {
     if (!id) return;
@@ -114,6 +139,7 @@ export function usePlaceDetail() {
     id,
     navigate,
     place,
+    isLoadingPlace,
     user,
     isPlaceSaved,
     reviews,

@@ -78,9 +78,13 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       )}
 
       {/* Posts */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start">
-        {(compact ? posts.slice(0, 6) : posts).map(post => (
-          <BusinessPostCard key={post.id} post={post} />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 items-start">
+        {(compact ? posts.slice(0, 8) : posts).map(post => (
+          <BusinessPostCard
+            key={post.id}
+            post={post}
+            onDeleted={(id) => setPosts(prev => prev.filter(p => p.id !== id))}
+          />
         ))}
       </div>
 

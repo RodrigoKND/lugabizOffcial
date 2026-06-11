@@ -377,36 +377,89 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
               )}
 
               {/* ── Input ────────────────────────────────────────── */}
-              <div className="px-5 pt-2 pb-5 border-t border-slate-100 shrink-0">
-                <form onSubmit={handleSubmit}>
-                  <div className="flex items-end gap-3 bg-slate-50 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/15 transition-all">
-                    <textarea
-                      ref={inputRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder={hasConversation ? 'Escribe algo más...' : '¿Qué plan buscas hoy?'}
-                      rows={1}
-                      maxLength={250}
-                      className="flex-1 resize-none bg-transparent text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none min-h-[24px] max-h-[96px] leading-6"
-                      style={{ overflowY: input.split('\n').length > 3 ? 'auto' : 'hidden' }}
-                    />
-                    <button
-                      type="submit"
-                      disabled={!input.trim() || chatLoading}
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all
-                                 bg-violet-600 text-white hover:bg-violet-700 active:scale-95
-                                 disabled:bg-slate-200 disabled:text-slate-400 disabled:scale-100 disabled:cursor-not-allowed"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center mt-2 px-1">
-                    <span className="text-[11px] text-slate-300">Enter para enviar · Shift+Enter para nueva línea</span>
-                    <span className="text-[11px] text-slate-300">{input.length}/250</span>
-                  </div>
-                </form>
-              </div>
+<div className="px-5 pt-2 pb-5 border-t border-slate-100 shrink-0">
+  <form onSubmit={handleSubmit}>
+    <div
+      className="
+        flex items-end gap-3
+        bg-slate-50
+        rounded-2xl
+        border border-slate-200
+        px-4 py-3
+        focus-within:border-violet-400
+        focus-within:ring-2
+        focus-within:ring-violet-400/15
+        transition-all
+        w-full
+      "
+    >
+      <textarea
+        ref={inputRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={
+          hasConversation
+            ? 'Escribe algo más...'
+            : '¿Qué plan buscas hoy?'
+        }
+        rows={1}
+        maxLength={250}
+        className="
+          flex-1
+          min-w-0
+          w-full
+          resize-none
+          bg-transparent
+          text-[14px]
+          text-slate-800
+          placeholder-slate-400
+          focus:outline-none
+          leading-6
+          whitespace-pre-wrap
+          break-words
+          overflow-y-auto
+        "
+        style={{
+          minHeight: '24px',
+          maxHeight: '96px'
+        }}
+      />
+
+      <button
+        type="submit"
+        disabled={!input.trim() || chatLoading}
+        className="
+          w-9 h-9
+          rounded-xl
+          flex items-center justify-center
+          shrink-0
+          transition-all
+          bg-violet-600
+          text-white
+          hover:bg-violet-700
+          active:scale-95
+          disabled:bg-slate-200
+          disabled:text-slate-400
+          disabled:scale-100
+          disabled:cursor-not-allowed
+        "
+      >
+        <Send className="w-4 h-4" />
+      </button>
+    </div>
+
+    <div className="flex justify-between items-center mt-2 px-1">
+      <span className="text-[11px] text-slate-300">
+        Enter para enviar · Shift+Enter para nueva línea
+      </span>
+
+      <span className="text-[11px] text-slate-300">
+        {input.length}/250
+      </span>
+    </div>
+  </form>
+</div>
 
             </div>
           </motion.div>

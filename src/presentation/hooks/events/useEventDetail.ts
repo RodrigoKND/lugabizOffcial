@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@presentation/context';
 import { eventsService, eventSharesService, notificationsService, eventLikesService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
+import { userActivityService } from '@lib/supabase/services/places/userActivity';
 import { Event } from '@domain/entities';
 import type { EventAttendee, EventStatus } from '@domain/entities/EventDetailTypes';
 import { getEventStatus, formatEventDate } from './eventStatusUtils';
@@ -35,6 +36,13 @@ export function useEventDetail() {
           setAttendeeCount(eventData.attendeesCount);
           setIsFull(!!(eventData.capacity && eventData.attendeesCount >= eventData.capacity));
           setEventStatus(getEventStatus(eventData.dateStart, eventData.timeStart, eventData.timeEnd));
+          // Registrar vista del evento en BD para personalización
+          if (user?.id) {
+            userActivityService.trackAction(user.id, 'view_event', {
+              event: id,
+              category: (eventData as any).category?.name,
+            }).catch(() => {});
+          }
 
           if (user) {
             const attending = await eventsService.isAttending(user.id, id);

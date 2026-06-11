@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Clock, Zap, Tag, Copy, Check, Store, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Zap, Tag, Copy, Check, Store, X, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { BusinessPost } from '@domain/entities/Post';
 import { postsService } from '@lib/supabase/services/posts/posts';
 import { useAuth } from '@presentation/context';
@@ -31,9 +31,10 @@ function useCountdown(expiresAt?: string) {
 interface BusinessPostCardProps {
   post: BusinessPost;
   onReactionUpdate?: (postId: string, emoji: string | null) => void;
+  onDeleted?: (postId: string) => void;
 }
 
-const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpdate }) => {
+const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpdate, onDeleted }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [imgIndex, setImgIndex] = useState(0);
@@ -41,9 +42,13 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
   const [showOffer, setShowOffer] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
   const [reacting, setReacting] = useState(false);
-  const [claiming, setClaiming] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const countdown = useCountdown(localPost.flashOffer?.expiresAt);
 
+  const isOwner = user?.id === localPost.userId;
   const totalReactions = Object.values(localPost.reactionsCount).reduce((a, b) => a + b, 0);
   const offer = localPost.flashOffer;
   const offerExpired = offer && new Date(offer.expiresAt) < new Date();
@@ -71,29 +76,6 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
     }
   }
 
-  async function handleClaimOffer(e: React.MouseEvent) {
-    e.stopPropagation();
-    if (!offer || claiming) return;
-    if (!user) { toast.error('Inicia sesión para reclamar la oferta'); return; }
-    setClaiming(true);
-    try {
-      const result = await postsService.claimFlashOffer(localPost.id);
-      setLocalPost(p => ({
-        ...p,
-        flashOffer: p.flashOffer ? { ...p.flashOffer, claimedSlots: result.claimedSlots } : undefined,
-      }));
-      setShowOffer(true);
-      toast.success('¡Oferta reclamada!');
-    } catch (e: any) {
-      const msg = e?.message;
-      if (msg === 'expired') toast.error('Esta oferta ya expiró');
-      else if (msg === 'full') toast.error('No quedan slots disponibles');
-      else toast.error('No se pudo reclamar la oferta');
-    } finally {
-      setClaiming(false);
-    }
-  }
-
   async function copyCode() {
     if (!offer?.code) return;
     await navigator.clipboard.writeText(offer.code);
@@ -102,7 +84,23 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
     toast.success('Código copiado');
   }
 
+  async function handleDelete() {
+    if (!isOwner || deleting) return;
+    setDeleting(true);
+    setShowMenu(false);
+    try {
+      await postsService.deletePost(localPost.id);
+      toast.success('Post eliminado');
+      onDeleted?.(localPost.id);
+    } catch {
+      toast.error('Error al eliminar el post');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
+    <>
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -110,9 +108,8 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
     >
       {/* ── Imagen ── */}
       <div
-        className="relative bg-stone-100 overflow-hidden cursor-pointer"
+        className="relative bg-stone-100 overflow-hidden"
         style={{ aspectRatio: '4/3' }}
-        onClick={() => localPost.placeId && navigate(`/place/${localPost.placeId}`)}
       >
         {localPost.images.length > 0 ? (
           <AnimatePresence mode="wait">
@@ -124,7 +121,8 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-zoom-in"
+              onClick={() => { setGalleryIndex(imgIndex); setGalleryOpen(true); }}
             />
           </AnimatePresence>
         ) : (
@@ -158,11 +156,35 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
           </>
         )}
 
-        {/* Oferta badge sobre la imagen */}
+        {/* Oferta badge */}
         {offerActive && (
           <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 rounded-md shadow-sm">
             <Zap className="w-2.5 h-2.5 text-white" />
             <span className="text-[10px] font-bold text-white">{countdown}</span>
+          </div>
+        )}
+
+        {/* Owner menu */}
+        {isOwner && (
+          <div className="absolute top-2 right-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowMenu(v => !v); }}
+              className="w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white"
+            >
+              <MoreVertical className="w-3.5 h-3.5" />
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 top-7 bg-white rounded-xl shadow-lg border border-stone-100 overflow-hidden z-10 min-w-[110px]">
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {deleting ? 'Eliminando…' : 'Eliminar'}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -192,7 +214,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
           {localPost.description}
         </p>
 
-        {/* Oferta expandible */}
+        {/* Oferta expandible — sin animación de height para evitar layout jump */}
         {offerActive && (
           <div className="rounded-lg border border-amber-200 overflow-hidden">
             <button
@@ -208,53 +230,45 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               )}
             </button>
 
-            <AnimatePresence>
-              {showOffer && (
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: 'auto' }}
-                  exit={{ height: 0 }}
-                  className="overflow-hidden bg-white border-t border-amber-100"
-                >
-                  <div className="px-2.5 py-2">
-                    {offer.totalSlots && (
-                      <div className="mb-2">
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span className="text-text-secondary">{offer.claimedSlots} de {offer.totalSlots} reclamados</span>
-                        </div>
-                        <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
-                            style={{ width: `${Math.min(100, (offer.claimedSlots / offer.totalSlots) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    {offer.code && showOffer ? (
-                      <div className="flex items-center gap-2 p-1.5 bg-amber-50 rounded-lg border border-amber-200">
-                        <Tag className="w-3 h-3 text-amber-600 shrink-0" />
-                        <span className="font-mono font-bold text-amber-800 flex-1 text-[12px] tracking-wider">{offer.code}</span>
-                        <button onClick={copyCode} className="text-[10px] text-amber-600 font-semibold flex items-center gap-0.5">
-                          {codeCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                          {codeCopied ? 'Copiado' : 'Copiar'}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={handleClaimOffer}
-                        disabled={claiming}
-                        className="w-full py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[12px] font-bold rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
-                      >
-                        {claiming
-                          ? <><Loader2 className="w-3 h-3 animate-spin" />Reclamando...</>
-                          : (offer.code ? '¡Revelar código!' : 'Reclamar oferta')
-                        }
-                      </button>
-                    )}
+            {/* CSS max-height en lugar de framer-motion height para evitar el brinco */}
+            <div
+              style={{
+                maxHeight: showOffer ? '200px' : '0px',
+                transition: 'max-height 0.22s ease',
+                overflow: 'hidden',
+              }}
+              className="bg-white border-t border-amber-100"
+            >
+              <div className="px-2.5 py-2 space-y-2">
+                {offer.description && (
+                  <p className="text-[11px] text-amber-800">{offer.description}</p>
+                )}
+                {offer.code && (
+                  <div className="flex items-center gap-2 p-1.5 bg-amber-50 rounded-lg border border-amber-200">
+                    <Tag className="w-3 h-3 text-amber-600 shrink-0" />
+                    <span className="font-mono font-bold text-amber-800 flex-1 text-[12px] tracking-wider">{offer.code}</span>
+                    <button onClick={copyCode} className="text-[10px] text-amber-600 font-semibold flex items-center gap-0.5">
+                      {codeCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      {codeCopied ? 'Copiado' : 'Copiar'}
+                    </button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+                {offer.totalSlots && (
+                  <div>
+                    <div className="flex justify-between text-[10px] mb-1">
+                      <span className="text-text-secondary">{offer.claimedSlots} de {offer.totalSlots} usados</span>
+                      <span className="text-amber-600 font-semibold">{offer.totalSlots - offer.claimedSlots} disponibles</span>
+                    </div>
+                    <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                        style={{ width: `${Math.min(100, (offer.claimedSlots / offer.totalSlots) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -276,13 +290,71 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               </button>
             ))}
           </div>
-          {totalReactions > 0 && (
-            <span className="text-[10px] text-text-secondary">{totalReactions} reacciones</span>
-          )}
         </div>
 
       </div>
     </motion.article>
+
+    {/* ── Galería lightbox ── */}
+    <AnimatePresence>
+      {galleryOpen && localPost.images.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center"
+          onClick={() => setGalleryOpen(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.95 }}
+            className="relative max-w-2xl w-full mx-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setGalleryOpen(false)}
+              className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img
+              src={localPost.images[galleryIndex]}
+              alt=""
+              className="max-w-full max-h-[80vh] object-contain rounded-xl mx-auto block"
+            />
+            {localPost.images.length > 1 && (
+              <>
+                <button
+                  onClick={() => setGalleryIndex(i => Math.max(0, i - 1))}
+                  disabled={galleryIndex === 0}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -ml-10 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:bg-white/25 transition-all"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setGalleryIndex(i => Math.min(localPost.images.length - 1, i + 1))}
+                  disabled={galleryIndex === localPost.images.length - 1}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 -mr-10 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:bg-white/25 transition-all"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                <div className="flex justify-center gap-1.5 mt-4">
+                  {localPost.images.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setGalleryIndex(i)}
+                      className={`h-1.5 rounded-full transition-all ${i === galleryIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
   );
 };
 
