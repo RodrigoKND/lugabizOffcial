@@ -451,7 +451,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 
     <div className="flex justify-between items-center mt-2 px-1">
       <span className="text-[11px] text-slate-300">
-        Enter para enviar · Shift+Enter para nueva línea
+        Lubi puede cometer errores, revisa antes de ir a un lugar
       </span>
 
       <span className="text-[11px] text-slate-300">
