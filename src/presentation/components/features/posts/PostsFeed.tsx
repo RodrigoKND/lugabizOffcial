@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Store, Plus, ChevronRight } from 'lucide-react';
+import { Store, Plus } from 'lucide-react';
 import { postsService } from '@lib/supabase/services/posts/posts';
 import { BusinessPost } from '@domain/entities/Post';
 import { useAuth } from '@presentation/context';
@@ -77,37 +76,27 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
         </div>
       )}
 
-      {/* Posts */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 items-start">
-        {(compact ? posts.slice(0, 8) : posts).map(post => (
-          <BusinessPostCard
-            key={post.id}
-            post={post}
-            onDeleted={(id) => setPosts(prev => prev.filter(p => p.id !== id))}
-          />
+      {/* Posts - horizontal scroll */}
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
+        {posts.map(post => (
+          <div key={post.id} className="snap-start shrink-0 w-[280px] sm:w-[300px]">
+            <BusinessPostCard
+              post={post}
+              onDeleted={(id) => setPosts(prev => prev.filter(p => p.id !== id))}
+            />
+          </div>
         ))}
       </div>
 
-      {/* Load more / See all */}
-      {!loading && posts.length > 0 && (
-        compact && posts.length > 3 ? (
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            className="w-auto p-2 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors"
-            onClick={() => {}}
-          >
-            Ver todos los posts
-            <ChevronRight className="w-4 h-4" />
-          </motion.button>
-        ) : hasMore && !compact ? (
-          <button
-            onClick={() => load(false)}
-            disabled={loading}
-            className="w-full py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Cargando…' : 'Ver más posts'}
-          </button>
-        ) : null
+      {/* Load more */}
+      {!loading && posts.length > 0 && hasMore && !compact && (
+        <button
+          onClick={() => load(false)}
+          disabled={loading}
+          className="w-full py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50"
+        >
+          {loading ? 'Cargando…' : 'Ver más posts'}
+        </button>
       )}
 
       {/* Owner empty state */}

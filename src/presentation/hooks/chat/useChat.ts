@@ -1,139 +1,132 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { chatService, ChatMessage, QuickIdea, WeatherBrief, VideoEmbed } from '@lib/supabase/services/ai/chatService'
+import {
+  chatService, ChatMessage, QuickIdea, WeatherBrief,
+  VideoEmbed, PlaceCard, EventCard, WebResult,
+} from '@lib/supabase/services/ai/chatService'
+import { useAuth } from '@presentation/context'
 
 export function useChat(isOpen: boolean) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [ideas, setIdeas] = useState<QuickIdea[]>([])
-  const [ideasLoading, setIdeasLoading] = useState(false)
-  const [chatLoading, setChatLoading] = useState(false)
-  const [city, setCity] = useState('tu ciudad')
-  const [weather, setWeather] = useState<WeatherBrief | null>(null)
-  const [timeLabel, setTimeLabel] = useState('')
+  const { user } = useAuth()
 
-  const coordsRef = useRef<{ lat: number; lng: number } | null>(null)
-  const geoPromiseRef = useRef<Promise<{ lat: number; lng: number } | null> | null>(null)
-  const ideasFetched = useRef(false)
-
-  useEffect(() => {
-    // Estrategia de ubicación:
-    // 1. GPS del navegador (más preciso, enableHighAccuracy)
-    // 2. Si falla → ipapi.co desde el CLIENTE (usa la IP real del usuario, no la del servidor)
-    // Así nunca se usa la IP del servidor de Supabase (que daba Buenos Aires)
-    const resolveLocation = async (): Promise<{ lat: number; lng: number } | null> => {
-      // Intento 1: GPS del dispositivo
-      if (navigator.geolocation) {
-        try {
-          const coords = await new Promise<{ lat: number; lng: number }>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-              (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
-              reject,
-              { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 },
-            )
-          })
-          coordsRef.current = coords
-          return coords
-        } catch { /* GPS denegado o timeout, intentar IP */ }
-      }
-
-      // Intento 2: geolocalización por IP del cliente (no del servidor)
-      try {
-        const res = await fetch('https://ipapi.co/json/', {
-          signal: AbortSignal.timeout(4000),
-        })
-        if (res.ok) {
-          const d = await res.json()
-          if (d.latitude && d.longitude && !d.error) {
-            const coords = { lat: Number(d.latitude), lng: Number(d.longitude) }
-            coordsRef.current = coords
-            return coords
-          }
-        }
-      } catch { /* sin ubicación disponible */ }
-
-      return null
-    }
-
-    geoPromiseRef.current = resolveLocation()
+  const [messages,     setMessages]     = useState<ChatMessage[]>([])
+  const [ideas,        setIdeas]        = useState<QuickIdea[]>([])
+  const [ideasLoading, setIdeasLoading] = useState(true)
+  const [chatLoading,  setChatLoading]  = useState(false)
+  const [city,         setCity]         = useState('tu ciudad')
+  const [weather,      setWeather]      = useState<WeatherBrief | null>(null)
+  const [timeLabel,    setTimeLabel]    = useState('')
+  const [locationMode, setLocationModeState] = useState<'nearby' | 'city'>(() => {
+    try { return (localStorage.getItem('_lugabiz_chat_locmode') as 'nearby' | 'city') || 'nearby' } catch { return 'nearby' }
+  })
+  const setLocationMode = useCallback((mode: 'nearby' | 'city') => {
+    setLocationModeState(mode)
+    try { localStorage.setItem('_lugabiz_chat_locmode', mode) } catch {}
   }, [])
 
+  const coordsRef = useRef<{ lat: number; lng: number } | null>(null)
+  const geoRef    = useRef<Promise<{ lat: number; lng: number } | null> | null>(null)
+  const ideasDone = useRef(false)
+  const histDone  = useRef(false)
+  const msgsRef   = useRef<ChatMessage[]>([])
+  useEffect(() => { msgsRef.current = messages }, [messages])
+
+  // Helper: actualiza la última burbuja del asistente
+  const patchLast = (patch: Partial<ChatMessage> | ((m: ChatMessage) => Partial<ChatMessage>)) =>
+    setMessages(prev => {
+      const copy = [...prev]
+      const last = copy[copy.length - 1]
+      if (last?.role === 'assistant') {
+        const p = typeof patch === 'function' ? patch(last) : patch
+        copy[copy.length - 1] = { ...last, ...p }
+      }
+      return copy
+    })
+
+  // ── Geolocalización en segundo plano ──────────────────────────────────────
   useEffect(() => {
-    if (!isOpen || ideasFetched.current) return
-    ideasFetched.current = true
-    setIdeasLoading(true)
-
-    const fetchIdeas = async () => {
-      // Espera coords GPS (máx 5s) antes de caer en IP geolocation del backend
-      // El backend maneja su propio caché en ai_quick_ideas_cache (2h TTL)
-      const geoTimeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000))
-      const coords = await Promise.race([geoPromiseRef.current ?? Promise.resolve(null), geoTimeout])
-      return chatService.getQuickIdeas({ lat: coords?.lat, lng: coords?.lng })
-    }
-
-    fetchIdeas()
-      .then((r) => {
-        setIdeas(r.ideas); setCity(r.city); setWeather(r.weather); setTimeLabel(r.timeLabel);
-        if (r.city && r.city !== 'tu ciudad') {
-          try { localStorage.setItem('_lugabiz_city', r.city); } catch {}
+    geoRef.current = (async () => {
+      if (navigator.geolocation) {
+        try {
+          return await new Promise<{ lat: number; lng: number }>((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(
+              p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+              reject, { enableHighAccuracy: true, timeout: 6000 },
+            )
+          ).then(c => { coordsRef.current = c; return c })
+        } catch {}
+      }
+      try {
+        const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
+        if (r.ok) {
+          const d = await r.json()
+          if (d.latitude && !d.error) { const c = { lat: +d.latitude, lng: +d.longitude }; coordsRef.current = c; return c }
         }
+      } catch {}
+      return null
+    })()
+  }, [])
+
+  // ── Cargar historial de sesiones anteriores ───────────────────────────────
+  useEffect(() => {
+    if (!isOpen || histDone.current || !user) return
+    histDone.current = true
+    chatService.loadHistory().then(past => { if (past.length) setMessages(past) }).catch(() => {})
+  }, [isOpen, user])
+
+  // ── Ideas rápidas ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen) { setIdeasLoading(false); return }
+    if (ideasDone.current) return
+    ideasDone.current = true
+    setIdeasLoading(true)
+    ;(async () => {
+      const c = await Promise.race([geoRef.current ?? Promise.resolve(null), new Promise<null>(r => setTimeout(() => r(null), 5000))])
+      return chatService.getQuickIdeas({ lat: c?.lat, lng: c?.lng, locationMode })
+    })()
+      .then(r => {
+        setIdeas(r.ideas); setCity(r.city); setWeather(r.weather); setTimeLabel(r.timeLabel)
+        try { if (r.city !== 'tu ciudad') localStorage.setItem('_lugabiz_city', r.city) } catch {}
       })
       .catch(() => {})
       .finally(() => setIdeasLoading(false))
   }, [isOpen])
 
-  const sendMessage = useCallback(
-    async (content: string) => {
-      // 1. Agregar mensaje del usuario
-      const userMsg: ChatMessage = { role: 'user', content, timestamp: new Date() }
-      setMessages((prev) => [...prev, userMsg])
+  // ── Enviar mensaje ────────────────────────────────────────────────────────
+  const sendMessage = useCallback(async (content: string) => {
+    // Hilo completo de la sesión actual → memoria del asistente
+    const history = msgsRef.current
+      .filter(m => !m.streaming && m.content.trim())
+      .map(m => ({ role: m.role, content: m.content }))
 
-      // 2. Agregar burbuja vacía de asistente (se irá llenando token a token)
-      setMessages((prev) => [...prev, { role: 'assistant', content: '', timestamp: new Date(), streaming: true }])
-      setChatLoading(true)
+    // Lugares ya mostrados en la sesión → para no repetirlos
+    const shownPlaces = [...new Set(
+      msgsRef.current.flatMap(m => (m.places ?? []).map(p => p.name)),
+    )]
 
-      // Historial para contexto (excluye la burbuja vacía que acabamos de añadir)
-      const history = messages
-        .slice(-6)
-        .map((m) => ({ role: m.role, content: m.content }))
+    setMessages(prev => [
+      ...prev,
+      { role: 'user',      content, timestamp: new Date() },
+      { role: 'assistant', content: '', timestamp: new Date(), streaming: true },
+    ])
+    setChatLoading(true)
 
-      await chatService.streamMessage(
-        { message: content, lat: coordsRef.current?.lat, lng: coordsRef.current?.lng, city, conversationHistory: history },
-        (token) => {
-          setMessages((prev) => {
-            const copy = [...prev]
-            const last = copy[copy.length - 1]
-            if (last?.role === 'assistant') {
-              copy[copy.length - 1] = { ...last, content: last.content + token }
-            }
-            return copy
-          })
-        },
-        () => {
-          setMessages((prev) => {
-            const copy = [...prev]
-            const last = copy[copy.length - 1]
-            if (last?.role === 'assistant') {
-              copy[copy.length - 1] = { ...last, streaming: false }
-            }
-            return copy
-          })
-          setChatLoading(false)
-        },
-        (videos: VideoEmbed[]) => {
-          setMessages((prev) => {
-            const copy = [...prev]
-            const last = copy[copy.length - 1]
-            if (last?.role === 'assistant') {
-              copy[copy.length - 1] = { ...last, videos }
-            }
-            return copy
-          })
-        },
-      )
-    },
-    [messages, city],
-  )
+    await chatService.streamMessage(
+      { message: content, lat: coordsRef.current?.lat, lng: coordsRef.current?.lng, city, conversationHistory: history, shownPlaces, locationMode },
+      {
+        onToken:      token   => patchLast(m => ({ content: m.content + token })),
+        onDone:       ()      => { patchLast({ streaming: false }); setChatLoading(false) },
+        onPlaces:     places  => patchLast({ places }),
+        onEvents:     events  => patchLast({ events }),
+        onVideos:     videos  => patchLast({ videos }),
+        onWebResults: webResults => patchLast({ webResults }),
+      },
+    )
+  }, [city, locationMode])
 
-  const reset = useCallback(() => setMessages([]), [])
+  const reset = useCallback(() => {
+    setMessages([])
+    histDone.current = false
+  }, [])
 
-  return { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, sendMessage, reset }
+  return { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, locationMode, setLocationMode, sendMessage, reset }
 }

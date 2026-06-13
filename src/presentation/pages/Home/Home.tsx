@@ -39,9 +39,6 @@ const Home: React.FC = () => {
 
   const { surveys: pendingSurveys, refresh: refreshSurveys } = usePendingsurveys();
 
-  const storedCity = useMemo(() => {
-    try { return localStorage.getItem('_lugabiz_city') || undefined; } catch { return undefined; }
-  }, []);
   const storedCoords = useMemo(() => {
     try {
       const raw = sessionStorage.getItem('_lugabiz_last_pos');
@@ -51,7 +48,7 @@ const Home: React.FC = () => {
     } catch { return { lat: undefined, lng: undefined }; }
   }, []);
   const { sections: personalizedSections, loading: sectionsLoading } = usePersonalizedSections(
-    places, events, user?.id ?? null, storedCity, storedCoords.lat, storedCoords.lng,
+    places, events, user?.id ?? null, undefined, storedCoords.lat, storedCoords.lng,
   );
 
   const handleStoryClick = (eventId: string) => {

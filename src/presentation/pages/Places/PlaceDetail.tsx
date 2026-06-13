@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useSmartBack } from '@presentation/hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2 } from 'lucide-react';
+import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2, LogIn } from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
 import { ReviewSection, ChatButton } from '@presentation/components/features';
@@ -24,7 +24,7 @@ const PlaceDetail: React.FC = () => {
   const isModal = !!routerLocation.state?.background;
   const { places } = usePlaces();
   const {
-    place, isLoadingPlace, user, isPlaceSaved, navigate, toggleSavedPlace,
+    place, isLoadingPlace, isAuthLoading, user, isPlaceSaved, navigate, toggleSavedPlace,
     reviews, hasMoreReviews, loadMoreReviews,
     showDeleteConfirm, setShowDeleteConfirm, sharePlace, handleDelete,
   } = usePlaceDetail();
@@ -82,9 +82,30 @@ const PlaceDetail: React.FC = () => {
     } : undefined,
   });
 
-  if (isLoadingPlace) return (
+  if (isLoadingPlace || isAuthLoading) return (
     <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-primary-400" />
+    </div>
+  );
+  if (!place && !user) return (
+    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center px-4">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-3xl border border-stone-100 shadow-lg p-8 max-w-sm w-full text-center">
+        <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
+          <LogIn className="w-7 h-7 text-primary-500" />
+        </div>
+        <h2 className="text-lg font-bold text-stone-800 mb-2">Inicia sesión</h2>
+        <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+          Necesitas iniciar sesión para ver los detalles de este lugar.
+        </p>
+        <Link to="/?auth=login"
+          className="w-full py-3 bg-primary-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary-600 transition-colors">
+          <LogIn className="w-4 h-4" /> Iniciar sesión
+        </Link>
+        <button onClick={() => navigate('/')} className="mt-3 w-full py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors">
+          Volver al inicio
+        </button>
+      </motion.div>
     </div>
   );
   if (!place) return <PlaceNotFound />;

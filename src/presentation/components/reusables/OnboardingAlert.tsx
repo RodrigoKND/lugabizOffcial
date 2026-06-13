@@ -48,7 +48,7 @@ const OnboardingAlert: React.FC<OnboardingAlertProps> = ({ type, isOpen, onActio
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 120, opacity: 0, scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 0.8 }}
-          className="fixed bottom-6 left-4 right-4 z-50 mx-auto max-w-md"
+          className="fixed bottom-20 sm:bottom-6 left-4 right-4 z-[60] mx-auto max-w-md"
         >
           <div className={`relative overflow-hidden rounded-2xl bg-white shadow-xl ${c.shadow} border border-white/20`}>
             <div className={`absolute inset-0 bg-gradient-to-br ${c.gradient} opacity-5`} />

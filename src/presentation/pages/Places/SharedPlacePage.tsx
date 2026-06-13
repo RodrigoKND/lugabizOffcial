@@ -22,6 +22,7 @@ const SharedPlacePage: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
   const [confirmations, setConfirmations] = useState<PlaceShareConfirmation[]>([]);
   const [showAllConfirmers, setShowAllConfirmers] = useState(false);
+  const [needsAuth, setNeedsAuth] = useState(false);
 
   useSEO({ title: 'Invitación a lugar', description: 'Te invitaron a visitar un lugar en Lugabiz' });
 
@@ -51,7 +52,15 @@ const SharedPlacePage: React.FC = () => {
         }
 
         setLoading(false);
-      } catch { toast.error('Error al cargar'); navigate('/'); }
+      } catch {
+        if (!user) {
+          setNeedsAuth(true);
+          setLoading(false);
+        } else {
+          toast.error('Error al cargar');
+          navigate('/');
+        }
+      }
     })();
   }, [shareId, user, navigate]);
 
@@ -80,7 +89,29 @@ const SharedPlacePage: React.FC = () => {
 
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center">
-      <div className="w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (needsAuth && !place) return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center px-4">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-3xl border border-purple-100/60 shadow-xl shadow-purple-200/20 p-8 max-w-sm w-full text-center">
+        <div className="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center mx-auto mb-4">
+          <LogIn className="w-8 h-8 text-purple-500" />
+        </div>
+        <h2 className="text-xl font-bold text-stone-800 mb-2">Inicia sesión</h2>
+        <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+          Debes iniciar sesión para ver los detalles de esta invitación y confirmar tu asistencia.
+        </p>
+        <Link to="/?auth=login"
+          className="w-full py-3 bg-gradient-to-r from-purple-600 to-amber-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-200/40 transition-all">
+          <LogIn className="w-4 h-4" /> Iniciar sesión
+        </Link>
+        <button onClick={goBack} className="mt-3 w-full py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors">
+          Volver
+        </button>
+      </motion.div>
     </div>
   );
 
@@ -172,10 +203,15 @@ const SharedPlacePage: React.FC = () => {
                 </button>
               )
             ) : (
-              <Link to="/?auth=register"
-                className="w-full py-3.5 bg-stone-800 text-white rounded-2xl font-semibold text-sm hover:bg-stone-700 transition-all flex items-center justify-center gap-2">
-                <LogIn className="w-5 h-5" /> Inicia sesión para confirmar
-              </Link>
+              <div className="space-y-2">
+                <button disabled
+                  className="w-full py-3.5 bg-stone-100 text-stone-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-stone-200">
+                  <CheckCircle className="w-5 h-5" /> Confirmar asistencia
+                </button>
+                <p className="text-center text-xs text-stone-500">
+                  <Link to="/?auth=login" className="text-purple-600 font-semibold hover:underline">Inicia sesión</Link> para confirmar tu asistencia
+                </p>
+              </div>
             )}
 
             {/* View place */}

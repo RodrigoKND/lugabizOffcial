@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { EventFormProps, TOTAL_STEPS } from './EventFormTypes';
@@ -8,6 +8,7 @@ import DateTimeLocationSection from './DateTimeLocationSection';
 import MapSection from './MapSection';
 import ReviewSection from './ReviewSection';
 import FormNavigation from './FormNavigation';
+import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 
 const stepLabels = ['Info', 'Fecha', 'Mapa', 'Revisar'];
 
@@ -49,6 +50,9 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
     handleChange, handleBlur, handleImage, removeImage, handleCoordsChange,
     handleSubmit, goNext, goBack,
   } = useEventForm(onClose);
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+
+  const handlePublishRequest = () => setShowPublishConfirm(true);
 
   return (
     <AnimatePresence>
@@ -80,7 +84,11 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Content */}
-            <form onSubmit={handleSubmit} className="px-5 sm:px-6 py-5 space-y-5 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent">
+            <form
+              onSubmit={e => { e.preventDefault(); handlePublishRequest(); }}
+              onKeyDown={e => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault(); }}
+              className="px-5 sm:px-6 py-5 space-y-5 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent"
+            >
               <AnimatePresence mode="wait">
                 {step === 0 && (
                   <motion.div key="s0"
@@ -140,6 +148,15 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
           </motion.div>
         </motion.div>
       )}
+      <ConfirmDialog
+        open={showPublishConfirm}
+        onClose={() => setShowPublishConfirm(false)}
+        onConfirm={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+        title="¿Publicar evento?"
+        message="Tu evento será visible para toda la comunidad. ¿Estás seguro de que todo está correcto?"
+        confirmLabel="Publicar"
+        variant="info"
+      />
     </AnimatePresence>
   );
 };

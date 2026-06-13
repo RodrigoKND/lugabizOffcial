@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Store, Calendar, X, Star, SlidersHorizontal, Filter, Loader2, Check, ChevronDown } from 'lucide-react';
 import * as Icons from 'lucide-react';
@@ -115,32 +116,19 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
     ? categories.filter(c => c.name.toLowerCase().includes(catQuery.toLowerCase()))
     : categories;
 
-  return (
+  return createPortal(
     <>
-      {/* AnimatePresence separados para que cada motion.div tenga su propio key */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="filter-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/40"
-            onClick={onClose}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="filter-sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-[201] bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
+      {open && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/40"
+          onClick={onClose}
+        />
+      )}
+      {open && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-[201] bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl"
+          onClick={e => e.stopPropagation()}
+        >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0">
               <div className="w-10 h-1 rounded-full bg-stone-200" />
@@ -306,10 +294,10 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                 Aplicar filtros{activeCount > 0 ? ` (${activeCount})` : ''}
               </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+          </div>
+      )}
+    </>,
+    document.body,
   );
 };
 
@@ -337,6 +325,8 @@ const CommunityPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function fetchPlaces(page: number, append: boolean) {
     const filters: PlaceSearchFilters = {
       query: committedQuery,
@@ -345,10 +335,17 @@ const CommunityPage: React.FC = () => {
       minRating,
       sortBy: placeSort,
     };
-    const result = await searchPlaces(filters, page);
-    setTotalPlaces(result.total);
-    setHasMorePlaces(result.hasMore);
-    setPlaces(prev => append ? [...prev, ...result.data] : result.data);
+    try {
+      const result = await searchPlaces(filters, page);
+      setTotalPlaces(result.total);
+      setHasMorePlaces(result.hasMore);
+      setPlaces(prev => append ? [...prev, ...result.data] : result.data);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching places:', err);
+      if (!append) setPlaces([]);
+      setError(err?.message || 'Error al cargar lugares');
+    }
   }
 
   async function fetchEvents(page: number, append: boolean) {
@@ -357,10 +354,17 @@ const CommunityPage: React.FC = () => {
       categoryId: selectedCategory,
       sortBy: eventSort,
     };
-    const result = await searchEvents(filters, page);
-    setTotalEvents(result.total);
-    setHasMoreEvents(result.hasMore);
-    setEvents(prev => append ? [...prev, ...result.data] : result.data);
+    try {
+      const result = await searchEvents(filters, page);
+      setTotalEvents(result.total);
+      setHasMoreEvents(result.hasMore);
+      setEvents(prev => append ? [...prev, ...result.data] : result.data);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching events:', err);
+      if (!append) setEvents([]);
+      setError(err?.message || 'Error al cargar eventos');
+    }
   }
 
   useEffect(() => {
@@ -657,8 +661,23 @@ const CommunityPage: React.FC = () => {
               </div>
             )}
 
+            {/* Error */}
+            {!loading && error && (
+              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                  <X className="w-6 h-6 text-red-400" />
+                </div>
+                <p className="font-semibold text-text-primary mb-1">Error al cargar</p>
+                <p className="text-sm text-text-secondary mb-4 max-w-xs">{error}</p>
+                <button onClick={() => { setError(null); setTab(tab); }}
+                  className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors">
+                  Reintentar
+                </button>
+              </div>
+            )}
+
             {/* Results count */}
-            {!loading && !isEmpty && (
+            {!loading && !error && !isEmpty && (
               <p className="text-xs text-text-secondary mb-4 px-1">
                 {tab === 'places'
                   ? `${currentTotal} negocio${currentTotal !== 1 ? 's' : ''} encontrado${currentTotal !== 1 ? 's' : ''}`
@@ -668,7 +687,7 @@ const CommunityPage: React.FC = () => {
             )}
 
             <AnimatePresence mode="wait">
-              {!loading && isEmpty ? (
+              {!loading && !error && isEmpty ? (
                 <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <EmptyCommunityState query={committedQuery} activeTab={tab} />
                 </motion.div>

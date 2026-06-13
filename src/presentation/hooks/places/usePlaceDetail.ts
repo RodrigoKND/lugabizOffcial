@@ -11,7 +11,7 @@ export function usePlaceDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getPlaceById, places } = usePlaces();
-  const { user, isSaved, toggleSavedPlace } = useAuth();
+  const { user, isSaved, toggleSavedPlace, isLoading: isAuthLoading } = useAuth();
   const [place, setPlace] = useState<Place | null>(() => getPlaceById(id || '') || null);
   const [isLoadingPlace, setIsLoadingPlace] = useState(!getPlaceById(id || ''));
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -140,6 +140,7 @@ export function usePlaceDetail() {
     navigate,
     place,
     isLoadingPlace,
+    isAuthLoading,
     user,
     isPlaceSaved,
     reviews,
