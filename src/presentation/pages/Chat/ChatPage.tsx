@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowLeft, Send, Compass, Sparkles, RotateCcw, MapPin, Sun, Cloud,
+  ArrowLeft, Send, Compass, RotateCcw, MapPin, Sun, Cloud, Sparkles,
   CloudRain, Thermometer, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
-  Globe, Instagram, Facebook, MessageCircle, Music2, Settings2, Building2, Check,
+  Globe, Instagram, Facebook, MessageCircle, Music2,
 } from 'lucide-react'
 import { useChat } from '@presentation/hooks/chat/useChat'
 import { useAuth } from '@presentation/context'
@@ -355,10 +355,9 @@ function IdeaSkeleton() {
 const ChatPage: React.FC = () => {
   const { user } = useAuth()
   const goBack   = useSmartBack('/')
-  const { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, locationMode, setLocationMode, sendMessage, reset } = useChat(true)
+  const { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, sendMessage, reset } = useChat(true)
   const [input,       setInput]       = useState('')
   const [activeVideo, setActiveVideo] = useState<VideoEmbed | null>(null)
-  const [showLocMenu, setShowLocMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const hasConversation = messages.length > 0
@@ -423,60 +422,6 @@ const ChatPage: React.FC = () => {
                 </span>
               )}
             </div>
-          </div>
-
-          {/* Botón de ajustes de ubicación */}
-          <div className="relative shrink-0">
-            <button onClick={() => setShowLocMenu(v => !v)} title="Ubicación de las recomendaciones"
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                showLocMenu ? 'bg-violet-50 text-violet-600' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-              }`}>
-              <Settings2 className="w-4 h-4" />
-            </button>
-
-            <AnimatePresence>
-              {showLocMenu && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setShowLocMenu(false)} />
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-11 z-20 w-64 bg-white rounded-2xl border border-slate-200 shadow-xl p-2">
-                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 pt-1 pb-2">
-                      ¿De dónde recomiendo?
-                    </p>
-
-                    <button
-                      onClick={() => { setLocationMode('nearby'); setShowLocMenu(false) }}
-                      className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-colors ${
-                        locationMode === 'nearby' ? 'bg-violet-50' : 'hover:bg-slate-50'
-                      }`}>
-                      <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${locationMode === 'nearby' ? 'text-violet-600' : 'text-slate-400'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] font-semibold ${locationMode === 'nearby' ? 'text-violet-700' : 'text-slate-700'}`}>Cerca de mí</p>
-                        <p className="text-[11px] text-slate-400 leading-snug">Lugares próximos a tu ubicación actual</p>
-                      </div>
-                      {locationMode === 'nearby' && <Check className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />}
-                    </button>
-
-                    <button
-                      onClick={() => { setLocationMode('city'); setShowLocMenu(false) }}
-                      className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-colors ${
-                        locationMode === 'city' ? 'bg-violet-50' : 'hover:bg-slate-50'
-                      }`}>
-                      <Building2 className={`w-4 h-4 mt-0.5 shrink-0 ${locationMode === 'city' ? 'text-violet-600' : 'text-slate-400'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] font-semibold ${locationMode === 'city' ? 'text-violet-700' : 'text-slate-700'}`}>Toda la ciudad</p>
-                        <p className="text-[11px] text-slate-400 leading-snug">Lo mejor de {city !== 'tu ciudad' ? city : 'la ciudad'}, sin importar la distancia</p>
-                      </div>
-                      {locationMode === 'city' && <Check className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />}
-                    </button>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
           </div>
 
           {hasConversation && (

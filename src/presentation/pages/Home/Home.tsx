@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Calendar, Zap } from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import {
-  Preferences, CompactCard,
+  CompactCard,
   EventCardSmall, ScrollRow, TrendBanner, AuthModal,
   SurveyDeck,
 } from '@presentation/components/features';
@@ -23,7 +23,7 @@ import PostsFeed from '@presentation/components/features/posts/PostsFeed';
 
 const Home: React.FC = () => {
   const { getRecentPlaces, isLoading, places, events } = usePlaces();
-  const { user, showPreferences, setShowPreferences } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { currentStep, showAuthModal, setShowAuthModal, handleAction, handleDismiss } = useOnboardingAlerts();
 
@@ -68,8 +68,6 @@ const Home: React.FC = () => {
 
   return (
     <section className="relative min-h-screen pb-24 md:pb-0 bg-feed-bg">
-      <Preferences openPreferences={showPreferences} setClosePreferences={setShowPreferences} />
-
       <OnboardingAlert type={currentStep || 'login'} isOpen={!!currentStep} onAction={handleAction} onDismiss={handleDismiss} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode="register" />
 

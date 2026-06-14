@@ -3,7 +3,7 @@ import { User } from '@domain/entities';
 import { AppNotification } from '@domain/entities';
 import { supabase, authService, savedPlacesService, notificationsService } from '@lib/supabase';
 import { tracking, setTrackingUser } from '@infrastructure/utils/tracking';
-import { sendSurveyPushNotification, sendAnnouncementPushNotification } from '@lib/supabase/services/push/sendPush';
+import { sendBrowserPush } from '@lib/supabase/services/push/sendPush';
 import { userActivityService } from '@lib/supabase/services/places/userActivity';
 import { AuthContextType } from '@domain/entities/AuthContextTypes';
 import toast from 'react-hot-toast';
@@ -205,19 +205,12 @@ export function useAuthProvider(): AuthContextType {
         return;
       }
 
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(notif.title, {
-          body: notif.body,
-          icon: '/L.ico',
-          data: { url: notif.data?.url || '/' },
-        });
-
-        if (notif.type === 'market_survey' && notif.data?.survey_id) {
-          sendSurveyPushNotification(notif.data.survey_id as string, notif.title);
-        }
-        if (notif.type === 'owner_announcement') {
-          sendAnnouncementPushNotification(notif.title, notif.body || '');
-        }
+      // nearby_push es solo registro de deduplicación (read:true), no mostrar
+      if ('Notification' in window && Notification.permission === 'granted' && notif.type !== 'nearby_push') {
+        const url = (notif.data?.url as string) || '/';
+        const prefix = notif.type === 'owner_announcement' ? '📢 ' : '';
+        // sendBrowserPush usa el SW → notificationclick maneja el redirect correctamente
+        sendBrowserPush(`${prefix}${notif.title}`, notif.body || '', url);
       }
     });
 

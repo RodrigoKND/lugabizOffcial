@@ -15,18 +15,11 @@ export function useChat(isOpen: boolean) {
   const [city,         setCity]         = useState('tu ciudad')
   const [weather,      setWeather]      = useState<WeatherBrief | null>(null)
   const [timeLabel,    setTimeLabel]    = useState('')
-  const [locationMode, setLocationModeState] = useState<'nearby' | 'city'>(() => {
-    try { return (localStorage.getItem('_lugabiz_chat_locmode') as 'nearby' | 'city') || 'nearby' } catch { return 'nearby' }
-  })
-  const setLocationMode = useCallback((mode: 'nearby' | 'city') => {
-    setLocationModeState(mode)
-    try { localStorage.setItem('_lugabiz_chat_locmode', mode) } catch {}
-  }, [])
+  const locationMode = 'nearby'
 
   const coordsRef = useRef<{ lat: number; lng: number } | null>(null)
   const geoRef    = useRef<Promise<{ lat: number; lng: number } | null> | null>(null)
   const ideasDone = useRef(false)
-  const histDone  = useRef(false)
   const msgsRef   = useRef<ChatMessage[]>([])
   useEffect(() => { msgsRef.current = messages }, [messages])
 
@@ -66,13 +59,6 @@ export function useChat(isOpen: boolean) {
     })()
   }, [])
 
-  // ── Cargar historial de sesiones anteriores ───────────────────────────────
-  useEffect(() => {
-    if (!isOpen || histDone.current || !user) return
-    histDone.current = true
-    chatService.loadHistory().then(past => { if (past.length) setMessages(past) }).catch(() => {})
-  }, [isOpen, user])
-
   // ── Ideas rápidas ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) { setIdeasLoading(false); return }
@@ -93,15 +79,16 @@ export function useChat(isOpen: boolean) {
 
   // ── Enviar mensaje ────────────────────────────────────────────────────────
   const sendMessage = useCallback(async (content: string) => {
-    // Hilo completo de la sesión actual → memoria del asistente
+    // Últimos 6 mensajes (3 intercambios) para ahorrar tokens
     const history = msgsRef.current
       .filter(m => !m.streaming && m.content.trim())
+      .slice(-6)
       .map(m => ({ role: m.role, content: m.content }))
 
-    // Lugares ya mostrados en la sesión → para no repetirlos
+    // Últimos lugares mencionados, sin repetir
     const shownPlaces = [...new Set(
       msgsRef.current.flatMap(m => (m.places ?? []).map(p => p.name)),
-    )]
+    )].slice(-8)
 
     setMessages(prev => [
       ...prev,
@@ -125,8 +112,7 @@ export function useChat(isOpen: boolean) {
 
   const reset = useCallback(() => {
     setMessages([])
-    histDone.current = false
   }, [])
 
-  return { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, locationMode, setLocationMode, sendMessage, reset }
+  return { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, locationMode, sendMessage, reset }
 }

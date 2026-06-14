@@ -24,7 +24,7 @@ function setSessionDone() {
 }
 
 export function useOnboardingAlerts() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, showPreferences } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [ready, setReady] = useState(false);
   const [localStep, setLocalStep] = useState<OnboardingStep>('login');
@@ -146,6 +146,8 @@ export function useOnboardingAlerts() {
     if (!ready || localStep === 'done') return null;
     if (localStep === 'login' && user) return null;
     if ((localStep === 'notifications' || localStep === 'geolocation') && !user) return null;
+    // Block onboarding while the preferences modal is still open (new-user flow)
+    if (showPreferences) return null;
     return localStep;
   })();
 

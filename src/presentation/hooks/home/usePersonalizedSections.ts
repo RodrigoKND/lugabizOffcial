@@ -22,8 +22,7 @@ interface Blueprint {
 }
 
 // ── Título local de fallback (cuando el edge function no responde) ──────────
-function localTitle(bp: Blueprint, city: string): { title: string; subtitle: string } {
-  const c = city ? city.split(',')[0].trim() : ''
+function localTitle(bp: Blueprint): { title: string; subtitle: string } {
   const base = bp.reason.split(':')[0]
   const place = bp.reason.split(':')[2] ?? ''
 
@@ -34,8 +33,8 @@ function localTitle(bp: Blueprint, city: string): { title: string; subtitle: str
     third_category:     `Más de ${bp.categoryName ?? 'lo tuyo'}`,
     social_group:       `Para ${bp.socialGroupName ?? 'salir'}`,
     discovery:          `Descubre ${bp.categoryName ?? 'algo nuevo'}`,
-    new_arrivals:       c ? `Recién llegados a ${c}` : 'Recién publicados',
-    upcoming_events:    c ? `Esta semana en ${c}` : 'Próximos eventos',
+    new_arrivals:       'Recién publicados',
+    upcoming_events:    'Próximos eventos',
   }
 
   const SUBTITLES: Record<string, string> = {
@@ -44,7 +43,7 @@ function localTitle(bp: Blueprint, city: string): { title: string; subtitle: str
   }
 
   return {
-    title: (TITLES[base] ?? `${bp.categoryName ?? bp.socialGroupName ?? 'Lugares'}${c ? ' en ' + c : ''}`).slice(0, 40),
+    title: (TITLES[base] ?? `${bp.categoryName ?? bp.socialGroupName ?? 'Lugares'}`).slice(0, 40),
     subtitle: (SUBTITLES[bp.sortBy] ?? 'Para ti hoy').slice(0, 22),
   }
 }
@@ -197,13 +196,21 @@ export function usePersonalizedSections(
 
         if (userId) {
           try {
-            // Preferencias explícitas del usuario
-            const { data: prefs } = await supabase
-              .from('user_category_preferences')
-              .select('categories(name)')
-              .eq('user_id', userId)
-              .limit(6)
+            // Preferencias explícitas del usuario (categorías y grupos sociales del modal)
+            const [{ data: prefs }, { data: sgPrefs }] = await Promise.all([
+              supabase
+                .from('user_category_preferences')
+                .select('categories(name)')
+                .eq('user_id', userId)
+                .limit(6),
+              supabase
+                .from('user_social_group_preferences')
+                .select('social_groups(name)')
+                .eq('user_id', userId)
+                .limit(6),
+            ])
             userTopCategories = (prefs || []).map((p: any) => p.categories?.name).filter(Boolean)
+            const prefSocialGroups: string[] = (sgPrefs || []).map((p: any) => p.social_groups?.name).filter(Boolean)
 
             // Historial de interacciones recientes
             const { data: activity } = await supabase
@@ -227,7 +234,9 @@ export function usePersonalizedSections(
             // Fusionar categorías preferidas + historial
             const historyCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).map(([c]) => c)
             userTopCategories = [...new Set([...userTopCategories, ...historyCats])].slice(0, 5)
-            userTopSocialGroup = Object.entries(sgCounts).sort((a, b) => b[1] - a[1]).map(([sg]) => sg)[0] ?? null
+            // Preferencias del modal tienen prioridad; la actividad complementa si no hay preferencias
+            const activityTopSGs = Object.entries(sgCounts).sort((a, b) => b[1] - a[1]).map(([sg]) => sg)
+            userTopSocialGroup = [...new Set([...prefSocialGroups, ...activityTopSGs])][0] ?? null
           } catch (e) {
             console.warn('[PersonalizedSections] error reading user prefs:', e)
           }
@@ -247,11 +256,10 @@ export function usePersonalizedSections(
         if (cancelled) return
 
         const upcomingEvents = events.filter(e => new Date(e.dateStart) >= new Date())
-        const cityStr = city || ''
 
         const built: HomeSection[] = blueprints
           .map((bp, i) => {
-            const { title, subtitle } = aiTitles?.[i] ?? localTitle(bp, cityStr)
+            const { title, subtitle } = aiTitles?.[i] ?? localTitle(bp)
             const isEventSection = bp.type === 'events'
             const isMixed = bp.type === 'mixed'
 

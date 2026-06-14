@@ -6,6 +6,9 @@ import { useAuth } from '@presentation/context';
 import { AppNotification } from '@domain/entities';
 
 function getNavUrl(n: AppNotification): string {
+  // Edge functions always store the target URL in data.url — prefer it
+  if (n.data?.url && typeof n.data.url === 'string') return n.data.url;
+
   switch (n.type) {
     case 'market_survey':
     case 'survey':
@@ -16,6 +19,7 @@ function getNavUrl(n: AppNotification): string {
       return pid ? `/place/${pid}` : '/';
     }
     case 'event_invite':
+    case 'event_start':
       return n.data?.event_id ? `/event/${n.data.event_id}` : '/';
     case 'new_review':
       return n.data?.place_id ? `/place/${n.data.place_id}` : '/';

@@ -20,7 +20,6 @@ const Preferences: React.FC<PreferencesProps> = ({ openPreferences = false, setC
   useEffect(() => {
     if (openPreferences) {
       setIsShowingPreferences(true);
-      setClosePreferences?.(!openPreferences);
     }
   }, [openPreferences]);
 

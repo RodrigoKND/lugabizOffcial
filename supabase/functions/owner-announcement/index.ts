@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import webPush from 'npm:web-push@3.6.7'
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -125,7 +126,56 @@ serve(async (req) => {
     })
   }
 
-  return new Response(JSON.stringify({ success: true, sentTo: users.length }), {
+  // Enviar push real a los usuarios que tengan suscripción
+  const vapidPublicKey = Deno.env.get('VITE_VAPID_PUBLIC_KEY') || ''
+  const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY') || ''
+
+  let pushSent = 0
+  if (vapidPublicKey && vapidPrivateKey && users.length > 0) {
+    webPush.setVapidDetails('mailto:support@lugabiz.com', vapidPublicKey, vapidPrivateKey)
+
+    const userIds = users.map((u: { id: string }) => u.id)
+    const { data: subscriptions } = await supabaseClient
+      .from('push_subscriptions')
+      .select('id, subscription')
+      .in('user_id', userIds)
+
+    if (subscriptions && subscriptions.length > 0) {
+      const pushPayload = JSON.stringify({
+        title: `📢 ${title}`,
+        body,
+        icon: '/L.ico',
+        badge: '/L.ico',
+        vibrate: [200, 100, 200],
+        data: { url: notifData?.url || '/' },
+        tag: `announcement-${user.id}`,
+        renotify: true,
+      })
+
+      const staleIds: string[] = []
+      const CHUNK_SIZE = 50
+      for (let i = 0; i < subscriptions.length; i += CHUNK_SIZE) {
+        const chunk = subscriptions.slice(i, i + CHUNK_SIZE)
+        const results = await Promise.allSettled(
+          chunk.map(async (sub: any) => {
+            try {
+              await webPush.sendNotification(sub.subscription, pushPayload)
+              return true
+            } catch {
+              staleIds.push(sub.id)
+              return false
+            }
+          })
+        )
+        pushSent += results.filter(r => r.status === 'fulfilled' && (r as any).value).length
+      }
+      if (staleIds.length > 0) {
+        await supabaseClient.from('push_subscriptions').delete().in('id', staleIds)
+      }
+    }
+  }
+
+  return new Response(JSON.stringify({ success: true, sentTo: users.length, pushSent }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 })
