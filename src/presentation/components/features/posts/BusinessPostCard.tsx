@@ -104,7 +104,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl border border-primary-100/40 shadow-sm overflow-hidden flex flex-col"
+      className="bg-white rounded-xl border border-primary-100/40 shadow-sm overflow-hidden flex flex-col h-full"
     >
       {/* ── Imagen ── */}
       <div
@@ -126,8 +126,9 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
             />
           </AnimatePresence>
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
-            <Store className="w-8 h-8 text-primary-300" />
+          <div className="w-full h-full flex flex-col items-center justify-center bg-violet-600">
+            <span className="text-white text-3xl font-bold tracking-wide">Lugabiz</span>
+            <span className="text-white/70 text-md font-medium mt-0.5"> 🔥</span>
           </div>
         )}
 

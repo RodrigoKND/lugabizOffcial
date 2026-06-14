@@ -100,7 +100,7 @@ function renderInline(text: string): React.ReactNode[] {
 
 // ── Place card (foto + galería + cómo llegar + maps + publicado) ─────────────────
 function PlaceCardComponent({ place }: { place: PlaceCard }) {
-  const photos = [place.image, ...place.gallery].filter(Boolean) as string[]
+  const photos = [place.image, ...(place.gallery ?? [])].filter(Boolean) as string[]
   const published = timeAgo(place.publishedAt)
 
   return (
@@ -504,14 +504,22 @@ const ChatPage: React.FC = () => {
               </p>
 
               <div className="w-full mt-8">
+                {ideasLoading ? (
+                  <div className="flex flex-col items-center py-10">
+                    <motion.div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-violet-200 mb-4"
+                      animate={{ scale: [1, 1.08, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
+                      <Compass className="w-6 h-6 text-white" />
+                    </motion.div>
+                    <p className="text-[14px] text-slate-400 font-medium">Lubi está cargando...</p>
+                  </div>
+                ) : (
+                  <>
                 <div className="flex items-center gap-1.5 mb-3">
                   <Sparkles className="w-3.5 h-3.5 text-violet-400" />
                   <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Ideas para ti</span>
                 </div>
-
-                {ideasLoading ? (
-                  <IdeaSkeleton />
-                ) : ideas.length > 0 ? (
+                {ideas.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2.5">
                     {ideas.map((idea, i) => (
                       <motion.button key={i}
@@ -526,6 +534,8 @@ const ChatPage: React.FC = () => {
                     ))}
                   </div>
                 ) : null}
+                  </>
+                )}
               </div>
 
               <p className="mt-8 text-[12px] text-slate-300 text-center">Escribe tu pregunta o elige una idea arriba</p>
@@ -669,6 +679,9 @@ const ChatPage: React.FC = () => {
               <span className="text-[11px] text-slate-300">{input.length}/300</span>
             </div>
           </form>
+          <p className="text-[10px] text-slate-300 text-center mt-2 leading-relaxed">
+            Lubi puede cometer errores. Verifica la información importante.
+          </p>
         </div>
       </div>
 

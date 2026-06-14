@@ -79,7 +79,7 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       {/* Posts - horizontal scroll */}
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
         {posts.map(post => (
-          <div key={post.id} className="snap-start shrink-0 w-[280px] sm:w-[300px]">
+          <div key={post.id} className="snap-start shrink-0 w-[280px] sm:w-[300px] h-full">
             <BusinessPostCard
               post={post}
               onDeleted={(id) => setPosts(prev => prev.filter(p => p.id !== id))}
