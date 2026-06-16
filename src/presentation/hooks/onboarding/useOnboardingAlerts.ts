@@ -85,6 +85,10 @@ export function useOnboardingAlerts() {
 
   const handleAction = useCallback(() => {
     if (localStep === 'login') {
+      setLoginDismissed();
+      sessionDoneRef.current = true;
+      setSessionDone();
+      setLocalStep('done');
       setShowAuthModal(true);
       return;
     }

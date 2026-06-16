@@ -17,7 +17,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center">
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
