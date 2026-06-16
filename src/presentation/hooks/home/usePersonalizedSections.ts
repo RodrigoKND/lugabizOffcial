@@ -11,30 +11,44 @@ export interface HomeSection {
   type: 'places' | 'events' | 'mixed';
 }
 
-// ── Blueprint: define qué contenido muestra cada sección ────────────────────
 interface Blueprint {
   id: string;
-  reason: string;           // para que la IA genere el título correcto
+  reason: string;
   categoryName: string | null;
   socialGroupName: string | null;
   sortBy: 'rating' | 'recent' | 'views' | 'date';
   type: 'places' | 'events' | 'mixed';
+  score?: number;
 }
 
-// ── Título local de fallback (cuando el edge function no responde) ──────────
+const CATEGORY_RELATED: Record<string, string[]> = {
+  Restaurantes: ['Cafeterias', 'Bares'],
+  Cafeterias: ['Restaurantes', 'Librerias'],
+  Bares: ['Restaurantes'],
+  Hoteles: ['Restaurantes', 'Centros Comerciales'],
+  Parques: ['Naturaleza'],
+  Museos: ['Librerias'],
+  Tiendas: ['Centros Comerciales'],
+  Gimnasios: ['Naturaleza', 'Parques'],
+  Cines: ['Restaurantes', 'Centros Comerciales'],
+  Librerias: ['Cafeterias', 'Museos'],
+  'Centros Comerciales': ['Tiendas', 'Cines', 'Restaurantes'],
+  Naturaleza: ['Parques'],
+}
+
 function localTitle(bp: Blueprint): { title: string; subtitle: string } {
   const base = bp.reason.split(':')[0]
   const place = bp.reason.split(':')[2] ?? ''
 
   const TITLES: Record<string, string> = {
     recent_interaction: place ? `Porque visitaste ${place}` : `Más ${bp.categoryName ?? 'lugares'} para ti`,
-    favorite_category:  `Porque te encanta ${bp.categoryName ?? 'esto'}`,
-    second_category:    `${bp.categoryName ?? 'Algo'} que también disfrutas`,
-    third_category:     `Más de ${bp.categoryName ?? 'lo tuyo'}`,
-    social_group:       `Para ${bp.socialGroupName ?? 'salir'}`,
-    discovery:          `Descubre ${bp.categoryName ?? 'algo nuevo'}`,
-    new_arrivals:       'Recién publicados',
-    upcoming_events:    'Próximos eventos',
+    favorite_category: `Porque te encanta ${bp.categoryName ?? 'esto'}`,
+    second_category: `${bp.categoryName ?? 'Algo'} que también disfrutas`,
+    third_category: `Más de ${bp.categoryName ?? 'lo tuyo'}`,
+    related_category: `También te gustará ${bp.categoryName ?? ''}`,
+    social_group: `Para ${bp.socialGroupName ?? 'salir'}`,
+    new_arrivals: 'Recién publicados',
+    upcoming_events: 'Próximos eventos',
   }
 
   const SUBTITLES: Record<string, string> = {
@@ -48,9 +62,15 @@ function localTitle(bp: Blueprint): { title: string; subtitle: string } {
   }
 }
 
-// ── Construye blueprints LOCALMENTE (sin edge function) ────────────────────
-// Usa los datos que el frontend ya tiene: places, categories, socialGroups
-function buildLocalBlueprints(
+function hasPlacesForCategory(places: Place[], catName: string): boolean {
+  return places.some(p => p.category?.name?.toLowerCase() === catName.toLowerCase())
+}
+
+function hasPlacesForSocialGroup(places: Place[], sgName: string): boolean {
+  return places.some(p => p.socialGroups?.some((sg: any) => sg.name?.toLowerCase() === sgName.toLowerCase()))
+}
+
+function buildScoredBlueprints(
   places: Place[],
   events: Event[],
   userTopCategories: string[],
@@ -60,103 +80,169 @@ function buildLocalBlueprints(
   isWeekend: boolean,
   hour: number,
 ): Blueprint[] {
-  const MAX = 10
+  const MAX = 6
   const result: Blueprint[] = []
-  const usedIds = new Set<string>()
   const usedCats = new Set<string>()
   const usedSGs = new Set<string>()
 
   function push(bp: Blueprint) {
-    if (result.length >= MAX || usedIds.has(bp.id)) return
+    if (result.length >= MAX) return
+    if (bp.categoryName) {
+      const lower = bp.categoryName.toLowerCase()
+      if (usedCats.has(lower)) return
+      usedCats.add(lower)
+    }
+    if (bp.socialGroupName) {
+      const lower = bp.socialGroupName.toLowerCase()
+      if (usedSGs.has(lower)) return
+      usedSGs.add(lower)
+    }
     result.push(bp)
-    usedIds.add(bp.id)
-    if (bp.categoryName) usedCats.add(bp.categoryName.toLowerCase())
-    if (bp.socialGroupName) usedSGs.add(bp.socialGroupName.toLowerCase())
   }
 
-  // ── P1. "Porque visitaste X" ────────────────────────────────────────────
-  const recentDiffersFromTop = recentCategory &&
-    recentCategory.toLowerCase() !== (userTopCategories[0] ?? '').toLowerCase()
-  if (recentPlaceName && recentCategory && recentDiffersFromTop) {
-    push({ id: 'recent-interaction', categoryName: recentCategory, socialGroupName: null,
-           sortBy: 'rating', type: 'places', reason: `recent_interaction:${recentCategory}:${recentPlaceName}` })
+  // ── Score ALL categories by relevance to THIS user ──
+  interface CategoryScore {
+    name: string
+    score: number
+    source: 'explicit' | 'implicit' | 'related'
   }
+  const catScores = new Map<string, CategoryScore>()
 
-  // ── P2. Categorías favoritas del usuario ────────────────────────────────
-  const USER_SORTS = ['rating', 'views', 'recent'] as const
-  const USER_REASONS = ['favorite_category', 'second_category', 'third_category'] as const
-  userTopCategories.slice(0, 3).forEach((cat, i) => {
-    push({ id: `user-cat-${i}`, categoryName: cat, socialGroupName: null,
-           sortBy: USER_SORTS[i], type: 'places', reason: `${USER_REASONS[i]}:${cat}` })
+  // 1. Explicit preferences: +4
+  userTopCategories.forEach(cat => {
+    const existing = catScores.get(cat.toLowerCase()) ?? { name: cat, score: 0, source: 'explicit' as const }
+    existing.score += 4
+    catScores.set(cat.toLowerCase(), existing)
   })
 
-  // ── P3. Grupo social del usuario ────────────────────────────────────────
-  if (userTopSocialGroup) {
-    push({ id: 'user-sg', categoryName: null, socialGroupName: userTopSocialGroup,
-           sortBy: 'rating', type: 'places', reason: `social_group:${userTopSocialGroup}` })
+  // 2. Related to explicit prefs: +1.5 (content-based filtering)
+  userTopCategories.forEach(cat => {
+    const related = CATEGORY_RELATED[cat] ?? []
+    related.forEach(rel => {
+      if (rel.toLowerCase() === cat.toLowerCase()) return
+      if (!hasPlacesForCategory(places, rel)) return
+      const existing = catScores.get(rel.toLowerCase()) ?? { name: rel, score: 0, source: 'related' as const }
+      existing.score += 1.5
+      existing.source = 'related'
+      catScores.set(rel.toLowerCase(), existing)
+    })
+  })
+
+  // 3. Recent interaction category: +3 if different from top
+  if (recentCategory && userTopCategories.length > 0 &&
+    recentCategory.toLowerCase() !== userTopCategories[0].toLowerCase()) {
+    const existing = catScores.get(recentCategory.toLowerCase()) ??
+      { name: recentCategory, score: 0, source: 'implicit' as const }
+    existing.score += 3
+    existing.source = 'implicit'
+    catScores.set(recentCategory.toLowerCase(), existing)
   }
 
-  // ── P4. Grupos sociales disponibles en los lugares ──────────────────────
-  const allSGs = [...new Set(places.flatMap(p => p.socialGroups?.map((sg: any) => sg.name) ?? []))].filter(Boolean)
-  const dayOffset = new Date().getDate()
-  const rotatedSGs = [...allSGs.slice(dayOffset % Math.max(1, allSGs.length)),
-                      ...allSGs.slice(0, dayOffset % Math.max(1, allSGs.length))]
-  for (const sg of rotatedSGs) {
-    if (result.length >= MAX - 3) break
-    if (usedSGs.has(sg.toLowerCase())) continue
-    push({ id: `sg-${sg.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}`,
-           categoryName: null, socialGroupName: sg, sortBy: 'rating', type: 'places',
-           reason: `social_group:${sg}` })
+  // 4. Popular categories in city (fallback for users with no prefs): +0.5
+  const cityCatCounts = new Map<string, number>()
+  places.forEach(p => {
+    const n = p.category?.name
+    if (n) cityCatCounts.set(n, (cityCatCounts.get(n) ?? 0) + 1)
+  })
+  const sortedCityCats = [...cityCatCounts.entries()].sort((a, b) => b[1] - a[1])
+  if (userTopCategories.length === 0) {
+    sortedCityCats.slice(0, 3).forEach(([cat]) => {
+      const existing = catScores.get(cat.toLowerCase()) ?? { name: cat, score: 0, source: 'implicit' as const }
+      existing.score += 0.5
+      catScores.set(cat.toLowerCase(), existing)
+    })
   }
 
-  // ── P5. Categorías disponibles en los lugares ───────────────────────────
-  const allCats = [...new Set(places.map(p => p.category?.name).filter(Boolean))] as string[]
-  const unusedCats = allCats.filter(c => !usedCats.has(c.toLowerCase()))
-  const rotatedCats = [...unusedCats.slice(dayOffset % Math.max(1, unusedCats.length)),
-                       ...unusedCats.slice(0, dayOffset % Math.max(1, unusedCats.length))]
-  for (const cat of rotatedCats) {
-    if (result.length >= MAX - 2) break
-    push({ id: `cat-${cat.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}`,
-           categoryName: cat, socialGroupName: null, sortBy: 'rating', type: 'places',
-           reason: `discovery:${cat}` })
+  // ── P1. "Porque visitaste X" (recent interaction) ──
+  if (recentPlaceName && recentCategory && catScores.get(recentCategory.toLowerCase())?.score >= 2) {
+    push({
+      id: 'recent-interaction', categoryName: recentCategory, socialGroupName: null,
+      sortBy: 'rating', type: 'places', score: 10,
+      reason: `recent_interaction:${recentCategory}:${recentPlaceName}`,
+    })
   }
 
-  // ── P6. Eventos ─────────────────────────────────────────────────────────
+  // ── P2-P4. Top scored categories ──
+  const scored = [...catScores.entries()]
+    .sort((a, b) => b[1].score - a[1].score)
+    .slice(0, 5)
+
+  const REASONS = ['favorite_category', 'second_category', 'third_category'] as const
+  const SORTS: Array<'rating' | 'views' | 'recent'> = ['rating', 'views', 'recent']
+  let catIndex = 0
+  for (const [, cs] of scored) {
+    if (catIndex >= 3) break
+    if (!hasPlacesForCategory(places, cs.name)) continue
+    if (cs.name.toLowerCase() === recentCategory?.toLowerCase() && recentPlaceName) continue
+    push({
+      id: `cat-${cs.source}-${catIndex}`, categoryName: cs.name, socialGroupName: null,
+      sortBy: SORTS[catIndex] ?? 'rating', type: 'places', score: cs.score,
+      reason: `${REASONS[catIndex] ?? 'favorite_category'}:${cs.name}`,
+    })
+    catIndex++
+  }
+
+  // ── P5. Solo el grupo social EXPLÍCITO del usuario ──
+  if (userTopSocialGroup && hasPlacesForSocialGroup(places, userTopSocialGroup)) {
+    push({
+      id: 'user-sg', categoryName: null, socialGroupName: userTopSocialGroup,
+      sortBy: 'rating', type: 'places', score: 3,
+      reason: `social_group:${userTopSocialGroup}`,
+    })
+  }
+
+  // ── P6. Events ──
   if (events.length > 0 && (isWeekend || hour >= 14)) {
-    push({ id: 'events-upcoming', categoryName: null, socialGroupName: null,
-           sortBy: 'date', type: 'events', reason: 'upcoming_events' })
+    push({
+      id: 'events-upcoming', categoryName: null, socialGroupName: null,
+      sortBy: 'date', type: 'events', score: 2,
+      reason: 'upcoming_events',
+    })
   }
 
-  // ── P7. Recién llegados (único genérico) ─────────────────────────────────
-  push({ id: 'new-arrivals', categoryName: null, socialGroupName: null,
-         sortBy: 'recent', type: 'places', reason: 'new_arrivals' })
+  // ── P7. New arrivals (siempre al final) ──
+  push({
+    id: 'new-arrivals', categoryName: null, socialGroupName: null,
+    sortBy: 'recent', type: 'places', score: 1,
+    reason: 'new_arrivals',
+  })
 
   return result
 }
 
-// ── Pide títulos AI al edge function ───────────────────────────────────────
-async function fetchAITitles(
+async function fetchPersonalizedContent(
   blueprints: Blueprint[],
   city: string,
   userCategories: string[],
   userSocialGroup: string | null,
-): Promise<{ title: string; subtitle: string }[] | null> {
+  recentCategory: string | null,
+  recentPlaceName: string | null,
+  activityHistoryCats: string[],
+): Promise<{
+  titles: { title: string; subtitle: string }[] | null
+  aiBlueprints: Blueprint[] | null
+}> {
   try {
     const hour = new Date().getHours()
     const isWeekend = [0, 6].includes(new Date().getDay())
     const { data, error } = await supabase.functions.invoke('personalized-content', {
-      body: { blueprints, city, hour, isWeekend, userCategories, userSocialGroup },
+      body: {
+        blueprints, city, hour, isWeekend, userCategories, userSocialGroup,
+        recentCategory, recentPlaceName, activityHistoryCats,
+      },
     })
-    if (error) { console.error('[PersonalizedSections] edge function error:', error); return null; }
-    if (!Array.isArray(data?.titles)) { console.warn('[PersonalizedSections] respuesta inesperada:', data); return null; }
-    return data.titles as { title: string; subtitle: string }[]
+    if (error) { console.error('[PersonalizedSections] edge function error:', error); return { titles: null, aiBlueprints: null }; }
+    if (!Array.isArray(data?.titles)) { console.warn('[PersonalizedSections] respuesta inesperada:', data); return { titles: null, aiBlueprints: null }; }
+    return {
+      titles: data.titles as { title: string; subtitle: string }[],
+      aiBlueprints: (data.blueprints ?? null) as Blueprint[] | null,
+    }
   } catch (e) {
     console.error('[PersonalizedSections] excepción:', e)
-    return null
+    return { titles: null, aiBlueprints: null }
   }
 }
 
-// ── Ordena lugares ────────────────────────────────────────────────────────
 function sortPlaces(places: Place[], sortBy?: string): Place[] {
   const arr = [...places]
   if (sortBy === 'rating') arr.sort((a, b) => (b.rating || 0) - (a.rating || 0))
@@ -165,7 +251,6 @@ function sortPlaces(places: Place[], sortBy?: string): Place[] {
   return arr
 }
 
-// ── Hook principal ────────────────────────────────────────────────────────
 export function usePersonalizedSections(
   places: Place[],
   events: Event[],
@@ -188,15 +273,15 @@ export function usePersonalizedSections(
         const hour = new Date().getHours()
         const isWeekend = [0, 6].includes(new Date().getDay())
 
-        // Leer preferencias del usuario desde BD o sessionStorage
         let userTopCategories: string[] = []
         let userTopSocialGroup: string | null = null
         let recentCategory: string | null = null
         let recentPlaceName: string | null = null
+        let activityHistoryCats: string[] = []
+        let activityHistorySGs: string[] = []
 
         if (userId) {
           try {
-            // Preferencias explícitas del usuario (categorías y grupos sociales del modal)
             const [{ data: prefs }, { data: sgPrefs }] = await Promise.all([
               supabase
                 .from('user_category_preferences')
@@ -212,14 +297,13 @@ export function usePersonalizedSections(
             userTopCategories = (prefs || []).map((p: any) => p.categories?.name).filter(Boolean)
             const prefSocialGroups: string[] = (sgPrefs || []).map((p: any) => p.social_groups?.name).filter(Boolean)
 
-            // Historial de interacciones recientes
             const { data: activity } = await supabase
               .from('user_activity')
               .select('data')
               .eq('user_id', userId)
               .eq('action', 'view_place')
               .order('created_at', { ascending: false })
-              .limit(20)
+              .limit(30)
 
             const catCounts: Record<string, number> = {}
             const sgCounts: Record<string, number> = {}
@@ -231,37 +315,40 @@ export function usePersonalizedSections(
               if (pName && !recentPlaceName) recentPlaceName = pName
               if (sgs) for (const sg of sgs) { sgCounts[sg] = (sgCounts[sg] || 0) + 1 }
             }
-            // Fusionar categorías preferidas + historial
-            const historyCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).map(([c]) => c)
-            userTopCategories = [...new Set([...userTopCategories, ...historyCats])].slice(0, 5)
-            // Preferencias del modal tienen prioridad; la actividad complementa si no hay preferencias
-            const activityTopSGs = Object.entries(sgCounts).sort((a, b) => b[1] - a[1]).map(([sg]) => sg)
+            activityHistoryCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).map(([c]) => c)
+            activityHistorySGs = Object.entries(sgCounts).sort((a, b) => b[1] - a[1]).map(([sg]) => sg)
+
+            userTopCategories = [...new Set([...userTopCategories, ...activityHistoryCats])].slice(0, 5)
+            const activityTopSGs = activityHistorySGs
             userTopSocialGroup = [...new Set([...prefSocialGroups, ...activityTopSGs])][0] ?? null
           } catch (e) {
             console.warn('[PersonalizedSections] error reading user prefs:', e)
           }
         }
 
-        // Construir blueprints LOCALMENTE
-        const blueprints = buildLocalBlueprints(
+        const localBlueprints = buildScoredBlueprints(
           places, events, userTopCategories, userTopSocialGroup,
           recentCategory, recentPlaceName, isWeekend, hour,
         )
 
         if (cancelled) return
 
-        // Pedir títulos AI (edge function solo hace esto)
-        const aiTitles = await fetchAITitles(blueprints, city || '', userTopCategories, userTopSocialGroup)
+        const { titles: aiTitles, aiBlueprints } = await fetchPersonalizedContent(
+          localBlueprints, city || '', userTopCategories, userTopSocialGroup,
+          recentCategory, recentPlaceName, activityHistoryCats,
+        )
 
         if (cancelled) return
 
+        // Use AI-ranked blueprints from edge function if available, fall back to local
+        const finalBlueprints = aiBlueprints && aiBlueprints.length > 0 ? aiBlueprints : localBlueprints
+
         const upcomingEvents = events.filter(e => new Date(e.dateStart) >= new Date())
 
-        const built: HomeSection[] = blueprints
+        const built: HomeSection[] = finalBlueprints
           .map((bp, i) => {
             const { title, subtitle } = aiTitles?.[i] ?? localTitle(bp)
             const isEventSection = bp.type === 'events'
-            const isMixed = bp.type === 'mixed'
 
             let filteredPlaces: Place[] = []
             let filteredEvents: Event[] = []
@@ -270,23 +357,23 @@ export function usePersonalizedSections(
               let fp = [...places]
               if (bp.categoryName) {
                 const lower = bp.categoryName.toLowerCase()
-                fp = fp.filter(p => p.category?.name?.toLowerCase().includes(lower))
+                fp = fp.filter(p => p.category?.name?.toLowerCase() === lower)
               }
               if (bp.socialGroupName) {
                 const sgLower = bp.socialGroupName.toLowerCase()
                 const withSG = fp.filter(p =>
-                  p.socialGroups?.some((sg: any) => sg.name?.toLowerCase().includes(sgLower))
+                  p.socialGroups?.some((sg: any) => sg.name?.toLowerCase() === sgLower)
                 )
                 if (withSG.length >= 1) fp = withSG
               }
               filteredPlaces = sortPlaces(fp, bp.sortBy).slice(0, 10)
             }
 
-            if (isEventSection || isMixed) {
+            if (isEventSection) {
               let fe = [...upcomingEvents]
               if (bp.categoryName) {
                 const lower = bp.categoryName.toLowerCase()
-                fe = fe.filter(e => e.category?.name?.toLowerCase().includes(lower))
+                fe = fe.filter(e => e.category?.name?.toLowerCase() === lower)
               }
               filteredEvents = fe.sort((a, b) => new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime()).slice(0, 8)
             }
