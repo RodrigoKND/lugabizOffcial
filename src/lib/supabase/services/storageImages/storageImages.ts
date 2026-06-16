@@ -40,6 +40,21 @@ export const storageService = {
     if (error) throw error;
   },
 
+  async deleteImagesByUrls(urls: string[]): Promise<void> {
+    const paths = urls.map(url => {
+      try {
+        const u = new URL(url);
+        const parts = u.pathname.split('/');
+        const idx = parts.indexOf('images');
+        return idx !== -1 ? parts.slice(idx + 1).join('/') : url;
+      } catch {
+        return url;
+      }
+    }).filter(Boolean);
+    if (!paths.length) return;
+    await supabase.storage.from('images').remove(paths);
+  },
+
   async getImageUrl(filePath: string): Promise<string> {
     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
     return data.publicUrl;

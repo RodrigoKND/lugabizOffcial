@@ -39,6 +39,17 @@ export function usePlaceSubmit(
       const imageUrls = imageFiles.length > 0
         ? await storageService.uploadMultipleFiles(imageFiles, 'places')
         : [];
+
+      if (imageUrls.length > 0) {
+        const imgModResult = await moderateContent('', 'place', user?.id, user?.name, imageUrls);
+        if (!imgModResult.approved) {
+          storageService.deleteImagesByUrls(imageUrls).catch(() => {});
+          toast.error(`Imagen no permitida: ${imgModResult.reason ?? 'Infringe las normas'}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const createData = {
         ...formData,
         image: imageUrls[0],

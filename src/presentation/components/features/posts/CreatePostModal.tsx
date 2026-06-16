@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Image, Zap, Plus, Trash2, Clock, AlertCircle } from 'lucide-react';
 import { postsService } from '@lib/supabase/services/posts/posts';
+import { storageService } from '@lib/supabase/services/storageImages/storageImages';
 import { useAuth } from '@presentation/context';
 import { BusinessPost, FlashOffer } from '@domain/entities/Post';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
@@ -89,6 +90,16 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
       for (const file of images) {
         const url = await postsService.uploadPostImage(file);
         urls.push(url);
+      }
+
+      if (urls.length > 0) {
+        const imgModResult = await moderateContent('', 'post', user.id, user.name, urls);
+        if (!imgModResult.approved) {
+          storageService.deleteImagesByUrls(urls).catch(() => {});
+          toast.error(`Imagen no permitida: ${imgModResult.reason ?? 'Infringe las normas'}`);
+          setLoading(false);
+          return;
+        }
       }
 
       const flashOffer: FlashOffer | undefined = withOffer && offer.title && offer.expiresAt

@@ -106,6 +106,13 @@ export function useEventForm(onClose: () => void) {
       let gallery: string[] = [];
       if (imageFiles.length > 0) {
         const urls = await storageService.uploadMultipleFiles(imageFiles, 'events');
+        const imgModResult = await moderateContent('', 'event', user.id, user.name, urls);
+        if (!imgModResult.approved) {
+          storageService.deleteImagesByUrls(urls).catch(() => {});
+          toast.error(`Imagen no permitida: ${imgModResult.reason ?? 'Infringe las normas'}`);
+          setIsSubmitting(false);
+          return;
+        }
         imageUrl = urls[0];
         gallery = urls;
       }

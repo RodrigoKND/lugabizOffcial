@@ -23,10 +23,11 @@ export async function moderateContent(
   contentType: ContentType,
   userId?: string,
   userName?: string,
+  imageUrls?: string[],
 ): Promise<ModerationResult> {
   try {
     const { data, error } = await supabase.functions.invoke('content-moderation', {
-      body: { text, contentType, userId, userName },
+      body: { text, contentType, userId, userName, imageUrls },
     });
     if (error) return { approved: true };
     return data as ModerationResult;
