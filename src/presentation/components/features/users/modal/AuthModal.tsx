@@ -17,55 +17,58 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative"
-        >
-          <button onClick={handleClose}
-            className="absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 transition-all flex items-center justify-center">
-            <X className="w-4 h-4 text-stone-500" />
-          </button>
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex items-center justify-center min-h-screen px-4 py-8">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+          >
+            <button onClick={handleClose}
+              className="absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 transition-all flex items-center justify-center">
+              <X className="w-4 h-4 text-stone-500" />
+            </button>
 
-          <div className="p-8">
-            <AuthModalHeader mode={mode} />
-            <SocialLogin onGoogleLogin={handleGoogleLogin} />
+            <div className="p-8">
+              <AuthModalHeader mode={mode} />
+              <SocialLogin onGoogleLogin={handleGoogleLogin} />
 
-            {mode === 'login' ? (
-              <LoginForm
-                formData={formData}
-                error={error}
-                isLoading={isLoading}
-                showPassword={showPassword}
-                onSubmit={handleSubmit}
-                onTogglePassword={() => setShowPassword(!showPassword)}
-                onChange={updateField}
-              />
-            ) : (
-              <RegisterForm
-                formData={formData}
-                error={error}
-                isLoading={isLoading}
-                showPassword={showPassword}
-                onSubmit={handleSubmit}
-                onTogglePassword={() => setShowPassword(!showPassword)}
-                onChange={updateField}
-              />
-            )}
+              {mode === 'login' ? (
+                <LoginForm
+                  formData={formData}
+                  error={error}
+                  isLoading={isLoading}
+                  showPassword={showPassword}
+                  onSubmit={handleSubmit}
+                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  onChange={updateField}
+                />
+              ) : (
+                <RegisterForm
+                  formData={formData}
+                  error={error}
+                  isLoading={isLoading}
+                  showPassword={showPassword}
+                  onSubmit={handleSubmit}
+                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  onChange={updateField}
+                />
+              )}
 
-            <div className="text-center pt-6">
-              <p className="text-stone-500 text-sm">
-                {mode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
-                <button type="button" onClick={switchMode}
-                  className="ml-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors">
-                  {mode === 'login' ? 'Regístrate' : 'Inicia sesión'}
-                </button>
-              </p>
+              <div className="text-center pt-6">
+                <p className="text-stone-500 text-sm">
+                  {mode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+                  <button type="button" onClick={switchMode}
+                    className="ml-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors">
+                    {mode === 'login' ? 'Regístrate' : 'Inicia sesión'}
+                  </button>
+                </p>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </AnimatePresence>
   );
