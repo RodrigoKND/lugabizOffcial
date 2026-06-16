@@ -48,6 +48,7 @@ const Preferences: React.FC<PreferencesProps> = ({ openPreferences = false, setC
     }
     try {
       await authService.saveUserPreferences(user.id, formData.category, formData.socialGroups);
+      sessionStorage.setItem('_lugabiz_prefs_done', '1');
       toast.success('Preferencias guardadas');
       onClose();
     } catch {

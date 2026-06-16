@@ -79,10 +79,21 @@ export function useAuthProvider(): AuthContextType {
       console.error('Error loading notifications:', e);
     }
 
-    // Show preferences only for accounts created within the last 10 minutes (truly new users)
-    const tenMinAgo = Date.now() - 10 * 60 * 1000;
-    if (userProfile.createdAt.getTime() > tenMinAgo) {
-      setShowPreferences(true);
+    // Show preferences only for truly new users: created < 10 min ago AND no saved preferences yet
+    const prefsDone = sessionStorage.getItem('_lugabiz_prefs_done') === '1';
+    if (!prefsDone) {
+      const { count } = await supabase
+        .from('user_category_preferences')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if ((count ?? 0) > 0) {
+        sessionStorage.setItem('_lugabiz_prefs_done', '1');
+      } else {
+        const tenMinAgo = Date.now() - 10 * 60 * 1000;
+        if (userProfile.createdAt.getTime() > tenMinAgo) {
+          setShowPreferences(true);
+        }
+      }
     }
 
     return userProfile;
@@ -255,10 +266,20 @@ export function useAuthProvider(): AuthContextType {
     } catch (e) {
       console.error('Error loading notifications:', e);
     }
-    // Show preferences only for accounts created within the last 10 minutes (truly new users)
-    const tenMinAgo = Date.now() - 10 * 60 * 1000;
-    if (userProfile.createdAt.getTime() > tenMinAgo) {
-      setShowPreferences(true);
+    const prefsDone = sessionStorage.getItem('_lugabiz_prefs_done') === '1';
+    if (!prefsDone) {
+      const { count } = await supabase
+        .from('user_category_preferences')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if ((count ?? 0) > 0) {
+        sessionStorage.setItem('_lugabiz_prefs_done', '1');
+      } else {
+        const tenMinAgo = Date.now() - 10 * 60 * 1000;
+        if (userProfile.createdAt.getTime() > tenMinAgo) {
+          setShowPreferences(true);
+        }
+      }
     }
     return false;
   };
