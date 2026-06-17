@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { X, Image, MapPin, Users, Clock, Calendar, Zap } from 'lucide-react';
+import AddressAutocomplete from '@presentation/components/ui/address/AddressAutocomplete';
 import { FormData, ValidationErrors } from './EventFormTypes';
+import type { GeoResult } from '@lib/geocoding/geocodingService';
 
 interface Props {
   formData: FormData;
@@ -11,6 +13,7 @@ interface Props {
   onBlur: (field: string) => void;
   onImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;
+  onCoordsChange?: (lat: number, lng: number) => void;
 }
 
 const iCls = (hasError?: boolean) =>
@@ -56,7 +59,7 @@ const TIME_PRESETS = [
 ];
 
 const DateTimeLocationSection: React.FC<Props> = ({
-  formData, errors, touched, imagePreviews, onChange, onBlur, onImage, onRemoveImage,
+  formData, errors, touched, imagePreviews, onChange, onBlur, onImage, onRemoveImage, onCoordsChange,
 }) => {
   const quickDates = useMemo(() => {
     const today = new Date();
@@ -226,13 +229,16 @@ const DateTimeLocationSection: React.FC<Props> = ({
           <h4 className="text-sm font-semibold text-stone-700">Ubicación</h4>
         </div>
         <div className="space-y-1">
-          <input
-            type="text"
+          <AddressAutocomplete
             value={formData.address}
-            onChange={e => onChange('address', e.target.value)}
+            onChange={(val) => onChange('address', val)}
+            onSelect={(result) => {
+              onChange('address', result.displayName)
+              onCoordsChange?.(result.lat, result.lng)
+            }}
             onBlur={() => onBlur('address')}
-            className={iCls(!!(touched.address && errors.address))}
             placeholder="Dirección del evento"
+            hasError={!!(touched.address && errors.address)}
           />
           {renderError('address', errors, touched)}
         </div>

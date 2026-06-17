@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { generateDescription } from '@lib/supabase/services/description/descriptionGenerator';
 import { SocialGroupSelector } from '@presentation/components/features';
 import FieldError from '@presentation/components/features/places/formAddNewPlace/FieldError';
 import type { PlaceFormData, ValidationErrors } from '@presentation/pages/Places/formAddNewPlace/types';
@@ -20,7 +22,29 @@ interface BasicInfoStepProps {
 const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   formData, handleInputChange, errors, touched, handleBlur,
   categories, socialGroups, handleSocialGroupsChange,
-}) => (
+}) => {
+  const [genLoading, setGenLoading] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  const handleGenerate = async () => {
+    if (!formData.name.trim()) {
+      toast.error('Escribe el nombre primero')
+      return
+    }
+    setGenLoading(true)
+    const catName = categories.find(c => c.id === formData.category)?.name ?? ''
+    const result = await generateDescription(formData.name, catName, 'place')
+    setGenLoading(false)
+    if (result.description) {
+      handleInputChange({ target: { name: 'description', value: result.description } } as any)
+      setCooldown(10)
+      const timer = setInterval(() => setCooldown(prev => { if (prev <= 1) { clearInterval(timer); return 0 }; return prev - 1 }), 1000)
+    } else {
+      toast.error(result.error ?? 'No se pudo generar')
+    }
+  }
+
+  return (
   <motion.div key="s0" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
     <div className="bg-white rounded-2xl p-6 border border-stone-200 space-y-5">
       <h2 className="text-base font-bold text-stone-800">Información básica</h2>
@@ -67,9 +91,23 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           }`}
           placeholder="¿Qué hace especial este lugar?"
         />
-        <div className="flex justify-between text-xs text-stone-400">
-          <FieldError message={touched.description ? errors.description : null} />
-          <span>{formData.description.length}/500</span>
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <FieldError message={touched.description ? errors.description : null} />
+            <button type="button" disabled={genLoading || cooldown > 0}
+              onClick={handleGenerate}
+              className="font-medium text-amber-600 hover:text-amber-700 disabled:text-stone-300 disabled:cursor-not-allowed transition-colors"
+            >
+              {genLoading ? (
+                <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />Generando...</span>
+              ) : cooldown > 0 ? (
+                `Espera ${cooldown}s`
+              ) : (
+                'Sugerir descripcion'
+              )}
+            </button>
+          </div>
+          <span className="text-stone-400">{formData.description.length}/500</span>
         </div>
       </div>
 
@@ -80,6 +118,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       </div>
     </div>
   </motion.div>
-);
+  )
+}
 
 export default BasicInfoStep;

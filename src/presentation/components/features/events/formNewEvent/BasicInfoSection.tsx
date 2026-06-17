@@ -1,5 +1,7 @@
-import React from 'react';
-import { ChevronDown, Tag, DollarSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, Tag, DollarSign, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { generateDescription } from '@lib/supabase/services/description/descriptionGenerator';
 import { FormData, ValidationErrors } from './EventFormTypes';
 
 interface Props {
@@ -26,7 +28,29 @@ const renderError = (field: string, errors: ValidationErrors, touched: Record<st
   );
 };
 
-const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categories, onChange, onBlur }) => (
+const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categories, onChange, onBlur }) => {
+  const [genLoading, setGenLoading] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  const handleGenerate = async () => {
+    if (!formData.name.trim()) {
+      toast.error('Escribe el nombre primero')
+      return
+    }
+    setGenLoading(true)
+    const catName = categories.find(c => c.id === formData.categoryId)?.name ?? ''
+    const result = await generateDescription(formData.name, catName, 'event')
+    setGenLoading(false)
+    if (result.description) {
+      onChange('description', result.description)
+      setCooldown(10)
+      const timer = setInterval(() => setCooldown(prev => { if (prev <= 1) { clearInterval(timer); return 0 }; return prev - 1 }), 1000)
+    } else {
+      toast.error(result.error ?? 'No se pudo generar')
+    }
+  }
+
+  return (
   <div className="space-y-5">
     <div className="space-y-1">
       <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Nombre del evento</label>
@@ -47,6 +71,23 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
         className={`${inputCls(!!(touched.description && errors.description))} resize-none`}
         placeholder="Describe tu evento..." />
       {renderError('description', errors, touched)}
+      <div className="flex items-center gap-2 mt-1">
+        <button type="button" disabled={genLoading || cooldown > 0}
+          onClick={handleGenerate}
+          className="text-[11px] font-medium text-amber-600 hover:text-amber-700 disabled:text-stone-300 disabled:cursor-not-allowed transition-colors"
+        >
+          {genLoading ? (
+            <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />Generando...</span>
+          ) : cooldown > 0 ? (
+            `Espera ${cooldown}s`
+          ) : (
+            'Sugerir descripcion'
+          )}
+        </button>
+        {formData.description.length > 0 && (
+          <span className="text-[10px] text-stone-400">{formData.description.length} caracteres</span>
+        )}
+      </div>
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -97,6 +138,7 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
       )}
     </div>
   </div>
-);
+  );
+}
 
 export default BasicInfoSection;

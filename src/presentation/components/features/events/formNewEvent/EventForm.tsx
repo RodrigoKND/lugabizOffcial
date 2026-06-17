@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { EventFormProps, TOTAL_STEPS } from './EventFormTypes';
@@ -51,6 +51,10 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
     handleSubmit, goNext, goBack,
   } = useEventForm(onClose);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+
+  const handleAddressFromMap = useCallback((addr: string) => {
+    handleChange('address', addr);
+  }, [handleChange]);
 
   const handlePublishRequest = () => setShowPublishConfirm(true);
 
@@ -112,6 +116,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
                       formData={formData} errors={errors} touched={touched}
                       imagePreviews={imagePreviews} onChange={handleChange} onBlur={handleBlur}
                       onImage={handleImage} onRemoveImage={removeImage}
+                      onCoordsChange={handleCoordsChange}
                     />
                   </motion.div>
                 )}
@@ -124,6 +129,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
                     <MapSection
                       coords={formData.coords} errors={errors} touched={touched}
                       onCoordsChange={handleCoordsChange}
+                      onAddressChange={handleAddressFromMap}
                     />
                   </motion.div>
                 )}
