@@ -95,4 +95,3 @@ const LocationStep: React.FC<LocationStepProps> = ({
 }
 
 export default LocationStep;
-export default LocationStep;
