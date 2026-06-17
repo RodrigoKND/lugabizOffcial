@@ -91,7 +91,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
             <form
               onSubmit={e => { e.preventDefault(); handlePublishRequest(); }}
               onKeyDown={e => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault(); }}
-              className="px-5 sm:px-6 py-5 space-y-5 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent"
+              className="px-5 sm:px-6 py-5 space-y-5 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] pb-20 md:pb-5 scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent"
             >
               <AnimatePresence mode="wait">
                 {step === 0 && (

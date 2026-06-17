@@ -66,7 +66,7 @@ const AddPlace: React.FC = () => {
           <StepIndicator step={formUtils.step} totalSteps={formUtils.totalSteps} />
         </motion.header>
 
-        <form onSubmit={submitUtils.handleSubmit} className="space-y-5">
+        <form onSubmit={submitUtils.handleSubmit} className="space-y-5 pb-20 md:pb-0">
           {formUtils.step === 0 && (
             <BasicInfoStep
               formData={formData}

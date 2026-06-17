@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Crosshair } from 'lucide-react';
 import { Map, MapMarker, MarkerContent, MapControls } from '@presentation/components/ui/map';
+import type { MapRef } from '@presentation/components/ui/map';
 
 interface MapPickerProps {
   initialCoords: number[];
@@ -10,6 +11,7 @@ interface MapPickerProps {
 const defaultCenter = { lng: -66.1568, lat: -17.3895 };
 
 const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) => {
+  const mapRef = useRef<MapRef>(null)
   const [coords, setCoords] = useState<[number, number]>(
     initialCoords.length === 2 ? [initialCoords[1], initialCoords[0]] : [defaultCenter.lng, defaultCenter.lat]
   );
@@ -29,6 +31,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) 
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
+        mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 15, duration: 1200 })
         setCoords([longitude, latitude]);
         onCoordsChange(latitude, longitude);
       });
@@ -38,6 +41,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) 
   return (
     <div className="relative rounded-2xl overflow-hidden border border-stone-200" style={{ height: '400px' }}>
       <Map
+        ref={mapRef}
         center={coords}
         zoom={13}
         onClick={handleMapClick}

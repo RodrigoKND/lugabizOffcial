@@ -19,10 +19,19 @@ export async function searchAddress(query: string): Promise<GeoResult[]> {
   if (!query.trim() || query.length < 3) return []
   await rateLimit()
   try {
-    const url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=0`
-    const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
+    let url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&countrycodes=bo&addressdetails=0`
+    let res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
     if (!res.ok) return []
-    const data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
+    let data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
+
+    if (data.length === 0) {
+      await rateLimit()
+      url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=0`
+      res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
+      if (!res.ok) return []
+      data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
+    }
+
     return data.map(d => ({
       displayName: d.display_name,
       lat: parseFloat(d.lat),

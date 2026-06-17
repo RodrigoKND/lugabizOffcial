@@ -29,9 +29,13 @@ export async function moderateContent(
     const { data, error } = await supabase.functions.invoke('content-moderation', {
       body: { text, contentType, userId, userName, imageUrls },
     });
-    if (error) return { approved: true };
+    if (error) {
+      console.error('[moderation] invoke error:', error)
+      return { approved: true }
+    }
     return data as ModerationResult;
-  } catch {
+  } catch (e) {
+    console.error('[moderation] exception:', e)
     return { approved: true };
   }
 }

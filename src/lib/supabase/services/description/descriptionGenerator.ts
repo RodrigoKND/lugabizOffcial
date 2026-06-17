@@ -1,6 +1,7 @@
 import { supabase } from '@lib/supabase/client'
 
 const FUNCTION_NAME = 'generate-description'
+const FALLBACK_MSG = 'No se pudo generar la descripcion, intenta de nuevo'
 
 export async function generateDescription(
   name: string,
@@ -12,12 +13,19 @@ export async function generateDescription(
       body: { name, category, type },
     })
 
-    if (error) return { error: error.message }
-    if (data?.error) return { error: data.error }
-    if (!data?.description) return { error: 'No se pudo generar la descripción' }
+    if (error) {
+      console.error('[generateDescription] invoke error:', error)
+      return { error: FALLBACK_MSG }
+    }
+    if (data?.error) {
+      console.error('[generateDescription] fn error:', data.error)
+      return { error: FALLBACK_MSG }
+    }
+    if (!data?.description) return { error: FALLBACK_MSG }
 
     return { description: data.description }
-  } catch (e: any) {
-    return { error: e?.message ?? 'Error al generar la descripción' }
+  } catch (e) {
+    console.error('[generateDescription] exception:', e)
+    return { error: FALLBACK_MSG }
   }
 }
