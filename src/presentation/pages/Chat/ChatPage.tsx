@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft, Send, Compass, RotateCcw, MapPin, Sun, Cloud, Sparkles,
   CloudRain, Thermometer, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
-  Globe, Instagram, Facebook, MessageCircle, Music2,
+  Globe, Instagram, Facebook, MessageCircle, Music2, Phone,
 } from 'lucide-react'
 import { useChat } from '@presentation/hooks/chat/useChat'
 import { useAuth } from '@presentation/context'
@@ -153,6 +153,38 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
             <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{published}</span>
           )}
         </div>
+
+        {/* Horarios — solo si el lugar los tiene */}
+        {place.hours && (
+          <div className="flex items-start gap-1 mt-1.5 text-[11px] text-slate-500">
+            <Clock className="w-3 h-3 text-slate-400 mt-0.5 shrink-0" />
+            <span className="leading-snug">{place.hours}</span>
+          </div>
+        )}
+
+        {/* Contacto — cada chip aparece solo si existe */}
+        {(place.whatsapp || place.phone || place.website) && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {place.whatsapp && (
+              <a href={place.whatsapp} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-emerald-600 bg-emerald-50 hover:opacity-80 transition-opacity">
+                <MessageCircle className="w-3 h-3" /> Pedidos
+              </a>
+            )}
+            {place.phone && (
+              <a href={`tel:${place.phone}`}
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-sky-600 bg-sky-50 hover:opacity-80 transition-opacity">
+                <Phone className="w-3 h-3" /> Llamar
+              </a>
+            )}
+            {place.website && (
+              <a href={place.website} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-violet-600 bg-violet-50 hover:opacity-80 transition-opacity">
+                <Globe className="w-3 h-3" /> Web
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Acciones */}
         <div className="flex gap-2 mt-3">

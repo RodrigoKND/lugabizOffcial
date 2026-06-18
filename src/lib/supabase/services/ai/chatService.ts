@@ -20,6 +20,11 @@ export interface PlaceCard {
   mapsUrl: string
   directionsUrl: string
   publishedAt: string | null
+  // Contacto opcional: solo viene si el lugar lo tiene
+  phone?: string | null
+  website?: string | null
+  whatsapp?: string | null
+  hours?: string | null
 }
 
 export interface EventCard {
