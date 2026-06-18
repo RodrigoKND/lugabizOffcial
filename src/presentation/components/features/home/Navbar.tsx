@@ -108,6 +108,12 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
             <span className="text-[10px] font-medium">Inicio</span>
           </Link>
 
+          <Link to="/asesor"
+            className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all ${isActive('/asesor') ? 'text-primary-500' : 'text-text-secondary'}`}>
+            <Compass className={`w-5 h-5 ${isActive('/asesor') ? 'fill-primary-100' : ''}`} />
+            <span className="text-[10px] font-medium">Asesor</span>
+          </Link>
+
           <button onClick={() => setShowSearch(true)}
             className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all text-text-secondary">
             <Search className="w-5 h-5" />
