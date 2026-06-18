@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Plus, User, Bell, Home, Search, Users } from 'lucide-react';
+import { Plus, User, Bell, Home, Search, Users, Compass } from 'lucide-react';
 import { useAuth } from '@presentation/context/AuthContext';
 import { useUnreadSurveys } from '@presentation/hooks/useSurveys';
 import { SearchModal } from '@presentation/components/ui/SearchModal';
@@ -54,6 +54,12 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
                   }`}>
                 <Users className="w-4 h-4" />
                 <span>Comunidad</span>
+              </Link>
+              <Link to="/asesor"
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${isActive('/asesor') ? 'bg-primary-50 text-primary-600' : 'text-text-secondary hover:bg-primary-50/50 hover:text-primary-500'
+                  }`}>
+                <Compass className="w-4 h-4" />
+                <span>Asesor</span>
               </Link>
               <Link to="/add-place"
                 className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all text-sm font-medium shadow-xs">

@@ -6,7 +6,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, PlacesProvider, useAuth } from '@presentation/context';
 import { Navbar, Footer, AuthModal, ChatButton, SurveyCard, Preferences } from '@presentation/components/features';
 import BannedAccountModal from '@presentation/components/features/users/modal/BannedAccountModal';
-import { Home, PlaceDetail, AddPlace, Profile, EventDetailPage, EventFeedPage, EditEventPage, EditPlacePage, Confirmation, SharedPlacePage, CommunityPage, ChatPage } from '@presentation/pages';
+import { Home, PlaceDetail, AddPlace, Profile, EventDetailPage, EventFeedPage, EditEventPage, EditPlacePage, Confirmation, SharedPlacePage, CommunityPage, ChatPage, BusinessAdvisorPage } from '@presentation/pages';
 import { useEventNotifications } from '@presentation/hooks/useEventNotifications';
 import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
@@ -141,6 +141,7 @@ function AppRoutes() {
               <Route path="/confirmation" element={<Confirmation />} />
               <Route path="/comunidad" element={<CommunityPage />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/asesor" element={<BusinessAdvisorPage />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>
