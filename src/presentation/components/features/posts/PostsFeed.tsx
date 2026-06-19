@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Store, Plus } from 'lucide-react';
 import { postsService } from '@lib/supabase/services/posts/posts';
 import { BusinessPost } from '@domain/entities/Post';
@@ -21,6 +21,18 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
   const [createOpen, setCreateOpen] = useState(false);
 
   const isOwner = user?.isOwner || user?.role === 'owner';
+
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (loading && posts.length === 0) {
+      timerRef.current = setTimeout(() => setShowSkeleton(true), 350);
+    } else {
+      setShowSkeleton(false);
+    }
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [loading, posts.length]);
 
   const load = useCallback(async (reset = false) => {
     setLoading(true);
@@ -60,8 +72,8 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
         )}
       </div>
 
-      {/* Loading skeleton */}
-      {loading && posts.length === 0 && (
+      {/* Loading skeleton — con delay para evitar flash en cargas rápidas/vacías */}
+      {showSkeleton && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
             <div key={i} className="bg-white rounded-xl border border-primary-100/40 overflow-hidden animate-pulse">
