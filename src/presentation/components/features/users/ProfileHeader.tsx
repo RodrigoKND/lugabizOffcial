@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Camera, Plus, Pencil, Menu, LogOut, BarChart3, Loader2, Award } from 'lucide-react';
+import { Camera, Plus, Pencil, Menu, LogOut, BarChart3, Loader2, Award, BadgeCheck, Sparkles } from 'lucide-react';
 import { User } from '@domain/entities';
 
 interface ProfileHeaderProps {
@@ -48,8 +48,20 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         {user.bio && <p className="text-sm text-text-secondary mt-1">{user.bio}</p>}
         {user.isOwner && user.ownerBusinessName && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-xs font-semibold mt-2">
-            <Award className="w-3 h-3" /> Dueño de {user.ownerBusinessName}
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mt-2">
+            {user.businessDocsVerified ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold ring-1 ring-amber-200">
+                <BadgeCheck className="w-3.5 h-3.5" /> Negocio verificado
+              </span>
+            ) : user.identityVerified ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-xs font-semibold ring-1 ring-primary-200">
+                <Sparkles className="w-3.5 h-3.5" /> Negocio emergente
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-xs font-semibold">
+                <Award className="w-3 h-3" /> {user.ownerBusinessName}
+              </span>
+            )}
           </div>
         )}
       </div>

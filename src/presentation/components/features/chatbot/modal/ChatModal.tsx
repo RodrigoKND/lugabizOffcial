@@ -382,13 +382,8 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
     <div
       className="
         flex items-end gap-3
-        bg-slate-50
         rounded-2xl
-        border border-slate-200
-        px-4 py-3
-        focus-within:border-violet-400
-        focus-within:ring-2
-        focus-within:ring-violet-400/15
+        p-4
         transition-all
         w-full
       "
@@ -421,7 +416,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
           overflow-y-auto
         "
         style={{
-          minHeight: '24px',
+          minHeight: '40px',
           maxHeight: '96px'
         }}
       />

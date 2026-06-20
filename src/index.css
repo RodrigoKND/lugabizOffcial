@@ -1,8 +1,32 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* ── CSS Custom Properties (shadcn/ui base - dark purple mode) ── */
+:root {
+  --background: 260 40% 6%;
+  --foreground: 260 15% 90%;
+  --card: 0 0% 100%;
+  --card-foreground: 260 30% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 260 30% 12%;
+  --primary: 270 75% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 260 25% 15%;
+  --secondary-foreground: 260 20% 85%;
+  --muted: 260 20% 12%;
+  --muted-foreground: 260 15% 58%;
+  --accent: 330 70% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 260 18% 16%;
+  --input: 260 18% 16%;
+  --ring: 270 75% 56%;
+  --radius: 1rem;
+}
+
 @theme {
-  /* --- Colores de Shadcn --- */
+  /* --- Shadcn / UI colors --- */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -23,31 +47,40 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  /* --- Custom Soft Purple Palette (Social Network Style) --- */
-  --color-tomato: #ff6347;
-  --color-primary-50: #faf5ff;
-  --color-primary-100: #f3e8ff;
-  --color-primary-200: #e9d5ff;
-  --color-primary-300: #d8b4fe;
-  --color-primary-400: #c084fc;
-  --color-primary-500: #a855f7;
-  --color-primary-600: #9333ea;
-  --color-primary-700: #7e22ce;
-  --color-primary-800: #6b21a8;
-  --color-primary-900: #581c87;
-  
+  /* --- Lugabiz Brand Purple Palette --- */
+  --color-primary-50: #f5f0ff;
+  --color-primary-100: #ede5ff;
+  --color-primary-200: #ddd0ff;
+  --color-primary-300: #c4adff;
+  --color-primary-400: #a880fa;
+  --color-primary-500: #9333ea;
+  --color-primary-600: #7c22ce;
+  --color-primary-700: #6b1cb0;
+  --color-primary-800: #581c87;
+  --color-primary-900: #3b0764;
+
   --color-secondary-50: #fef2f2;
   --color-secondary-500: #ef4444;
 
-  /* --- Social Feed Colors --- */
-  --color-feed-bg: #faf9fb;
+  /* --- Social Feed Colors (dark purple background) --- */
+  --color-feed-bg: #0d0620;
   --color-card-bg: #ffffff;
-  --color-card-border: #f0edf4;
+  --color-card-border: #e4d8f0;
   --color-accent-purple: #a855f7;
-  --color-accent-pink: #ec4899;
-  --color-text-primary: #1e1b2e;
-  --color-text-secondary: #6b6580;
-  --color-story-ring: linear-gradient(135deg, #a855f7, #ec4899, #f97316);
+  --color-accent-pink: #db2777;
+  --color-text-primary: #ede8f5;
+  --color-text-secondary: #9b8db5;
+  --color-text-muted: #6b5e85;
+  --color-story-ring: linear-gradient(135deg, #a855f7, #db2777, #c084fc);
+
+  /* --- Brand Gradients --- */
+  --gradient-brand: linear-gradient(135deg, #9333ea, #7c22ce, #6b1cb0);
+  --gradient-brand-soft: linear-gradient(135deg, #2d1655, #1a0e33);
+  --gradient-brand-glow: radial-gradient(ellipse at 50% 0%, rgba(147, 51, 234, 0.15), transparent 70%);
+
+  /* --- Fonts --- */
+  --font-sora: 'Sora', sans-serif;
+  --font-dm: 'DM Sans', sans-serif;
 
   /* --- Radius --- */
   --radius-lg: var(--radius);
@@ -55,34 +88,76 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* Scrollbar hide utility */
+/* --- Custom Utilities --- */
 @utility scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 }
 
-/* Base styles */
+@utility bg-brand-gradient {
+  background: linear-gradient(135deg, #9333ea, #7c22ce, #6b1cb0);
+}
+
+@utility bg-brand-soft {
+  background: linear-gradient(135deg, #2d1655, #1a0e33);
+}
+
+@utility glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@utility glass-dark {
+  background: rgba(13, 6, 32, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@utility text-gradient {
+  background: linear-gradient(135deg, #a855f7, #db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Base Styles --- */
 * {
-  border-color: var(--color-border);
+  border-color: hsl(var(--border));
 }
 
 body {
   background-color: var(--color-feed-bg);
+  background-image:
+    radial-gradient(ellipse 900px 500px at 8% 10%, rgba(147, 51, 234, 0.12), transparent),
+    radial-gradient(ellipse 700px 600px at 90% 55%, rgba(168, 128, 250, 0.08), transparent),
+    radial-gradient(ellipse 550px 450px at 45% 85%, rgba(219, 39, 119, 0.05), transparent);
+  background-attachment: fixed;
   color: var(--color-text-primary);
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 ::selection {
-  background-color: var(--color-primary-200);
-  color: var(--color-primary-800);
+  background-color: rgba(147, 51, 234, 0.3);
+  color: #f0ebf8;
 }
 
-/* Smooth card transitions */
+:focus-visible {
+  outline: 2px solid rgba(168, 128, 250, 0.4);
+  outline-offset: 2px;
+}
+
+/* --- Smooth Card Transitions --- */
 .feed-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -90,11 +165,482 @@ body {
   transform: scale(0.98);
 }
 
-/* Purple blur decorations */
+/* --- Purple Blob Decorations --- */
 .purple-blob {
   position: fixed;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(100px);
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
 }
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 128, 250, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 128, 250, 0.35);
+}
+
+/* --- Animations --- */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(147, 51, 234, 0.1); }
+}
+@keyframes card-lift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK THEME OVERRIDES — NAVBAR
+   ═══════════════════════════════════════════════════════ */
+nav.sticky {
+  background: rgba(13, 6, 32, 0.88) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom-color: rgba(168, 128, 250, 0.08) !important;
+}
+
+nav.fixed {
+  background: rgba(13, 6, 32, 0.95) !important;
+  border-top-color: rgba(168, 128, 250, 0.08) !important;
+}
+
+nav.sticky a[href="/"] span,
+nav.fixed a[href="/"] span {
+  color: #ffffff !important;
+}
+
+nav.sticky button svg.text-text-secondary,
+nav.fixed button svg.text-text-secondary {
+  color: #9b8db5 !important;
+}
+
+/* Navbar link hover — subtle glow */
+nav.sticky [class*="hover:bg-primary-50\/50"]:hover,
+nav.fixed [class*="hover:bg-primary-50\/50"]:hover {
+  background: rgba(147, 51, 234, 0.12) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK THEME OVERRIDES — ADVISOR PAGE (Asesor)
+   ═══════════════════════════════════════════════════════ */
+/* Outer wrapper: override off-white bg to dark */
+div.min-h-screen:has(> header.sticky > div > h1) {
+  background: var(--color-feed-bg) !important;
+}
+
+/* Header bar override */
+div.min-h-screen:has(> header.sticky) header.sticky {
+  background: rgba(13, 6, 32, 0.92) !important;
+  border-bottom-color: rgba(168, 128, 250, 0.08) !important;
+}
+div.min-h-screen:has(> header.sticky) header.sticky h1 {
+  color: #ede8f5 !important;
+}
+div.min-h-screen:has(> header.sticky) header.sticky p {
+  color: #9b8db5 !important;
+}
+div.min-h-screen:has(> header.sticky) header.sticky svg {
+  color: #9b8db5 !important;
+}
+
+/* All white cards inside advisor → translucent glass */
+div.min-h-screen:has(> header.sticky) .bg-white {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+}
+div.min-h-screen:has(> header.sticky) .bg-slate-50 {
+  background: rgba(168, 128, 250, 0.06) !important;
+}
+div.min-h-screen:has(> header.sticky) .bg-slate-100 {
+  background: rgba(168, 128, 250, 0.08) !important;
+}
+div.min-h-screen:has(> header.sticky) .bg-slate-50\/70 {
+  background: rgba(13, 6, 32, 0.6) !important;
+}
+
+/* Text colors → light for dark bg */
+div.min-h-screen:has(> header.sticky) .text-slate-900 { color: #ede8f5 !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-800 { color: #e0d8f0 !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-700 { color: #d0c5e8 !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-600 { color: #b8acd0 !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-500 { color: #9b8db5 !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-400 { color: #7d6d9a !important; }
+div.min-h-screen:has(> header.sticky) .text-slate-300 { color: #6b5a8a !important; }
+
+/* Border colors → subtle purple */
+div.min-h-screen:has(> header.sticky) .border-slate-200,
+div.min-h-screen:has(> header.sticky) .border-slate-100 {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+div.min-h-screen:has(> header.sticky) .divide-slate-100 > * {
+  border-color: rgba(168, 128, 250, 0.08) !important;
+}
+
+/* Horizontal rule / separators */
+div.min-h-screen:has(> header.sticky) [class*="border-t"],
+div.min-h-screen:has(> header.sticky) [class*="border-b"] {
+  border-color: rgba(168, 128, 250, 0.08) !important;
+}
+div.min-h-screen:has(> header.sticky) .h-px.bg-slate-200 {
+  background: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Input fields */
+div.min-h-screen:has(> header.sticky) input,
+div.min-h-screen:has(> header.sticky) textarea {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+  color: #ede8f5 !important;
+}
+div.min-h-screen:has(> header.sticky) input::placeholder,
+div.min-h-screen:has(> header.sticky) textarea::placeholder {
+  color: #6b5a8a !important;
+}
+
+/* KPI chips */
+div.min-h-screen:has(> header.sticky) [class*="rounded-lg"][class*="border"][class*="px-3"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Alternative cards inside advisor tabs */
+div.min-h-screen:has(> header.sticky) .space-y-2\.5 > .rounded-lg.border {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(168, 128, 250, 0.08) !important;
+}
+
+/* Product cards */
+div.min-h-screen:has(> header.sticky) .rounded-lg.border-slate-200.p-3 {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Embed / survey recommendation box */
+div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 {
+  background: rgba(147, 51, 234, 0.1) !important;
+  border-color: rgba(147, 51, 234, 0.2) !important;
+}
+div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 h4 {
+  color: #c4adff !important;
+}
+div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 p {
+  color: #b8acd0 !important;
+}
+
+/* Score dial circle stroke */
+div.min-h-screen:has(> header.sticky) svg circle[fill="none"][stroke="#eef2f5"] {
+  stroke: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Section icon colors */
+div.min-h-screen:has(> header.sticky) .text-slate-400 > svg {
+  color: #7d6d9a !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK THEME OVERRIDES — PROFILE PAGE
+   ═══════════════════════════════════════════════════════ */
+/* Profile header card */
+.max-w-5xl .bg-white.rounded-2xl {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* White cards in profile tabs (lugares guardados, eventos, asistentes) */
+.max-w-5xl .bg-white.rounded-2xl,
+.max-w-5xl .bg-white.rounded-xl {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Dashboard stats cards */
+.max-w-5xl .bg-white.rounded-xl.shadow-xs {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* Dashboard survey items */
+.max-w-5xl .bg-stone-50,
+.max-w-5xl .bg-stone-50\/50 {
+  background: rgba(168, 128, 250, 0.06) !important;
+}
+.max-w-5xl .text-stone-800 { color: #e0d8f0 !important; }
+.max-w-5xl .text-stone-700 { color: #d0c5e8 !important; }
+.max-w-5xl .text-stone-600 { color: #b8acd0 !important; }
+.max-w-5xl .text-stone-500 { color: #9b8db5 !important; }
+.max-w-5xl .text-stone-400 { color: #7d6d9a !important; }
+.max-w-5xl .border-stone-200,
+.max-w-5xl .border-stone-100,
+.max-w-5xl .border-stone-50 {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Edit profile modal */
+.fixed.inset-0.z-50 > .bg-white.rounded-2xl {
+  background: #150d2e !important;
+  border: 1px solid rgba(168, 128, 250, 0.12) !important;
+}
+.fixed.inset-0.z-50 .border-b.border-primary-100,
+.fixed.inset-0.z-50 .border-t.border-primary-100 {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+.fixed.inset-0.z-50 .bg-primary-50\/50,
+.fixed.inset-0.z-50 .hover\:bg-primary-100\/60 {
+  background: rgba(147, 51, 234, 0.08) !important;
+}
+
+/* Profile tab divider */
+.max-w-5xl .border-b.border-primary-100\/30 {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Profile header top border */
+.max-w-5xl [class*="border-t"].border-primary-100\/30 {
+  border-color: rgba(168, 128, 250, 0.08) !important;
+}
+
+/* Profile verification badges */
+.max-w-5xl .bg-amber-50 {
+  background: rgba(217, 119, 6, 0.15) !important;
+}
+
+/* Admin tab stat cards */
+.max-w-5xl .grid-cols-2 .bg-white.rounded-xl {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Shared confirmations section */
+.max-w-5xl .bg-purple-50\/50 {
+  background: rgba(147, 51, 234, 0.06) !important;
+}
+.max-w-5xl .border-purple-100\/40,
+.max-w-5xl .border-purple-100 {
+  border-color: rgba(147, 51, 234, 0.15) !important;
+}
+.max-w-5xl .bg-purple-50\/50 .bg-white.rounded-full {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK THEME OVERRIDES — COMMUNITY PAGE
+   ═══════════════════════════════════════════════════════ */
+/* Sidebar filter panel */
+.max-w-7xl aside .bg-white.rounded-2xl {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Category filter buttons */
+.max-w-7xl aside .bg-stone-50 {
+  background: rgba(168, 128, 250, 0.06) !important;
+}
+.max-w-7xl aside .hover\:bg-stone-50:hover {
+  background: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Social group pills in sidebar */
+.max-w-7xl aside .bg-white.border-stone-200 {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+.max-w-7xl aside .hover\:border-primary-300:hover {
+  border-color: rgba(168, 128, 250, 0.3) !important;
+}
+
+/* Star rating buttons */
+.max-w-7xl aside .bg-stone-50.text-stone-400 {
+  background: rgba(168, 128, 250, 0.06) !important;
+  color: #7d6d9a !important;
+}
+
+/* Search input in community */
+.max-w-7xl .rounded-xl.bg-white.shadow-lg {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(8px) !important;
+}
+.max-w-7xl .rounded-xl.bg-white.shadow-lg input {
+  color: #ede8f5 !important;
+}
+.max-w-7xl .rounded-xl.bg-white.shadow-lg input::placeholder {
+  color: #6b5a8a !important;
+}
+
+/* Filter chips */
+.max-w-7xl .bg-primary-50.text-primary-600 {
+  background: rgba(147, 51, 234, 0.12) !important;
+}
+
+/* Empty community state circle */
+.max-w-7xl .w-20.h-20.rounded-full.bg-primary-50 {
+  background: rgba(147, 51, 234, 0.1) !important;
+}
+
+/* Find more button */
+.max-w-7xl .rounded-xl.border-primary-100 {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Tab buttons (not active) */
+.max-w-7xl .bg-white.border-primary-100\/40 {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Mobile filter button */
+.max-w-7xl .bg-white.border-stone-200 {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Filter bottom sheet */
+.z-\[201\].bg-white.rounded-t-3xl {
+  background: #150d2e !important;
+}
+.z-\[201\] .bg-stone-100 {
+  background: rgba(168, 128, 250, 0.08) !important;
+}
+.z-\[201\] .bg-stone-50 {
+  background: rgba(168, 128, 250, 0.06) !important;
+}
+.z-\[201\] .border-stone-200 {
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+.z-\[201\] .border-stone-100 {
+  border-color: rgba(168, 128, 250, 0.08) !important;
+}
+.z-\[201\] .text-stone-800 { color: #e0d8f0 !important; }
+.z-\[201\] .text-stone-600 { color: #b8acd0 !important; }
+.z-\[201\] .text-stone-500 { color: #9b8db5 !important; }
+.z-\[201\] .text-stone-400 { color: #7d6d9a !important; }
+.z-\[201\] .bg-white.border.stone-200 {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+.z-\[201\] input {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+  color: #ede8f5 !important;
+}
+.z-\[201\] input::placeholder {
+  color: #6b5a8a !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   COMMUNITY CARDS — LUGABIZ DISTINCTIVE STYLE
+   ═══════════════════════════════════════════════════════ */
+/* Community search cards: purple glow + lift on hover */
+a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover,
+button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover {
+  box-shadow:
+    0 8px 32px rgba(147, 51, 234, 0.15),
+    0 0 0 1px rgba(168, 128, 250, 0.25) !important;
+  border-color: rgba(168, 128, 250, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Background transition on hover */
+a[class*="rounded-2xl"][class*="border-primary-100\/40"],
+button[class*="rounded-2xl"][class*="border-primary-100\/40"] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle gradient overlay on hover */
+a[class*="rounded-2xl"][class*="border-primary-100\/40"]::after,
+button[class*="rounded-2xl"][class*="border-primary-100\/40"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.04), rgba(219, 39, 119, 0.02));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after,
+button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GENERAL ENHANCED HOVER ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+/* All primary buttons: glow on hover */
+[class*="bg-primary-500"]:not(nav *):hover {
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.35);
+  transform: translateY(-1px);
+}
+
+/* All clickable cards with shadow: purple hover */
+[class*="hover:shadow-md"]:hover {
+  box-shadow: 0 8px 30px rgba(147, 51, 234, 0.12) !important;
+}
+
+/* Interactive elements: smooth transitions */
+button, a {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+button:disabled, a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* Image zoom enhancement */
+[class*="group-hover:scale-105"] {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HERO HEADER — COMMUNITY PAGE (dark harmony)
+   ═══════════════════════════════════════════════════════ */
+/* The community hero gradient stays as is - just ensure seamless transition */
+.bg-gradient-to-br.from-primary-700.via-primary-800.to-primary-950 {
+  border-bottom: 1px solid rgba(168, 128, 250, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE TOUCHES
+   ═══════════════════════════════════════════════════════ */
+@media (hover: hover) {
+  a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover,
+  button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover {
+    transform: translateY(-3px) !important;
+  }
+}
+
+

@@ -8,6 +8,11 @@ export interface User {
   isOwner?: boolean;
   ownerBusinessName?: string;
   role?: 'admin' | 'owner' | 'user';
+  // Verificación de confianza (neutra respecto a estatus legal/tributario):
+  // identityVerified = hay una persona real detrás (CI + selfie, freno anti-estafa)
+  // businessDocsVerified = además presentó documentos de registro (NIT/SEPREC/licencia)
+  identityVerified?: boolean;
+  businessDocsVerified?: boolean;
   banned?: boolean;
   banReason?: string;
   createdAt: Date;

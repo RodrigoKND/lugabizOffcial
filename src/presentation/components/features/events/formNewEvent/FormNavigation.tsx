@@ -20,12 +20,12 @@ const FormNavigation: React.FC<Props> = ({ step, isSubmitting, onBack, onNext })
 
     {step < TOTAL_STEPS - 1 ? (
       <button type="button" onClick={onNext}
-        className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-amber-500 text-white rounded-xl font-semibold text-sm hover:bg-amber-600 active:scale-[0.98] transition-all shadow-sm hover:shadow-md">
+        className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 active:scale-[0.98] transition-all shadow-sm hover:shadow-md">
         Siguiente <ArrowRight className="w-3.5 h-3.5" />
       </button>
     ) : (
       <button type="submit" disabled={isSubmitting}
-        className="inline-flex items-center gap-2 px-7 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold text-sm hover:shadow-lg hover:from-amber-600 hover:to-orange-600 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm">
+        className="inline-flex items-center gap-2 px-7 py-2.5 bg-gradient-to-r from-primary-500 to-primary-700 text-white rounded-xl font-semibold text-sm hover:shadow-lg hover:from-primary-600 hover:to-primary-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm">
         {isSubmitting ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</>
         ) : (

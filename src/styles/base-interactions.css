@@ -1,0 +1,39 @@
+/* ── Button Press Effect ── */
+button:not(:disabled):active {
+  transform: scale(0.97) !important;
+}
+button:not(:disabled):active:has(svg:only-child, img:only-child) {
+  transform: scale(0.92) !important;
+}
+
+/* ── Input Focus Glow Animation ── */
+input:focus, select:focus {
+  outline: none !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 3px rgba(168, 128, 250, 0.25), 0 0 12px rgba(168, 128, 250, 0.15) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+input, textarea, select {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ── View Transitions (SPA cross-fade) ── */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 280ms cubic-bezier(0.4, 0, 0.2, 1) both vt-fade-out;
+  pointer-events: none;
+}
+::view-transition-new(root) {
+  animation: 280ms cubic-bezier(0.4, 0, 0.2, 1) both vt-fade-in;
+  pointer-events: none;
+}
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0.15; }
+  to { opacity: 1; }
+}

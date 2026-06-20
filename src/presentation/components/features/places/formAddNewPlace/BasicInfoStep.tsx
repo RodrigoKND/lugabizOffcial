@@ -55,7 +55,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           type="text" name="name" value={formData.name}
           onChange={handleInputChange} onBlur={() => handleBlur('name')}
           className={`w-full px-4 py-3.5 bg-stone-50 border rounded-xl focus:ring-0 transition-all text-sm outline-none ${
-            touched.name && errors.name ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-amber-400'
+            touched.name && errors.name ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-primary-400'
           }`}
           placeholder="Ej. Café de la Esquina"
         />
@@ -69,7 +69,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             name="category" value={formData.category}
             onChange={handleInputChange} onBlur={() => handleBlur('category')}
             className={`w-full px-4 py-3.5 bg-stone-50 border rounded-xl focus:ring-0 text-sm appearance-none cursor-pointer outline-none ${
-              touched.category && errors.category ? 'border-red-300' : 'border-stone-200 focus:border-amber-400'
+              touched.category && errors.category ? 'border-red-300' : 'border-stone-200 focus:border-primary-400'
             }`}
           >
             <option value="">Selecciona una categoría</option>
@@ -87,7 +87,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           onChange={handleInputChange} onBlur={() => handleBlur('description')}
           rows={4} maxLength={500}
           className={`w-full px-4 py-3.5 bg-stone-50 border rounded-xl focus:ring-0 text-sm resize-none outline-none ${
-            touched.description && errors.description ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-amber-400'
+            touched.description && errors.description ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-primary-400'
           }`}
           placeholder="¿Qué hace especial este lugar?"
         />
@@ -96,7 +96,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             <FieldError message={touched.description ? errors.description : null} />
             <button type="button" disabled={genLoading || cooldown > 0}
               onClick={handleGenerate}
-              className="font-medium text-amber-600 hover:text-amber-700 disabled:text-stone-300 disabled:cursor-not-allowed transition-colors"
+              className="font-medium text-primary-600 hover:text-primary-700 disabled:text-stone-300 disabled:cursor-not-allowed transition-colors"
             >
               {genLoading ? (
                 <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />Generando...</span>

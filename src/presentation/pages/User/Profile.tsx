@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Bookmark, Calendar, CheckCircle2, BarChart3, Activity } from 'lucide-react';
 import { useAuth, usePlaces } from '@presentation/context';
 import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
-import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal } from '@presentation/components/features/users';
+import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal, VerificationWizard, MyBusinessesModal } from '@presentation/components/features/users';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { MarketSurvey, ProfileTab } from '@domain/entities';
 import { eventsService } from '@lib/supabase';
@@ -27,8 +27,20 @@ const Profile: React.FC = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [statsTarget, setStatsTarget] = useState<MarketSurvey | null>(null);
+  const [showVerification, setShowVerification] = useState(false);
+  const [showBusinesses, setShowBusinesses] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useSEO({ title: user?.name || 'Perfil', description: 'Perfil de usuario en Lugabiz' });
+
+  // Abrir el wizard de verificación si se llega con ?verify=1 (ej. desde el asesor)
+  useEffect(() => {
+    if (searchParams.get('verify') === '1') {
+      setShowVerification(true);
+      searchParams.delete('verify');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => { if (isAdmin) edgeService.createOwnerAnnouncement('', '').catch(() => {}); }, [isAdmin]);
 
@@ -122,7 +134,11 @@ const Profile: React.FC = () => {
         onClose={() => setIsEditing(false)}
         onChange={setEditData}
         onSave={handleSaveProfile}
+        onVerify={() => setShowVerification(true)}
+        onManageBusinesses={() => setShowBusinesses(true)}
       />
+      <VerificationWizard isOpen={showVerification} onClose={() => setShowVerification(false)} />
+      <MyBusinessesModal isOpen={showBusinesses} onClose={() => setShowBusinesses(false)} />
 
       <CreateSurveyModal
         open={showSurveyModal}

@@ -20,8 +20,8 @@ const config = {
   },
   notifications: {
     icon: Bell,
-    gradient: 'from-amber-500 to-orange-500',
-    shadow: 'shadow-amber-500/20',
+    gradient: 'from-primary-500 to-primary-700',
+    shadow: 'shadow-primary-500/20',
     title: 'No te pierdas nada',
     message: 'Activa las notificaciones y entérate al instante de nuevos eventos, lugares y promociones cerca de ti.',
     actionLabel: 'Activar Notificaciones',

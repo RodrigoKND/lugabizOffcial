@@ -537,9 +537,9 @@ function TabSurvey({ r }: { r: BusinessAdvisorReport }) {
             <p className="text-[12.5px] text-primary-800/90 leading-relaxed mt-0.5">
               {s.lugabizTip || 'Activá tu perfil de dueño de negocio y publicá encuestas de mercado a usuarios reales de tu zona: validá tu idea con datos en vivo antes de invertir un solo boliviano.'}
             </p>
-            <Link to="/profile"
+            <Link to="/profile?verify=1"
               className="inline-flex items-center gap-1.5 mt-2.5 px-3 py-1.5 rounded-lg bg-primary-600 text-white text-[12.5px] font-medium hover:bg-primary-700 transition-colors">
-              Convertirme en dueño de negocio <ChevronRight className="w-3.5 h-3.5" />
+              Verificar mi negocio <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

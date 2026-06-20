@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Image, Zap, Plus, Trash2, Clock, AlertCircle } from 'lucide-react';
+import { X, Image, Zap, Plus, Trash2, Clock, AlertCircle, Lock } from 'lucide-react';
 import { postsService } from '@lib/supabase/services/posts/posts';
 import { storageService } from '@lib/supabase/services/storageImages/storageImages';
 import { useAuth } from '@presentation/context';
@@ -74,6 +74,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
   async function handleSubmit() {
     if (!user) return;
     if (!description.trim()) { toast.error('Escribe una descripción'); return; }
+    if (withOffer && !user.identityVerified) { toast.error('Verificá tu identidad para crear ofertas con código'); return; }
     if (withOffer && !offer.title?.trim()) { toast.error('La oferta necesita un título'); return; }
     if (withOffer && !offer.expiresAt) { toast.error('Define cuándo expira la oferta'); return; }
 
@@ -205,8 +206,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   onChange={e => handleFiles(e.target.files)} />
               </div>
 
-              {/* Flash Offer toggle */}
+              {/* Flash Offer toggle — requiere identidad verificada (anti-estafa) */}
               <div>
+                {!user?.identityVerified ? (
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-stone-200 bg-stone-50">
+                    <Lock className="w-4 h-4 text-stone-400 mt-0.5 shrink-0" />
+                    <div className="text-xs text-text-secondary">
+                      <p className="font-semibold text-text-primary">Ofertas con código bloqueadas</p>
+                      <p>Verificá tu identidad en tu perfil para crear ofertas. Así protegemos a la comunidad de estafas. Mientras tanto, podés publicar fotos y novedades sin límite.</p>
+                    </div>
+                  </div>
+                ) : (
+                <>
                 <button
                   onClick={() => setWithOffer(v => !v)}
                   className={`flex items-center gap-2 w-full px-4 py-3 rounded-xl border-2 transition-all text-sm font-semibold ${
@@ -287,6 +298,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                     </motion.div>
                   )}
                 </AnimatePresence>
+                </>
+                )}
               </div>
             </div>
 

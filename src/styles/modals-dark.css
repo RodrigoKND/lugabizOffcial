@@ -1,0 +1,221 @@
+/* ═══ MODAL DARK OVERRIDES — glass cards inside overlays ═══ */
+
+/* Catch-all: any fixed modal with bg-black/ overlay → darken inner bg-white card */
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"]:not(body) {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-800"],
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-700"] {
+  color: #f0e6ff !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-600"] {
+  color: #c7b5db !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-400"] {
+  color: #8b7d9e !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-300"] {
+  color: #6b5d7e !important;
+}
+
+/* Catch-all inner element backgrounds */
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-stone-50"],
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-stone-100"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-white"]:not([class*="rounded-3xl"]):not([class*="rounded-2xl"]) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-primary-50"],
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-primary-100"] {
+  background: rgba(168, 128, 250, 0.08) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+}
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="border-primary-"],
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="border-stone-"] {
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+/* Select elements — dark theme dropdown */
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] select,
+section.min-h-screen select {
+  color-scheme: dark !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+  color: #e4d4f5 !important;
+}
+
+/* Search Modal */
+[aria-modal="true"] {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Auth Modal (z-[70]) */
+.z-\[70\] > .rounded-3xl.shadow-2xl {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Place Survey Modal (z-[100]) */
+.z-\[100\] > .rounded-3xl.shadow-2xl,
+.z-\[100\] > .max-w-sm.w-full {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Edit Profile Modal (z-50) */
+.z-50 > .rounded-2xl.shadow-xl {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(168, 128, 250, 0.12) !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+}
+
+/* Create Post Modal (z-[200] + sibling of backdrop) */
+[class*="sm:rounded-2xl"][class*="rounded-t-2xl"]:not(body) {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* Chat Modal (z-[200] + rounded-t-3xl) */
+[class*="rounded-t-3xl"][class*="sm:rounded-2xl"]:not(body) {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+/* ── Modal shared text/input overrides ── */
+[aria-modal="true"] [class*="text-stone-"],
+.z-\[70\] [class*="text-stone-"],
+.z-\[100\] [class*="text-stone-"],
+.z-50 [class*="text-text-primary"],
+.z-50 [class*="text-text-secondary"],
+[class*="sm:rounded-2xl"] [class*="text-stone-"],
+[class*="sm:rounded-2xl"] [class*="text-text-primary"],
+[class*="sm:rounded-2xl"] [class*="text-text-secondary"],
+[class*="rounded-t-3xl"] [class*="text-slate-"] {
+  color: #e4d4f5 !important;
+}
+[aria-modal="true"] [class*="text-stone-400"],
+.z-\[70\] [class*="text-stone-400"],
+.z-\[100\] [class*="text-stone-400"],
+[class*="sm:rounded-2xl"] [class*="text-stone-400"],
+[class*="rounded-t-3xl"] [class*="text-slate-400"] {
+  color: #8b7d9e !important;
+}
+
+[aria-modal="true"] input,
+[aria-modal="true"] textarea,
+.z-\[70\] input,
+.z-\[100\] input,
+.z-\[100\] textarea,
+.z-50 input,
+.z-50 textarea,
+[class*="sm:rounded-2xl"] input,
+[class*="sm:rounded-2xl"] textarea,
+[class*="sm:rounded-2xl"] select,
+[class*="rounded-t-3xl"] textarea {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+  color: #e4d4f5 !important;
+}
+[aria-modal="true"] input::placeholder,
+[aria-modal="true"] textarea::placeholder,
+.z-\[70\] input::placeholder,
+.z-\[100\] textarea::placeholder,
+.z-50 input::placeholder,
+.z-50 textarea::placeholder,
+[class*="sm:rounded-2xl"] input::placeholder,
+[class*="sm:rounded-2xl"] textarea::placeholder,
+[class*="rounded-t-3xl"] textarea::placeholder {
+  color: rgba(196, 132, 252, 0.35) !important;
+}
+
+[aria-modal="true"] [class*="bg-stone-"],
+.z-\[70\] [class*="bg-stone-"],
+.z-\[100\] [class*="bg-stone-"],
+[class*="sm:rounded-2xl"] [class*="bg-stone-"],
+[class*="sm:rounded-2xl"] [class*="bg-amber-"],
+[class*="sm:rounded-2xl"] [class*="bg-white"],
+[class*="rounded-t-3xl"] [class*="bg-slate-"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+[aria-modal="true"] [class*="border-stone-"],
+.z-\[70\] [class*="border-stone-"],
+.z-\[100\] [class*="border-stone-"],
+[class*="sm:rounded-2xl"] [class*="border-stone-"],
+[class*="sm:rounded-2xl"] [class*="border-amber-"],
+[class*="sm:rounded-2xl"] [class*="border-primary-"],
+[class*="rounded-t-3xl"] [class*="border-slate-"] {
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+
+[class*="rounded-t-3xl"] [class*="hover:bg-slate-"]:hover {
+  background: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* CreatePostModal — Flash Offer section text */
+[class*="sm:rounded-2xl"] [class*="text-amber-"] { color: #c084fc !important; }
+[class*="sm:rounded-2xl"] [class*="hover:bg-amber-50"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
+[class*="sm:rounded-2xl"] [class*="hover:border-amber-"]:hover { border-color: rgba(168, 128, 250, 0.3) !important; }
+[class*="sm:rounded-2xl"] [class*="hover:bg-stone-"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
+[class*="sm:rounded-2xl"] [class*="hover:bg-primary-50"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
+[class*="sm:rounded-2xl"] [class*="border-dashed"] { border-style: dashed !important; }
+
+/* PlaceSurveyModal (z-[100]) inner content overrides */
+.z-\[100\] [class*="bg-amber-100"] { background: rgba(168, 128, 250, 0.12) !important; }
+.z-\[100\] [class*="text-amber-500"],
+.z-\[100\] [class*="text-amber-600"] { color: #c084fc !important; }
+.z-\[100\] [class*="bg-emerald-100"] { background: rgba(34, 197, 94, 0.12) !important; }
+.z-\[100\] [class*="text-emerald-600"] { color: #86efac !important; }
+.z-\[100\] [class*="bg-amber-500"] { background: linear-gradient(135deg, #7c22ce, #a855f7) !important; }
+.z-\[100\] [class*="hover:bg-amber-600"]:hover { background: linear-gradient(135deg, #6d1fc0, #9333ea) !important; }
+.z-\[100\] [class*="bg-emerald-500"] { background: rgba(34, 197, 94, 0.8) !important; }
+.z-\[100\] [class*="hover:bg-emerald-600"]:hover { background: rgba(34, 197, 94, 0.9) !important; }
+
+/* ═══ NOTIFICATION DROPDOWN DARK OVERRIDES ═══ */
+
+/* Desktop dropdown */
+[class*="fixed"][class*="right-4"][class*="top-16"][class*="bg-white"] {
+  background: rgba(13, 6, 32, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4) !important;
+}
+[class*="fixed"][class*="right-4"][class*="top-16"] [class*="text-stone-"] { color: #c7b5db !important; }
+[class*="fixed"][class*="right-4"][class*="top-16"] [class*="bg-stone-"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+[class*="fixed"][class*="right-4"][class*="top-16"] [class*="border-stone-"] {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+
+/* Mobile fullscreen dropdown */
+.fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] {
+  background: rgba(13, 6, 32, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+}
+.fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] [class*="text-stone-"] { color: #c7b5db !important; }
+.fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] [class*="bg-stone-"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] [class*="border-stone-"] {
+  border-color: rgba(168, 128, 250, 0.1) !important;
+}
+.fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] [class*="hover:bg-amber-"]:hover {
+  background: rgba(251, 191, 36, 0.1) !important;
+}

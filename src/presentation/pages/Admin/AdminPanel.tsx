@@ -9,8 +9,10 @@ import {
   Bell, ArrowLeft, Loader2, X, Hash, Clock, UserX, UserCheck,
   ClipboardList, Flag, TrendingUp, Eye, Zap, Globe, BarChart2,
   RefreshCw, UserPlus, Store, Wifi, Database, Users2, ShieldAlert,
+  BadgeCheck, Sparkles, FileText,
 } from 'lucide-react';
 import { getModerationLogs, markModerationLogReviewed, type ModerationLog } from '@lib/supabase/services/moderation/moderationService';
+import { ownerVerificationService, type PendingVerification, ownerBusinessesService, type AdminOwnerBusiness } from '@lib/supabase';
 import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { adminService } from '@lib/supabase/services/admin/admin';
@@ -20,7 +22,7 @@ import toast from 'react-hot-toast';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'system';
+type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'verifications' | 'businesses' | 'system';
 
 interface DashboardData {
   stats: { users: number; places: number; events: number; reviews: number; surveys: number; notifications: number } | null;
@@ -36,16 +38,16 @@ interface DashboardData {
 
 const C = {
   users: '#3b82f6',
-  places: '#f59e0b',
+  places: '#a855f7',
   events: '#10b981',
   reviews: '#8b5cf6',
   surveys: '#06b6d4',
   banned: '#ef4444',
   online: '#22c55e',
-  owners: '#f97316',
+  owners: '#7c22ce',
 };
 
-const PIE_COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899'];
+const PIE_COLORS = ['#3b82f6', '#a855f7', '#10b981', '#8b5cf6', '#06b6d4', '#7c22ce', '#ec4899'];
 
 const BAN_REASONS = [
   'Contenido inapropiado', 'Spam', 'Comportamiento abusivo', 'Información falsa',
@@ -68,6 +70,8 @@ const SIDEBAR_GROUPS = [
       { id: 'users' as Section, label: 'Usuarios', icon: Users },
       { id: 'reports' as Section, label: 'Reportes', icon: Flag },
       { id: 'moderation' as Section, label: 'Moderación IA', icon: ShieldAlert },
+      { id: 'verifications' as Section, label: 'Verificaciones', icon: BadgeCheck },
+      { id: 'businesses' as Section, label: 'Negocios', icon: Store },
       { id: 'system' as Section, label: 'Sistema', icon: Activity },
     ],
   },
@@ -264,7 +268,7 @@ function AdminDashboard() {
             <Link to="/" className="flex items-center gap-3">
               <div>
                 <p className="text-sm font-bold text-white leading-none">Lugabiz</p>
-                <p className="text-[9px] text-amber-400/80 font-semibold uppercase tracking-widest mt-0.5">Admin Panel</p>
+                <p className="text-[9px] text-primary-400/80 font-semibold uppercase tracking-widest mt-0.5">Admin Panel</p>
               </div>
             </Link>
             <button onClick={() => setMobileOpen(false)}
@@ -290,13 +294,13 @@ function AdminDashboard() {
                       className={`
                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                         ${active
-                          ? 'bg-amber-500/15 text-amber-300 border border-amber-500/20'
+                          ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20'
                           : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
                         }
                       `}>
-                      <item.icon className={`w-4 h-4 shrink-0 ${active ? 'text-amber-400' : ''}`} />
+                      <item.icon className={`w-4 h-4 shrink-0 ${active ? 'text-primary-400' : ''}`} />
                       <span className="flex-1 text-left">{item.label}</span>
-                      {active && <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+                      {active && <div className="w-1.5 h-1.5 rounded-full bg-primary-400 shrink-0" />}
                     </button>
                   );
                 })}
@@ -362,6 +366,8 @@ function AdminDashboard() {
               {section === 'users' && <UsersSection />}
               {section === 'reports' && <FlaggedContentSection />}
               {section === 'moderation' && <AIModerationSection />}
+              {section === 'verifications' && <VerificationsSection />}
+              {section === 'businesses' && <BusinessesSection />}
               {section === 'system' && <SystemSection />}
             </motion.div>
           </AnimatePresence>
@@ -463,10 +469,10 @@ function DashboardSection() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-28 gap-4">
       <div className="relative">
-        <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center">
-          <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
+        <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center">
+          <Loader2 className="w-7 h-7 animate-spin text-primary-500" />
         </div>
-        <div className="absolute -inset-1 rounded-2xl border-2 border-amber-200 animate-ping opacity-30" />
+        <div className="absolute -inset-1 rounded-2xl border-2 border-primary-200 animate-ping opacity-30" />
       </div>
       <p className="text-sm text-stone-400 font-medium">Cargando métricas del sistema...</p>
     </div>
@@ -479,8 +485,8 @@ function DashboardSection() {
     { label: 'Total Usuarios', value: stats?.users ?? 0, icon: Users, bg: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-600', desc: 'registrados' },
     { label: 'Online Ahora', value: advanced?.onlineUsers ?? 0, icon: Wifi, bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', desc: 'últ. 10 min' },
     { label: 'Baneados', value: advanced?.banned ?? 0, icon: Ban, bg: 'bg-red-500', light: 'bg-red-50', text: 'text-red-600', desc: 'suspendidos' },
-    { label: 'Dueños', value: advanced?.owners ?? 0, icon: Store, bg: 'bg-orange-500', light: 'bg-orange-50', text: 'text-orange-600', desc: `${advanced?.activeOwners ?? 0} activos` },
-    { label: 'Lugares', value: stats?.places ?? 0, icon: MapPin, bg: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-600', desc: 'publicados' },
+    { label: 'Dueños', value: advanced?.owners ?? 0, icon: Store, bg: 'bg-primary-500', light: 'bg-primary-50', text: 'text-primary-600', desc: `${advanced?.activeOwners ?? 0} activos` },
+    { label: 'Lugares', value: stats?.places ?? 0, icon: MapPin, bg: 'bg-primary-500', light: 'bg-primary-50', text: 'text-primary-600', desc: 'publicados' },
     { label: 'Eventos', value: stats?.events ?? 0, icon: Calendar, bg: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-600', desc: 'creados' },
     { label: 'Reseñas', value: stats?.reviews ?? 0, icon: MessageSquare, bg: 'bg-violet-500', light: 'bg-violet-50', text: 'text-violet-600', desc: 'escritas' },
     { label: 'Encuestas', value: advanced?.surveysTotal ?? stats?.surveys ?? 0, icon: ClipboardList, bg: 'bg-cyan-500', light: 'bg-cyan-50', text: 'text-cyan-600', desc: 'de mercado' },
@@ -511,7 +517,7 @@ function DashboardSection() {
           )}
         </div>
         <button onClick={load}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-50 hover:border-amber-300 hover:text-amber-600 transition-all shadow-sm">
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-50 hover:border-primary-300 hover:text-primary-600 transition-all shadow-sm">
           <RefreshCw className="w-3.5 h-3.5" />
           Actualizar
         </button>
@@ -598,8 +604,8 @@ function DashboardSection() {
         {/* Categories */}
         <div className="bg-white rounded-2xl p-6 border border-stone-100 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-amber-500" />
+            <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-primary-500" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-stone-800">Categorías más Demandadas</h3>
@@ -643,8 +649,8 @@ function DashboardSection() {
         {/* Business Owners */}
         <div className="bg-white rounded-2xl p-6 border border-stone-100 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
-              <Store className="w-4 h-4 text-orange-500" />
+            <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
+              <Store className="w-4 h-4 text-primary-500" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-stone-800">Dueños de Negocio</h3>
@@ -704,7 +710,7 @@ function DashboardSection() {
               { label: 'Usuarios / Día', value: engagement?.dailyActiveUsers ?? 0, unit: 'DAU', icon: UserPlus, bg: 'bg-blue-50', color: 'text-blue-600' },
               { label: 'Usuarios / Sem', value: engagement?.weeklyActiveUsers ?? 0, unit: 'WAU', icon: Users, bg: 'bg-violet-50', color: 'text-violet-600' },
               { label: 'Sesión Promedio', value: engagement?.avgSessionMinutes ?? 0, unit: 'min', icon: Clock, bg: 'bg-teal-50', color: 'text-teal-600' },
-              { label: 'Acción Top', value: engagement?.topAction ?? '—', unit: '', icon: Eye, bg: 'bg-amber-50', color: 'text-amber-600' },
+              { label: 'Acción Top', value: engagement?.topAction ?? '—', unit: '', icon: Eye, bg: 'bg-primary-50', color: 'text-primary-600' },
             ].map((m, i) => (
               <div key={i} className={`${m.bg} rounded-xl p-3.5`}>
                 <m.icon className={`w-4 h-4 ${m.color} mb-2`} />
@@ -836,7 +842,7 @@ function ModerationSection({ type }: { type: 'places' | 'events' | 'reviews' }) 
 
   if (loading) return (
     <div className="flex justify-center py-20">
-      <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
+      <Loader2 className="w-7 h-7 animate-spin text-primary-500" />
     </div>
   );
 
@@ -847,7 +853,7 @@ function ModerationSection({ type }: { type: 'places' | 'events' | 'reviews' }) 
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder={`Buscar en ${labels[type]}...`}
-            className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10" />
+            className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10" />
         </div>
         <div className="flex items-center gap-2 text-xs text-stone-400 font-medium">
           <span className="px-2.5 py-1 bg-stone-100 rounded-full">{filtered.length} / {items.length}</span>
@@ -998,7 +1004,7 @@ function UsersSection() {
 
   const banned = users.filter(u => u.banned).length;
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-amber-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
 
   return (
     <>
@@ -1022,7 +1028,7 @@ function UsersSection() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Buscar por nombre o email..."
-              className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10" />
+              className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10" />
           </div>
         </div>
         {filtered.length === 0 ? (
@@ -1047,10 +1053,10 @@ function UsersSection() {
                       <span className="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">BANEADO</span>
                     )}
                     {u.role === 'admin' && (
-                      <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">Admin</span>
+                      <span className="text-[9px] font-bold bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full">Admin</span>
                     )}
                     {u.role === 'owner' && (
-                      <span className="text-[9px] font-bold bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Dueño</span>
+                      <span className="text-[9px] font-bold bg-primary-100 text-primary-600 px-1.5 py-0.5 rounded-full">Dueño</span>
                     )}
                   </div>
                   <p className="text-[11px] text-stone-400 truncate">{u.email}</p>
@@ -1112,14 +1118,14 @@ function UsersSection() {
               </div>
               <label className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2 block">Motivo de suspensión</label>
               <select value={banReason} onChange={e => setBanReason(e.target.value)}
-                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-amber-400 mb-4">
+                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-primary-400 mb-4">
                 <option value="">Seleccionar motivo...</option>
                 {BAN_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
-              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 mb-5">
+              <div className="bg-primary-50 border border-primary-200/80 rounded-xl p-3 mb-5">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-                  <p className="text-xs text-amber-700">
+                  <AlertTriangle className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
+                  <p className="text-xs text-primary-700">
                     El usuario recibirá una notificación informando el motivo de la suspensión.
                   </p>
                 </div>
@@ -1174,7 +1180,7 @@ function FlaggedContentSection() {
     finally { setBanning(null); }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-amber-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
 
   return (
     <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
@@ -1203,7 +1209,7 @@ function FlaggedContentSection() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-semibold text-stone-700">{item.authorName}</span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.reportCount >= 5 ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.reportCount >= 5 ? 'bg-red-100 text-red-600' : 'bg-primary-100 text-primary-600'}`}>
                     {item.reportCount} reportes
                   </span>
                 </div>
@@ -1264,7 +1270,7 @@ function SystemSection() {
     checkAll();
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-amber-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
 
   const services = [
     { icon: Globe, label: 'Aplicación Web', desc: 'Interfaz principal operativa', status: 'ok' as const },
@@ -1353,10 +1359,10 @@ function SystemSection() {
 
       {/* Engagement summary */}
       {engagement && (
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-2xl p-6 border border-amber-200/50">
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100/50 rounded-2xl p-6 border border-primary-200/50">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-amber-600" />
+            <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-primary-600" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-stone-800">Resumen de Actividad</h3>
@@ -1371,7 +1377,7 @@ function SystemSection() {
               { label: 'Acción top', value: engagement.topAction, sub: 'acción más frecuente' },
             ].map((s, i) => (
               <div key={i} className="bg-white/80 rounded-xl p-3">
-                <p className="text-xs font-bold text-amber-700 mb-0.5">{s.label}</p>
+                <p className="text-xs font-bold text-primary-700 mb-0.5">{s.label}</p>
                 <p className="text-base font-bold text-stone-800 truncate">{s.value}</p>
                 <p className="text-[9px] text-stone-400 mt-0.5">{s.sub}</p>
               </div>
@@ -1421,7 +1427,7 @@ function AIModerationSection() {
 
   if (loading) return (
     <div className="flex justify-center py-20">
-      <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
+      <Loader2 className="w-7 h-7 animate-spin text-primary-500" />
     </div>
   );
 
@@ -1431,7 +1437,7 @@ function AIModerationSection() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {[
           { label: 'Total detectados', value: logs.length, color: 'text-red-600', bg: 'bg-red-50' },
-          { label: 'Pendientes de revisión', value: pending.length, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Pendientes de revisión', value: pending.length, color: 'text-primary-600', bg: 'bg-primary-50' },
           { label: 'Revisados', value: reviewed.length, color: 'text-green-600', bg: 'bg-green-50' },
         ].map(s => (
           <div key={s.label} className={`${s.bg} rounded-2xl p-4 text-center`}>
@@ -1473,11 +1479,11 @@ function AIModerationSection() {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-sm font-semibold text-stone-700">{log.userName}</span>
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      log.contentType === 'place' ? 'bg-amber-100 text-amber-700' :
+                      log.contentType === 'place' ? 'bg-primary-100 text-primary-700' :
                       log.contentType === 'event' ? 'bg-emerald-100 text-emerald-700' :
                       log.contentType === 'post' ? 'bg-blue-100 text-blue-700' :
                       log.contentType === 'survey' ? 'bg-violet-100 text-violet-700' :
-                      'bg-orange-100 text-orange-700'
+                      'bg-primary-100 text-primary-700'
                     }`}>
                       {CONTENT_TYPE_LABELS[log.contentType] ?? log.contentType}
                     </span>
@@ -1514,6 +1520,221 @@ function AIModerationSection() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function VerificationsSection() {
+  const [items, setItems] = useState<PendingVerification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [acting, setActing] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try { setItems(await ownerVerificationService.listPending()); }
+    catch (e: any) { toast.error(e?.message ?? 'Error al cargar verificaciones'); }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const decide = async (id: string, decision: 'approve' | 'reject') => {
+    setActing(id);
+    try {
+      await ownerVerificationService.review(id, decision, notes[id]);
+      setItems(prev => prev.filter(v => v.id !== id));
+      toast.success(decision === 'approve' ? 'Verificación aprobada' : 'Verificación rechazada');
+    } catch (e: any) { toast.error(e?.message ?? 'No se pudo procesar'); }
+    finally { setActing(null); }
+  };
+
+  if (loading) return (
+    <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
+        <div className="p-5 border-b border-stone-100 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
+            <BadgeCheck className="w-4 h-4 text-primary-500" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-stone-800">Solicitudes de verificación</h3>
+            <p className="text-[11px] text-stone-400">Confirmá que hay una persona real detrás. No clasifiques estatus legal.</p>
+          </div>
+          <button onClick={load} className="p-2 rounded-xl hover:bg-stone-100 transition-colors text-stone-400 hover:text-stone-600">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="text-center py-16 text-stone-400">
+            <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-200" />
+            <p className="text-sm font-medium text-stone-500">No hay solicitudes pendientes</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-stone-50">
+            {items.map(v => (
+              <div key={v.id} className="p-5 space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-semibold text-stone-700">{v.userName ?? v.userId}</span>
+                  <span className="text-[11px] text-stone-400">{v.userEmail}</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${v.kind === 'identity' ? 'bg-blue-100 text-blue-700' : 'bg-primary-100 text-primary-700'}`}>
+                    {v.kind === 'identity' ? (<><Sparkles className="w-3 h-3 inline -mt-0.5" /> Identidad</>) : (<><FileText className="w-3 h-3 inline -mt-0.5" /> Docs de negocio</>)}
+                  </span>
+                  <span className="text-stone-300">·</span>
+                  <Clock className="w-2.5 h-2.5 text-stone-300" />
+                  <span className="text-[10px] text-stone-400">{timeAgo(v.createdAt)}</span>
+                </div>
+
+                {v.businessName && <p className="text-xs text-stone-500">Negocio: <span className="font-medium text-stone-700">{v.businessName}</span></p>}
+                {(v.extracted as any)?.claimedName && (
+                  <p className="text-xs text-stone-500">
+                    Nombre declarado: <span className="font-medium text-stone-700">{String((v.extracted as any).claimedName)}</span>
+                    {(v.extracted as any)?.nameMatches === false && <span className="ml-1 text-red-500 font-semibold">(IA: no coincide)</span>}
+                    {(v.extracted as any)?.nameMatches === true && <span className="ml-1 text-green-600 font-semibold">(IA: coincide)</span>}
+                  </p>
+                )}
+
+                {/* Pre-análisis de IA (referencia, no decide) */}
+                <div className="flex items-start gap-2 text-[11px] bg-stone-50 rounded-lg px-3 py-2">
+                  <Zap className="w-3.5 h-3.5 text-primary-500 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-semibold text-stone-600">IA: </span>
+                    {v.aiScore != null && <span className={`font-bold ${v.aiScore >= 0.7 ? 'text-green-600' : v.aiScore >= 0.4 ? 'text-primary-600' : 'text-red-600'}`}>{Math.round(v.aiScore * 100)}% </span>}
+                    <span className="text-stone-500">{v.aiNotes ?? 'Sin análisis automático — revisá manualmente.'}</span>
+                  </div>
+                </div>
+
+                {/* Documentos (URLs firmadas, expiran pronto) */}
+                {v.docUrls.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {v.docUrls.map((u, i) => (
+                      <a key={i} href={u} target="_blank" rel="noreferrer"
+                        className="w-24 h-24 rounded-xl overflow-hidden border border-stone-200 hover:ring-2 hover:ring-primary-300 transition-all">
+                        <img src={u} alt={`doc-${i}`} className="w-full h-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <input value={notes[v.id] ?? ''} onChange={e => setNotes(n => ({ ...n, [v.id]: e.target.value }))}
+                  placeholder="Nota para el usuario (opcional, ej. motivo del rechazo)"
+                  className="w-full text-xs border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-200" />
+
+                <div className="flex gap-2">
+                  <button onClick={() => decide(v.id, 'approve')} disabled={acting === v.id}
+                    className="flex-1 py-2 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
+                    {acting === v.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Aprobar
+                  </button>
+                  <button onClick={() => decide(v.id, 'reject')} disabled={acting === v.id}
+                    className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
+                    <X className="w-4 h-4" /> Rechazar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BusinessesSection() {
+  const [items, setItems] = useState<AdminOwnerBusiness[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [acting, setActing] = useState<string | null>(null);
+  const [target, setTarget] = useState<AdminOwnerBusiness | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try { setItems(await ownerBusinessesService.listAllForAdmin()); }
+    catch (e: any) { toast.error(e?.message ?? 'Error al cargar negocios'); }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const remove = async (biz: AdminOwnerBusiness) => {
+    setActing(biz.id);
+    try {
+      await ownerBusinessesService.removeForAdmin(biz.id);
+      setItems(prev => prev.filter(b => b.id !== biz.id));
+      toast.success('Negocio eliminado');
+    } catch (e: any) { toast.error(e?.message ?? 'No se pudo eliminar'); }
+    finally { setActing(null); setTarget(null); }
+  };
+
+  // Agrupar por dueño
+  const groups = items.reduce<Record<string, { name?: string; email?: string; list: AdminOwnerBusiness[] }>>((acc, b) => {
+    (acc[b.userId] ??= { name: b.ownerName, email: b.ownerEmail, list: [] }).list.push(b);
+    return acc;
+  }, {});
+
+  if (loading) return (
+    <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
+        <div className="p-5 border-b border-stone-100 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
+            <Store className="w-4 h-4 text-primary-500" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-stone-800">Negocios registrados</h3>
+            <p className="text-[11px] text-stone-400">{items.length} negocio(s) · {Object.keys(groups).length} dueño(s)</p>
+          </div>
+          <button onClick={load} className="p-2 rounded-xl hover:bg-stone-100 transition-colors text-stone-400 hover:text-stone-600">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="text-center py-16 text-stone-400">
+            <Store className="w-10 h-10 mx-auto mb-3 text-stone-200" />
+            <p className="text-sm font-medium text-stone-500">No hay negocios registrados</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-stone-50">
+            {Object.entries(groups).map(([uid, g]) => (
+              <div key={uid} className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-semibold text-stone-700">{g.name ?? uid}</span>
+                  <span className="text-[11px] text-stone-400">{g.email}</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700">{g.list.length}/3</span>
+                </div>
+                <div className="space-y-1.5">
+                  {g.list.map(biz => (
+                    <div key={biz.id} className="flex items-center gap-2 px-3 py-2 bg-stone-50 rounded-lg">
+                      <Store className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                      <span className="text-sm text-stone-700 flex-1 min-w-0 truncate">{biz.name}</span>
+                      <button onClick={() => setTarget(biz)} disabled={acting === biz.id}
+                        className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
+                        {acting === biz.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={!!target}
+        onClose={() => setTarget(null)}
+        onConfirm={() => target && remove(target)}
+        title="Eliminar negocio"
+        message={`¿Eliminar "${target?.name}" de ${target?.ownerName ?? 'este dueño'}?`}
+        confirmLabel="Eliminar"
+        variant="danger"
+      />
     </div>
   );
 }

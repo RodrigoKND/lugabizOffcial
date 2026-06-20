@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, ShieldCheck, Store } from 'lucide-react';
 import { EditProfileData } from '@domain/entities/ProfileTypes';
 
 interface EditProfileModalProps {
@@ -9,9 +9,11 @@ interface EditProfileModalProps {
   onClose: () => void;
   onChange: (data: EditProfileData) => void;
   onSave: () => void;
+  onVerify?: () => void;
+  onManageBusinesses?: () => void;
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, onClose, onChange, onSave }) => (
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, onClose, onChange, onSave, onVerify, onManageBusinesses }) => (
   <AnimatePresence>
     {isOpen && (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -42,18 +44,36 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, o
               <textarea value={editData.bio} onChange={e => onChange({ ...editData, bio: e.target.value })}
                 className="w-full px-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all resize-none" rows={3} />
             </div>
-            <label className="flex items-center gap-3 cursor-pointer p-3 bg-primary-50/50 rounded-xl">
-              <input type="checkbox" checked={!!editData.ownerBusinessName}
-                onChange={e => onChange({ ...editData, ownerBusinessName: e.target.checked ? editData.ownerBusinessName || 'Mi Negocio' : '' })}
-                className="w-4 h-4 rounded border-primary-300 text-primary-500 focus:ring-primary-400" />
-              <span className="text-sm text-text-primary font-medium">Soy dueño de negocio</span>
-            </label>
-            {editData.ownerBusinessName && (
+            {editData.isOwner && (
               <div>
                 <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Nombre del negocio</label>
                 <input type="text" value={editData.ownerBusinessName} onChange={e => onChange({ ...editData, ownerBusinessName: e.target.value })}
                   className="w-full px-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all" />
               </div>
+            )}
+            <button type="button" onClick={() => { onClose(); onVerify?.(); }}
+              className="w-full flex items-center gap-3 p-3 bg-primary-50/50 hover:bg-primary-100/60 rounded-xl text-left transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-text-primary">
+                  {editData.isOwner ? 'Verificar mi negocio' : 'Tengo un negocio'}
+                </p>
+                <p className="text-[11px] text-text-secondary">Suma confianza y desbloquea ofertas. Tus datos son privados.</p>
+              </div>
+            </button>
+            {editData.isOwner && onManageBusinesses && (
+              <button type="button" onClick={() => { onClose(); onManageBusinesses(); }}
+                className="w-full flex items-center gap-3 p-3 bg-primary-50/50 hover:bg-primary-100/60 rounded-xl text-left transition-colors">
+                <div className="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+                  <Store className="w-5 h-5 text-primary-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-text-primary">Mis negocios</p>
+                  <p className="text-[11px] text-text-secondary">Registrá hasta 3 negocios o eliminá los que no uses.</p>
+                </div>
+              </button>
             )}
           </div>
           <div className="flex gap-3 p-5 border-t border-primary-100">

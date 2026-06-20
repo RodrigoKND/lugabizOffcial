@@ -7,3 +7,5 @@ export { default as AttendingEventsTab } from './AttendingEventsTab';
 export { default as DashboardTab } from './DashboardTab';
 export { default as AdminTab } from './AdminTab';
 export { default as EditProfileModal } from './EditProfileModal';
+export { default as VerificationWizard } from './verification/VerificationWizard';
+export { default as MyBusinessesModal } from './verification/MyBusinessesModal';

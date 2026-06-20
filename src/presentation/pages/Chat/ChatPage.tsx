@@ -38,7 +38,7 @@ function TypingDots() {
   return (
     <div className="flex gap-1.5 items-center h-5">
       {[0, 1, 2].map(i => (
-        <motion.div key={i} className="w-2 h-2 rounded-full bg-slate-300"
+        <motion.div key={i} className="w-2 h-2 rounded-full bg-feed-bg/20"
           animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }} />
       ))}
@@ -57,11 +57,11 @@ function AssistantMessage({ text }: { text: string }) {
         const rendered = renderInline(clean)
         if (isBullet) return (
           <div key={i} className="flex gap-2 items-start">
-            <ChevronRight className="w-3.5 h-3.5 mt-0.5 text-violet-400 shrink-0" />
-            <p className="text-[14px] text-slate-700 leading-relaxed">{rendered}</p>
+            <ChevronRight className="w-3.5 h-3.5 mt-0.5 text-primary-400 shrink-0" />
+            <p className="text-[14px] text-text-primary leading-relaxed">{rendered}</p>
           </div>
         )
-        return <p key={i} className="text-[14px] text-slate-700 leading-relaxed">{rendered}</p>
+        return <p key={i} className="text-[14px] text-text-primary leading-relaxed">{rendered}</p>
       })}
     </div>
   )
@@ -72,13 +72,13 @@ function renderInline(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*.*?\*\*|\[.*?\]\(.*?\)|https?:\/\/\S+)/g)
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>
+      return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>
     }
     const mdLink = part.match(/^\[(.*?)\]\((https?:\/\/.*?)\)$/)
     if (mdLink) {
       return (
         <a key={i} href={mdLink[2]} target="_blank" rel="noopener noreferrer"
-          className="text-violet-600 underline underline-offset-2 hover:text-violet-700 font-medium">
+          className="text-violet-600 underline underline-offset-2 hover:text-primary-500 font-medium">
           {mdLink[1]}
         </a>
       )
@@ -88,7 +88,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <a key={i} href={part} target="_blank" rel="noopener noreferrer"
           className={`inline-flex items-center gap-1 underline underline-offset-2 font-medium ${
-            isGoogleMaps ? 'text-emerald-600 hover:text-emerald-700' : 'text-violet-600 hover:text-violet-700'
+            isGoogleMaps ? 'text-emerald-600 hover:text-emerald-700' : 'text-violet-600 hover:text-primary-500'
           }`}>
           {isGoogleMaps ? <><Navigation className="w-3 h-3" />Ver en Maps</> : part.slice(0, 40) + (part.length > 40 ? '…' : '')}
         </a>
@@ -104,12 +104,12 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
   const published = timeAgo(place.publishedAt)
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-feed-bg overflow-hidden shadow-sm">
       {/* Galería de fotos */}
       {photos.length > 0 ? (
         <div className={`grid gap-0.5 ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-3'}`}>
           {photos.slice(0, photos.length === 1 ? 1 : 3).map((src, i) => (
-            <div key={i} className={`relative bg-slate-100 overflow-hidden ${photos.length === 1 ? 'h-36' : 'h-24'}`}>
+            <div key={i} className={`relative bg-feed-bg/5 overflow-hidden ${photos.length === 1 ? 'h-36' : 'h-24'}`}>
               <img src={src} alt={place.name} className="w-full h-full object-cover" loading="lazy" />
               {i === 2 && photos.length > 3 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-sm font-semibold">
@@ -120,8 +120,8 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
           ))}
         </div>
       ) : (
-        <div className="h-28 bg-gradient-to-br from-violet-50 to-slate-100 flex items-center justify-center">
-          <MapPin className="w-7 h-7 text-slate-300" />
+        <div className="h-28 bg-gradient-to-br from-primary-900/50 to-white/5 flex items-center justify-center">
+          <MapPin className="w-7 h-7 text-text-muted" />
         </div>
       )}
 
@@ -129,23 +129,23 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
       <div className="p-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[14px] font-bold text-slate-800 leading-tight truncate">{place.name}</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">{place.category}</p>
+            <p className="text-[14px] font-bold text-text-primary leading-tight truncate">{place.name}</p>
+            <p className="text-[11px] text-text-secondary mt-0.5">{place.category}</p>
           </div>
           {place.rating != null && (
-            <span className="shrink-0 flex items-center gap-0.5 text-[12px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-lg">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="shrink-0 flex items-center gap-0.5 text-[12px] text-primary-400 font-bold bg-primary-500/20 px-1.5 py-0.5 rounded-lg">
+              <Star className="w-3 h-3 fill-primary-400 text-primary-400" />
               {Number(place.rating).toFixed(1)}
             </span>
           )}
         </div>
 
         <div className="flex items-start gap-1 mt-1.5">
-          <MapPin className="w-3 h-3 text-slate-400 mt-0.5 shrink-0" />
-          <p className="text-[11px] text-slate-500 leading-snug">{place.address}</p>
+          <MapPin className="w-3 h-3 text-text-secondary mt-0.5 shrink-0" />
+          <p className="text-[11px] text-text-secondary leading-snug">{place.address}</p>
         </div>
 
-        <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center gap-3 mt-1.5 text-[11px] text-text-secondary">
           {place.distance != null && (
             <span className="flex items-center gap-1"><Navigation className="w-3 h-3" />{place.distance.toFixed(1)} km</span>
           )}
@@ -156,8 +156,8 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
 
         {/* Horarios — solo si el lugar los tiene */}
         {place.hours && (
-          <div className="flex items-start gap-1 mt-1.5 text-[11px] text-slate-500">
-            <Clock className="w-3 h-3 text-slate-400 mt-0.5 shrink-0" />
+          <div className="flex items-start gap-1 mt-1.5 text-[11px] text-text-secondary">
+            <Clock className="w-3 h-3 text-text-secondary mt-0.5 shrink-0" />
             <span className="leading-snug">{place.hours}</span>
           </div>
         )}
@@ -179,7 +179,7 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
             )}
             {place.website && (
               <a href={place.website} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-violet-600 bg-violet-50 hover:opacity-80 transition-opacity">
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-violet-600 bg-primary-500/20 hover:opacity-80 transition-opacity">
                 <Globe className="w-3 h-3" /> Web
               </a>
             )}
@@ -193,7 +193,7 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
             <Navigation className="w-3.5 h-3.5" /> Cómo llegar
           </a>
           <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-600 text-[12px] font-semibold hover:bg-slate-50 active:scale-[0.98] transition-all">
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 text-text-secondary text-[12px] font-semibold hover:bg-feed-bg/5 active:scale-[0.98] transition-all">
             <MapPin className="w-3.5 h-3.5" /> Maps
           </a>
         </div>
@@ -212,20 +212,20 @@ function EventCardComponent({ event }: { event: EventCard }) {
   })()
   return (
     <a href={event.mapsUrl} target="_blank" rel="noopener noreferrer"
-      className="flex gap-3 p-3 rounded-2xl border border-slate-200 bg-white hover:border-pink-300 transition-all group active:scale-[0.98] shadow-sm">
-      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
+      className="flex gap-3 p-3 rounded-2xl border border-white/10 bg-feed-bg hover:border-pink-300 transition-all group active:scale-[0.98] shadow-sm">
+      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-feed-bg/5">
         {event.image
           ? <img src={event.image} alt={event.name} className="w-full h-full object-cover" loading="lazy" />
-          : <div className="w-full h-full flex items-center justify-center"><CalendarDays className="w-5 h-5 text-slate-300" /></div>}
+          : <div className="w-full h-full flex items-center justify-center"><CalendarDays className="w-5 h-5 text-text-muted" /></div>}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-slate-800 leading-tight truncate group-hover:text-pink-600 transition-colors">{event.name}</p>
-        <p className="text-[11px] text-slate-400 mt-0.5">{event.category}</p>
-        <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+        <p className="text-[13px] font-bold text-text-primary leading-tight truncate group-hover:text-pink-600 transition-colors">{event.name}</p>
+        <p className="text-[11px] text-text-secondary mt-0.5">{event.category}</p>
+        <div className="flex items-center gap-2 mt-1 text-[11px] text-text-secondary">
           <span className="flex items-center gap-1 text-pink-600 font-semibold"><CalendarDays className="w-3 h-3" />{dateLabel}</span>
           {event.time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{event.time}</span>}
         </div>
-        <p className="text-[11px] text-slate-500 mt-0.5 truncate">{event.address}</p>
+        <p className="text-[11px] text-text-secondary mt-0.5 truncate">{event.address}</p>
       </div>
     </a>
   )
@@ -235,33 +235,33 @@ function EventCardComponent({ event }: { event: EventCard }) {
 const SOCIAL_META: Record<string, { icon: any; color: string; label: string }> = {
   instagram: { icon: Instagram,     color: 'text-pink-600 bg-pink-50',     label: 'Instagram' },
   facebook:  { icon: Facebook,      color: 'text-blue-600 bg-blue-50',     label: 'Facebook' },
-  tiktok:    { icon: Music2,        color: 'text-slate-800 bg-slate-100',  label: 'TikTok' },
+  tiktok:    { icon: Music2,        color: 'text-text-primary bg-feed-bg/5',  label: 'TikTok' },
   whatsapp:  { icon: MessageCircle, color: 'text-emerald-600 bg-emerald-50', label: 'WhatsApp' },
-  web:       { icon: Globe,         color: 'text-violet-600 bg-violet-50', label: 'Sitio web' },
+  web:       { icon: Globe,         color: 'text-violet-600 bg-primary-500/20', label: 'Sitio web' },
 }
 
 function WebResultCard({ result }: { result: WebResult }) {
   const published = timeAgo(result.lastActivity) ?? result.lastActivity
   return (
-    <div className="rounded-2xl border border-amber-200/70 bg-amber-50/30 overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-primary-500/20 bg-primary-500/10 overflow-hidden shadow-sm">
       <div className="p-3">
         <div className="flex items-center gap-1.5 mb-1">
-          <Globe className="w-3 h-3 text-amber-500" />
-          <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Desde la web</span>
+          <Globe className="w-3 h-3 text-primary-400" />
+          <span className="text-[10px] font-bold text-primary-400 uppercase tracking-wider">Desde la web</span>
         </div>
 
-        <p className="text-[14px] font-bold text-slate-800 leading-tight">{result.name}</p>
-        {result.offering && <p className="text-[12px] text-slate-600 mt-1 leading-snug">{result.offering}</p>}
+        <p className="text-[14px] font-bold text-text-primary leading-tight">{result.name}</p>
+        {result.offering && <p className="text-[12px] text-text-secondary mt-1 leading-snug">{result.offering}</p>}
 
         {result.address && (
           <div className="flex items-start gap-1 mt-1.5">
-            <MapPin className="w-3 h-3 text-slate-400 mt-0.5 shrink-0" />
-            <p className="text-[11px] text-slate-500 leading-snug">{result.address}</p>
+            <MapPin className="w-3 h-3 text-text-secondary mt-0.5 shrink-0" />
+            <p className="text-[11px] text-text-secondary leading-snug">{result.address}</p>
           </div>
         )}
 
         {published && (
-          <div className="flex items-center gap-1 mt-1 text-[11px] text-slate-400">
+          <div className="flex items-center gap-1 mt-1 text-[11px] text-text-secondary">
             <Clock className="w-3 h-3" />{published}
           </div>
         )}
@@ -286,13 +286,13 @@ function WebResultCard({ result }: { result: WebResult }) {
         <div className="flex gap-2 mt-3">
           {result.mapsUrl && (
             <a href={result.mapsUrl} target="_blank" rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-amber-500 text-white text-[12px] font-semibold hover:bg-amber-600 active:scale-[0.98] transition-all">
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary-600 text-white text-[12px] font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all">
               <Navigation className="w-3.5 h-3.5" /> Cómo llegar
             </a>
           )}
           {result.sourceUrl && (
             <a href={result.sourceUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-600 text-[12px] font-semibold hover:bg-white active:scale-[0.98] transition-all">
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 text-text-secondary text-[12px] font-semibold hover:bg-white/5 active:scale-[0.98] transition-all">
               <Globe className="w-3.5 h-3.5" /> Ver más
             </a>
           )}
@@ -313,13 +313,13 @@ function VideoPreviewCard({ video, onPlay }: { video: VideoEmbed; onPlay: () => 
   const m = VIDEO_META[video.platform]
   return (
     <button onClick={onPlay}
-      className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-slate-200 bg-white hover:bg-violet-50 hover:border-violet-300 transition-all text-left active:scale-[0.98] shadow-sm group">
+      className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-white/10 bg-feed-bg hover:bg-primary-500/20 hover:border-primary-500/40 transition-all text-left active:scale-[0.98] shadow-sm group">
       <div className={`w-10 h-10 rounded-lg ${m.bg} flex items-center justify-center text-white text-lg font-bold shrink-0`}>{m.symbol}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">{m.label}</p>
-        <p className="text-[13px] text-slate-600 group-hover:text-violet-700">Toca para ver el video</p>
+        <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wide">{m.label}</p>
+        <p className="text-[13px] text-text-secondary group-hover:text-primary-500">Toca para ver el video</p>
       </div>
-      <div className="w-8 h-8 rounded-lg bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-600 shrink-0 transition-colors">
+      <div className="w-8 h-8 rounded-lg bg-primary-500/30 group-hover:bg-primary-500/40 flex items-center justify-center text-violet-600 shrink-0 transition-colors">
         <Play className="w-4 h-4 ml-0.5" />
       </div>
     </button>
@@ -349,7 +349,7 @@ function VideoModal({ video, onClose }: { video: VideoEmbed; onClose: () => void
         {video.platform === 'instagram' ? (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm">
             <iframe src={video.embedUrl}
-              className="w-full rounded-2xl bg-white"
+              className="w-full rounded-2xl bg-feed-bg"
               style={{ height: '60dvh', maxHeight: 600 }}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               loading="eager" title="Instagram" />
@@ -377,7 +377,7 @@ function IdeaSkeleton() {
   return (
     <div className="w-full grid grid-cols-2 gap-2 mt-5">
       {[1, 2, 3, 4].map(i => (
-        <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse" />
+        <div key={i} className="h-16 rounded-xl bg-feed-bg/5 animate-pulse" />
       ))}
     </div>
   )
@@ -425,30 +425,30 @@ const ChatPage: React.FC = () => {
   const greeting  = firstName ? `Hola, ${firstName} 👋` : 'Hola 👋'
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-50 flex flex-col bg-feed-bg">
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 bg-white border-b border-slate-100 shadow-sm">
+      <div className="shrink-0 bg-feed-bg border-b border-white/5 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={goBack}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors shrink-0">
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-text-secondary hover:bg-feed-bg/5 transition-colors shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </button>
 
           <div className="relative shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shadow-sm shadow-violet-200">
+            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shadow-sm shadow-primary-500/20">
               <Compass className="w-5 h-5 text-white" />
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-semibold text-slate-900 leading-tight">Lubi</p>
+            <p className="text-[15px] font-semibold text-white leading-tight">Lubi</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-              <span className="text-[12px] text-slate-400 truncate">{city}</span>
+              <MapPin className="w-3 h-3 text-text-secondary shrink-0" />
+              <span className="text-[12px] text-text-secondary truncate">{city}</span>
               {weather && (
-                <span className="flex items-center gap-1 text-[12px] text-slate-400 shrink-0">
+                <span className="flex items-center gap-1 text-[12px] text-text-secondary shrink-0">
                   <WeatherIcon bucket={weather.bucket} />
                   {weather.temp}°C
                 </span>
@@ -458,7 +458,7 @@ const ChatPage: React.FC = () => {
 
           {hasConversation && (
             <button onClick={reset} title="Nueva conversación"
-              className="w-9 h-9 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex items-center justify-center transition-colors shrink-0">
+              className="w-9 h-9 rounded-xl text-text-secondary hover:text-text-secondary hover:bg-feed-bg/5 flex items-center justify-center transition-colors shrink-0">
               <RotateCcw className="w-4 h-4" />
             </button>
           )}
@@ -472,29 +472,29 @@ const ChatPage: React.FC = () => {
           {!hasConversation ? (
             /* Pantalla inicial */
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-violet-200 mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-primary-500/20 mb-4">
                 <Compass className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-[22px] font-bold text-slate-900">{greeting}</h2>
-              <p className="text-[15px] text-slate-400 mt-2 text-center max-w-xs leading-relaxed">
+              <h2 className="text-[22px] font-bold text-white">{greeting}</h2>
+              <p className="text-[15px] text-text-secondary mt-2 text-center max-w-xs leading-relaxed">
                 {timeLabel ? `Buenas ${timeLabel}. ` : ''}¿Qué plan buscas para hoy?
               </p>
 
               <div className="w-full mt-8">
                 {ideasLoading ? (
                   <div className="flex flex-col items-center py-10">
-                    <motion.div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-violet-200 mb-4"
+                    <motion.div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-primary-500/20 mb-4"
                       animate={{ scale: [1, 1.08, 1] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
                       <Compass className="w-6 h-6 text-white" />
                     </motion.div>
-                    <p className="text-[14px] text-slate-400 font-medium">Lubi está cargando...</p>
+                    <p className="text-[14px] text-text-secondary font-medium">Lubi está cargando...</p>
                   </div>
                 ) : (
                   <>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Ideas para ti</span>
+                  <Sparkles className="w-3.5 h-3.5 text-primary-400" />
+                  <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Ideas para ti</span>
                 </div>
                 {ideas.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2.5">
@@ -502,9 +502,9 @@ const ChatPage: React.FC = () => {
                       <motion.button key={i}
                         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                         onClick={() => { setInput(idea.text); inputRef.current?.focus() }}
-                        className="flex items-center gap-2.5 p-4 rounded-xl border border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all text-left group active:scale-[0.97] shadow-sm">
+                        className="flex items-center gap-2.5 p-4 rounded-xl border border-white/10 bg-feed-bg hover:border-primary-500/40 hover:bg-primary-500/20 transition-all text-left group active:scale-[0.97] shadow-sm">
                         <span className="text-2xl leading-none shrink-0">{idea.emoji}</span>
-                        <span className="text-[13px] font-medium text-slate-600 group-hover:text-violet-700 leading-tight line-clamp-2">
+                        <span className="text-[13px] font-medium text-text-secondary group-hover:text-primary-500 leading-tight line-clamp-2">
                           {idea.text}
                         </span>
                       </motion.button>
@@ -515,7 +515,7 @@ const ChatPage: React.FC = () => {
                 )}
               </div>
 
-              <p className="mt-8 text-[12px] text-slate-300 text-center">Escribe tu pregunta o elige una idea arriba</p>
+              <p className="mt-8 text-[12px] text-text-muted text-center">Escribe tu pregunta o elige una idea arriba</p>
             </div>
 
           ) : (
@@ -528,7 +528,7 @@ const ChatPage: React.FC = () => {
                     className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
                     {msg.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-violet-200">
+                      <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-primary-500/20">
                         <Compass className="w-4 h-4 text-white" />
                       </div>
                     )}
@@ -538,7 +538,7 @@ const ChatPage: React.FC = () => {
                       <div className={`${
                         msg.role === 'user'
                           ? 'bg-violet-600 text-white rounded-2xl rounded-br-sm px-4 py-3'
-                          : 'bg-slate-50 border border-slate-100 rounded-2xl rounded-bl-sm px-4 py-3'
+                          : 'bg-white/5 border border-white/10 rounded-2xl rounded-bl-sm px-4 py-3'
                       }`}>
                         {msg.role === 'user' ? (
                           <p className="text-[14px] leading-relaxed">{msg.content}</p>
@@ -548,7 +548,7 @@ const ChatPage: React.FC = () => {
                           <>
                             <AssistantMessage text={msg.content} />
                             {msg.streaming && (
-                              <motion.span className="inline-block w-0.5 h-3.5 bg-violet-400 rounded-full ml-0.5 align-middle"
+                              <motion.span className="inline-block w-0.5 h-3.5 bg-primary-400"
                                 animate={{ opacity: [1, 0] }} transition={{ duration: 0.55, repeat: Infinity }} />
                             )}
                           </>
@@ -559,7 +559,7 @@ const ChatPage: React.FC = () => {
                       {!msg.streaming && msg.places && msg.places.length > 0 && (
                         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                           className="space-y-2">
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1 flex items-center gap-1">
+                          <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider px-1 flex items-center gap-1">
                             <MapPin className="w-3 h-3" /> Lugares encontrados
                           </p>
                           {msg.places.map((p, pi) => <PlaceCardComponent key={pi} place={p} />)}
@@ -570,7 +570,7 @@ const ChatPage: React.FC = () => {
                       {!msg.streaming && msg.webResults && msg.webResults.length > 0 && (
                         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                           className="space-y-2">
-                          <p className="text-[11px] font-semibold text-amber-500 uppercase tracking-wider px-1 flex items-center gap-1">
+                          <p className="text-[11px] font-semibold text-primary-400 uppercase tracking-wider px-1 flex items-center gap-1">
                             <Globe className="w-3 h-3" /> También en la web
                           </p>
                           {msg.webResults.map((w, wi) => <WebResultCard key={wi} result={w} />)}
@@ -581,7 +581,7 @@ const ChatPage: React.FC = () => {
                       {!msg.streaming && msg.events && msg.events.length > 0 && (
                         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                           className="space-y-2">
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1 flex items-center gap-1">
+                          <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider px-1 flex items-center gap-1">
                             <CalendarDays className="w-3 h-3" /> Próximos eventos
                           </p>
                           {msg.events.map((e, ei) => <EventCardComponent key={ei} event={e} />)}
@@ -610,11 +610,11 @@ const ChatPage: React.FC = () => {
       <AnimatePresence>
         {hasConversation && ideas.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-            className="shrink-0 bg-white border-t border-slate-50 px-4 py-2">
+            className="shrink-0 bg-feed-bg border-t border-white/5 px-4 py-2">
             <div className="max-w-2xl mx-auto flex gap-2 overflow-x-auto pb-1 no-scrollbar">
               {ideas.map((idea, i) => (
                 <button key={i} onClick={() => { setInput(idea.text); inputRef.current?.focus() }}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[12px] text-slate-500 hover:bg-violet-50 hover:border-violet-200 hover:text-violet-600 transition-colors whitespace-nowrap">
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[12px] text-text-secondary hover:bg-primary-500/20 hover:border-primary-500/30 hover:text-primary-400 transition-colors whitespace-nowrap">
                   <span>{idea.emoji}</span>
                   <span>{idea.text}</span>
                 </button>
@@ -628,35 +628,35 @@ const ChatPage: React.FC = () => {
       <AnimatePresence>
         {chatLoading && (
           <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-            className="shrink-0 px-4 py-2 bg-white border-t border-slate-50">
+            className="shrink-0 px-4 py-2 bg-feed-bg border-t border-white/5">
             <div className="max-w-2xl mx-auto flex items-center gap-2">
               <TypingDots />
-              <span className="text-[12px] text-slate-400">Lubi está pensando...</span>
+              <span className="text-[12px] text-text-secondary">Lubi está pensando...</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* ── Input ───────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 bg-white border-t border-slate-100 px-4 pt-3 pb-safe-4">
+      <div className="shrink-0 bg-feed-bg border-t border-white/5 px-4 pt-3 pb-safe-4">
         <div className="max-w-2xl mx-auto">
           <form onSubmit={handleSubmit}>
-            <div className="flex items-end gap-3 bg-slate-50 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/15 transition-all">
+            <div className="flex items-end gap-3 rounded-2xl px-4 py-3 transition-all">
               <textarea ref={inputRef} value={input} onChange={handleInputChange} onKeyDown={handleKeyDown}
                 placeholder={hasConversation ? 'Escribe algo más...' : '¿Qué plan buscas hoy?'}
                 rows={1} maxLength={300}
-                className="flex-1 resize-none bg-transparent text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none min-h-[24px] max-h-[120px] leading-6 overflow-hidden" />
+                className="flex-1 resize-none bg-transparent border-0 text-[14px] text-text-primary placeholder-text-muted focus:outline-none focus:ring-0 min-h-[24px] max-h-[120px] leading-6 overflow-hidden" />
               <button type="submit" disabled={!input.trim() || chatLoading}
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all bg-violet-600 text-white hover:bg-violet-700 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:scale-100 disabled:cursor-not-allowed">
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all bg-violet-600 text-white hover:bg-violet-700 active:scale-95 disabled:bg-white/10 disabled:text-text-secondary disabled:scale-100 disabled:cursor-not-allowed">
                 <Send className="w-4 h-4" />
               </button>
             </div>
             <div className="flex justify-between items-center mt-2 px-1">
-              <span className="text-[11px] text-slate-300">Enter para enviar · Shift+Enter para nueva línea</span>
-              <span className="text-[11px] text-slate-300">{input.length}/300</span>
+              <span className="text-[11px] text-text-muted">Enter para enviar · Shift+Enter para nueva línea</span>
+              <span className="text-[11px] text-text-muted">{input.length}/300</span>
             </div>
           </form>
-          <p className="text-[10px] text-slate-300 text-center mt-2 leading-relaxed">
+          <p className="text-[10px] text-text-muted text-center mt-2 leading-relaxed">
             Lubi puede cometer errores. Verifica la información importante.
           </p>
         </div>

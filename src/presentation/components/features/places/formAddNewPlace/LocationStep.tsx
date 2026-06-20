@@ -67,7 +67,7 @@ const LocationStep: React.FC<LocationStepProps> = ({
           <label className="text-xs font-semibold text-stone-500 uppercase">Selecciona en el mapa</label>
           <Suspense fallback={
             <div className="aspect-video bg-stone-100 rounded-xl flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
             </div>
           }>
             <MapPicker
@@ -76,8 +76,8 @@ const LocationStep: React.FC<LocationStepProps> = ({
             />
           </Suspense>
           {formData.latitude && formData.longitude && (
-            <div className="flex items-center gap-2 text-xs text-stone-500 bg-amber-50 px-3 py-2 rounded-xl">
-              <Locate className="w-3.5 h-3.5 text-amber-500" />
+            <div className="flex items-center gap-2 text-xs text-stone-500 bg-primary-50 px-3 py-2 rounded-xl">
+              <Locate className="w-3.5 h-3.5 text-primary-500" />
               <span>{formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}</span>
             </div>
           )}

@@ -10,7 +10,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ step, totalSteps }) => (
     {Array.from({ length: totalSteps }).map((_, i) => (
       <div
         key={i}
-        className={`h-1 flex-1 rounded-full transition-all ${i <= step ? 'bg-amber-500' : 'bg-stone-200'}`}
+        className={`h-1 flex-1 rounded-full transition-all ${i <= step ? 'bg-primary-500' : 'bg-stone-200'}`}
       />
     ))}
   </div>

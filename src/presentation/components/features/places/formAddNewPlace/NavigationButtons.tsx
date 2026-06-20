@@ -22,7 +22,7 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ step, totalSteps,
     {showNext && (
       <button
         type="button" onClick={onNext}
-        className="px-6 py-2.5 bg-amber-500 text-white rounded-xl font-medium text-sm hover:bg-amber-600 transition-all"
+        className="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm hover:bg-primary-600 transition-all"
       >
         Siguiente
       </button>

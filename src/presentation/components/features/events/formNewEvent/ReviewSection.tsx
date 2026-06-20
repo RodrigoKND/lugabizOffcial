@@ -10,7 +10,7 @@ interface Props {
 
 const Row = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) => (
   <div className="flex items-start gap-3 py-2.5 border-b border-stone-100 last:border-0">
-    <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
+    <div className="w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 mt-0.5">
       {icon}
     </div>
     <div className="min-w-0 flex-1">
@@ -23,8 +23,8 @@ const Row = ({ icon, label, value }: { icon: React.ReactNode; label: string; val
 const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) => (
   <div className="space-y-5">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center">
-        <CheckCircle2 className="w-5 h-5 text-amber-600" />
+      <div className="w-10 h-10 rounded-2xl bg-primary-100 flex items-center justify-center">
+        <CheckCircle2 className="w-5 h-5 text-primary-600" />
       </div>
       <div>
         <h3 className="text-base font-bold text-stone-800">Revisa tu evento</h3>
@@ -34,25 +34,25 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
 
     <div className="bg-white rounded-2xl border border-stone-200/60 divide-y divide-stone-100 px-4">
       <Row
-        icon={<Tag className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<Tag className="w-3.5 h-3.5 text-primary-600" />}
         label="Nombre y categoría"
         value={
           <div className="flex items-center gap-2 flex-wrap">
             <span>{formData.name}</span>
             <span className="text-[10px] text-stone-400">·</span>
-            <span className="text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-medium text-primary-700 bg-primary-50 px-2 py-0.5 rounded-full">
               {categories.find(c => c.id === formData.categoryId)?.name}
             </span>
           </div>
         }
       />
       <Row
-        icon={<CalendarDays className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<CalendarDays className="w-3.5 h-3.5 text-primary-600" />}
         label="Fecha y hora"
         value={`${formData.dateStart} · ${formData.timeStart}${formData.timeEnd ? ` - ${formData.timeEnd}` : ''}`}
       />
       <Row
-        icon={<MapPin className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<MapPin className="w-3.5 h-3.5 text-primary-600" />}
         label="Dirección"
         value={
           <span className="text-stone-500 text-xs">
@@ -61,17 +61,17 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
         }
       />
       <Row
-        icon={<DollarSign className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<DollarSign className="w-3.5 h-3.5 text-primary-600" />}
         label="Precio"
         value={formData.isFree ? <span className="text-green-600 font-semibold">Gratuito</span> : `Bs. ${formData.price}`}
       />
       <Row
-        icon={<Users className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<Users className="w-3.5 h-3.5 text-primary-600" />}
         label="Capacidad"
         value={formData.capacity ? `${formData.capacity} personas` : <span className="text-stone-300 italic">Sin límite</span>}
       />
       <Row
-        icon={<MapPin className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<MapPin className="w-3.5 h-3.5 text-primary-600" />}
         label="Coordenadas"
         value={
           formData.coords.length === 2
@@ -80,11 +80,11 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
         }
       />
       <Row
-        icon={<ImageIcon className="w-3.5 h-3.5 text-amber-600" />}
+        icon={<ImageIcon className="w-3.5 h-3.5 text-primary-600" />}
         label="Imágenes"
         value={
           imageFiles.length > 0
-            ? <span className="font-semibold text-amber-600">{imageFiles.length} imagen(es)</span>
+            ? <span className="font-semibold text-primary-600">{imageFiles.length} imagen(es)</span>
             : <span className="text-stone-300 italic">Sin imágenes</span>
         }
       />
@@ -93,7 +93,7 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
     {formData.tags && (
       <div className="flex flex-wrap gap-1.5">
         {formData.tags.split(',').filter(Boolean).map((tag, i) => (
-          <span key={i} className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[11px] font-medium border border-amber-100/60">
+          <span key={i} className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-[11px] font-medium border border-primary-100/60">
             #{tag.trim()}
           </span>
         ))}

@@ -32,7 +32,7 @@ const MapSection: React.FC<Props> = ({ coords, errors, touched, onCoordsChange, 
       <p className="text-xs text-stone-500">Haz clic en el mapa para marcar la ubicación. Arrastra el marcador para ajustar.</p>
       <Suspense fallback={
         <div className="aspect-video bg-stone-100 rounded-xl flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+          <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
         </div>
       }>
         <MapPicker initialCoords={coords} onCoordsChange={handleCoordsChangeWithReverse} />
@@ -44,8 +44,8 @@ const MapSection: React.FC<Props> = ({ coords, errors, touched, onCoordsChange, 
         </p>
       )}
       {coords.length === 2 && (
-        <div className="flex items-center gap-2 text-xs text-stone-500 bg-amber-50 px-3 py-2 rounded-xl">
-          <Locate className="w-3.5 h-3.5 text-amber-500" />
+        <div className="flex items-center gap-2 text-xs text-stone-500 bg-primary-50 px-3 py-2 rounded-xl">
+          <Locate className="w-3.5 h-3.5 text-primary-500" />
           <span>{coords[0].toFixed(6)}, {coords[1].toFixed(6)}</span>
         </div>
       )}

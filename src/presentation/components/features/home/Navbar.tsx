@@ -34,7 +34,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary-800">Lugabiz</span>
+              <span className="text-2xl font-bold text-white">Lugabiz</span>
             </Link>
             <div className="flex items-center gap-3">
               <button onClick={() => setShowSearch(true)}
@@ -79,7 +79,6 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
                         </span>
                       )}
                     </button>
-                    <NotificationDropdown open={showNotifs} onClose={() => setShowNotifs(false)} />
                   </div>
                   <button onClick={() => navigate('/profile')}
                     className="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-primary-50 transition-colors">
@@ -164,9 +163,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         </div>
       </nav>
 
-      {/* Notification dropdown — renderizado fuera del nav para evitar problemas de z-index */}
       <NotificationDropdown open={showNotifs} onClose={() => setShowNotifs(false)} />
-
       <SearchModal open={showSearch} onClose={() => setShowSearch(false)} />
     </>
   );

@@ -31,7 +31,7 @@ const ExtraStep: React.FC<ExtraStepProps> = ({
       type="submit" disabled={!isValid || isSubmitting}
       className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-sm ${
         isValid && !isSubmitting
-          ? 'bg-amber-500 text-white hover:bg-amber-600'
+          ? 'bg-primary-500 text-white hover:bg-primary-600'
           : 'bg-stone-200 text-stone-400 cursor-not-allowed'
       }`}
     >

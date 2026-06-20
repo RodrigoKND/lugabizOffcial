@@ -1,5 +1,9 @@
 export { supabase } from '@lib/supabase/client';
 export { authService } from '@lib/supabase/services/user/auth';
+export { ownerVerificationService } from '@lib/supabase/services/user/ownerVerification';
+export type { OwnerVerification, PendingVerification, VerificationKind, VerificationStatus, IdentityPrecheck } from '@lib/supabase/services/user/ownerVerification';
+export { ownerBusinessesService, MAX_BUSINESSES } from '@lib/supabase/services/user/ownerBusinesses';
+export type { OwnerBusiness, AdminOwnerBusiness } from '@lib/supabase/services/user/ownerBusinesses';
 export { categoriesService } from '@lib/supabase/services/categories/categories';
 export { socialGroupsService } from '@lib/supabase/services/socialGroups/socialGroups';
 export { placesService } from '@lib/supabase/services/places';

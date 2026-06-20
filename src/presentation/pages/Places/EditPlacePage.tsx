@@ -121,7 +121,7 @@ const EditPlacePage: React.FC = () => {
 
   if (loading) return (
     <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
     </div>
   );
 
@@ -136,17 +136,17 @@ const EditPlacePage: React.FC = () => {
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase">Nombre</label>
             <input type="text" value={form.name} onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-400" />
+              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-primary-400" />
           </div>
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase">Descripción</label>
             <textarea value={form.description} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-400 resize-none" rows={4} />
+              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-primary-400 resize-none" rows={4} />
           </div>
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase">Dirección</label>
             <input type="text" value={form.address} onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
-              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-400" />
+              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-primary-400" />
           </div>
 
           {/* Imagen principal */}
@@ -168,7 +168,7 @@ const EditPlacePage: React.FC = () => {
               </div>
             ) : (
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImage}
-                className="w-full h-32 border-2 border-dashed border-stone-300 rounded-xl flex items-center justify-center gap-2 text-stone-400 hover:border-amber-400 hover:text-amber-500 transition-all disabled:opacity-50">
+                className="w-full h-32 border-2 border-dashed border-stone-300 rounded-xl flex items-center justify-center gap-2 text-stone-400 hover:border-primary-400 hover:text-primary-500 transition-all disabled:opacity-50">
                 {uploadingImage ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
                 {uploadingImage ? 'Subiendo...' : 'Agregar imagen principal'}
               </button>
@@ -190,7 +190,7 @@ const EditPlacePage: React.FC = () => {
                 </div>
               ))}
               <button type="button" onClick={() => galleryInputRef.current?.click()} disabled={uploadingGallery}
-                className="aspect-square border-2 border-dashed border-stone-300 rounded-lg flex items-center justify-center text-stone-400 hover:border-amber-400 hover:text-amber-500 transition-all disabled:opacity-50">
+                className="aspect-square border-2 border-dashed border-stone-300 rounded-lg flex items-center justify-center text-stone-400 hover:border-primary-400 hover:text-primary-500 transition-all disabled:opacity-50">
                 {uploadingGallery ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
               </button>
             </div>
@@ -201,7 +201,7 @@ const EditPlacePage: React.FC = () => {
           </div>
 
           <button type="submit" disabled={saving}
-            className="w-full py-3.5 bg-amber-500 text-white rounded-xl font-semibold text-sm hover:bg-amber-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+            className="w-full py-3.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
             {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>

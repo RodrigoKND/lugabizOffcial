@@ -167,6 +167,8 @@ export const authService = {
       bio: data.bio,
       isOwner: data.is_owner || false,
       ownerBusinessName: data.owner_business_name,
+      identityVerified: data.identity_verified || false,
+      businessDocsVerified: data.business_docs_verified || false,
       banned: data.banned || false,
       banReason: data.ban_reason,
       createdAt: new Date(data.created_at),
