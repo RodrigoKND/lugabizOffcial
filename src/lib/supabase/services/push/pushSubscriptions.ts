@@ -2,12 +2,14 @@ import { supabase } from '@lib/supabase/client';
 
 export const pushSubscriptionsService = {
   async save(userId: string, subscription: PushSubscription): Promise<void> {
+    // Upsert por endpoint: permite múltiples dispositivos por usuario.
     const { error } = await supabase
       .from('push_subscriptions')
       .upsert({
         user_id: userId,
+        endpoint: subscription.endpoint,
         subscription: JSON.parse(JSON.stringify(subscription)),
-      }, { onConflict: 'user_id' });
+      }, { onConflict: 'endpoint' });
     if (error) throw error;
   },
 

@@ -49,12 +49,15 @@ export function usePushNotifications() {
         }
 
         if (sub && user) {
+          // Upsert por ENDPOINT (no por user_id): así un mismo usuario puede tener
+          // varias suscripciones (móvil + desktop) sin que una sobrescriba a la otra.
           await supabase
             .from('push_subscriptions')
             .upsert({
               user_id: user.id,
+              endpoint: sub.endpoint,
               subscription: JSON.parse(JSON.stringify(sub)),
-            }, { onConflict: 'user_id' });
+            }, { onConflict: 'endpoint' });
         }
       } catch (err) {
         console.error('Push registration error:', err);

@@ -58,6 +58,7 @@ export interface UserRolesUpdate {
 export interface PushSubscriptionsRow {
   id: string;
   user_id: string;
+  endpoint: string | null;
   subscription: Record<string, unknown>;
   created_at: string;
 }
@@ -65,6 +66,7 @@ export interface PushSubscriptionsRow {
 export interface PushSubscriptionsInsert {
   id?: string;
   user_id: string;
+  endpoint?: string | null;
   subscription: Record<string, unknown>;
   created_at?: string;
 }
@@ -72,5 +74,6 @@ export interface PushSubscriptionsInsert {
 export interface PushSubscriptionsUpdate {
   id?: string;
   user_id?: string;
+  endpoint?: string | null;
   subscription?: Record<string, unknown>;
 }

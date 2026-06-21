@@ -161,8 +161,11 @@ serve(async (req) => {
             try {
               await webPush.sendNotification(sub.subscription, pushPayload)
               return true
-            } catch {
-              staleIds.push(sub.id)
+            } catch (e: any) {
+              const code = e?.statusCode ?? e?.status
+              // Solo borrar si la suscripción está muerta (404/410); un 403 (VAPID) o
+              // un timeout NO debe eliminar una suscripción válida.
+              if (code === 404 || code === 410) staleIds.push(sub.id)
               return false
             }
           })

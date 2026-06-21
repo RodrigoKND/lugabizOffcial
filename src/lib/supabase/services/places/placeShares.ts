@@ -7,6 +7,8 @@ export interface PlaceShare {
   sharedBy: string;
   sharedUrl: string;
   createdAt: Date;
+  placeName?: string;
+  placeImage?: string;
 }
 
 export const placeSharesService = {
@@ -56,7 +58,7 @@ export const placeSharesService = {
   async getSharesByUser(userId: string): Promise<PlaceShare[]> {
     const { data, error } = await supabase
       .from('place_shares')
-      .select('*')
+      .select('*, place:places(id, name, image)')
       .eq('shared_by', userId)
       .order('created_at', { ascending: false });
 
@@ -67,6 +69,8 @@ export const placeSharesService = {
       sharedBy: item.shared_by,
       sharedUrl: item.shared_url,
       createdAt: new Date(item.created_at),
+      placeName: item.place?.name,
+      placeImage: item.place?.image,
     }));
   },
 
