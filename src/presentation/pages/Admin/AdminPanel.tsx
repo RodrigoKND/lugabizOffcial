@@ -1650,11 +1650,23 @@ function VerificationsSection() {
   );
 }
 
+// Insignia por estado de documentos de un negocio (dorada = verificado).
+const DOCS_BADGE: Record<string, { label: string; cls: string }> = {
+  approved: { label: 'Verificado', cls: 'bg-gradient-to-r from-amber-400 to-amber-500 text-white' },
+  pending:  { label: 'En revisión', cls: 'bg-blue-100 text-blue-700' },
+  rejected: { label: 'Rechazado', cls: 'bg-stone-100 text-stone-500' },
+  none:     { label: 'Emergente', cls: 'bg-stone-100 text-stone-500' },
+};
+
+type RevokeTarget = { target: 'business_docs' | 'identity'; businessId?: string; ownerId?: string; title: string; message: string };
+
 function BusinessesSection() {
   const [items, setItems] = useState<AdminOwnerBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
   const [target, setTarget] = useState<AdminOwnerBusiness | null>(null);
+  const [revoke, setRevoke] = useState<RevokeTarget | null>(null);
+  const [reason, setReason] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -1673,6 +1685,24 @@ function BusinessesSection() {
       toast.success('Negocio eliminado');
     } catch (e: any) { toast.error(e?.message ?? 'No se pudo eliminar'); }
     finally { setActing(null); setTarget(null); }
+  };
+
+  const doRevoke = async () => {
+    if (!revoke) return;
+    const key = revoke.target === 'identity' ? `id-${revoke.ownerId}` : `docs-${revoke.businessId}`;
+    setActing(key);
+    try {
+      await ownerVerificationService.revokeBadge({
+        target: revoke.target,
+        businessId: revoke.businessId,
+        ownerId: revoke.ownerId,
+        notes: reason.trim() || undefined,
+      });
+      toast.success('Insignia retirada. Se avisó al dueño.');
+      setRevoke(null); setReason('');
+      await load();
+    } catch (e: any) { toast.error(e?.message ?? 'No se pudo retirar la insignia'); }
+    finally { setActing(null); }
   };
 
   // Agrupar por dueño
@@ -1714,18 +1744,40 @@ function BusinessesSection() {
                   <span className="text-sm font-semibold text-stone-700">{g.name ?? uid}</span>
                   <span className="text-[11px] text-stone-400">{g.email}</span>
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700">{g.list.length}/3</span>
+                  {/* Retirar la verificación de IDENTIDAD de la cuenta (quita todas las
+                      insignias del dueño). Identidad es por-cuenta, por eso va en el grupo. */}
+                  <button
+                    onClick={() => { setReason(''); setRevoke({ target: 'identity', ownerId: uid, title: 'Retirar verificación de identidad', message: `Se quitará la verificación de la cuenta de ${g.name ?? 'este dueño'}: dejará de ser dueño verificado y todos sus negocios perderán la insignia dorada. Se le avisará por la campana y por email.` }); }}
+                    disabled={acting === `id-${uid}`}
+                    className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50">
+                    {acting === `id-${uid}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldAlert className="w-3 h-3" />} Retirar identidad
+                  </button>
                 </div>
                 <div className="space-y-1.5">
-                  {g.list.map(biz => (
+                  {g.list.map(biz => {
+                    const badge = DOCS_BADGE[biz.docsStatus] ?? DOCS_BADGE.none;
+                    return (
                     <div key={biz.id} className="flex items-center gap-2 px-3 py-2 bg-stone-50 rounded-lg">
                       <Store className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                       <span className="text-sm text-stone-700 flex-1 min-w-0 truncate">{biz.name}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${badge.cls}`}>{badge.label}</span>
+                      {biz.docsStatus === 'approved' && (
+                        <button
+                          onClick={() => { setReason(''); setRevoke({ target: 'business_docs', businessId: biz.id, title: 'Retirar insignia dorada', message: `La insignia de negocio verificado de "${biz.name}" volverá a estado emergente (gris). El dueño podrá reenviar sus documentos. Se le avisará por la campana y por email.` }); }}
+                          disabled={acting === `docs-${biz.id}`}
+                          title="Retirar insignia dorada"
+                          className="p-1.5 rounded-lg text-amber-500 hover:text-amber-700 hover:bg-amber-50 transition-all disabled:opacity-50">
+                          {acting === `docs-${biz.id}` ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BadgeCheck className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
                       <button onClick={() => setTarget(biz)} disabled={acting === biz.id}
+                        title="Eliminar negocio"
                         className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
                         {acting === biz.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                       </button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1742,6 +1794,46 @@ function BusinessesSection() {
         confirmLabel="Eliminar"
         variant="danger"
       />
+
+      {/* Modal de retiro de insignia (con motivo opcional que se le envía al dueño). */}
+      <AnimatePresence>
+        {revoke && (
+          <motion.div
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setRevoke(null)}>
+            <motion.div
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+              initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }}
+              onClick={e => e.stopPropagation()}>
+              <div className="p-5 space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                    <ShieldAlert className="w-4 h-4 text-red-500" />
+                  </div>
+                  <h3 className="font-bold text-stone-800 text-sm">{revoke.title}</h3>
+                </div>
+                <p className="text-xs text-stone-500 leading-relaxed">{revoke.message}</p>
+                <textarea
+                  value={reason} onChange={e => setReason(e.target.value)}
+                  placeholder="Motivo para el dueño (opcional)"
+                  rows={2}
+                  className="w-full text-xs border border-stone-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-200" />
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => setRevoke(null)}
+                    className="flex-1 py-2 rounded-xl bg-stone-100 text-stone-600 text-sm font-semibold hover:bg-stone-200 transition-colors">
+                    Cancelar
+                  </button>
+                  <button onClick={doRevoke} disabled={acting != null}
+                    className="flex-1 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
+                    {acting != null ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />} Retirar
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

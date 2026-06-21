@@ -187,4 +187,17 @@ export const ownerVerificationService = {
     if (error) throw new Error(error.message ?? 'No se pudo procesar la decisión.');
     if ((data as any)?.error) throw new Error((data as any).error);
   },
+
+  /**
+   * Retira/baja una insignia (admin). 'business_docs' => la dorada de un negocio
+   * vuelve a gris; 'identity' => retira toda la verificación de la cuenta. En ambos
+   * casos el dueño recibe aviso in-app y por email (si el correo está configurado).
+   */
+  async revokeBadge(params: { target: 'business_docs' | 'identity'; businessId?: string; ownerId?: string; notes?: string }): Promise<void> {
+    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
+      body: { action: 'admin-revoke', ...params },
+    });
+    if (error) throw new Error(error.message ?? 'No se pudo retirar la insignia.');
+    if ((data as any)?.error) throw new Error((data as any).error);
+  },
 };
