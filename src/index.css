@@ -247,10 +247,12 @@ nav.fixed button svg.text-text-secondary {
   color: #9b8db5 !important;
 }
 
-/* Navbar link hover — subtle glow */
-nav.sticky [class*="hover:bg-primary-50\/50"]:hover,
-nav.fixed [class*="hover:bg-primary-50\/50"]:hover {
-  background: rgba(147, 51, 234, 0.12) !important;
+/* Navbar link hover — subtle glow (solo en dispositivos con puntero real) */
+@media (hover: hover) {
+  nav.sticky [class*="hover:bg-primary-50\/50"]:hover,
+  nav.fixed [class*="hover:bg-primary-50\/50"]:hover {
+    background: rgba(147, 51, 234, 0.12) !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -468,8 +470,10 @@ div.min-h-screen:has(> header.sticky) .text-slate-400 > svg {
 .max-w-7xl aside .bg-stone-50 {
   background: rgba(168, 128, 250, 0.06) !important;
 }
-.max-w-7xl aside .hover\:bg-stone-50:hover {
-  background: rgba(168, 128, 250, 0.1) !important;
+@media (hover: hover) {
+  .max-w-7xl aside .hover\:bg-stone-50:hover {
+    background: rgba(168, 128, 250, 0.1) !important;
+  }
 }
 
 /* Social group pills in sidebar */
@@ -477,8 +481,10 @@ div.min-h-screen:has(> header.sticky) .text-slate-400 > svg {
   background: rgba(255, 255, 255, 0.04) !important;
   border-color: rgba(168, 128, 250, 0.12) !important;
 }
-.max-w-7xl aside .hover\:border-primary-300:hover {
-  border-color: rgba(168, 128, 250, 0.3) !important;
+@media (hover: hover) {
+  .max-w-7xl aside .hover\:border-primary-300:hover {
+    border-color: rgba(168, 128, 250, 0.3) !important;
+  }
 }
 
 /* Star rating buttons */
@@ -562,14 +568,16 @@ div.min-h-screen:has(> header.sticky) .text-slate-400 > svg {
 /* ═══════════════════════════════════════════════════════
    COMMUNITY CARDS — LUGABIZ DISTINCTIVE STYLE
    ═══════════════════════════════════════════════════════ */
-/* Community search cards: purple glow + lift on hover */
-a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover,
-button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover {
-  box-shadow:
-    0 8px 32px rgba(147, 51, 234, 0.15),
-    0 0 0 1px rgba(168, 128, 250, 0.25) !important;
-  border-color: rgba(168, 128, 250, 0.3) !important;
-  transform: translateY(-2px) !important;
+/* Community search cards: purple glow + lift on hover (solo con puntero real) */
+@media (hover: hover) {
+  a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover,
+  button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover {
+    box-shadow:
+      0 8px 32px rgba(147, 51, 234, 0.15),
+      0 0 0 1px rgba(168, 128, 250, 0.25) !important;
+    border-color: rgba(168, 128, 250, 0.3) !important;
+    transform: translateY(-2px) !important;
+  }
 }
 
 /* Background transition on hover */
@@ -592,23 +600,31 @@ button[class*="rounded-2xl"][class*="border-primary-100\/40"]::after {
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
-a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after,
-button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after {
-  opacity: 1;
+@media (hover: hover) {
+  a[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after,
+  button[class*="rounded-2xl"][class*="border-primary-100\/40"]:hover::after {
+    opacity: 1;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
    GENERAL ENHANCED HOVER ANIMATIONS
    ═══════════════════════════════════════════════════════ */
-/* All primary buttons: glow on hover */
-[class*="bg-primary-500"]:not(nav *):hover {
-  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.35);
-  transform: translateY(-1px);
-}
+/* Efectos hover globales — SOLO en dispositivos con puntero real (mouse).
+   En touch, un :hover con transform/box-shadow provoca "sticky hover":
+   el primer toque solo activa el hover y el click recién dispara al segundo
+   toque. Por eso, sin este media query, había que dar doble click para navegar. */
+@media (hover: hover) {
+  /* All primary buttons: glow on hover */
+  [class*="bg-primary-500"]:not(nav *):hover {
+    box-shadow: 0 4px 20px rgba(147, 51, 234, 0.35);
+    transform: translateY(-1px);
+  }
 
-/* All clickable cards with shadow: purple hover */
-[class*="hover:shadow-md"]:hover {
-  box-shadow: 0 8px 30px rgba(147, 51, 234, 0.12) !important;
+  /* All clickable cards with shadow: purple hover */
+  [class*="hover:shadow-md"]:hover {
+    box-shadow: 0 8px 30px rgba(147, 51, 234, 0.12) !important;
+  }
 }
 
 /* Interactive elements: smooth transitions */

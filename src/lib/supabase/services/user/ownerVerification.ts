@@ -11,6 +11,7 @@ export interface OwnerVerification {
   userId: string;
   kind: VerificationKind;
   status: VerificationStatus;
+  businessId?: string | null;
   businessName?: string | null;
   extracted?: Record<string, unknown>;
   docUrls?: string[];
@@ -24,6 +25,7 @@ export interface OwnerVerification {
 export interface PendingVerification extends OwnerVerification {
   userName?: string;
   userEmail?: string;
+  userAvatar?: string;
   docUrls: string[]; // URLs firmadas de corta duración (solo admin)
 }
 
@@ -33,6 +35,7 @@ function mapRow(r: any): OwnerVerification {
     userId: r.user_id,
     kind: r.kind,
     status: r.status,
+    businessId: r.business_id ?? null,
     businessName: r.business_name,
     extracted: r.extracted ?? {},
     docUrls: r.doc_urls ?? [],
@@ -125,17 +128,17 @@ export const ownerVerificationService = {
     return mapRow((data as any).verification);
   },
 
-  /** Envía documentos OPCIONALES de negocio (NIT/SEPREC/licencia) para el badge dorado. */
+  /** Envía documentos de negocio (NIT/SEPREC/licencia) de UN negocio concreto para su insignia dorada. */
   async submitBusinessDocs(
     userId: string,
-    params: { businessName: string; docFiles: File[] },
+    params: { businessId: string; businessName: string; docFiles: File[] },
   ): Promise<OwnerVerification> {
     const docPaths: string[] = [];
     for (let i = 0; i < params.docFiles.length; i++) {
-      docPaths.push(await uploadDoc(userId, 'business_docs', `doc${i}`, params.docFiles[i]));
+      docPaths.push(await uploadDoc(userId, 'business_docs', `${params.businessId}-doc${i}`, params.docFiles[i]));
     }
     const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'submit-business-docs', businessName: params.businessName, docPaths },
+      body: { action: 'submit-business-docs', businessId: params.businessId, businessName: params.businessName, docPaths },
     });
     if (error) throw new Error(error.message ?? 'No se pudieron enviar los documentos.');
     if ((data as any)?.error) throw new Error((data as any).error);
@@ -171,6 +174,7 @@ export const ownerVerificationService = {
       ...mapRow(r),
       userName: r.user_name,
       userEmail: r.user_email,
+      userAvatar: r.user_avatar,
       docUrls: r.doc_urls_signed || [],
     }));
   },

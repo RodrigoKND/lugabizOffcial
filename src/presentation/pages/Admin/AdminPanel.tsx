@@ -1578,9 +1578,16 @@ function VerificationsSection() {
           <div className="divide-y divide-stone-50">
             {items.map(v => (
               <div key={v.id} className="p-5 space-y-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-semibold text-stone-700">{v.userName ?? v.userId}</span>
-                  <span className="text-[11px] text-stone-400">{v.userEmail}</span>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {/* Foto de perfil del usuario que envió la solicitud — ayuda a no
+                      perderse cuando hay muchas solicitudes y a cotejar con la selfie. */}
+                  <img src={v.userAvatar || '/avatar.png'} alt={v.userName ?? ''}
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-stone-100 shrink-0"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/avatar.png'; }} />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-stone-700 leading-tight">{v.userName ?? v.userId}</span>
+                    <span className="text-[11px] text-stone-400 leading-tight">{v.userEmail}</span>
+                  </div>
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${v.kind === 'identity' ? 'bg-blue-100 text-blue-700' : 'bg-primary-100 text-primary-700'}`}>
                     {v.kind === 'identity' ? (<><Sparkles className="w-3 h-3 inline -mt-0.5" /> Identidad</>) : (<><FileText className="w-3 h-3 inline -mt-0.5" /> Docs de negocio</>)}
                   </span>

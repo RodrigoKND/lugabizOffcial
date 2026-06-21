@@ -18,6 +18,7 @@ export interface AuthContextType {
   isAdmin: boolean;
   resendConfirmation: (email: string) => Promise<boolean>;
   updateProfile: (updates: Partial<User>) => Promise<boolean>;
+  refreshUser: () => Promise<void>;
   uploadAvatar: (file: File) => Promise<string | null>;
   notifications: AppNotification[];
   unreadCount: number;

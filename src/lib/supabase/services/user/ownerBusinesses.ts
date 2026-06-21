@@ -2,10 +2,14 @@ import { supabase } from '@lib/supabase/client';
 
 export const MAX_BUSINESSES = 3;
 
+/** Estado de verificación de documentos de un negocio (cada negocio es una entidad). */
+export type BusinessDocsStatus = 'none' | 'pending' | 'approved' | 'rejected';
+
 export interface OwnerBusiness {
   id: string;
   userId: string;
   name: string;
+  docsStatus: BusinessDocsStatus;
   createdAt: string;
 }
 
@@ -15,7 +19,13 @@ export interface AdminOwnerBusiness extends OwnerBusiness {
 }
 
 function mapRow(r: any): OwnerBusiness {
-  return { id: r.id, userId: r.user_id, name: r.name, createdAt: r.created_at };
+  return {
+    id: r.id,
+    userId: r.user_id,
+    name: r.name,
+    docsStatus: (r.docs_status ?? 'none') as BusinessDocsStatus,
+    createdAt: r.created_at,
+  };
 }
 
 export const ownerBusinessesService = {

@@ -50,7 +50,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {user.isOwner && user.ownerBusinessName && (
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mt-2">
             {user.businessDocsVerified ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold ring-1 ring-amber-200">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-white rounded-lg text-xs font-bold ring-1 ring-amber-300/60 shadow-sm shadow-amber-500/30">
                 <BadgeCheck className="w-3.5 h-3.5" /> Negocio verificado
               </span>
             ) : user.identityVerified ? (

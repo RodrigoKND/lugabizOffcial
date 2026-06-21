@@ -409,14 +409,14 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
       {user ? (
         <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmitReview}
-          className="bg-gradient-to-br from-purple-50 to-orange-50 rounded-xl p-6 mb-6">
-          <h4 className="font-semibold text-gray-900 mb-4">Escribe una reseña</h4>
+          className="bg-white rounded-xl p-6 mb-6">
+          <h4 className="font-semibold text-gray-300 mb-4">Escribe una reseña</h4>
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">Calificación</label>
+            <label className="block text-gray-400 font-medium mb-2">Calificación</label>
             {renderStars(rating, setRating, hoveredRating, setHoveredRating)}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">Comentario</label>
+            <label className="block text-gray-400 font-medium mb-2">Comentario</label>
             <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all resize-none"
               placeholder="Comparte tu experiencia en este lugar..." required />
@@ -424,7 +424,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
           <button type="submit" disabled={rating === 0 || !comment.trim() || isSubmitting}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
               rating > 0 && comment.trim() && !isSubmitting
-                ? 'bg-gradient-to-r from-primary-500 to-tomato text-white hover:shadow-lg transform hover:scale-105'
+                ? 'bg-purple-600 text-white hover:shadow-lg transform hover:scale-105'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}>
             {isSubmitting

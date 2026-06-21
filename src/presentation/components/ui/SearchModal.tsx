@@ -25,8 +25,8 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          animate={{ opacity: 1, pointerEvents: 'auto' }}
+          exit={{ opacity: 0, pointerEvents: 'none' }}
           transition={{ duration: 0.15 }}
           className="fixed inset-0 z-200 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4"
           onClick={onClose}

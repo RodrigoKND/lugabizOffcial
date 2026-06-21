@@ -357,6 +357,14 @@ section.min-h-screen.bg-stone-50.text-stone-800 [class*="hover:border-primary-"]
   border-color: rgba(168, 128, 250, 0.4) !important;
 }
 
+/* ── Fix: opciones de <select> con letra invisible (Windows/Chrome pinta el
+   fondo de las <option> en blanco aunque el select tenga color-scheme:dark) ── */
+.min-h-screen.bg-slate-50 select option,
+section.min-h-screen.bg-stone-50.text-stone-800 select option {
+  background-color: #1a0f2e !important;
+  color: #e4d4f5 !important;
+}
+
 /* Success screen */
 div.min-h-screen.bg-stone-50:has(> div.max-w-sm) {
   background: #0d0620 !important;

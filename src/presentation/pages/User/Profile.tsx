@@ -14,7 +14,7 @@ import { useProfileData, useProfileEdit } from '@presentation/hooks';
 import toast from 'react-hot-toast';
 
 const Profile: React.FC = () => {
-  const { user, logout, isAdmin, notifications, unreadCount } = useAuth();
+  const { user, logout, isAdmin, notifications, unreadCount, refreshUser } = useAuth();
   const { getLengthPlacesByUserId, getLengthReviewsByUserId } = usePlaces();
 
   const { savedPlaces, myEvents, attendingEvents, mySurveys, setMyEvents, refreshSurveys } = useProfileData();
@@ -43,6 +43,10 @@ const Profile: React.FC = () => {
   }, [searchParams, setSearchParams]);
 
   useEffect(() => { if (isAdmin) edgeService.createOwnerAnnouncement('', '').catch(() => {}); }, [isAdmin]);
+
+  // Al entrar al perfil, re-leemos las banderas de verificación desde la DB: así la
+  // insignia dorada aparece apenas el admin aprueba los documentos, sin re-login.
+  useEffect(() => { refreshUser(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) return <Navigate to="/" replace />;
 

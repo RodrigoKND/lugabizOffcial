@@ -10,7 +10,10 @@ interface Props {
   onClose: () => void;
 }
 
-type Step = 'intro' | 'business' | 'identity' | 'analyzing' | 'review' | 'docs' | 'sending' | 'done' | 'pending' | 'verified';
+// El wizard verifica SOLO la identidad de la persona (una vez por cuenta).
+// Los documentos de cada negocio se suben por separado desde "Mis negocios"
+// (cada negocio es una entidad distinta con su propia insignia dorada).
+type Step = 'intro' | 'business' | 'identity' | 'analyzing' | 'review' | 'sending' | 'done' | 'pending' | 'verified';
 
 // Selector de un solo archivo con vista previa, estilo de la app (primary-*)
 const FilePicker: React.FC<{
@@ -49,10 +52,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
   const [selfie, setSelfie] = useState<File | null>(null);
   const [ciFront, setCiFront] = useState<File | null>(null);
   const [ciBack, setCiBack] = useState<File | null>(null);
-  const [bizDocs, setBizDocs] = useState<File[]>([]);
   const [precheck, setPrecheck] = useState<IdentityPrecheck | null>(null);
-  // docsOnly = el dueño ya tiene la identidad verificada y solo sube documentos de negocio.
-  const [docsOnly, setDocsOnly] = useState(false);
   // Inicializamos una sola vez por montaje: así cerrar/abrir la modal NO borra el
   // progreso (el estado vive en memoria). Tras un refresh el componente se vuelve a
   // montar y restauramos el BORRADOR desde el servidor (datos sensibles nunca en el navegador).
@@ -66,16 +66,14 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
       .then((vs: OwnerVerification[]) => {
         const pendingIdentity = vs.find(v => v.kind === 'identity' && v.status === 'pending');
         const pendingDocs = vs.find(v => v.kind === 'business_docs' && v.status === 'pending');
-        if (pendingIdentity || pendingDocs) { setStep('pending'); return; }
+        // Solo nos importa la identidad pendiente aquí (los docs de negocio se
+        // gestionan en "Mis negocios"); pendingDocs se ignora en este wizard.
+        void pendingDocs;
+        if (pendingIdentity) { setStep('pending'); return; }
 
-        // Si el admin ya verificó la identidad, no se rehace: solo faltan los documentos de negocio.
-        if (user.identityVerified) {
-          if (user.businessDocsVerified) { setStep('verified'); return; }
-          setDocsOnly(true);
-          setBusinessName(user.ownerBusinessName || '');
-          setStep('docs');
-          return;
-        }
+        // Si el admin ya verificó la identidad, no hay nada que rehacer aquí: la
+        // verificación de documentos de cada negocio se hace desde "Mis negocios".
+        if (user.identityVerified) { setStep('verified'); return; }
 
         const draft = vs.find(v => v.kind === 'identity' && v.status === 'draft');
         if (draft) {
@@ -102,7 +100,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
   if (!user) return null;
 
   const reset = () => {
-    setStep('intro'); setFullName(''); setSelfie(null); setCiFront(null); setCiBack(null); setBizDocs([]); setPrecheck(null); setDocsOnly(false);
+    setStep('intro'); setFullName(''); setSelfie(null); setCiFront(null); setCiBack(null); setPrecheck(null);
   };
   const close = () => {
     // No reseteamos al cerrar: conservamos el progreso. Solo limpiamos tras enviar
@@ -134,37 +132,19 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
     setStep('identity');
   };
 
-  // Paso 2: enviar a revisión (solo si la IA no marcó 'fail').
+  // Paso 2: enviar la IDENTIDAD a revisión (solo si la IA no marcó 'fail').
+  // Los documentos de negocio NO se envían aquí: se suben por negocio en "Mis negocios".
   const submit = async () => {
     if (!precheck || precheck.verdict === 'fail' || !businessName.trim()) return;
     setStep('sending');
     try {
       await ownerVerificationService.submitIdentity(user.id, { businessName: businessName.trim(), precheck });
-      if (bizDocs.length) {
-        await ownerVerificationService.submitBusinessDocs(user.id, { businessName: businessName.trim(), docFiles: bizDocs });
-      }
       // No marcamos al usuario como dueño aquí: el rol se otorga solo cuando el
       // admin aprueba la identidad. Mientras tanto la solicitud queda "en revisión".
       setStep('done');
     } catch (e: any) {
       toast.error(e?.message ?? 'No se pudo enviar la verificación.');
       setStep('review');
-    }
-  };
-
-  // Envío SOLO de documentos de negocio (cuando la identidad ya está verificada).
-  const submitDocsOnly = async () => {
-    if (!bizDocs.length) return;
-    setStep('sending');
-    try {
-      await ownerVerificationService.submitBusinessDocs(user.id, {
-        businessName: (user.ownerBusinessName || businessName).trim() || 'Mi negocio',
-        docFiles: bizDocs,
-      });
-      setStep('done');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'No se pudieron enviar los documentos.');
-      setStep('docs');
     }
   };
 
@@ -205,9 +185,13 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
                 </div>
               ) : step === 'verified' ? (
                 <div className="text-center py-6 space-y-3">
-                  <BadgeCheck className="w-12 h-12 text-amber-500 mx-auto" />
-                  <h4 className="font-bold text-text-primary">Tu negocio ya está verificado</h4>
-                  <p className="text-sm text-text-secondary">Tenés la insignia dorada de negocio verificado. ¡No necesitás hacer nada más!</p>
+                  <BadgeCheck className="w-12 h-12 text-primary-500 mx-auto" />
+                  <h4 className="font-bold text-text-primary">Tu identidad ya está verificada</h4>
+                  <p className="text-sm text-text-secondary">
+                    Ya sos un dueño verificado. Para obtener la <strong>insignia dorada</strong> de cada negocio,
+                    subí sus documentos (NIT, SEPREC o licencia) desde <strong>Mis negocios</strong>. Cada negocio se
+                    verifica por separado.
+                  </p>
                   <button onClick={close} className="mt-2 px-6 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all">Entendido</button>
                 </div>
               ) : step === 'done' ? (
@@ -305,47 +289,16 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
                   ) : (
                     <div className="flex gap-2">
                       <button onClick={retake} className="px-4 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm flex items-center gap-1" title="Volver a tomar"><RotateCcw className="w-4 h-4" /></button>
-                      <button onClick={() => setStep('docs')}
+                      <button onClick={submit}
                         className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all flex items-center justify-center gap-1">
-                        Continuar <ChevronRight className="w-4 h-4" />
+                        Enviar a revisión <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                   )}
-                </div>
-              ) : step === 'docs' ? (
-                <div className="space-y-3">
-                  {docsOnly ? (
-                    <div className="flex items-start gap-2 p-3 bg-green-50 rounded-xl">
-                      <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                      <p className="text-xs text-green-700">Tu identidad ya está verificada. Subí tus documentos de negocio (NIT, SEPREC o licencia) para obtener la <strong>insignia dorada</strong> de negocio verificado.</p>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-xl">
-                      <FileCheck2 className="w-5 h-5 text-amber-500 shrink-0" />
-                      <p className="text-xs text-amber-700">Opcional. Si tu negocio está registrado (NIT, SEPREC, licencia), subilo para obtener la <strong>insignia dorada</strong> de máxima confianza. Si no lo tenés, podés saltarlo.</p>
-                    </div>
-                  )}
-                  <FilePicker label="Documento de negocio" hint="NIT / SEPREC / licencia"
-                    icon={<FileCheck2 className="w-5 h-5 text-primary-400" />}
-                    file={bizDocs[0] ?? null}
-                    onSelect={(f) => setBizDocs(f ? [f, ...bizDocs.slice(1)] : bizDocs.slice(1))} />
-                  {bizDocs.length > 0 && (
-                    <FilePicker label="Otro documento — opcional" hint="Agregar otro"
-                      icon={<FileCheck2 className="w-5 h-5 text-primary-400" />}
-                      file={bizDocs[1] ?? null}
-                      onSelect={(f) => setBizDocs(f ? [bizDocs[0], f] : [bizDocs[0]])} />
-                  )}
-                  <div className="flex gap-2 pt-1">
-                    {docsOnly ? (
-                      <button onClick={close} className="px-4 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm">Después</button>
-                    ) : (
-                      <button onClick={() => setStep('review')} className="px-4 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm flex items-center gap-1"><ChevronLeft className="w-4 h-4" /></button>
-                    )}
-                    <button onClick={docsOnly ? submitDocsOnly : submit} disabled={docsOnly && bizDocs.length === 0}
-                      className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all disabled:opacity-50 flex items-center justify-center gap-1">
-                      {docsOnly ? 'Enviar documentos' : 'Enviar a revisión'}
-                    </button>
-                  </div>
+                  <p className="text-[11px] text-text-secondary text-center">
+                    ¿Tu negocio tiene NIT, SEPREC o licencia? Tras verificar tu identidad podés subir los documentos de
+                    <strong> cada negocio</strong> desde <strong>Mis negocios</strong> para su insignia dorada.
+                  </p>
                 </div>
               ) : null}
             </div>

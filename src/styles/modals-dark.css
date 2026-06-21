@@ -219,3 +219,41 @@ section.min-h-screen select {
 .fixed.inset-0.z-\[60\] > [class*="rounded-2xl"] [class*="hover:bg-amber-"]:hover {
   background: rgba(251, 191, 36, 0.1) !important;
 }
+
+/* ═══ FIX: selects de categoría y autocompletado de dirección en modales ═══ */
+
+/* El <select> de categoría del modal de evento está anidado (no es hijo directo),
+   por eso la regla con ">" no lo alcanzaba y la letra quedaba negra sobre fondo
+   oscuro. Cubrimos cualquier <select> dentro de modales. */
+[aria-modal="true"] select,
+.z-50 select,
+.z-\[70\] select,
+.z-\[100\] select,
+.z-\[200\] select,
+.fixed.inset-0[class*="bg-black"] [class*="bg-white"][class*="rounded-"] select {
+  color-scheme: dark !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(168, 128, 250, 0.15) !important;
+  color: #e4d4f5 !important;
+}
+
+/* Las <option> del desplegable se pintan con fondo blanco del sistema → texto
+   invisible. Forzamos fondo oscuro + texto claro en TODA la app (todos los
+   selects viven en superficies oscuras tras el rediseño). */
+select option {
+  background-color: #1a0f2e !important;
+  color: #e4d4f5 !important;
+}
+
+/* Sugerencias del autocompletado de dirección (text-stone-*) dentro del modal de
+   evento (z-50): el scope z-50 solo remapeaba text-text-*, no text-stone-*, así
+   que el texto de las sugerencias quedaba oscuro sobre el desplegable oscuro. */
+.z-50 [class*="text-stone-800"],
+.z-50 [class*="text-stone-700"],
+.z-50 [class*="text-stone-600"] {
+  color: #e4d4f5 !important;
+}
+.z-50 [class*="text-stone-500"],
+.z-50 [class*="text-stone-400"] {
+  color: #aba0bc !important;
+}

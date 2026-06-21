@@ -114,6 +114,11 @@ function AppRoutes() {
   // Background location is set when navigating to /place/:id from the feed
   // so the feed stays mounted underneath and the place slides up as a sheet
   const background = location.state?.background as typeof location | undefined;
+  // Ubicación que realmente se pinta como "página" (cuando hay modal sheet de
+  // lugar, debajo sigue la página de fondo). La transición se keyea por su
+  // pathname: abrir/cerrar el sheet NO dispara transición de página (el sheet
+  // tiene su propia animación), pero navegar entre páginas sí.
+  const displayLocation = background || location;
 
   return (
     <>
@@ -125,26 +130,41 @@ function AppRoutes() {
       <Navbar onAuthClick={() => setIsAuthModalOpen(true)} />
       <main className="min-h-screen flex flex-col w-full">
         <div className="flex-1">
-          <Suspense fallback={<LoadingSpinner />}>
-            {/* When a background exists, render that page (keeps feed alive) */}
-            <Routes location={background || location}>
-              <Route path="/" element={<Home />} />
-              <Route path="/place/:id" element={<PlaceDetail />} />
-              <Route path="/add-place" element={<AddPlace />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/event/:id" element={<EventDetailPage />} />
-              <Route path="/events/feed" element={<EventFeedPage />} />
-              <Route path="/edit-event/:id" element={<EditEventPage />} />
-              <Route path="/edit-place/:id" element={<EditPlacePage />} />
-              <Route path="/share/place/:shareId" element={<SharedPlacePage />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/confirmation" element={<Confirmation />} />
-              <Route path="/comunidad" element={<CommunityPage />} />
-              <Route path="/chat" element={<ChatPage />} />
-              <Route path="/asesor" element={<BusinessAdvisorPage />} />
-              <Route path="*" element={<Home />} />
-            </Routes>
-          </Suspense>
+          {/* Transición tipo Spotify entre páginas: crossfade rápido. Usamos SOLO
+              opacity (sin transform) a propósito: muchos modales son `fixed inset-0`
+              sin portal, y un transform persistente en este wrapper los atraparía
+              (position:fixed quedaría relativo al wrapper). `mode="wait"` evita que
+              dos páginas se solapen (y con ello que una "trague" clicks). */}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={displayLocation.pathname}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Suspense fallback={<LoadingSpinner />}>
+                {/* When a background exists, render that page (keeps feed alive) */}
+                <Routes location={displayLocation}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/place/:id" element={<PlaceDetail />} />
+                  <Route path="/add-place" element={<AddPlace />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/event/:id" element={<EventDetailPage />} />
+                  <Route path="/events/feed" element={<EventFeedPage />} />
+                  <Route path="/edit-event/:id" element={<EditEventPage />} />
+                  <Route path="/edit-place/:id" element={<EditPlacePage />} />
+                  <Route path="/share/place/:shareId" element={<SharedPlacePage />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/confirmation" element={<Confirmation />} />
+                  <Route path="/comunidad" element={<CommunityPage />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                  <Route path="/asesor" element={<BusinessAdvisorPage />} />
+                  <Route path="*" element={<Home />} />
+                </Routes>
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         </div>
         <ChatButton isVisible />
         <PendingSurveys />
@@ -164,8 +184,8 @@ function AppRoutes() {
                 <motion.div
                   key="place-sheet"
                   initial={{ y: '100%' }}
-                  animate={{ y: 0 }}
-                  exit={{ y: '100%' }}
+                  animate={{ y: 0, pointerEvents: 'auto' }}
+                  exit={{ y: '100%', pointerEvents: 'none' }}
                   transition={{ type: 'spring', damping: 32, stiffness: 320, mass: 0.9 }}
                   className="fixed inset-0 z-[200] bg-[#FDFCFB] overflow-y-auto overscroll-contain"
                   style={{ WebkitOverflowScrolling: 'touch' }}

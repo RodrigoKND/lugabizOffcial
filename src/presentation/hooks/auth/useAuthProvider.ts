@@ -216,6 +216,16 @@ export function useAuthProvider(): AuthContextType {
         return;
       }
 
+      // Verificación resuelta por el admin (identidad o documentos de negocio) →
+      // re-leemos el perfil EN TIEMPO REAL para que la insignia aparezca/cambie al
+      // instante (la dorada "Negocio verificado" solo tras aprobar, nunca antes),
+      // sin que el usuario tenga que recargar ni volver a iniciar sesión.
+      if (notif.type === 'system' && (notif.data?.kind === 'identity' || notif.data?.kind === 'business_docs')) {
+        authService.getUserProfile(user.id)
+          .then(fresh => setUser(prev => (prev ? { ...prev, ...fresh } : fresh)))
+          .catch(() => {});
+      }
+
       // nearby_push es solo registro de deduplicación (read:true), no mostrar
       if ('Notification' in window && Notification.permission === 'granted' && notif.type !== 'nearby_push') {
         const url = (notif.data?.url as string) || '/';
@@ -381,6 +391,20 @@ export function useAuthProvider(): AuthContextType {
     }
   }, [user]);
 
+  // Re-lee el perfil desde la DB y actualiza el estado. Necesario para que las
+  // banderas que solo cambia el backend (identity_verified, business_docs_verified,
+  // is_owner) se reflejen sin tener que cerrar sesión — p. ej. la insignia dorada
+  // que aparece cuando el admin aprueba los documentos de un negocio.
+  const refreshUser = useCallback(async (): Promise<void> => {
+    if (!user) return;
+    try {
+      const fresh = await authService.getUserProfile(user.id);
+      setUser(prev => prev ? { ...prev, ...fresh } : fresh);
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  }, [user]);
+
   const uploadAvatar = useCallback(async (file: File): Promise<string | null> => {
     if (!user) return null;
     try {
@@ -422,6 +446,7 @@ export function useAuthProvider(): AuthContextType {
     isAdmin,
     resendConfirmation,
     updateProfile,
+    refreshUser,
     uploadAvatar,
     notifications,
     unreadCount,
