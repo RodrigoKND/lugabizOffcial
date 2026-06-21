@@ -9,10 +9,10 @@ import {
   Bell, ArrowLeft, Loader2, X, Hash, Clock, UserX, UserCheck,
   ClipboardList, Flag, TrendingUp, Eye, Zap, Globe, BarChart2,
   RefreshCw, UserPlus, Store, Wifi, Database, Users2, ShieldAlert,
-  BadgeCheck, Sparkles, FileText,
+  BadgeCheck, Sparkles, FileText, Megaphone, Send, Link2, Crown, BellRing,
 } from 'lucide-react';
 import { getModerationLogs, markModerationLogReviewed, type ModerationLog } from '@lib/supabase/services/moderation/moderationService';
-import { ownerVerificationService, type PendingVerification, ownerBusinessesService, type AdminOwnerBusiness } from '@lib/supabase';
+import { ownerVerificationService, type PendingVerification, ownerBusinessesService, type AdminOwnerBusiness, broadcastService, type BroadcastAudience, type BroadcastResult } from '@lib/supabase';
 import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { adminService } from '@lib/supabase/services/admin/admin';
@@ -22,7 +22,7 @@ import toast from 'react-hot-toast';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'verifications' | 'businesses' | 'system';
+type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'verifications' | 'businesses' | 'marketing' | 'system';
 
 interface DashboardData {
   stats: { users: number; places: number; events: number; reviews: number; surveys: number; notifications: number } | null;
@@ -73,6 +73,12 @@ const SIDEBAR_GROUPS = [
       { id: 'verifications' as Section, label: 'Verificaciones', icon: BadgeCheck },
       { id: 'businesses' as Section, label: 'Negocios', icon: Store },
       { id: 'system' as Section, label: 'Sistema', icon: Activity },
+    ],
+  },
+  {
+    label: 'CRECIMIENTO',
+    items: [
+      { id: 'marketing' as Section, label: 'Marketing', icon: Megaphone },
     ],
   },
 ];
@@ -368,6 +374,7 @@ function AdminDashboard() {
               {section === 'moderation' && <AIModerationSection />}
               {section === 'verifications' && <VerificationsSection />}
               {section === 'businesses' && <BusinessesSection />}
+              {section === 'marketing' && <MarketingSection />}
               {section === 'system' && <SystemSection />}
             </motion.div>
           </AnimatePresence>
@@ -1834,6 +1841,273 @@ function BusinessesSection() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Marketing (campana in-app + push del navegador) ─────────────────────────────
+
+const AUDIENCES: { id: BroadcastAudience; label: string; desc: string; icon: any }[] = [
+  { id: 'all', label: 'Todos', desc: 'Toda la base de usuarios', icon: Users },
+  { id: 'owners', label: 'Dueños de negocio', desc: 'Cuentas con rol de dueño', icon: Crown },
+  { id: 'non_owners', label: 'Usuarios (no dueños)', desc: 'Clientes / exploradores', icon: Users2 },
+  { id: 'identity_verified', label: 'Identidad verificada', desc: 'Persona real confirmada', icon: Sparkles },
+  { id: 'business_verified', label: 'Negocios verificados', desc: 'Con insignia dorada', icon: BadgeCheck },
+  { id: 'specific', label: 'Específicos', desc: 'Elegís a mano', icon: UserCheck },
+];
+
+function MarketingSection() {
+  const [audience, setAudience] = useState<BroadcastAudience>('all');
+  const [heading, setHeading] = useState('');
+  const [message, setMessage] = useState('');
+  const [ctaUrl, setCtaUrl] = useState('');
+
+  // Audiencia específica
+  const [users, setUsers] = useState<{ id: string; name?: string; email?: string; avatar?: string }[]>([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [userQuery, setUserQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const [count, setCount] = useState<{ total: number } | null>(null);
+  const [sending, setSending] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [result, setResult] = useState<BroadcastResult | null>(null);
+
+  // Cargar usuarios solo cuando se elige "específicos".
+  useEffect(() => {
+    if (audience === 'specific' && !usersLoaded) {
+      adminService.getUsers()
+        .then(list => { setUsers(list.map(u => ({ id: u.id, name: u.name, email: u.email, avatar: u.avatar }))); setUsersLoaded(true); })
+        .catch((e: any) => toast.error(e?.message ?? 'No se pudieron cargar usuarios'));
+    }
+  }, [audience, usersLoaded]);
+
+  // Calcular el alcance al cambiar de audiencia o selección.
+  useEffect(() => {
+    let cancelled = false;
+    if (audience === 'specific') {
+      setCount({ total: selectedIds.size });
+      return;
+    }
+    setCount(null);
+    broadcastService.previewAudience(audience)
+      .then(c => { if (!cancelled) setCount(c); })
+      .catch(() => { if (!cancelled) setCount(null); });
+    return () => { cancelled = true; };
+  }, [audience, selectedIds]);
+
+  const toggleUser = (id: string) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
+
+  const filteredUsers = userQuery.trim()
+    ? users.filter(u => `${u.name ?? ''} ${u.email ?? ''}`.toLowerCase().includes(userQuery.toLowerCase()))
+    : users;
+
+  const validate = (): string | null => {
+    if (!heading.trim()) return 'Escribí un título para la campaña.';
+    if (!message.trim()) return 'Escribí el mensaje.';
+    if (audience === 'specific' && selectedIds.size === 0) return 'Elegí al menos un usuario.';
+    return null;
+  };
+
+  const onSendClick = () => {
+    const err = validate();
+    if (err) { toast.error(err); return; }
+    setConfirmOpen(true);
+  };
+
+  const doSend = async () => {
+    setConfirmOpen(false);
+    setSending(true);
+    setResult(null);
+    try {
+      const res = await broadcastService.send({
+        audience,
+        userIds: audience === 'specific' ? [...selectedIds] : undefined,
+        heading: heading.trim(),
+        message: message.trim(),
+        ctaUrl: ctaUrl.trim() || undefined,
+      });
+      setResult(res);
+      toast.success('Campaña enviada.');
+    } catch (e: any) {
+      toast.error(e?.message ?? 'No se pudo enviar la campaña.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const audienceLabel = AUDIENCES.find(a => a.id === audience)?.label ?? '';
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
+        <div className="p-5 border-b border-stone-100 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
+            <Megaphone className="w-4 h-4 text-primary-500" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-stone-800">Marketing</h3>
+            <p className="text-[11px] text-stone-400">Enviá avisos a tus usuarios por la campana y por push del navegador.</p>
+          </div>
+        </div>
+
+        {/* Cómo llega: campana siempre; push solo a quienes activaron notificaciones. */}
+        <div className="m-5 mb-0 flex items-start gap-2 text-[11px] bg-primary-50 border border-primary-100 rounded-xl px-3 py-2.5 text-primary-700">
+          <BellRing className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          <p>
+            El aviso llega a la <b>campana</b> dentro de Lugabiz y, además, como <b>notificación push del navegador</b>
+            {' '}a quienes hayan activado las notificaciones — así les llega aunque no estén dentro de la app.
+          </p>
+        </div>
+
+        <div className="p-5 space-y-5">
+          {/* Audiencia */}
+          <div>
+            <label className="text-xs font-semibold text-stone-600 mb-2 block">¿A quién?</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {AUDIENCES.map(a => {
+                const active = audience === a.id;
+                return (
+                  <button key={a.id} onClick={() => setAudience(a.id)}
+                    className={`text-left p-3 rounded-xl border transition-all ${active ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-100' : 'border-stone-200 hover:border-stone-300'}`}>
+                    <a.icon className={`w-4 h-4 mb-1 ${active ? 'text-primary-500' : 'text-stone-400'}`} />
+                    <p className={`text-xs font-semibold ${active ? 'text-primary-700' : 'text-stone-700'}`}>{a.label}</p>
+                    <p className="text-[10px] text-stone-400 leading-tight">{a.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Selector de usuarios específicos */}
+          {audience === 'specific' && (
+            <div className="border border-stone-200 rounded-xl overflow-hidden">
+              <div className="p-2.5 border-b border-stone-100 flex items-center gap-2">
+                <Search className="w-3.5 h-3.5 text-stone-400" />
+                <input value={userQuery} onChange={e => setUserQuery(e.target.value)}
+                  placeholder="Buscar por nombre o email…"
+                  className="flex-1 text-xs focus:outline-none" />
+                <span className="text-[10px] text-stone-400">{selectedIds.size} elegido(s)</span>
+              </div>
+              <div className="max-h-52 overflow-y-auto divide-y divide-stone-50">
+                {!usersLoaded ? (
+                  <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-primary-400" /></div>
+                ) : filteredUsers.length === 0 ? (
+                  <p className="text-center text-xs text-stone-400 py-8">Sin resultados</p>
+                ) : filteredUsers.slice(0, 80).map(u => {
+                  const sel = selectedIds.has(u.id);
+                  return (
+                    <button key={u.id} onClick={() => toggleUser(u.id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors ${sel ? 'bg-primary-50' : 'hover:bg-stone-50'}`}>
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${sel ? 'bg-primary-500 border-primary-500' : 'border-stone-300'}`}>
+                        {sel && <CheckCircle className="w-3 h-3 text-white" />}
+                      </div>
+                      <img src={u.avatar || '/avatar.png'} alt="" className="w-7 h-7 rounded-full object-cover"
+                        onError={e => { (e.target as HTMLImageElement).src = '/avatar.png'; }} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-stone-700 truncate">{u.name ?? 'Sin nombre'}</p>
+                        <p className="text-[10px] text-stone-400 truncate">{u.email ?? 'sin email'}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Contenido */}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold text-stone-600 mb-1 block">Título</label>
+              <input value={heading} onChange={e => setHeading(e.target.value)}
+                placeholder="Ej. Descubrí lo mejor de tu ciudad"
+                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-200" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-stone-600 mb-1 block">Mensaje</label>
+              <textarea value={message} onChange={e => setMessage(e.target.value)} rows={4}
+                placeholder="Escribí tu mensaje."
+                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-primary-200" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-stone-600 mb-1 block flex items-center gap-1"><Link2 className="w-3 h-3" /> Al tocar la notificación, llevar a (opcional)</label>
+              <input value={ctaUrl} onChange={e => setCtaUrl(e.target.value)}
+                placeholder="Ej. /comunidad  ·  /event/123  ·  https://…"
+                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-200" />
+            </div>
+          </div>
+
+          {/* Vista previa de la notificación */}
+          {(heading || message) && (
+            <div>
+              <label className="text-xs font-semibold text-stone-600 mb-2 block">Vista previa</label>
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm p-3 flex items-start gap-3 max-w-md">
+                <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
+                  <span className="text-white font-extrabold text-sm">L</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-stone-800 leading-snug">📢 {heading || 'Tu título aquí'}</p>
+                  <p className="text-xs text-stone-500 mt-0.5 whitespace-pre-wrap leading-snug">{message || 'Tu mensaje aquí…'}</p>
+                  <p className="text-[10px] text-stone-400 mt-1">Lugabiz · ahora</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Resumen de alcance + enviar */}
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <div className="text-xs text-stone-500">
+              {count == null ? (
+                <span className="inline-flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> calculando alcance…</span>
+              ) : (
+                <span><b className="text-stone-700">{count.total}</b> destinatario(s)</span>
+              )}
+            </div>
+            <button onClick={onSendClick} disabled={sending}
+              className="px-5 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center gap-2">
+              {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} Enviar campaña
+            </button>
+          </div>
+
+          {/* Resultado del envío */}
+          {result && (
+            <div className="rounded-xl border border-stone-200 p-4 space-y-2 bg-stone-50">
+              <p className="text-sm font-semibold text-stone-700">Resultado del envío</p>
+              <p className="text-xs text-stone-500">Audiencia: <b>{result.recipients}</b> destinatario(s).</p>
+              <p className="text-xs text-green-600 flex items-center gap-1"><Bell className="w-3 h-3" /> {result.inApp} aviso(s) en la campana.</p>
+              <p className="text-xs flex items-center gap-1">
+                <BellRing className="w-3 h-3 text-stone-400" />
+                <span className="text-green-600 font-semibold">{result.pushSent} push entregado(s)</span>
+                {result.push && result.push.failed > 0 && <span className="text-red-500 font-semibold"> · {result.push.failed} fallaron</span>}
+                {result.push && <span className="text-stone-400"> · {result.push.subscriptions} suscripción(es) hallada(s)</span>}
+              </p>
+              {result.push && result.push.subscriptions === 0 && (
+                <p className="text-[11px] text-stone-400">No hay suscripciones push para esta audiencia. El usuario debe entrar a Lugabiz y aceptar las notificaciones del navegador (en iPhone, además, agregar la app a la pantalla de inicio).</p>
+              )}
+              {result.push && result.push.errors.length > 0 && (
+                <div className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg p-2 space-y-1">
+                  <p className="font-semibold flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> El navegador rechazó el push:</p>
+                  {result.push.errors.map((e, i) => <p key={i} className="font-mono leading-snug">{e}</p>)}
+                  <p className="text-stone-500 mt-1">Un <b>403</b> casi siempre significa que las claves <b>VAPID</b> del servidor no coinciden con la pública que usa la app. Un <b>410/404</b> = suscripción vencida (se limpia sola).</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={doSend}
+        title="Enviar campaña"
+        message={`Vas a enviar "${heading}" a la audiencia: ${audienceLabel}${count ? ` (${count.total} destinatario(s))` : ''}. ¿Confirmás?`}
+        confirmLabel="Enviar"
+      />
     </div>
   );
 }

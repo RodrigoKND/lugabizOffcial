@@ -19,6 +19,8 @@ export { eventViewsService } from '@lib/supabase/services/events/eventViews';
 export { notificationsService } from '@lib/supabase/services/notifications/notifications';
 export { surveysService } from '@lib/supabase/services/notifications/surveys';
 export { adminService } from '@lib/supabase/services/admin/admin';
+export { broadcastService } from '@lib/supabase/services/admin/broadcast';
+export type { BroadcastAudience, BroadcastCampaign, BroadcastResult } from '@lib/supabase/services/admin/broadcast';
 export { marketSurveysService } from '@lib/supabase/services/surveys';
 export { pushSubscriptionsService, sendBrowserPush, sendSurveyPushNotification, sendAnnouncementPushNotification } from '@lib/supabase/services/push';
 export { placeSharesService } from '@lib/supabase/services/places/placeShares';
