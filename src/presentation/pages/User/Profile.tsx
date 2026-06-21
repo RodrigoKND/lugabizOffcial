@@ -7,7 +7,7 @@ import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@p
 import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal, VerificationWizard, MyBusinessesModal } from '@presentation/components/features/users';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { MarketSurvey, ProfileTab } from '@domain/entities';
-import { eventsService } from '@lib/supabase';
+import { eventsService, ownerBusinessesService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { useProfileData, useProfileEdit } from '@presentation/hooks';
@@ -29,6 +29,11 @@ const Profile: React.FC = () => {
   const [statsTarget, setStatsTarget] = useState<MarketSurvey | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [showBusinesses, setShowBusinesses] = useState(false);
+  // ¿El negocio principal (ownerBusinessName) tiene los documentos APROBADOS? La
+  // insignia dorada depende de esto (estado por-negocio), no de la bandera de cuenta
+  // business_docs_verified (que es "tiene al menos un negocio verificado" y doraba de
+  // más a negocios que solo tienen la identidad verificada).
+  const [principalDocsApproved, setPrincipalDocsApproved] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useSEO({ title: user?.name || 'Perfil', description: 'Perfil de usuario en Lugabiz' });
@@ -47,6 +52,18 @@ const Profile: React.FC = () => {
   // Al entrar al perfil, re-leemos las banderas de verificación desde la DB: así la
   // insignia dorada aparece apenas el admin aprueba los documentos, sin re-login.
   useEffect(() => { refreshUser(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Estado de documentos del negocio principal (para la insignia dorada por-negocio).
+  // Se recalcula cuando cambia el negocio principal o las banderas de verificación.
+  useEffect(() => {
+    if (!user?.isOwner) { setPrincipalDocsApproved(false); return; }
+    ownerBusinessesService.listMine(user.id)
+      .then(list => {
+        const principal = list.find(b => b.name === user.ownerBusinessName) ?? list[0];
+        setPrincipalDocsApproved(principal?.docsStatus === 'approved');
+      })
+      .catch(() => setPrincipalDocsApproved(false));
+  }, [user?.id, user?.isOwner, user?.ownerBusinessName, user?.businessDocsVerified]);
 
   if (!user) return <Navigate to="/" replace />;
 
@@ -105,6 +122,7 @@ const Profile: React.FC = () => {
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-6">
         <ProfileHeader
           user={user}
+          businessDocsApproved={principalDocsApproved}
           myPlacesCount={myPlacesArr.length}
           reviewsCount={reviewsCount}
           myEventsCount={myEvents.length}

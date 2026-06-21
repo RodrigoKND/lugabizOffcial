@@ -5,6 +5,11 @@ import { User } from '@domain/entities';
 
 interface ProfileHeaderProps {
   user: User;
+  // ¿El negocio principal (el que se muestra acá) tiene sus DOCUMENTOS aprobados?
+  // La insignia dorada se basa en ESTO (estado por-negocio), no en una bandera de
+  // cuenta: tener un negocio con docs verificados no debe dorar a otro negocio que
+  // solo tiene la identidad verificada.
+  businessDocsApproved: boolean;
   myPlacesCount: number;
   reviewsCount: number;
   myEventsCount: number;
@@ -20,7 +25,7 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  user, myPlacesCount, reviewsCount, myEventsCount,
+  user, businessDocsApproved, myPlacesCount, reviewsCount, myEventsCount,
   isUploadingAvatar, avatarInputRef, isAdmin, showMobileMenu,
   onAvatarChange, onEditClick, onEventCreate, onToggleMobileMenu, onLogout,
 }) => (
@@ -49,12 +54,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {user.bio && <p className="text-sm text-text-secondary mt-1">{user.bio}</p>}
         {user.isOwner && user.ownerBusinessName && (
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mt-2">
-            {user.businessDocsVerified ? (
+            {businessDocsApproved ? (
+              // DORADA: solo cuando el admin aprobó los DOCUMENTOS de este negocio.
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-white rounded-lg text-xs font-bold ring-1 ring-amber-300/60 shadow-sm shadow-amber-500/30">
                 <BadgeCheck className="w-3.5 h-3.5" /> Negocio verificado
               </span>
             ) : user.identityVerified ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-xs font-semibold ring-1 ring-primary-200">
+              // GRIS: identidad verificada pero sin documentos de negocio aprobados.
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 text-stone-600 rounded-lg text-xs font-semibold ring-1 ring-stone-200">
                 <Sparkles className="w-3.5 h-3.5" /> Negocio emergente
               </span>
             ) : (
