@@ -1,11 +1,15 @@
 const CACHE = 'lugabiz-v1';
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  // No llamar skipWaiting() automáticamente: eso causa que Chrome muestre
+  // "Este sitio se actualizó en segundo plano" en cada recarga. El update
+  // manual se dispara desde la página vía postMessage({ type: 'SKIP_WAITING' }).
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  // clients.claim() no es necesario para recibir push: los eventos push llegan
+  // directamente al SW activo sin importar si controla pestañas abiertas.
+  // Sin claim() Chrome deja de mostrar el toast de "actualización en segundo plano".
 });
 
 self.addEventListener('push', (event) => {

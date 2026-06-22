@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import webPush from 'npm:web-push@3.6.7'
+import { createPushSender } from './webpush.ts'
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -132,7 +132,11 @@ serve(async (req) => {
 
   let pushSent = 0
   if (vapidPublicKey && vapidPrivateKey && users.length > 0) {
-    webPush.setVapidDetails('mailto:support@lugabiz.com', vapidPublicKey, vapidPrivateKey)
+    const sender = await createPushSender({
+      subject: 'mailto:support@lugabiz.com',
+      publicKey: vapidPublicKey,
+      privateKey: vapidPrivateKey,
+    })
 
     const userIds = users.map((u: { id: string }) => u.id)
     const { data: subscriptions } = await supabaseClient
@@ -159,7 +163,7 @@ serve(async (req) => {
         const results = await Promise.allSettled(
           chunk.map(async (sub: any) => {
             try {
-              await webPush.sendNotification(sub.subscription, pushPayload)
+              await sender.send(sub.subscription, pushPayload)
               return true
             } catch (e: any) {
               const code = e?.statusCode ?? e?.status

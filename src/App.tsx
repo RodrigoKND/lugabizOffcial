@@ -1,4 +1,5 @@
-import { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, createContext, useContext } from 'react';
+import { Bell, X } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
@@ -46,11 +47,65 @@ function ScrollRestorer() {
   return null;
 }
 
+// Contexto global para que cualquier componente pueda pedir "activar push"
+const PushCtx = createContext<{ enable: () => Promise<boolean> }>({ enable: async () => false });
+export const usePushEnable = () => useContext(PushCtx);
+
 function EventNotificationsManager() {
   useEventNotifications();
-  usePushNotifications();
+  const { enablePushNotifications } = usePushNotifications();
   useUserTracking();
-  return null;
+  return (
+    <PushCtx.Provider value={{ enable: enablePushNotifications }}>
+      <PushEnableBanner />
+    </PushCtx.Provider>
+  );
+}
+
+function PushEnableBanner() {
+  const { user } = useAuth();
+  const { enable } = usePushEnable();
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setShow(false); return; }
+    // Mostrar solo si los permisos NO están ya concedidos
+    if (Notification.permission === 'granted') { setShow(false); return; }
+    if (Notification.permission === 'denied') { setShow(false); return; }
+    // Solo en navegadores que soportan push
+    if (!('PushManager' in window)) { setShow(false); return; }
+    setShow(true);
+  }, [user]);
+
+  if (!show) return null;
+
+  const handleEnable = async () => {
+    setLoading(true);
+    const ok = await enable();
+    setLoading(false);
+    if (ok) setShow(false);
+    else if (Notification.permission === 'denied') setShow(false);
+  };
+
+  return (
+    <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
+      <div className="bg-primary-600 text-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3">
+        <Bell className="w-5 h-5 shrink-0" />
+        <p className="text-sm flex-1">Activá las notificaciones push para recibir alertas aunque no estés en la app.</p>
+        <button
+          onClick={handleEnable}
+          disabled={loading}
+          className="shrink-0 px-3 py-1.5 bg-white text-primary-600 rounded-xl text-xs font-bold hover:bg-primary-50 transition-colors disabled:opacity-60"
+        >
+          {loading ? '...' : 'Activar'}
+        </button>
+        <button onClick={() => setShow(false)} className="shrink-0 text-white/70 hover:text-white">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function PendingSurveys() {
