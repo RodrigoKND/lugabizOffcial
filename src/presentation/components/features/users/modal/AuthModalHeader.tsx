@@ -7,12 +7,14 @@ interface AuthModalHeaderProps {
 export default function AuthModalHeader({ mode }: AuthModalHeaderProps) {
   return (
     <div className="text-center mb-8">
-      <div className="text-5xl mb-4">🦕</div>
-      <h3 className="text-2xl font-bold text-stone-800 mb-1">
-        {mode === 'login' ? 'Bienvenido' : 'Crear Cuenta'}
+      <div className="mb-5">
+        <span className="text-2xl font-bold text-gradient">Lugabiz</span>
+      </div>
+      <h3 className="text-[1.4rem] font-bold text-white mb-1.5 tracking-tight">
+        {mode === 'login' ? 'Bienvenido de vuelta' : 'Únete a la comunidad'}
       </h3>
-      <p className="text-stone-500 text-sm">
-        {mode === 'login' ? 'Accede a tu cuenta' : 'Únete a la comunidad'}
+      <p className="text-white/40 text-sm">
+        {mode === 'login' ? 'Accede para descubrir lo local' : 'Empieza a descubrir tu ciudad'}
       </p>
     </div>
   );

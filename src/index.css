@@ -228,31 +228,19 @@ h1, h2, h3, h4, h5, h6 {
    ═══════════════════════════════════════════════════════ */
 nav.sticky {
   background: rgba(13, 6, 32, 0.88) !important;
-  backdrop-filter: blur(16px) !important;
-  border-bottom-color: rgba(168, 128, 250, 0.08) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom-color: rgba(168, 128, 250, 0.07) !important;
 }
 
+/* Mobile floating nav — the pill inside handles its own background */
 nav.fixed {
-  background: rgba(13, 6, 32, 0.95) !important;
-  border-top-color: rgba(168, 128, 250, 0.08) !important;
+  background: transparent !important;
 }
 
-nav.sticky a[href="/"] span,
-nav.fixed a[href="/"] span {
+/* Logo text stays white */
+nav.sticky a[href="/"] span {
   color: #ffffff !important;
-}
-
-nav.sticky button svg.text-text-secondary,
-nav.fixed button svg.text-text-secondary {
-  color: #9b8db5 !important;
-}
-
-/* Navbar link hover — subtle glow (solo en dispositivos con puntero real) */
-@media (hover: hover) {
-  nav.sticky [class*="hover:bg-primary-50\/50"]:hover,
-  nav.fixed [class*="hover:bg-primary-50\/50"]:hover {
-    background: rgba(147, 51, 234, 0.12) !important;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════

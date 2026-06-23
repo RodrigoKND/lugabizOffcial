@@ -23,74 +23,86 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         setShowSearch(true);
       }
     }
+    function handleOpenSearch() { setShowSearch(true); }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('lugabiz:open-search', handleOpenSearch);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('lugabiz:open-search', handleOpenSearch);
+    };
   }, []);
+
+  const navLinks = [
+    { to: '/', label: 'Inicio' },
+    { to: '/comunidad', label: 'Comunidad' },
+    { to: '/asesor', label: 'Asesor' },
+  ];
 
   return (
     <>
-      {/* Desktop Top Navbar */}
-      <nav className="hidden md:block bg-white/90 backdrop-blur-xl border-b border-primary-100/50 sticky top-0 z-50">
+      {/* ── Desktop Top Navbar ── */}
+      <nav className="hidden md:block sticky top-0 z-50 border-b">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-white">Lugabiz</span>
+          <div className="flex items-center justify-between h-[62px] gap-6">
+
+            {/* Logo */}
+            <Link to="/" className="shrink-0">
+              <span className="text-white font-bold text-xl tracking-tight">Lugabiz</span>
             </Link>
-            <div className="flex items-center gap-3">
+
+            {/* Center nav links */}
+            <div className="flex items-center gap-0.5">
+              {navLinks.map(({ to, label }) => (
+                <Link key={to} to={to}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    isActive(to)
+                      ? 'text-white bg-white/10'
+                      : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                  }`}>
+                  {label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-2 shrink-0">
+
+              {/* Search pill */}
               <button onClick={() => setShowSearch(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium text-text-secondary hover:bg-primary-50/50 hover:text-primary-500">
-                <Search className="w-4 h-4" />
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/45 hover:text-white/75 hover:bg-white/8 hover:border-white/20 transition-all text-sm">
+                <Search className="w-3.5 h-3.5" />
                 <span>Buscar</span>
-                <kbd className="ml-1 px-1.5 py-0.5 bg-stone-100 text-[10px] text-stone-400 rounded border border-stone-200 font-mono">⌘K</kbd>
+                <kbd className="ml-0.5 px-1.5 py-0.5 rounded text-[10px] text-white/25 font-mono bg-white/8 border border-white/10">⌘K</kbd>
               </button>
-              <Link to="/"
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${isActive('/') ? 'bg-primary-50 text-primary-600' : 'text-text-secondary hover:bg-primary-50/50 hover:text-primary-500'
-                  }`}>
-                <Home className="w-4 h-4" />
-                <span>Inicio</span>
-              </Link>
-              <Link to="/comunidad"
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${isActive('/comunidad') ? 'bg-primary-50 text-primary-600' : 'text-text-secondary hover:bg-primary-50/50 hover:text-primary-500'
-                  }`}>
-                <Users className="w-4 h-4" />
-                <span>Comunidad</span>
-              </Link>
-              <Link to="/asesor"
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${isActive('/asesor') ? 'bg-primary-50 text-primary-600' : 'text-text-secondary hover:bg-primary-50/50 hover:text-primary-500'
-                  }`}>
-                <Compass className="w-4 h-4" />
-                <span>Asesor</span>
-              </Link>
+
+              {/* Publicar */}
               <Link to="/add-place"
-                className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all text-sm font-medium shadow-xs">
-                <Plus className="w-4 h-4" />
-                <span>Publicar</span>
+                className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 transition-colors shadow-sm">
+                <Plus className="w-3.5 h-3.5" />
+                Publicar
               </Link>
 
               {user ? (
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <button onClick={() => setShowNotifs(v => !v)}
-                      className="relative p-2.5 rounded-xl hover:bg-primary-50 transition-colors">
-                      <Bell className="w-5 h-5 text-text-secondary" />
-                      {totalUnread > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
-                          {totalUnread > 9 ? '9+' : totalUnread}
-                        </span>
-                      )}
-                    </button>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setShowNotifs(v => !v)}
+                    className="relative p-2.5 rounded-full hover:bg-white/8 transition-colors">
+                    <Bell className="w-5 h-5 text-white/45" />
+                    {totalUnread > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                        {totalUnread > 9 ? '9+' : totalUnread}
+                      </span>
+                    )}
+                  </button>
                   <button onClick={() => navigate('/profile')}
-                    className="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-primary-50 transition-colors">
+                    className="p-1 rounded-full hover:bg-white/8 transition-colors">
                     <img src={user.avatar || '/avatar.png'} alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-200" />
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-400/40" />
                   </button>
                 </div>
               ) : (
                 <button onClick={onAuthClick}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all text-sm font-medium shadow-xs">
-                  <User className="w-4 h-4" />
-                  <span>Acceder</span>
+                  className="px-4 py-2 rounded-full border border-white/20 text-white/75 text-sm font-medium hover:bg-white/8 hover:border-white/30 hover:text-white transition-all">
+                  Acceder
                 </button>
               )}
             </div>
@@ -98,68 +110,70 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation — sin backdrop-blur para no crear stacking context */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-primary-100/50 safe-bottom pb-safe">
-        <div className="flex items-center justify-between h-14 px-0.5 gap-0">
-          <Link to="/"
-            className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/') ? 'text-primary-500' : 'text-text-secondary'}`}>
-            <Home className={`w-5 h-5 ${isActive('/') ? 'fill-primary-100' : ''}`} />
-            <span className="text-[10px] font-medium">Inicio</span>
-          </Link>
+      {/* ── Mobile Bottom Navigation — floating pill ── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-bottom pb-safe">
+        <div className="mx-3 mb-2">
+          <div className="flex items-center justify-around h-[58px] px-1 bg-[#0d0620]/90 backdrop-blur-xl border border-white/8 rounded-2xl shadow-2xl shadow-black/60">
 
-          <Link to="/asesor"
-            className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/asesor') ? 'text-primary-500' : 'text-text-secondary'}`}>
-            <Compass className={`w-5 h-5 ${isActive('/asesor') ? 'fill-primary-100' : ''}`} />
-            <span className="text-[10px] font-medium">Asesor</span>
-          </Link>
-
-          <button onClick={() => setShowSearch(true)}
-            className="flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 text-text-secondary">
-            <Search className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Buscar</span>
-          </button>
-
-          <Link to="/add-place"
-            className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/add-place') ? 'text-primary-500' : 'text-text-secondary'}`}>
-            <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center shadow-sm">
-              <Plus className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-[10px] font-medium">Publicar</span>
-          </Link>
-
-          <Link to="/comunidad"
-            className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/comunidad') ? 'text-primary-500' : 'text-text-secondary'}`}>
-            <Users className={`w-5 h-5 ${isActive('/comunidad') ? 'fill-primary-100' : ''}`} />
-            <span className="text-[10px] font-medium">Comunidad</span>
-          </Link>
-
-          <button onClick={() => setShowNotifs(v => !v)}
-            className={`relative flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/profile') ? 'text-primary-500' : 'text-text-secondary'}`}>
-            <Bell className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Notis</span>
-            {totalUnread > 0 && (
-              <span className="absolute top-1 right-0.5 w-4 h-4 bg-pink-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow-xs">
-                {totalUnread > 9 ? '9+' : totalUnread}
-              </span>
-            )}
-          </button>
-
-          {user ? (
-            <Link to="/profile"
-              className={`flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 ${isActive('/profile') ? 'text-primary-500' : 'text-text-secondary'}`}>
-              <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-primary-200">
-                <img src={user.avatar || '/avatar.png'} alt={user.name}
-                  className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[10px] font-medium">Perfil</span>
+            <Link to="/"
+              className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/') ? 'text-white' : 'text-white/35'}`}>
+              <Home className={`w-5 h-5 ${isActive('/') ? 'text-primary-400' : ''}`} />
+              <span className="text-[9px] font-medium">Inicio</span>
             </Link>
-          ) : (
-            <button onClick={onAuthClick}
-              className="flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-all flex-1 min-w-0 text-text-secondary">
-              <User className="w-5 h-5" />
-              <span className="text-[10px] font-medium">Acceder</span>
+
+            <Link to="/asesor"
+              className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/asesor') ? 'text-white' : 'text-white/35'}`}>
+              <Compass className={`w-5 h-5 ${isActive('/asesor') ? 'text-primary-400' : ''}`} />
+              <span className="text-[9px] font-medium">Asesor</span>
+            </Link>
+
+            <button onClick={() => setShowSearch(true)}
+              className="flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all text-white/35">
+              <Search className="w-5 h-5" />
+              <span className="text-[9px] font-medium">Buscar</span>
             </button>
-          )}
+
+            <Link to="/add-place"
+              className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/add-place') ? 'text-primary-400' : 'text-white/35'}`}>
+              <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center shadow-md shadow-primary-500/30">
+                <Plus className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-[9px] font-medium">Publicar</span>
+            </Link>
+
+            <Link to="/comunidad"
+              className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/comunidad') ? 'text-white' : 'text-white/35'}`}>
+              <Users className={`w-5 h-5 ${isActive('/comunidad') ? 'text-primary-400' : ''}`} />
+              <span className="text-[9px] font-medium">Comunidad</span>
+            </Link>
+
+            <button onClick={() => setShowNotifs(v => !v)}
+              className="relative flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all text-white/35">
+              <Bell className="w-5 h-5" />
+              <span className="text-[9px] font-medium">Notis</span>
+              {totalUnread > 0 && (
+                <span className="absolute top-1 right-0.5 w-3.5 h-3.5 bg-pink-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </span>
+              )}
+            </button>
+
+            {user ? (
+              <Link to="/profile"
+                className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/profile') ? 'text-white' : 'text-white/35'}`}>
+                <div className={`w-5 h-5 rounded-full overflow-hidden ${isActive('/profile') ? 'ring-1 ring-primary-400' : ''}`}>
+                  <img src={user.avatar || '/avatar.png'} alt={user.name} className="w-full h-full object-cover" />
+                </div>
+                <span className="text-[9px] font-medium">Perfil</span>
+              </Link>
+            ) : (
+              <button onClick={onAuthClick}
+                className="flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all text-white/35">
+                <User className="w-5 h-5" />
+                <span className="text-[9px] font-medium">Acceder</span>
+              </button>
+            )}
+          </div>
         </div>
       </nav>
 

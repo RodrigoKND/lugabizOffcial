@@ -28,7 +28,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           animate={{ opacity: 1, pointerEvents: 'auto' }}
           exit={{ opacity: 0, pointerEvents: 'none' }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-200 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4"
+          className="fixed inset-0 z-200 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4"
           onClick={onClose}
           role="presentation"
         >
@@ -41,7 +41,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
             exit={{ opacity: 0, scale: 0.96, y: -10 }}
             transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden border border-stone-200/50"
+            className="bg-[#150d2e] rounded-2xl shadow-2xl shadow-black/60 w-full max-w-xl overflow-hidden border border-white/8"
           >
             <SearchInput
               value={query}

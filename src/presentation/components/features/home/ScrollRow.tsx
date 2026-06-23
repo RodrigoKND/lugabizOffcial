@@ -33,7 +33,6 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children }
     };
   }, []);
 
-  // Re-check when children change (new items loaded)
   useEffect(() => { setTimeout(check, 100); }, [children]);
 
   const scroll = (dir: 'left' | 'right') => {
@@ -42,39 +41,43 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children }
 
   return (
     <section className="mb-7">
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-2">
-          {icon || <div className="w-1 h-4 rounded-full bg-primary-400" />}
-          <div>
-            <h2 className="font-bold text-sm sm:text-base text-text-primary uppercase tracking-wide">{title}</h2>
-            {subtitle && <p className="text-[11px] text-text-secondary -mt-0.5">{subtitle}</p>}
+      {title && (
+        <div className="flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center gap-2.5">
+            {icon}
+            <div>
+              <h2 className="font-semibold text-[15px] text-white leading-none">{title}</h2>
+              {subtitle && <p className="text-xs text-white/35 mt-1">{subtitle}</p>}
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => scroll('left')}
+              disabled={!canLeft}
+              aria-label="Desplazar izquierda"
+              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                canLeft
+                  ? 'border-white/15 text-white/45 hover:border-white/30 hover:text-white hover:bg-white/5 active:scale-95 cursor-pointer'
+                  : 'border-white/5 text-white/15 cursor-default'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canRight}
+              aria-label="Desplazar derecha"
+              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                canRight
+                  ? 'border-white/15 text-white/45 hover:border-white/30 hover:text-white hover:bg-white/5 active:scale-95 cursor-pointer'
+                  : 'border-white/5 text-white/15 cursor-default'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canLeft}
-            aria-label="Desplazar izquierda"
-            className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all
-              ${canLeft
-                ? 'border-primary-200 text-primary-500 hover:bg-primary-50 active:scale-95 cursor-pointer'
-                : 'border-stone-100 text-stone-300 cursor-default'}`}
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => scroll('right')}
-            disabled={!canRight}
-            aria-label="Desplazar derecha"
-            className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all
-              ${canRight
-                ? 'border-primary-200 text-primary-500 hover:bg-primary-50 active:scale-95 cursor-pointer'
-                : 'border-stone-100 text-stone-300 cursor-default'}`}
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+      )}
       <div
         ref={ref}
         className="flex gap-3 overflow-x-auto scrollbar-hide md:-mx-4 mx-1 px-4 pb-1 snap-x snap-mandatory"

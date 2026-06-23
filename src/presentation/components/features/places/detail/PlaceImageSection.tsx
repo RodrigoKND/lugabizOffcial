@@ -3,7 +3,7 @@ import type { PlaceImageSectionProps } from '@domain/entities/PlaceDetailTypes';
 
 export default function PlaceImageSection({ place, user, onEdit, onDeleteClick }: PlaceImageSectionProps) {
   return (
-    <div className="relative rounded-3xl overflow-hidden bg-stone-100 aspect-4/3 lg:aspect-auto lg:h-125">
+    <div className="relative rounded-3xl overflow-hidden bg-white/5 aspect-4/3 lg:aspect-auto lg:h-125">
       <img src={place.image} alt={place.name} className="w-full h-full object-cover" loading="lazy" />
       <div className="absolute top-4 left-4 flex flex-wrap gap-2">
         {place.featured && (

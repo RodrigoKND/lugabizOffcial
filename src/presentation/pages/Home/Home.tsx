@@ -11,6 +11,7 @@ import {
 import { OnboardingAlert } from '@presentation/components/reusables';
 import LoadingSkeleton from '@presentation/components/features/home/LoadingSkeleton';
 import EmptyHomeState from '@presentation/components/features/home/EmptyHomeState';
+import HomeWelcome from '@presentation/components/features/home/HomeWelcome';
 import StoriesRow from '@presentation/components/features/home/StoriesRow';
 import FeaturedHeroSection from '@presentation/components/features/home/FeaturedHeroSection';
 import PersonalizedSections from '@presentation/components/features/home/PersonalizedSections';
@@ -85,6 +86,8 @@ const Home: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-5">
 
+        <HomeWelcome userName={user?.name} />
+
         {isLoading && trendingLoading && <LoadingSkeleton />}
 
         {!isLoading && !hasContent && (
@@ -121,9 +124,9 @@ const Home: React.FC = () => {
 
         {trendingPlaces.length > 0 && (
           <>
-            <div className="flex items-center gap-2 mb-3 px-1">
-              <TrendingUp className="w-4 h-4 text-primary-500" />
-              <h2 className="font-bold text-sm uppercase tracking-wide text-text-primary">En Tendencia</h2>
+            <div className="flex items-center gap-2.5 mb-3 px-1">
+              <TrendingUp className="w-4 h-4 text-primary-400" />
+              <h2 className="font-semibold text-[15px] text-white">En Tendencia</h2>
             </div>
             <TrendBanner places={trendingPlaces} />
             <ScrollRow title="" subtitle="Más lugares populares">

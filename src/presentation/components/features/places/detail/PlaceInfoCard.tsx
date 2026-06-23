@@ -5,9 +5,9 @@ import type { PlaceInfoCardProps } from '@domain/entities/PlaceDetailTypes';
 
 export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onToggleSave }: PlaceInfoCardProps) {
   return (
-    <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+    <div className="bg-white/5 rounded-3xl p-6 border border-white/8 backdrop-blur-sm">
       <div className="flex items-start justify-between gap-4 mb-4">
-        <h1 className="text-2xl lg:text-3xl font-bold text-stone-800 leading-tight">
+        <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
           {place.name}
         </h1>
       </div>
@@ -15,22 +15,22 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
       <div className="flex items-center gap-4 mb-5 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-          <span className="font-semibold text-stone-700">{place.rating}</span>
-          <span className="text-stone-400 text-sm">({place.reviewCount})</span>
+          <span className="font-semibold text-white/80">{place.rating}</span>
+          <span className="text-white/35 text-sm">({place.reviewCount})</span>
         </div>
-        <div className="flex items-center gap-1.5 text-stone-400 text-sm">
+        <div className="flex items-center gap-1.5 text-white/35 text-sm">
           <Calendar className="w-4 h-4" />
           <span>{place.createdAt.toLocaleDateString()}</span>
         </div>
         {place.viewsCount !== undefined && (
-          <div className="flex items-center gap-1.5 text-stone-400 text-sm">
+          <div className="flex items-center gap-1.5 text-white/35 text-sm">
             <Eye className="w-4 h-4" />
             <span>{place.viewsCount}</span>
           </div>
         )}
       </div>
 
-      <p className="text-stone-600 leading-relaxed mb-6">
+      <p className="text-white/55 leading-relaxed mb-6">
         {place.description}
       </p>
 
@@ -51,7 +51,7 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
 
       <div className="flex flex-col sm:flex-row gap-3">
         <button onClick={onShare}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 font-medium transition-all text-sm flex-1">
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-white/6 border border-white/10 rounded-2xl text-white/55 hover:bg-white/10 hover:text-white/80 font-medium transition-all text-sm flex-1">
           <Share2 className="w-4 h-4" /> Compartir
         </button>
         <button onClick={() => {
@@ -60,8 +60,8 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
         }}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border font-medium transition-all text-sm flex-1 ${
             isPlaceSaved
-              ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
-              : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+              ? 'bg-red-500/15 border-red-500/25 text-red-400 hover:bg-red-500/20'
+              : 'bg-white/6 border-white/10 text-white/55 hover:bg-white/10 hover:text-white/80'
           }`}>
           {isPlaceSaved ? <HeartOff className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
           {isPlaceSaved ? 'Guardado' : 'Guardar'}

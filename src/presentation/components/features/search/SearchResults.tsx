@@ -15,16 +15,16 @@ export function SearchResults({ query, results, selectedCategory, selectedSocial
     <section aria-label="Resultados de búsqueda" className="max-h-80 overflow-y-auto">
       {query && results.length === 0 && !selectedCategory && !selectedSocialGroup && (
         <div className="flex flex-col items-center py-12 px-4" role="status">
-          <Search className="w-10 h-10 text-stone-300 mb-3" aria-hidden="true" />
-          <p className="text-stone-500 text-sm font-medium">Sin resultados para "{query}"</p>
-          <p className="text-stone-400 text-xs mt-1">Prueba con otra palabra o categoría</p>
+          <Search className="w-10 h-10 text-white/15 mb-3" aria-hidden="true" />
+          <p className="text-white/50 text-sm font-medium">Sin resultados para "{query}"</p>
+          <p className="text-white/25 text-xs mt-1">Prueba con otra palabra o categoría</p>
         </div>
       )}
 
       {selectedCategory && results.length === 0 && (
         <div className="flex flex-col items-center py-12 px-4" role="status">
-          <Store className="w-10 h-10 text-stone-300 mb-3" aria-hidden="true" />
-          <p className="text-stone-500 text-sm font-medium">No hay lugares en esta categoría</p>
+          <Store className="w-10 h-10 text-white/15 mb-3" aria-hidden="true" />
+          <p className="text-white/50 text-sm font-medium">No hay lugares en esta categoría</p>
         </div>
       )}
 
@@ -38,8 +38,8 @@ export function SearchResults({ query, results, selectedCategory, selectedSocial
 
       {!query && !selectedCategory && !selectedSocialGroup && (
         <div className="flex flex-col items-center py-12 px-4" role="status">
-          <Search className="w-10 h-10 text-stone-300 mb-3" aria-hidden="true" />
-          <p className="text-stone-500 text-sm font-medium">Escribe para buscar o elige una categoría</p>
+          <Search className="w-10 h-10 text-white/15 mb-3" aria-hidden="true" />
+          <p className="text-white/50 text-sm font-medium">Escribe para buscar o elige una categoría</p>
         </div>
       )}
     </section>
