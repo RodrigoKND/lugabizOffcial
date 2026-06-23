@@ -1,39 +1,82 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MessageCircle, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import LubiMascot from './LubiMascot'
+
+const MESSAGES = [
+  '¡Hola! ¿Qué buscas? 😊',
+  '¿Buscas un lugar? 🗺️',
+  '¡Pregúntame algo! ✨',
+  '¿Comida, salidas, planes? 🍕',
+  '¡Soy tu guía local! 📍',
+  '¿Qué plan tienes hoy? 🎉',
+  '¡Conozco todos los lugares! 🌟',
+]
 
 interface ChatButtonProps {
-  isVisible: boolean;
+  isVisible: boolean
+  onClick?: () => void
 }
 
-const ChatButton: React.FC<ChatButtonProps> = ({ isVisible }) => {
-  const navigate = useNavigate();
-  const [hover, setHover] = useState(false);
+const ChatButton: React.FC<ChatButtonProps> = ({ isVisible, onClick }) => {
+  const navigate = useNavigate()
+  const [msgIndex, setMsgIndex] = useState(0)
 
-  if (!isVisible) return null;
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMsgIndex(i => (i + 1) % MESSAGES.length)
+    }, 3800)
+    return () => clearInterval(id)
+  }, [])
+
+  if (!isVisible) return null
+
+  const handleClick = () => {
+    if (onClick) onClick()
+    else navigate('/chat')
+  }
 
   return (
-    <div className="fixed md:bottom-6 bottom-28 right-6 z-40">
-      <div className={`absolute -bottom-2 left-0 right-0 h-0.5 bg-linear-to-r from-emerald-400/0 via-emerald-400/60 to-emerald-400/0 rounded-full transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`} />
-      <button
-        aria-label="Pregúntame sobre lugares"
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        className="group relative cursor-pointer"
-        onClick={() => navigate('/chat')}
-      >
-        <div className="relative w-14 h-14 sm:w-15 sm:h-15 rounded-2xl bg-white border border-purple-100 shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 hover:border-purple-200">
-          <MessageCircle className="w-6 h-6 text-purple-600 group-hover:scale-110 transition-transform duration-300" />
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-400 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-            <Sparkles className="w-3 h-3 text-white" />
-          </div>
-        </div>
-        <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[11px] font-medium text-purple-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-100">
-          Pregúntame
-        </span>
-      </button>
-    </div>
-  );
-};
+    <div className="fixed md:bottom-6 bottom-28 right-4 sm:right-6 z-40 flex flex-col items-center">
 
-export default ChatButton;
+      {/* ── Speech bubble — ancho fijo para que la cola no se mueva ── */}
+      <div className="mb-3 relative">
+        <div className="bg-white border border-pink-100 rounded-2xl px-3 py-2 shadow-md w-44 text-center">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={msgIndex}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="text-pink-600 font-semibold text-[11px] sm:text-[12px] block leading-tight"
+            >
+              {MESSAGES[msgIndex]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+        {/* Cola del bubble apuntando al personaje */}
+        <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-0 h-0
+          border-l-[7px] border-l-transparent
+          border-r-[7px] border-r-transparent
+          border-t-[8px] border-t-white"
+        />
+      </div>
+
+      {/* ── Mascot con flotación suave ── */}
+      <motion.button
+        aria-label="Pregúntame sobre lugares"
+        onClick={handleClick}
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        whileTap={{ scale: 0.88 }}
+        whileHover={{ scale: 1.08 }}
+        className="cursor-pointer focus:outline-none select-none block"
+      >
+        <LubiMascot size={56} animated />
+      </motion.button>
+    </div>
+  )
+}
+
+export default ChatButton

@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowLeft, Send, Compass, RotateCcw, MapPin, Sun, Cloud, Sparkles,
+  ArrowLeft, Send, RotateCcw, MapPin, Sun, Cloud, Sparkles,
   CloudRain, Thermometer, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
   Globe, Instagram, Facebook, MessageCircle, Music2, Phone,
 } from 'lucide-react'
+import LubiMascot, { type LubiExpression } from '@presentation/components/features/chatbot/LubiMascot'
 import { useChat } from '@presentation/hooks/chat/useChat'
 import { useAuth } from '@presentation/context'
 import { useSmartBack } from '@presentation/hooks/useSmartBack'
@@ -390,12 +391,28 @@ const ChatPage: React.FC = () => {
   const { messages, ideas, ideasLoading, chatLoading, city, weather, timeLabel, sendMessage, reset } = useChat(true)
   const [input,       setInput]       = useState('')
   const [activeVideo, setActiveVideo] = useState<VideoEmbed | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef       = useRef<HTMLTextAreaElement>(null)
+  const [lubiExp,     setLubiExp]     = useState<LubiExpression>('idle')
+  const messagesEndRef  = useRef<HTMLDivElement>(null)
+  const inputRef        = useRef<HTMLTextAreaElement>(null)
+  const lubiTimer       = useRef<ReturnType<typeof setTimeout>>()
   const hasConversation = messages.length > 0
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, chatLoading])
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 200) }, [])
+
+  /* Expresiones de Lubi según el flujo del chat */
+  useEffect(() => {
+    clearTimeout(lubiTimer.current)
+    if (chatLoading) {
+      // Después de 450ms muestra "thinking" (así el happy del envío se ve un momento)
+      lubiTimer.current = setTimeout(() => setLubiExp('thinking'), 450)
+    } else if (messages.length > 0) {
+      // Lubi terminó de responder → feliz
+      setLubiExp('happy')
+      lubiTimer.current = setTimeout(() => setLubiExp('idle'), 1800)
+    }
+    return () => clearTimeout(lubiTimer.current)
+  }, [chatLoading])   // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -403,6 +420,9 @@ const ChatPage: React.FC = () => {
     if (!msg || chatLoading) return
     setInput('')
     if (inputRef.current) inputRef.current.style.height = 'auto'
+    // Reacción inmediata al envío del usuario
+    clearTimeout(lubiTimer.current)
+    setLubiExp('happy')
     await sendMessage(msg)
   }
 
@@ -436,10 +456,8 @@ const ChatPage: React.FC = () => {
           </button>
 
           <div className="relative shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shadow-sm shadow-primary-500/20">
-              <Compass className="w-5 h-5 text-white" />
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white" />
+            <LubiMascot size={36} variant="chat" expression={lubiExp} />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-feed-bg" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -472,8 +490,8 @@ const ChatPage: React.FC = () => {
           {!hasConversation ? (
             /* Pantalla inicial */
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-primary-500/20 mb-4">
-                <Compass className="w-8 h-8 text-white" />
+              <div className="mb-2">
+                <LubiMascot size={72} variant="chat" expression={lubiExp} />
               </div>
               <h2 className="text-[22px] font-bold text-white">{greeting}</h2>
               <p className="text-[15px] text-text-secondary mt-2 text-center max-w-xs leading-relaxed">
@@ -483,10 +501,12 @@ const ChatPage: React.FC = () => {
               <div className="w-full mt-8">
                 {ideasLoading ? (
                   <div className="flex flex-col items-center py-10">
-                    <motion.div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-primary-500/20 mb-4"
-                      animate={{ scale: [1, 1.08, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
-                      <Compass className="w-6 h-6 text-white" />
+                    <motion.div
+                      className="mb-2"
+                      animate={{ scale: [1, 1.07, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                      <LubiMascot size={56} variant="chat" expression={lubiExp} />
                     </motion.div>
                     <p className="text-[14px] text-text-secondary font-medium">Lubi está cargando...</p>
                   </div>
@@ -528,8 +548,8 @@ const ChatPage: React.FC = () => {
                     className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
                     {msg.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-primary-500/20">
-                        <Compass className="w-4 h-4 text-white" />
+                      <div className="shrink-0 mt-0.5">
+                        <LubiMascot size={30} variant="chat" expression={lubiExp} />
                       </div>
                     )}
 
