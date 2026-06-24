@@ -1,9 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, MapPin, Calendar, Star, Megaphone, ClipboardList, CheckCheck, Clock } from 'lucide-react';
+import { Bell, BellOff, BellRing, MapPin, Calendar, Star, Megaphone, ClipboardList, CheckCheck, Clock, X } from 'lucide-react';
 import { useAuth } from '@presentation/context';
+import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { AppNotification } from '@domain/entities';
+
+const NOTIF_NUDGE_KEY = '_lgz_notif_nudge_dis';
+function getNudgeDismissed(): boolean {
+  try {
+    const val = parseInt(localStorage.getItem(NOTIF_NUDGE_KEY) || '0', 10);
+    return val > 0 && (Date.now() - val) / 86_400_000 < 7;
+  } catch { return false; }
+}
+function setNudgeDismissed() {
+  try { localStorage.setItem(NOTIF_NUDGE_KEY, String(Date.now())); } catch {}
+}
 
 function getNavUrl(n: AppNotification): string {
   // Edge functions always store the target URL in data.url — prefer it
@@ -68,10 +80,30 @@ interface Props {
 const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { notifications, unreadCount, markNotifAsRead, markAllNotifsAsRead } = useAuth();
+  const { enablePushNotifications } = usePushNotifications();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [nudgeDismissed, setNudgeDismissed_] = useState(false);
+  const [nudgeLoading, setNudgeLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const groups = groupByDate(notifications);
+
+  const pushPermission = typeof window !== 'undefined' && 'Notification' in window
+    ? Notification.permission
+    : 'granted';
+  const showNudge = open && pushPermission !== 'granted' && !nudgeDismissed && !getNudgeDismissed();
+
+  const handleNudgeDismiss = useCallback(() => {
+    setNudgeDismissed_(true);
+    setNudgeDismissed();
+  }, []);
+
+  const handleNudgeEnable = useCallback(async () => {
+    setNudgeLoading(true);
+    await enablePushNotifications();
+    setNudgeLoading(false);
+    setNudgeDismissed_(true);
+  }, [enablePushNotifications]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -130,6 +162,48 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
           )}
         </div>
       </div>
+
+      {/* Nudge push — solo cuando no se activaron las notificaciones */}
+      <AnimatePresence>
+        {showNudge && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            {pushPermission === 'denied' ? (
+              <div className="mx-3 my-2 px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-100 flex items-start gap-2.5">
+                <BellOff className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-stone-500 flex-1 leading-snug">
+                  Para recibir estas alertas en tu pantalla: candado del navegador → <strong>Notificaciones</strong> → <strong>Permitir</strong>
+                </p>
+                <button onClick={handleNudgeDismiss} className="text-stone-300 hover:text-stone-500 shrink-0">
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ) : (
+              <div className="mx-3 my-2 px-3 py-2.5 rounded-xl bg-primary-50 border border-primary-100/60 flex items-center gap-2.5">
+                <BellRing className="w-3.5 h-3.5 text-primary-500 shrink-0" />
+                <p className="text-[11px] text-primary-700 flex-1 leading-snug font-medium">
+                  ¿Recibir esto aunque estés fuera de la app?
+                </p>
+                <button
+                  onClick={handleNudgeEnable}
+                  disabled={nudgeLoading}
+                  className="shrink-0 px-2.5 py-1 bg-primary-600 text-white rounded-lg text-[10px] font-bold hover:bg-primary-700 transition-colors disabled:opacity-60"
+                >
+                  {nudgeLoading ? '...' : 'Activar'}
+                </button>
+                <button onClick={handleNudgeDismiss} className="text-primary-300 hover:text-primary-500 shrink-0">
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Body */}
       <div className="max-h-[28rem] overflow-y-auto scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent">

@@ -163,7 +163,7 @@ serve(async (req) => {
         const results = await Promise.allSettled(
           chunk.map(async (sub: any) => {
             try {
-              await sender.send(sub.subscription, pushPayload)
+              await sender.send(sub.subscription, pushPayload, { urgency: 'high', ttl: 86400 })
               return true
             } catch (e: any) {
               const code = e?.statusCode ?? e?.status

@@ -77,6 +77,33 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
+// Chrome renueva la suscripción push automáticamente. Cuando lo hace, el
+// endpoint viejo muere y el nuevo debe guardarse en la DB.
+// Este evento notifica a las pestañas abiertas para que re-registren.
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(
+    (async () => {
+      try {
+        const newSub = await self.registration.pushManager.subscribe(
+          event.oldSubscription
+            ? event.oldSubscription.options
+            : { userVisibleOnly: true }
+        );
+        const allClients = await clients.matchAll({ includeUncontrolled: true, type: 'window' });
+        allClients.forEach((client) =>
+          client.postMessage({
+            type: 'PUSH_SUBSCRIPTION_CHANGED',
+            subscription: JSON.parse(JSON.stringify(newSub)),
+          })
+        );
+      } catch {
+        // Si no hay clientes abiertos, el hook registrará la nueva suscripción
+        // la próxima vez que el usuario abra la app.
+      }
+    })()
+  );
+});
+
 // Escuchar mensajes de la página para forzar actualización del SW
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {

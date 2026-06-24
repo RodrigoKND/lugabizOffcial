@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense, useRef, createContext, useContext } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell, BellOff, X } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
@@ -62,49 +62,128 @@ function EventNotificationsManager() {
   );
 }
 
+const PUSH_DIS_AT = '_lgz_push_dis_at';
+const PUSH_DIS_CT = '_lgz_push_dis_ct';
+// días de cooldown por número de veces que el usuario cerró el banner (índice = count)
+const COOLDOWN_DAYS = [0, 3, 7, 14, 21];
+const MAX_DISMISSALS = 5;
+
+function getPushDismissCount(): number {
+  try { return parseInt(localStorage.getItem(PUSH_DIS_CT) || '0', 10); } catch { return 0; }
+}
+function getPushDismissAt(): number {
+  try { return parseInt(localStorage.getItem(PUSH_DIS_AT) || '0', 10); } catch { return 0; }
+}
+function recordPushDismiss() {
+  try {
+    const c = getPushDismissCount();
+    localStorage.setItem(PUSH_DIS_CT, String(c + 1));
+    localStorage.setItem(PUSH_DIS_AT, String(Date.now()));
+  } catch {}
+}
+
 function PushEnableBanner() {
   const { user } = useAuth();
   const { enable } = usePushEnable();
   const [show, setShow] = useState(false);
+  const [denied, setDenied] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) { setShow(false); return; }
-    // Mostrar solo si los permisos NO están ya concedidos
-    if (Notification.permission === 'granted') { setShow(false); return; }
-    if (Notification.permission === 'denied') { setShow(false); return; }
-    // Solo en navegadores que soportan push
-    if (!('PushManager' in window)) { setShow(false); return; }
-    setShow(true);
+    if (!user || !('PushManager' in window) || !('Notification' in window)) {
+      setShow(false);
+      return;
+    }
+    const perm = Notification.permission;
+    if (perm === 'granted') { setShow(false); return; }
+
+    if (perm === 'denied') {
+      // Mostrar instrucciones de desbloqueo máximo 1x por semana
+      const daysSince = (Date.now() - getPushDismissAt()) / 86_400_000;
+      if (daysSince < 7) { setShow(false); return; }
+      setDenied(true);
+      const t = setTimeout(() => setShow(true), 30_000);
+      return () => clearTimeout(t);
+    }
+
+    // permission === 'default'
+    const count = getPushDismissCount();
+    if (count >= MAX_DISMISSALS) { setShow(false); return; }
+    const cooldown = COOLDOWN_DAYS[Math.min(count, COOLDOWN_DAYS.length - 1)];
+    const daysSince = (Date.now() - getPushDismissAt()) / 86_400_000;
+    if (getPushDismissAt() > 0 && daysSince < cooldown) { setShow(false); return; }
+
+    const t = setTimeout(() => setShow(true), 30_000);
+    return () => clearTimeout(t);
   }, [user]);
 
   if (!show) return null;
+
+  const handleDismiss = () => {
+    setShow(false);
+    recordPushDismiss();
+  };
 
   const handleEnable = async () => {
     setLoading(true);
     const ok = await enable();
     setLoading(false);
-    if (ok) setShow(false);
-    else if (Notification.permission === 'denied') setShow(false);
+    if (ok) { setShow(false); return; }
+    if (Notification.permission === 'denied') setDenied(true);
   };
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
-      <div className="bg-primary-600 text-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3">
-        <Bell className="w-5 h-5 shrink-0" />
-        <p className="text-sm flex-1">Activá las notificaciones push para recibir alertas aunque no estés en la app.</p>
-        <button
-          onClick={handleEnable}
-          disabled={loading}
-          className="shrink-0 px-3 py-1.5 bg-white text-primary-600 rounded-xl text-xs font-bold hover:bg-primary-50 transition-colors disabled:opacity-60"
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          key="push-banner"
+          initial={{ y: 16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 16, opacity: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm"
         >
-          {loading ? '...' : 'Activar'}
-        </button>
-        <button onClick={() => setShow(false)} className="shrink-0 text-white/70 hover:text-white">
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
+          {denied ? (
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-xl px-4 py-3 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center shrink-0 mt-0.5">
+                <BellOff className="w-4 h-4 text-stone-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-stone-800">Notificaciones bloqueadas</p>
+                <p className="text-xs text-stone-500 mt-0.5 leading-snug">
+                  Tocá el candado en la barra del navegador → <span className="font-medium">Notificaciones</span> → <span className="font-medium">Permitir</span>, y recargá la página.
+                </p>
+              </div>
+              <button onClick={handleDismiss} className="shrink-0 text-stone-300 hover:text-stone-500 mt-0.5">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="bg-white border border-stone-100 rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
+                <Bell className="w-4 h-4 text-primary-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-stone-800">Activá las notificaciones</p>
+                <p className="text-xs text-stone-500 leading-snug">Enteráte de eventos y lugares aunque no estés en la app.</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleEnable}
+                  disabled={loading}
+                  className="px-3 py-1.5 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 transition-colors disabled:opacity-60"
+                >
+                  {loading ? '...' : 'Activar'}
+                </button>
+                <button onClick={handleDismiss} className="text-stone-300 hover:text-stone-500">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

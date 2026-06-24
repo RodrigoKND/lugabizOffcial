@@ -122,11 +122,23 @@ export function usePushNotifications() {
   useEffect(() => {
     if (!user || ran.current) return;
     ran.current = true;
-    // Si el permiso ya está concedido, registrar automáticamente al entrar.
-    // Si no, esperar a que el usuario haga clic en "Activar notificaciones".
     if (Notification.permission === 'granted') {
       registerAndSave(user.id);
     }
+  }, [user]);
+
+  // Chrome renueva suscripciones automáticamente. El SW manda este mensaje
+  // para que el hook re-registre el nuevo endpoint en la DB.
+  useEffect(() => {
+    if (!user || !('serviceWorker' in navigator)) return;
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'PUSH_SUBSCRIPTION_CHANGED') {
+        ran.current = false;
+        registerAndSave(user.id);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage);
   }, [user]);
 
   // Función para el botón "Activar notificaciones" (requiere gesto del usuario).
