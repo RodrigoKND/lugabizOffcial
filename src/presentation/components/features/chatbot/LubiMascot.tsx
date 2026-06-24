@@ -8,6 +8,7 @@ interface LubiMascotProps {
   variant?: 'button' | 'chat'
   expression?: LubiExpression
   className?: string
+  dizzy?: boolean
 }
 
 /* ── Configuración de expresiones (solo para variant="chat") ─────────────
@@ -37,12 +38,35 @@ const BLINK_TRANS = {
   repeatDelay: 3.6,
 }
 
+/* ── Dizzy eye roll keyframes ─────────────────────────────────────────── */
+const DIZZY_LEFT_PUPIL = {
+  cx: [22, 25, 24, 20, 16, 15, 18, 22, 22] as number[],
+  cy: [33, 30, 26, 25, 28, 32, 36, 36, 33] as number[],
+}
+const DIZZY_RIGHT_PUPIL = {
+  cx: [42, 45, 44, 40, 36, 35, 38, 42, 42] as number[],
+  cy: [33, 30, 26, 25, 28, 32, 36, 36, 33] as number[],
+}
+const DIZZY_SHINE_L = {
+  cx: [24.5, 27.5, 26.5, 22.5, 18.5, 17.5, 20.5, 24.5, 24.5] as number[],
+  cy: [30, 27, 23, 22, 25, 29, 33, 33, 30] as number[],
+}
+const DIZZY_SHINE_R = {
+  cx: [39.5, 42.5, 41.5, 37.5, 33.5, 32.5, 35.5, 39.5, 39.5] as number[],
+  cy: [30, 27, 23, 22, 25, 29, 33, 33, 30] as number[],
+}
+const DIZZY_TRANS = {
+  duration: 0.6,
+  repeat: Infinity,
+  ease: 'linear' as const,
+}
+
 /* ─────────────────────────────────────────────────────────────────────────
    CARA PARA CHATBUTTON — parpadeo animado, diseño neutro
    Pupilas simétricas: ambas apuntan levemente hacia el centro de la cara
    (izq +2px, der −2px) para efecto "mirándote" sin parecer vizco.
 ───────────────────────────────────────────────────────────────────────── */
-function LubiButtonFace({ size, animated }: { size: number; animated: boolean }) {
+function LubiButtonFace({ size, animated, dizzy }: { size: number; animated: boolean; dizzy?: boolean }) {
   return (
     <svg
       width={size} height={size}
@@ -57,8 +81,8 @@ function LubiButtonFace({ size, animated }: { size: number; animated: boolean })
 
       {/* Ambos ojos en un solo motion.g para garantizar parpadeo sincronizado */}
       <motion.g
-        animate={animated ? BLINK_ANIM : {}}
-        transition={animated ? BLINK_TRANS : {}}
+        animate={!dizzy && animated ? BLINK_ANIM : { scaleY: 0.8 }}
+        transition={!dizzy ? BLINK_TRANS : { duration: 0.3 }}
         style={{ transformBox: 'fill-box' }}
       >
         {/* Ojo izquierdo — centro x=20 */}
@@ -72,18 +96,53 @@ function LubiButtonFace({ size, animated }: { size: number; animated: boolean })
       </motion.g>
 
       {/* Pupilas — fuera del grupo de parpadeo, se muestran sobre los ojos */}
-      {/* Izq: cx=22 (+2 desde centro 20 = mirando levemente al centro) */}
-      <circle cx="22" cy="33" r="5.8" fill="#1C1028" />
-      {/* Der: cx=42 (−2 desde centro 44 = mirando levemente al centro, simétrico) */}
-      <circle cx="42" cy="33" r="5.8" fill="#1C1028" />
-
-      {/* Brillos — espejo perfecto */}
-      <circle cx="24.5" cy="30" r="2.2" fill="white" />
-      <circle cx="39.5" cy="30" r="2.2" fill="white" />
+      {dizzy ? (
+        <>
+          <motion.circle
+            cx={DIZZY_LEFT_PUPIL.cx[0]} cy={DIZZY_LEFT_PUPIL.cy[0]} r="5.8" fill="#1C1028"
+            animate={{ cx: DIZZY_LEFT_PUPIL.cx, cy: DIZZY_LEFT_PUPIL.cy }}
+            transition={DIZZY_TRANS}
+          />
+          <motion.circle
+            cx={DIZZY_RIGHT_PUPIL.cx[0]} cy={DIZZY_RIGHT_PUPIL.cy[0]} r="5.8" fill="#1C1028"
+            animate={{ cx: DIZZY_RIGHT_PUPIL.cx, cy: DIZZY_RIGHT_PUPIL.cy }}
+            transition={DIZZY_TRANS}
+          />
+          {/* Dizzy shine dots follow pupils */}
+          <motion.circle
+            cx={DIZZY_SHINE_L.cx[0]} cy={DIZZY_SHINE_L.cy[0]} r="2.2" fill="white"
+            animate={{ cx: DIZZY_SHINE_L.cx, cy: DIZZY_SHINE_L.cy }}
+            transition={DIZZY_TRANS}
+          />
+          <motion.circle
+            cx={DIZZY_SHINE_R.cx[0]} cy={DIZZY_SHINE_R.cy[0]} r="2.2" fill="white"
+            animate={{ cx: DIZZY_SHINE_R.cx, cy: DIZZY_SHINE_R.cy }}
+            transition={DIZZY_TRANS}
+          />
+        </>
+      ) : (
+        <>
+          {/* Izq: cx=22 (+2 desde centro 20 = mirando levemente al centro) */}
+          <circle cx="22" cy="33" r="5.8" fill="#1C1028" />
+          {/* Der: cx=42 (−2 desde centro 44 = mirando levemente al centro, simétrico) */}
+          <circle cx="42" cy="33" r="5.8" fill="#1C1028" />
+          {/* Brillos — espejo perfecto */}
+          <circle cx="24.5" cy="30" r="2.2" fill="white" />
+          <circle cx="39.5" cy="30" r="2.2" fill="white" />
+        </>
+      )}
 
       {/* Rubor */}
-      <ellipse cx="9"  cy="42" rx="7.5" ry="4.5" fill="#BE185D" opacity="0.16" />
-      <ellipse cx="55" cy="42" rx="7.5" ry="4.5" fill="#BE185D" opacity="0.16" />
+      <motion.ellipse
+        cx="9" cy="42" rx="7.5" ry="4.5" fill="#BE185D"
+        animate={{ opacity: dizzy ? 0.5 : 0.16 }}
+        transition={{ duration: 0.3 }}
+      />
+      <motion.ellipse
+        cx="55" cy="42" rx="7.5" ry="4.5" fill="#BE185D"
+        animate={{ opacity: dizzy ? 0.5 : 0.16 }}
+        transition={{ duration: 0.3 }}
+      />
     </svg>
   )
 }
@@ -168,11 +227,12 @@ const LubiMascot: React.FC<LubiMascotProps> = ({
   variant = 'button',
   expression = 'idle',
   className = '',
+  dizzy = false,
 }) => (
   <div className={className} style={{ display: 'inline-block', lineHeight: 0 }}>
     {variant === 'chat'
       ? <LubiChatFace size={size} expression={expression} />
-      : <LubiButtonFace size={size} animated={animated} />
+      : <LubiButtonFace size={size} animated={animated} dizzy={dizzy} />
     }
   </div>
 )

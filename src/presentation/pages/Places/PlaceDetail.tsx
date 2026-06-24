@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2, LogIn } from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
-import { ReviewSection, ChatButton } from '@presentation/components/features';
+import { ReviewSection } from '@presentation/components/features';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { usePlaceDetail } from '@presentation/hooks/places/usePlaceDetail';
@@ -112,7 +112,6 @@ const PlaceDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-feed-bg">
-      <ChatButton onClick={() => setIsChatOpen(true)} isVisible />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
           {isModal ? (

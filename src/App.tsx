@@ -300,7 +300,7 @@ function AppRoutes() {
             </motion.div>
           </AnimatePresence>
         </div>
-        <ChatButton isVisible />
+        <ChatButton isVisible={['/', '/profile'].includes(displayLocation.pathname)} />
         <PendingSurveys />
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         <Toaster position="top-right" toastOptions={{

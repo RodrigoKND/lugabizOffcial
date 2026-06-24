@@ -139,7 +139,7 @@ const Profile: React.FC = () => {
 
         <ProfileTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div className="max-h-[60vh] overflow-y-auto scrollbar-hide">
+        <div className="max-h-[60vh] overflow-y-auto scrollbar-hide pb-20 md:pb-0">
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {renderTabContent()}
