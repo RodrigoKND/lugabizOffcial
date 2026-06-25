@@ -9,7 +9,7 @@ import {
   Bell, ArrowLeft, Loader2, X, Hash, Clock, UserX, UserCheck,
   ClipboardList, Flag, TrendingUp, Eye, Zap, Globe, BarChart2,
   RefreshCw, UserPlus, Store, Wifi, Database, Users2, ShieldAlert,
-  BadgeCheck, Sparkles, FileText, Megaphone, Send, Link2, Crown, BellRing,
+  BadgeCheck, Sparkles, FileText, Megaphone, Send, Link2, Crown, BellRing, Smartphone,
 } from 'lucide-react';
 import { getModerationLogs, markModerationLogReviewed, type ModerationLog } from '@lib/supabase/services/moderation/moderationService';
 import { ownerVerificationService, type PendingVerification, ownerBusinessesService, type AdminOwnerBusiness, broadcastService, type BroadcastAudience, type BroadcastResult } from '@lib/supabase';
@@ -2087,6 +2087,19 @@ function MarketingSection() {
               </p>
               {result.push && result.push.subscriptions === 0 && (
                 <p className="text-[11px] text-stone-400">No hay suscripciones push para esta audiencia. El usuario debe entrar a Lugabiz y aceptar las notificaciones del navegador (en iPhone, además, agregar la app a la pantalla de inicio).</p>
+              )}
+              <p className="text-xs flex items-center gap-1">
+                <Smartphone className="w-3 h-3 text-stone-400" />
+                <span className="text-green-600 font-semibold">{result.fcmSent} push a la app móvil</span>
+                {result.fcm && result.fcm.failed > 0 && <span className="text-red-500 font-semibold"> · {result.fcm.failed} fallaron</span>}
+                {result.fcm && <span className="text-stone-400"> · {result.fcm.tokens} token(s) FCM hallado(s)</span>}
+              </p>
+              {result.fcm && result.fcm.errors.length > 0 && (
+                <div className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg p-2 space-y-1">
+                  <p className="font-semibold flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Push de la app móvil (FCM):</p>
+                  {result.fcm.errors.map((e, i) => <p key={i} className="font-mono leading-snug">{e}</p>)}
+                  <p className="text-stone-500 mt-1">Falta el secret <b>FIREBASE_SERVICE_ACCOUNT</b> en Supabase, o el token está vencido (se limpia solo).</p>
+                </div>
               )}
               {result.push && result.push.errors.length > 0 && (
                 <div className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg p-2 space-y-1">

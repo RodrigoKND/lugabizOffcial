@@ -26,11 +26,20 @@ export interface BroadcastPush {
   errors: string[];      // motivos reales de web-push (ej. 403 = claves VAPID no coinciden)
 }
 
+export interface BroadcastFcm {
+  sent: number;    // pushes entregados a la app móvil (FCM)
+  failed: number;  // intentos fallidos
+  tokens: number;  // tokens FCM hallados para la audiencia
+  errors: string[];
+}
+
 export interface BroadcastResult {
   recipients: number;
   inApp: number;     // notificaciones de campana insertadas
   pushSent: number;  // pushes del navegador entregados
   push?: BroadcastPush;
+  fcmSent: number;   // pushes entregados a la app móvil (FCM)
+  fcm?: BroadcastFcm;
 }
 
 export const broadcastService = {
@@ -56,6 +65,8 @@ export const broadcastService = {
       inApp: (data as any).inApp ?? 0,
       pushSent: (data as any).pushSent ?? 0,
       push: (data as any).push,
+      fcmSent: (data as any).fcmSent ?? 0,
+      fcm: (data as any).fcm,
     };
   },
 };
