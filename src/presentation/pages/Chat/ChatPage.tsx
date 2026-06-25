@@ -103,11 +103,14 @@ function renderInline(text: string): React.ReactNode[] {
 function PlaceCardComponent({ place }: { place: PlaceCard }) {
   const photos = [place.image, ...(place.gallery ?? [])].filter(Boolean) as string[]
   const published = timeAgo(place.publishedAt)
+  // Si hay varios números (ej. "+591 4123456; +591 70011223"), llamamos solo al
+  // primero — antes se concatenaban todos y el botón "Llamar" marcaba basura.
+  const telNumber = place.phone ? place.phone.split(/[;,/]|\s+y\s+/i)[0].replace(/[^0-9+]/g, '').trim() : ''
 
   return (
     <div className="rounded-2xl border border-white/10 bg-feed-bg overflow-hidden shadow-sm">
-      {/* Galería de fotos */}
-      {photos.length > 0 ? (
+      {/* Galería de fotos — si el lugar no tiene imagen, no mostramos nada */}
+      {photos.length > 0 && (
         <div className={`grid gap-0.5 ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-3'}`}>
           {photos.slice(0, photos.length === 1 ? 1 : 3).map((src, i) => (
             <div key={i} className={`relative bg-feed-bg/5 overflow-hidden ${photos.length === 1 ? 'h-36' : 'h-24'}`}>
@@ -119,10 +122,6 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
               )}
             </div>
           ))}
-        </div>
-      ) : (
-        <div className="h-28 bg-gradient-to-br from-primary-900/50 to-white/5 flex items-center justify-center">
-          <MapPin className="w-7 h-7 text-text-muted" />
         </div>
       )}
 
@@ -155,6 +154,17 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
           )}
         </div>
 
+        {/* Info útil — solo si el lugar la tiene (WiFi, mesas afuera, delivery…) */}
+        {place.highlights && place.highlights.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {place.highlights.map((h, i) => (
+              <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-medium text-text-secondary bg-white/5 border border-white/10">
+                {h}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Horarios — solo si el lugar los tiene */}
         {place.hours && (
           <div className="flex items-start gap-1 mt-1.5 text-[11px] text-text-secondary">
@@ -172,8 +182,8 @@ function PlaceCardComponent({ place }: { place: PlaceCard }) {
                 <MessageCircle className="w-3 h-3" /> Pedidos
               </a>
             )}
-            {place.phone && (
-              <a href={`tel:${place.phone}`}
+            {telNumber && (
+              <a href={`tel:${telNumber}`}
                 className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-sky-600 bg-sky-50 hover:opacity-80 transition-opacity">
                 <Phone className="w-3 h-3" /> Llamar
               </a>

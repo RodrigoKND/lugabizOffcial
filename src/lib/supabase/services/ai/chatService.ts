@@ -25,6 +25,8 @@ export interface PlaceCard {
   website?: string | null
   whatsapp?: string | null
   hours?: string | null
+  // Info útil del lugar (WiFi, mesas afuera, delivery…): solo si existe
+  highlights?: string[]
 }
 
 export interface EventCard {
