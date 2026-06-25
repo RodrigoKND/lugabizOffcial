@@ -85,10 +85,10 @@ export function useChat(isOpen: boolean) {
       .slice(-6)
       .map(m => ({ role: m.role, content: m.content }))
 
-    // Últimos lugares mencionados, sin repetir
+    // Lugares ya mostrados en TODA la sesión → el backend los excluye para no repetir
     const shownPlaces = [...new Set(
       msgsRef.current.flatMap(m => (m.places ?? []).map(p => p.name)),
-    )].slice(-8)
+    )].slice(-20)
 
     setMessages(prev => [
       ...prev,
@@ -97,8 +97,15 @@ export function useChat(isOpen: boolean) {
     ])
     setChatLoading(true)
 
+    // Asegura las coordenadas: si la geolocalización en curso aún no resolvió,
+    // la esperamos (máx ~5s) en vez de mandar sin ubicación. Si ya resolvió, no espera.
+    let coords = coordsRef.current
+    if (!coords && geoRef.current) {
+      coords = await Promise.race([geoRef.current, new Promise<null>(r => setTimeout(() => r(null), 5000))])
+    }
+
     await chatService.streamMessage(
-      { message: content, lat: coordsRef.current?.lat, lng: coordsRef.current?.lng, city, conversationHistory: history, shownPlaces, locationMode },
+      { message: content, lat: coords?.lat, lng: coords?.lng, city, conversationHistory: history, shownPlaces, locationMode },
       {
         onToken:      token   => patchLast(m => ({ content: m.content + token })),
         onDone:       ()      => { patchLast({ streaming: false }); setChatLoading(false) },

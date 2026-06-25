@@ -637,13 +637,23 @@ function TabPlan({ r }: { r: BusinessAdvisorReport }) {
           </ol>
         </Section>
       )}
-      {(r.investment.note || r.investment.recoveryEstimate) && (
+      {(r.investment.note || r.investment.recoveryEstimate || r.investment.range || r.investment.startLean) && (
         <Section icon={<Wallet className="w-4 h-4" />} title="Inversión y recuperación">
           <div className="rounded-xl border border-white/8 bg-white/4 p-4 space-y-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] uppercase tracking-widest text-white/25">Nivel</span>
               <span className="text-[13px] font-semibold text-white/70 capitalize">{r.investment.level}</span>
+              {r.investment.range && (
+                <span className="text-[13px] font-semibold text-primary-300 bg-primary-500/15 border border-primary-500/20 rounded-lg px-2 py-0.5">
+                  {r.investment.range}
+                </span>
+              )}
             </div>
+            {r.investment.startLean && (
+              <p className="text-[13px] text-emerald-300/80 leading-relaxed">
+                <span className="font-semibold">Empezar ya: </span>{r.investment.startLean}
+              </p>
+            )}
             {r.investment.note && <p className="text-[13.5px] text-white/55 leading-relaxed">{r.investment.note}</p>}
             {r.investment.recoveryEstimate && (
               <p className="text-[12.5px] text-white/35">↳ Recuperación estimada: {r.investment.recoveryEstimate}</p>

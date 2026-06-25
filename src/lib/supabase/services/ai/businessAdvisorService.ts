@@ -51,6 +51,8 @@ export interface AdvisorSource { title: string; url: string }
 
 export interface AdvisorInvestment {
   level: 'baja' | 'media' | 'alta'
+  range?: string
+  startLean?: string
   note: string
   recoveryEstimate: string
 }
