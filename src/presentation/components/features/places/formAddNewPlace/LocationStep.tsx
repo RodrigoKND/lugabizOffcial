@@ -59,6 +59,7 @@ const LocationStep: React.FC<LocationStepProps> = ({
             onBlur={() => handleBlur('address')}
             placeholder="Calle, número, ciudad..."
             hasError={!!(touched.address && errors.address)}
+            near={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : undefined}
           />
           <FieldError message={touched.address ? errors.address : null} />
         </div>

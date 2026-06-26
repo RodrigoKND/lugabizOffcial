@@ -28,4 +28,4 @@ export interface FormData {
   coords: number[];
 }
 
-export const TOTAL_STEPS = 4;
+export const TOTAL_STEPS = 3;

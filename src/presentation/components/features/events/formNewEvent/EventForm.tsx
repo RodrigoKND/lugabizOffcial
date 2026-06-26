@@ -1,16 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { EventFormProps, TOTAL_STEPS } from './EventFormTypes';
+import { EventFormProps } from './EventFormTypes';
 import { useEventForm } from './useEventForm';
 import BasicInfoSection from './BasicInfoSection';
 import DateTimeLocationSection from './DateTimeLocationSection';
-import MapSection from './MapSection';
 import ReviewSection from './ReviewSection';
 import FormNavigation from './FormNavigation';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 
-const stepLabels = ['Info', 'Fecha', 'Mapa', 'Revisar'];
+const stepLabels = ['Info', 'Fecha y lugar', 'Revisar'];
 
 const overlayVariants = {
   hidden: { opacity: 0 },
@@ -51,10 +50,6 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
     handleSubmit, goNext, goBack,
   } = useEventForm(onClose);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
-
-  const handleAddressFromMap = useCallback((addr: string) => {
-    handleChange('address', addr);
-  }, [handleChange]);
 
   const handlePublishRequest = () => setShowPublishConfirm(true);
 
@@ -122,19 +117,6 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
                 )}
                 {step === 2 && (
                   <motion.div key="s2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}>
-                    <MapSection
-                      coords={formData.coords} errors={errors} touched={touched}
-                      onCoordsChange={handleCoordsChange}
-                      onAddressChange={handleAddressFromMap}
-                    />
-                  </motion.div>
-                )}
-                {step === 3 && (
-                  <motion.div key="s3"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

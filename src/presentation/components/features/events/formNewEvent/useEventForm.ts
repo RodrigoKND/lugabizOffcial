@@ -142,16 +142,15 @@ export function useEventForm(onClose: () => void) {
   const isStepValid = () => {
     switch (step) {
       case 0: return formData.name.length >= 3 && formData.description.length >= 10 && formData.categoryId;
-      case 1: return formData.dateStart && formData.timeStart;
-      case 2: return formData.coords.length === 2;
-      case 3: return true;
+      case 1: return formData.dateStart && formData.timeStart && formData.address.trim() && formData.coords.length === 2;
+      case 2: return true;
       default: return true;
     }
   };
 
   const goNext = () => {
     if (step === 0) { setTouched(t => ({ ...t, name: true, description: true, categoryId: true })); }
-    if (step === 1) { setTouched(t => ({ ...t, dateStart: true, timeStart: true, address: true })); }
+    if (step === 1) { setTouched(t => ({ ...t, dateStart: true, timeStart: true, address: true, coords: true })); }
     if (!isStepValid()) { validate(); return; }
     setStep(s => s + 1);
   };

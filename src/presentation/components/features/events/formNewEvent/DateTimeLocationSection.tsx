@@ -1,8 +1,11 @@
-import React, { useMemo } from 'react';
-import { X, Image, MapPin, Users, Clock, Calendar, Zap } from 'lucide-react';
+import React, { useMemo, lazy, Suspense, useCallback, useRef } from 'react';
+import { X, Image, MapPin, Users, Clock, Calendar, Zap, Loader2, Locate } from 'lucide-react';
 import AddressAutocomplete from '@presentation/components/ui/address/AddressAutocomplete';
 import { FormData, ValidationErrors } from './EventFormTypes';
+import { reverseGeocode } from '@lib/geocoding/geocodingService';
 import type { GeoResult } from '@lib/geocoding/geocodingService';
+
+const MapPicker = lazy(() => import('./MapPicker'));
 
 interface Props {
   formData: FormData;
@@ -91,6 +94,18 @@ const DateTimeLocationSection: React.FC<Props> = ({
       })
       .filter(Boolean) as { label: string; value: string }[];
   }, [formData.timeStart]);
+
+  // Al mover el pin del mapa, rellenamos la dirección automáticamente (reverse geocoding).
+  const revTimer = useRef<ReturnType<typeof setTimeout>>();
+  const handleMapCoords = useCallback((lat: number, lng: number) => {
+    onCoordsChange?.(lat, lng);
+    onBlur('coords');
+    clearTimeout(revTimer.current);
+    revTimer.current = setTimeout(async () => {
+      const addr = await reverseGeocode(lat, lng);
+      if (addr) onChange('address', addr);
+    }, 600);
+  }, [onCoordsChange, onChange, onBlur]);
 
   return (
     <div className="space-y-6">
@@ -234,13 +249,40 @@ const DateTimeLocationSection: React.FC<Props> = ({
             onChange={(val) => onChange('address', val)}
             onSelect={(result) => {
               onChange('address', result.displayName)
-              onCoordsChange?.(result.lat, result.lng)
+              handleMapCoords(result.lat, result.lng)
             }}
             onBlur={() => onBlur('address')}
             placeholder="Dirección del evento"
             hasError={!!(touched.address && errors.address)}
+            near={formData.coords?.length === 2 ? { lat: formData.coords[0], lng: formData.coords[1] } : undefined}
           />
           {renderError('address', errors, touched)}
+        </div>
+
+        {/* Mapa justo debajo de la dirección: buscar y ubicar van de la mano */}
+        <div className="space-y-1 mt-3">
+          <p className="text-[11px] text-stone-500 mb-2">
+            Confirma la ubicación en el mapa. Haz clic o arrastra el marcador para ajustarla.
+          </p>
+          <Suspense fallback={
+            <div className="aspect-video bg-stone-100 rounded-xl flex items-center justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+            </div>
+          }>
+            <MapPicker initialCoords={formData.coords} onCoordsChange={handleMapCoords} />
+          </Suspense>
+          {touched.coords && errors.coords && (
+            <p className="flex items-center gap-1 text-[11px] text-red-500 mt-1.5">
+              <span className="w-3.5 h-3.5 inline-flex items-center justify-center rounded-full bg-red-100 text-red-500 text-[8px] font-bold">!</span>
+              {errors.coords}
+            </p>
+          )}
+          {formData.coords?.length === 2 && (
+            <div className="flex items-center gap-2 text-xs text-stone-500 bg-primary-50 px-3 py-2 rounded-xl mt-2">
+              <Locate className="w-3.5 h-3.5 text-primary-500" />
+              <span>{formData.coords[0].toFixed(6)}, {formData.coords[1].toFixed(6)}</span>
+            </div>
+          )}
         </div>
       </div>
 

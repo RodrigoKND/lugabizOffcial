@@ -11,19 +11,23 @@ interface Props {
   hasError?: boolean
   className?: string
   icon?: React.ReactNode
+  /** Sesga las sugerencias hacia este punto (ej. ubicación del usuario o el pin del mapa) */
+  near?: { lat: number; lng: number }
 }
 
 export default function AddressAutocomplete({
   value, onChange, onSelect, onBlur,
   placeholder = 'Buscar dirección…',
-  hasError, className = '', icon,
+  hasError, className = '', icon, near,
 }: Props) {
   const [query, setQuery] = useState(value)
   const [results, setResults] = useState<GeoResult[]>([])
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState(false)
+  const [highlight, setHighlight] = useState(-1)
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const abortRef = useRef<AbortController>()
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { if (!selected) setQuery(value) }, [value])
@@ -37,27 +41,52 @@ export default function AddressAutocomplete({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  // Limpieza al desmontar: cancela timers y peticiones pendientes.
+  useEffect(() => () => { clearTimeout(timerRef.current); abortRef.current?.abort() }, [])
+
   function handleInput(val: string) {
     setQuery(val)
     setSelected(false)
+    setHighlight(-1)
     onChange(val)
     clearTimeout(timerRef.current)
-    if (val.trim().length < 3) { setResults([]); setOpen(false); return }
+    abortRef.current?.abort()
+    if (val.trim().length < 3) { setResults([]); setOpen(false); setLoading(false); return }
+    setLoading(true)
     timerRef.current = setTimeout(async () => {
-      setLoading(true)
-      const res = await searchAddress(val)
+      const ctrl = new AbortController()
+      abortRef.current = ctrl
+      const res = await searchAddress(val, { near, signal: ctrl.signal })
+      if (ctrl.signal.aborted) return
       setResults(res)
       setOpen(res.length > 0)
       setLoading(false)
-    }, 400)
+    }, 250)
   }
 
   function handlePick(r: GeoResult) {
     setQuery(r.displayName)
     setSelected(true)
     setOpen(false)
+    setHighlight(-1)
     onChange(r.displayName)
     onSelect(r)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || results.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlight(h => (h + 1) % results.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlight(h => (h - 1 + results.length) % results.length)
+    } else if (e.key === 'Enter' && highlight >= 0) {
+      e.preventDefault()
+      handlePick(results[highlight])
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
   }
 
   return (
@@ -68,9 +97,11 @@ export default function AddressAutocomplete({
           type="text"
           value={query}
           onChange={e => handleInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => { if (results.length > 0) setOpen(true) }}
           onBlur={() => { onBlur?.() }}
           placeholder={placeholder}
+          autoComplete="off"
           className={`w-full pl-11 pr-10 py-3.5 bg-stone-50 border rounded-xl focus:ring-0 text-sm outline-none transition-all ${
             hasError ? 'border-red-300' : 'border-stone-200 focus:border-amber-400'
           } ${className}`}
@@ -80,15 +111,23 @@ export default function AddressAutocomplete({
         )}
       </div>
       {open && results.length > 0 && (
-        <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+        <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
           {results.map((r, i) => (
             <li
               key={i}
               onMouseDown={() => handlePick(r)}
-              className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-amber-50 border-b border-stone-100 last:border-0 transition-colors"
+              onMouseEnter={() => setHighlight(i)}
+              className={`flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-stone-100 last:border-0 transition-colors ${
+                highlight === i ? 'bg-amber-50' : 'hover:bg-amber-50'
+              }`}
             >
               <MapPin className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-stone-700 line-clamp-2">{r.displayName}</span>
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-stone-800 truncate">{r.mainText}</span>
+                {r.secondaryText && (
+                  <span className="block text-xs text-stone-500 truncate">{r.secondaryText}</span>
+                )}
+              </span>
             </li>
           ))}
         </ul>
