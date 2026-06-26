@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Tag as TagIcon, Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin, Cctv, Waves, Music, Tv, Wind, Trees, Bike, Tent, Bed, Bath, Dumbbell } from 'lucide-react';
+import { Tag as TagIcon, Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin, Cctv, Waves, Music, Tv, Wind, Trees, Bike, Tent, Bed, Bath, Dumbbell, CalendarCheck, Package, GraduationCap, Timer, Users, Radio } from 'lucide-react';
 
 export interface Tag {
   id: string;
@@ -26,6 +26,12 @@ export const AMENITIES: Tag[] = [
   { id: 'bike', name: 'Estacionamiento bicis', icon: 'Bike', color: '#F97316' },
   { id: 'events', name: 'Eventos privados', icon: 'Tent', color: '#A855F7' },
   { id: 'delivery', name: 'Delivery / Rappi', icon: 'Bike', color: '#E11D48' },
+  { id: 'reservas', name: 'Reservas', icon: 'CalendarCheck', color: '#F97316' },
+  { id: 'equipamiento', name: 'Equipamiento incluido', icon: 'Package', color: '#84CC16' },
+  { id: 'instructores', name: 'Instructores', icon: 'GraduationCap', color: '#06B6D4' },
+  { id: 'horario_ext', name: 'Horario extendido', icon: 'Timer', color: '#14B8A6' },
+  { id: 'grupos', name: 'Grupos', icon: 'Users', color: '#EC4899' },
+  { id: 'musica', name: 'Música', icon: 'Radio', color: '#A855F7' },
 ];
 
 interface TagSelectorProps {
@@ -47,6 +53,7 @@ const AmenitySelector: React.FC<TagSelectorProps> = ({ tags = AMENITIES, selecte
     const icons: Record<string, React.ComponentType<{ className?: string }>> = {
       Wifi, Car, Utensils, Coffee, Dog, Accessibility, Clock, CreditCard, MapPin,
       Music, Tv, Wind, Trees, Cctv, Bike, Tent, Bed, Bath, Dumbbell,
+      CalendarCheck, Package, GraduationCap, Timer, Users, Radio,
     };
     return icons[iconName] || TagIcon;
   };
