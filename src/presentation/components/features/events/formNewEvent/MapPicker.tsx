@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Crosshair } from 'lucide-react';
 import { Map, MapMarker, MarkerContent, MapControls } from '@presentation/components/ui/map';
 import type { MapRef } from '@presentation/components/ui/map';
@@ -10,19 +10,46 @@ interface MapPickerProps {
 
 const defaultCenter = { lng: -66.1568, lat: -17.3895 };
 
+// Geoapify osm-bright: mapa con TODAS las calles y lugares (mucho más detallado que Carto).
+// Usa la misma clave del autocompletado; si no hay clave, cae a los estilos Carto por defecto del <Map/>.
+const GEOAPIFY_KEY = (import.meta.env.VITE_GEOAPIFY_API_KEY as string | undefined)?.trim();
+const geoapifyStyles = GEOAPIFY_KEY
+  ? {
+      light: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${GEOAPIFY_KEY}`,
+      dark: `https://maps.geoapify.com/v1/styles/dark-matter-brown/style.json?apiKey=${GEOAPIFY_KEY}`,
+    }
+  : undefined;
+
 const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) => {
   const mapRef = useRef<MapRef>(null)
   const [coords, setCoords] = useState<[number, number]>(
     initialCoords.length === 2 ? [initialCoords[1], initialCoords[0]] : [defaultCenter.lng, defaultCenter.lat]
   );
+  // Cuando el cambio de coords viene de un click/drag/locate del propio mapa, NO queremos
+  // que el efecto de abajo vuelva a volar (evita saltos y bucles).
+  const skipFlyRef = useRef(false);
+
+  // Reacciona a coordenadas que llegan DESDE FUERA (ej. elegir una dirección del autocompletado):
+  // mueve el marcador y vuela hacia el punto.
+  useEffect(() => {
+    if (initialCoords.length !== 2) return;
+    const [lat, lng] = initialCoords;
+    if (skipFlyRef.current) { skipFlyRef.current = false; return; }
+    setCoords(prev =>
+      (Math.abs(prev[0] - lng) < 1e-7 && Math.abs(prev[1] - lat) < 1e-7) ? prev : [lng, lat]
+    );
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 16, duration: 1000 });
+  }, [initialCoords]);
 
   const handleMapClick = useCallback((e: any) => {
     const lngLat = e.lngLat;
+    skipFlyRef.current = true;
     setCoords([lngLat.lng, lngLat.lat]);
     onCoordsChange(lngLat.lat, lngLat.lng);
   }, [onCoordsChange]);
 
   const handleDragEnd = useCallback((lngLat: { lng: number; lat: number }) => {
+    skipFlyRef.current = true;
     setCoords([lngLat.lng, lngLat.lat]);
     onCoordsChange(lngLat.lat, lngLat.lng);
   }, [onCoordsChange]);
@@ -31,7 +58,8 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) 
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
-        mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 15, duration: 1200 })
+        skipFlyRef.current = true;
+        mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 16, duration: 1200 })
         setCoords([longitude, latitude]);
         onCoordsChange(latitude, longitude);
       });
@@ -44,6 +72,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialCoords, onCoordsChange }) 
         ref={mapRef}
         center={coords}
         zoom={13}
+        styles={geoapifyStyles}
         onClick={handleMapClick}
         style={{ width: '100%', height: '100%' }}
       >

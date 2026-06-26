@@ -126,7 +126,7 @@ export default function BusinessAdvisorPage() {
   const runZoneSearch = useCallback(async () => {
     if (zoneQuery.trim().length < 3) return
     setSearchingZone(true)
-    try { setGeoResults(await searchAddress(zoneQuery)) } finally { setSearchingZone(false) }
+    try { setGeoResults(await searchAddress(zoneQuery, { allCountry: true })) } finally { setSearchingZone(false) }
   }, [zoneQuery])
 
   const pickZone = (g: GeoResult) => {

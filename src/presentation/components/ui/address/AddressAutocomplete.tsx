@@ -111,7 +111,7 @@ export default function AddressAutocomplete({
         )}
       </div>
       {open && results.length > 0 && (
-        <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+        <ul className="address-suggest-panel absolute z-50 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
           {results.map((r, i) => (
             <li
               key={i}

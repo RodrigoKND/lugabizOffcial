@@ -15,14 +15,50 @@ const GEOAPIFY = 'https://api.geoapify.com/v1/geocode'
 const NOMINATIM = 'https://nominatim.openstreetmap.org'
 const USER_AGENT = 'LugabizApp/1.0'
 
-// Centro de Cochabamba (Plaza 14 de Septiembre) — sesgo de búsqueda por defecto.
+// Centro de Cochabamba (Plaza 14 de Septiembre) — ciudad por defecto.
 const COCHABAMBA = { lat: -17.3935, lng: -66.157 }
 
+// Radio que abarca el área metropolitana de una ciudad (Cochabamba + Quillacollo, Sacaba,
+// Tiquipaya, Colcapirhua, Vinto…). Las sugerencias se RESTRINGEN a este círculo.
+const CITY_RADIUS_M = 30000
+
 export interface SearchOpts {
-  /** Punto para sesgar resultados (ej. ubicación del usuario). Default: Cochabamba */
+  /** Punto para PRIORIZAR resultados dentro de la ciudad (ej. el pin del mapa). */
   near?: { lat: number; lng: number }
+  /** Centro de la ciudad que RESTRINGE el área de búsqueda. Default: ciudad del usuario / Cochabamba */
+  city?: { lat: number; lng: number }
+  /** Busca en toda Bolivia sin restringir a la ciudad (ej. el Asesor, que analiza otras zonas). */
+  allCountry?: boolean
   /** Para cancelar peticiones obsoletas desde el autocompletado */
   signal?: AbortSignal
+}
+
+/**
+ * Resuelve el centro de la ciudad del usuario UNA sola vez:
+ * - Si el navegador ya tiene permiso de ubicación CONCEDIDO → usa su ubicación real
+ *   (así un usuario de Santa Cruz autocompleta en Santa Cruz, no Cochabamba). No pide permiso nuevo.
+ * - En cualquier otro caso (sin permiso, sin soporte, error) → Cochabamba.
+ */
+let cityCenterPromise: Promise<{ lat: number; lng: number }> | null = null
+export function resolveCityCenter(): Promise<{ lat: number; lng: number }> {
+  if (cityCenterPromise) return cityCenterPromise
+  cityCenterPromise = (async () => {
+    try {
+      if (!('geolocation' in navigator) || !('permissions' in navigator)) return COCHABAMBA
+      const status = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
+      if (status.state !== 'granted') return COCHABAMBA
+      return await new Promise<{ lat: number; lng: number }>(resolve => {
+        navigator.geolocation.getCurrentPosition(
+          p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+          () => resolve(COCHABAMBA),
+          { maximumAge: 300000, timeout: 4000, enableHighAccuracy: false },
+        )
+      })
+    } catch {
+      return COCHABAMBA
+    }
+  })()
+  return cityCenterPromise
 }
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -43,12 +79,14 @@ function splitDisplay(name: string): { main: string; secondary: string } {
   return { main: name.slice(0, i).trim(), secondary: name.slice(i + 1).trim() }
 }
 
-async function searchGeoapify(query: string, opts: SearchOpts): Promise<GeoResult[]> {
-  const near = opts.near ?? COCHABAMBA
+async function searchGeoapify(query: string, opts: SearchOpts, city: { lat: number; lng: number }): Promise<GeoResult[]> {
+  // El pin del mapa (near) prioriza dentro de la ciudad; si no hay pin, prioriza el centro de la ciudad.
+  const near = opts.near ?? city
   const params = new URLSearchParams({
     text: query,
     apiKey: GEOAPIFY_KEY!,
-    filter: 'countrycode:bo',
+    // Por defecto RESTRINGE a la ciudad (círculo); con allCountry busca en toda Bolivia.
+    filter: opts.allCountry ? 'countrycode:bo' : `circle:${city.lng},${city.lat},${CITY_RADIUS_M}`,
     bias: `proximity:${near.lng},${near.lat}`,
     lang: 'es',
     limit: '6',
@@ -98,24 +136,24 @@ async function rateLimit() {
   lastRequest = Date.now()
 }
 
-async function searchNominatim(query: string, signal?: AbortSignal): Promise<GeoResult[]> {
+async function searchNominatim(query: string, city: { lat: number; lng: number }, allCountry: boolean, signal?: AbortSignal): Promise<GeoResult[]> {
   await rateLimit()
   const toResult = (d: { display_name: string; lat: string; lon: string }): GeoResult => {
     const { main, secondary } = splitDisplay(d.display_name)
     return { displayName: d.display_name, mainText: main, secondaryText: secondary, lat: parseFloat(d.lat), lng: parseFloat(d.lon) }
   }
-  let url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&countrycodes=bo&addressdetails=0`
-  let res = await fetch(url, { headers: { 'User-Agent': USER_AGENT }, signal })
-  if (!res.ok) return []
-  let data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
-
-  if (data.length === 0) {
-    await rateLimit()
-    url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=0`
-    res = await fetch(url, { headers: { 'User-Agent': USER_AGENT }, signal })
-    if (!res.ok) return []
-    data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
+  let bound = ''
+  if (!allCountry) {
+    // Caja delimitadora (~30km) alrededor de la ciudad + bounded=1 → restringe a la ciudad.
+    const dLat = CITY_RADIUS_M / 111320
+    const dLng = CITY_RADIUS_M / (111320 * Math.cos(city.lat * Math.PI / 180))
+    const viewbox = `${city.lng - dLng},${city.lat - dLat},${city.lng + dLng},${city.lat + dLat}`
+    bound = `&bounded=1&viewbox=${viewbox}`
   }
+  const url = `${NOMINATIM}/search?q=${encodeURIComponent(query)}&format=json&limit=6&countrycodes=bo&addressdetails=0${bound}`
+  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT }, signal })
+  if (!res.ok) return []
+  const data = await res.json() as Array<{ display_name: string; lat: string; lon: string }>
   return data.map(toResult)
 }
 
@@ -135,9 +173,11 @@ async function reverseNominatim(lat: number, lng: number): Promise<string | null
 export async function searchAddress(query: string, opts: SearchOpts = {}): Promise<GeoResult[]> {
   if (!query.trim() || query.length < 3) return []
   try {
+    // La ciudad restringe el área: la pasada por opts, o la del usuario (si dio permiso) / Cochabamba.
+    const city = opts.city ?? await resolveCityCenter()
     return GEOAPIFY_KEY
-      ? await searchGeoapify(query, opts)
-      : await searchNominatim(query, opts.signal)
+      ? await searchGeoapify(query, opts, city)
+      : await searchNominatim(query, city, !!opts.allCountry, opts.signal)
   } catch (e) {
     // Una petición cancelada (AbortController) no es un error real: devolvemos vacío silenciosamente.
     if ((e as Error)?.name === 'AbortError') return []

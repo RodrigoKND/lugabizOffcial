@@ -365,6 +365,22 @@ section.min-h-screen.bg-stone-50.text-stone-800 select option {
   color: #e4d4f5 !important;
 }
 
+/* Autocompletado de dirección — panel sólido (el bg-white translúcido lo hacía ilegible sobre el mapa) */
+section.min-h-screen.bg-stone-50.text-stone-800 ul.address-suggest-panel {
+  background: #1a0f2e !important;
+  backdrop-filter: none !important;
+  border-color: rgba(168, 128, 250, 0.25) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+}
+section.min-h-screen.bg-stone-50.text-stone-800 ul.address-suggest-panel li {
+  background: transparent !important;
+  border-color: rgba(168, 128, 250, 0.12) !important;
+}
+section.min-h-screen.bg-stone-50.text-stone-800 ul.address-suggest-panel li:hover,
+section.min-h-screen.bg-stone-50.text-stone-800 ul.address-suggest-panel li[class*="bg-amber-50"] {
+  background: rgba(168, 128, 250, 0.18) !important;
+}
+
 /* Success screen */
 div.min-h-screen.bg-stone-50:has(> div.max-w-sm) {
   background: #0d0620 !important;

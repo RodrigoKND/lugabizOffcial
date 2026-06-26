@@ -249,7 +249,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
             onChange={(val) => onChange('address', val)}
             onSelect={(result) => {
               onChange('address', result.displayName)
-              handleMapCoords(result.lat, result.lng)
+              onCoordsChange?.(result.lat, result.lng)
+              onBlur('coords')
             }}
             onBlur={() => onBlur('address')}
             placeholder="Dirección del evento"
