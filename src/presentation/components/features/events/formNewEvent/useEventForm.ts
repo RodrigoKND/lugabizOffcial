@@ -106,7 +106,8 @@ export function useEventForm(onClose: () => void) {
       let gallery: string[] = [];
       if (imageFiles.length > 0) {
         const urls = await storageService.uploadMultipleFiles(imageFiles, 'events');
-        const imgModResult = await moderateContent('', 'event', user.id, user.name, urls);
+        // Se envía el texto para que la moderación valide que la imagen coincide con el evento.
+        const imgModResult = await moderateContent(contentToCheck, 'event', user.id, user.name, urls);
         if (!imgModResult.approved) {
           storageService.deleteImagesByUrls(urls).catch(() => {});
           toast.error(`Imagen no permitida: ${imgModResult.reason ?? 'Infringe las normas'}`);
