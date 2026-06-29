@@ -1,9 +1,12 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
 import type { PlaceLocationCardProps } from '@domain/entities/PlaceDetailTypes';
 
 export default function PlaceLocationCard({ address, latitude, longitude }: PlaceLocationCardProps) {
   const hasCoords = latitude && longitude;
+  const googleMapsUrl = hasCoords
+    ? `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
+    : '#';
 
   return (
     <div className="bg-white/5 rounded-3xl p-6 border border-white/8 backdrop-blur-sm">
@@ -14,28 +17,39 @@ export default function PlaceLocationCard({ address, latitude, longitude }: Plac
       </div>
 
       {hasCoords && (
-        <div className="rounded-2xl overflow-hidden border border-white/8" style={{ height: '200px' }}>
-          <Map
-            center={[longitude!, latitude!]}
-            zoom={15}
-            style={{ width: '100%', height: '100%' }}
+        <>
+          <div className="rounded-2xl overflow-hidden border border-white/8" style={{ height: '200px' }}>
+            <Map
+              center={[longitude!, latitude!]}
+              zoom={15}
+              style={{ width: '100%', height: '100%' }}
+            >
+              <MapMarker longitude={longitude!} latitude={latitude!}>
+                <MarkerContent>
+                  <div style={{
+                    width: 40, height: 40,
+                    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+                  }}>
+                    <svg viewBox="0 0 48 48" fill="none">
+                      <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C"/>
+                      <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white"/>
+                      <circle cx="24" cy="10" r="4" fill="#D4785C"/>
+                    </svg>
+                  </div>
+                </MarkerContent>
+              </MapMarker>
+            </Map>
+          </div>
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-transparent hover:bg-purple-50 text-purple-600 rounded-xl text-sm font-semibold transition-all border border-purple-200"
           >
-            <MapMarker longitude={longitude!} latitude={latitude!}>
-              <MarkerContent>
-                <div style={{
-                  width: 40, height: 40,
-                  filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
-                }}>
-                  <svg viewBox="0 0 48 48" fill="none">
-                    <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C"/>
-                    <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white"/>
-                    <circle cx="24" cy="10" r="4" fill="#D4785C"/>
-                  </svg>
-                </div>
-              </MarkerContent>
-            </MapMarker>
-          </Map>
-        </div>
+            <Navigation className="w-4 h-4" />
+            Cómo llegar
+          </a>
+        </>
       )}
     </div>
   );

@@ -48,26 +48,26 @@ export function CountdownTimer({ endDate, onExpired }: CountdownTimerProps) {
   }
 
   return (
-    <div className="bg-white/20 ">
-      <p className="text-black text-xs mb-2 font-medium text-center">Comienza en:</p>
+    <div>
+      <p className="text-stone-500 text-xs mb-2 font-medium text-center">Comienza en:</p>
       <div className="flex justify-center gap-1.5">
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-black">{timeLeft.days}</div>
-          <div className="text-[9px] text-black font-medium">días</div>
+        <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-stone-800">{timeLeft.days}</div>
+          <div className="text-[9px] text-stone-400 font-medium">días</div>
         </div>
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-black">{timeLeft.hours}</div>
-          <div className="text-[9px] text-black font-medium">hrs</div>
+        <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-stone-800">{timeLeft.hours}</div>
+          <div className="text-[9px] text-stone-400 font-medium">hrs</div>
         </div>
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-black">{timeLeft.minutes}</div>
-          <div className="text-[9px] text-black font-medium">min</div>
+        <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-stone-800">{timeLeft.minutes}</div>
+          <div className="text-[9px] text-stone-400 font-medium">min</div>
         </div>
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-black">
+        <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
+          <div className="text-base font-bold text-stone-800">
             {Math.max(0, Math.floor((endDate.getTime() - Date.now()) / 1000) % 60)}
           </div>
-          <div className="text-[9px] text-black font-medium">seg</div>
+          <div className="text-[9px] text-stone-400 font-medium">seg</div>
         </div>
       </div>
     </div>

@@ -321,11 +321,11 @@ function AppRoutes() {
                   animate={{ y: 0, pointerEvents: 'auto' }}
                   exit={{ y: '100%', pointerEvents: 'none' }}
                   transition={{ type: 'spring', damping: 32, stiffness: 320, mass: 0.9 }}
-                  className="fixed inset-0 z-[200] bg-[#FDFCFB] overflow-y-auto overscroll-contain"
+                  className="fixed inset-0 z-[200] bg-feed-bg overflow-y-auto overscroll-contain"
                   style={{ WebkitOverflowScrolling: 'touch' }}
                 >
                   {/* Drag handle visual cue */}
-                  <div className="sticky top-0 z-10 flex justify-center pt-2 pb-1 bg-[#FDFCFB]/90 backdrop-blur-sm">
+                  <div className="sticky top-0 z-10 flex justify-center pt-2 pb-1 bg-feed-bg/90 backdrop-blur-sm">
                     <div className="w-10 h-1 rounded-full bg-stone-200" />
                   </div>
                   <PlaceDetail />

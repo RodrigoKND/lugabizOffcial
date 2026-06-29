@@ -61,7 +61,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ isVisible, onClick }) => {
 
   return (
     <motion.div
-      className="fixed md:bottom-6 bottom-28 right-4 sm:right-6 z-50 flex flex-col items-center"
+      className="fixed md:bottom-6 bottom-28 right-4 sm:right-6 z-30 flex flex-col items-center"
       initial={{ x: offset.x, y: offset.y }}
       animate={{ x: offset.x, y: offset.y }}
       drag

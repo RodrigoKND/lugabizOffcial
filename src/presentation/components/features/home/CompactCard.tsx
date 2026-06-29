@@ -1,5 +1,5 @@
 import { Star } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface CompactCardProps {
   image?: string;
@@ -10,12 +10,11 @@ interface CompactCardProps {
 }
 
 const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to }) => {
-  const location = useLocation();
+  const navigate = useNavigate();
   return (
-    <Link
-      to={to}
-      state={{ background: location }}
-      className="shrink-0 w-40 snap-start group relative rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
+    <div
+      onClick={() => navigate(to)}
+      className="shrink-0 w-40 snap-start group relative rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97] cursor-pointer"
     >
       <div className="aspect-[3/4] relative overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
@@ -32,7 +31,7 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
           <p className="text-white font-bold text-xs leading-tight truncate">{name}</p>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

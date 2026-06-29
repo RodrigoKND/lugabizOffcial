@@ -33,7 +33,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ image, name, description, categ
         <div className="flex items-center gap-3 mt-2 sm:mt-3 text-[11px] text-white/60">
           <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {date}</span>
           <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {time}</span>
-          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {address}</span>
+          <span className="flex items-center gap-1 min-w-0 max-w-[160px] sm:max-w-[280px]"><MapPin className="w-3 h-3 shrink-0" /> <span className="truncate min-w-0">{address}</span></span>
         </div>
         <div className="mt-3 flex gap-2">
           <span className="px-4 py-2 bg-primary-500 text-white rounded-lg text-xs font-semibold hover:bg-primary-600 transition-colors">

@@ -1,4 +1,4 @@
-import { MapPin, Clock, Users, Info, XCircle, CheckCircle2, Ticket } from 'lucide-react';
+import { MapPin, Clock, Users, Info, XCircle, CheckCircle2, Ticket, Navigation } from 'lucide-react';
 import { Event } from '@domain/entities';
 import type { EventStatus } from '@domain/entities/EventDetailTypes';
 import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
@@ -59,28 +59,39 @@ export default function EventDetailSidebar({
 
       <div className="space-y-4 mb-6">
         {hasCoords && (
-          <div className="rounded-2xl overflow-hidden border border-stone-100" style={{ height: '160px' }}>
-            <Map center={[event.coords[1], event.coords[0]]} zoom={15} style={{ width: '100%', height: '100%' }}>
-              <MapMarker longitude={event.coords[1]} latitude={event.coords[0]}>
-                <MarkerContent>
-                  <div style={{ width: 36, height: 36, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
-                    <svg viewBox="0 0 48 48" fill="none">
-                      <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C" />
-                      <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white" />
-                      <circle cx="24" cy="10" r="4" fill="#D4785C" />
-                    </svg>
-                  </div>
-                </MarkerContent>
-              </MapMarker>
-            </Map>
-          </div>
+          <>
+            <div className="rounded-2xl overflow-hidden border border-stone-100" style={{ height: '160px' }}>
+              <Map center={[event.coords[1], event.coords[0]]} zoom={15} style={{ width: '100%', height: '100%' }}>
+                <MapMarker longitude={event.coords[1]} latitude={event.coords[0]}>
+                  <MarkerContent>
+                    <div style={{ width: 36, height: 36, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
+                      <svg viewBox="0 0 48 48" fill="none">
+                        <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C" />
+                        <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white" />
+                        <circle cx="24" cy="10" r="4" fill="#D4785C" />
+                      </svg>
+                    </div>
+                  </MarkerContent>
+                </MapMarker>
+              </Map>
+            </div>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${event.coords[0]},${event.coords[1]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-transparent hover:bg-purple-50 text-purple-600 rounded-xl text-sm font-semibold transition-all border border-purple-200"
+            >
+              <Navigation className="w-4 h-4" />
+              Cómo llegar
+            </a>
+          </>
         )}
 
         <div className="flex items-start gap-3">
           <div className="bg-amber-50 p-2.5 rounded-xl"><MapPin className="w-5 h-5 text-amber-500" /></div>
           <div>
             <p className="text-xs font-semibold text-stone-400 uppercase">Ubicación</p>
-            <p className="text-sm font-medium text-stone-700">{event.address}</p>
+            <p className="text-sm font-medium text-stone-700 truncate">{event.address}</p>
           </div>
         </div>
 
@@ -88,7 +99,7 @@ export default function EventDetailSidebar({
           <div className="bg-amber-50 p-2.5 rounded-xl"><Clock className="w-5 h-5 text-amber-500" /></div>
           <div>
             <p className="text-xs font-semibold text-stone-400 uppercase">Fecha y Hora</p>
-            <p className="text-sm font-medium text-stone-700">{formattedDate}</p>
+            <p className="text-sm font-medium text-stone-700 truncate">{formattedDate}</p>
             <p className="text-sm text-stone-500">{event.timeStart}{event.timeEnd ? ` - ${event.timeEnd}` : ''}</p>
           </div>
         </div>
@@ -98,7 +109,7 @@ export default function EventDetailSidebar({
             <div className="bg-amber-50 p-2.5 rounded-xl"><Info className="w-5 h-5 text-amber-500" /></div>
             <div>
               <p className="text-xs font-semibold text-stone-400 uppercase">Capacidad</p>
-              <p className="text-sm font-medium text-stone-700">{event.capacity} personas</p>
+              <p className="text-sm font-medium text-stone-700 truncate">{event.capacity} personas</p>
             </div>
           </div>
         )}

@@ -107,11 +107,19 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
       }}
     >
       {/* ── IMAGE PANEL ── */}
-      <div className="relative md:w-[58%] lg:w-[60%] h-[46vh] md:h-full bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative w-full md:w-[58%] lg:w-[60%] h-full bg-black flex items-center justify-center overflow-hidden">
+
+        {/* Blurred background behind image (fills empty space — like Instagram stories) */}
+        {images.length > 0 && !imgError && (
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-60 scale-110"
+            style={{ backgroundImage: `url(${images[imgIdx]})` }}
+          />
+        )}
 
         {/* Progress bars */}
         {images.length > 1 && (
-          <div className="absolute top-3 inset-x-3 flex gap-1 z-10">
+          <div className="absolute top-3 inset-x-3 flex gap-1 z-20">
             {images.map((_, i) => (
               <div key={i} className="flex-1 h-0.5 rounded-full bg-white/20 overflow-hidden">
                 <div className="h-full bg-white/75 rounded-full"
@@ -123,12 +131,12 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
 
         {/* Image */}
         {!imgLoaded && !imgError && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="w-8 h-8 border-2 border-white/10 border-t-amber-500 rounded-full animate-spin" />
           </div>
         )}
         {images.length === 0 || imgError ? (
-          <div className="flex flex-col items-center gap-2 text-white/20">
+          <div className="flex flex-col items-center gap-2 text-white/20 z-10">
             <Calendar className="w-12 h-12" />
             <p className="text-sm">{event.name}</p>
           </div>
@@ -142,7 +150,7 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
               onError={() => setImgError(true)}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={`w-full h-full object-contain transition-opacity ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`relative z-10 w-full h-full object-cover md:object-contain transition-opacity drop-shadow-2xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           </AnimatePresence>
         )}
