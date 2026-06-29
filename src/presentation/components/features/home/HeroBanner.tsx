@@ -24,7 +24,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ image, name, description, categ
         <span className={`inline-block px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold text-white bg-gradient-to-r ${gradient} mb-2 w-fit shadow-xs`}>
           {category || 'Destacado'}
         </span>
-        <h2 className="text-white font-bold text-lg sm:text-2xl lg:text-3xl leading-tight max-w-lg">
+        <h2 className="text-white font-bold text-lg sm:text-2xl lg:text-3xl leading-tight max-w-lg line-clamp-2">
           {name}
         </h2>
         <p className="text-white/70 text-xs sm:text-sm mt-1 max-w-md line-clamp-2">
