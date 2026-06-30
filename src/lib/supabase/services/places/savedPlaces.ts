@@ -22,6 +22,9 @@ export const savedPlacesService = {
       }, { onConflict: 'user_id,place_id', ignoreDuplicates: true });
 
     if (error) throw error;
+    // Invalidar caché de recomendaciones para que la Home recalcule
+    // con esta nueva señal en la próxima carga.
+    supabase.from('reco_cache').delete().eq('user_id', userId).then(() => {});
   },
 
   // Unsave place (instant - uses DB trigger to update count)
@@ -33,6 +36,8 @@ export const savedPlacesService = {
       .eq('place_id', placeId);
 
     if (error) throw error;
+    // Invalidar caché de recomendaciones
+    supabase.from('reco_cache').delete().eq('user_id', userId).then(() => {});
   },
 
   // Toggle save status
