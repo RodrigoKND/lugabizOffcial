@@ -43,7 +43,7 @@ const EventDetailPage: React.FC = () => {
   }
 
   return (
-    <section className="min-h-screen bg-[#FDFCFB] text-stone-800">
+    <section className="min-h-screen bg-[#FDFCFB] text-stone-800 pb-24 md:pb-0">
       <EventDetailNavbar
         event={event}
         isLiked={isLiked}

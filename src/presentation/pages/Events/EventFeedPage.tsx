@@ -150,7 +150,7 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
               onError={() => setImgError(true)}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={`relative z-10 w-full h-full object-cover md:object-contain transition-opacity drop-shadow-2xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`relative z-10 w-full h-full object-contain transition-opacity drop-shadow-2xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           </AnimatePresence>
         )}
@@ -170,7 +170,7 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
         )}
 
         {/* Mobile: top bar */}
-        <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 z-10 md:hidden">
+        <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 pb-10 z-20 md:hidden bg-gradient-to-b from-black/75 via-black/30 to-transparent">
           <div className="flex items-center gap-2.5">
             <div className="ring-2 ring-amber-400/60 rounded-full p-[1.5px]">
               <div className="w-7 h-7 rounded-full bg-stone-700 overflow-hidden ring-1 ring-black flex items-center justify-center">
@@ -191,7 +191,7 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
         </div>
 
         {/* Mobile: bottom info */}
-        <div className="md:hidden absolute bottom-0 inset-x-0 p-4 pt-14 bg-gradient-to-t from-black/85 via-black/30 to-transparent">
+        <div className="md:hidden absolute bottom-0 inset-x-0 z-20 p-4 pt-14 bg-gradient-to-t from-black/90 via-black/55 to-transparent">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">{event.category?.name}</span>
           </div>

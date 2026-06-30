@@ -1,12 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { XCircle } from 'lucide-react';
 
 interface CountdownTimerProps {
   endDate: Date;
+  time?: string;
   onExpired?: () => void;
+  /** 'light' for white/light surfaces (dark text), 'dark' for dark surfaces (light text) */
+  variant?: 'light' | 'dark';
 }
 
-export function CountdownTimer({ endDate, onExpired }: CountdownTimerProps) {
+export function CountdownTimer({ endDate, time, onExpired, variant = 'light' }: CountdownTimerProps) {
+  const isDark = variant === 'dark';
+  const labelClass = isDark ? 'text-white/55' : 'text-stone-500';
+  const numberClass = isDark ? 'text-white' : 'text-stone-800';
+  const unitClass = isDark ? 'text-white/40' : 'text-stone-400';
+  const targetDate = useMemo(() => {
+    if (!time) return endDate;
+    const d = new Date(endDate);
+    const parts = time.split(':').map(Number);
+    d.setHours(parts[0] || 0, parts[1] || 0, 0, 0);
+    return d;
+  }, [endDate, time]);
+
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [expired, setExpired] = useState(false);
   const firedRef = useRef(false);
@@ -15,7 +30,7 @@ export function CountdownTimer({ endDate, onExpired }: CountdownTimerProps) {
     firedRef.current = false;
 
     const tick = () => {
-      const distance = endDate.getTime() - Date.now();
+      const distance = targetDate.getTime() - Date.now();
       if (distance <= 0) {
         setExpired(true);
         if (!firedRef.current && onExpired) {
@@ -36,7 +51,7 @@ export function CountdownTimer({ endDate, onExpired }: CountdownTimerProps) {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [endDate, onExpired]);
+  }, [targetDate, onExpired]);
 
   if (expired) {
     return (
@@ -49,25 +64,25 @@ export function CountdownTimer({ endDate, onExpired }: CountdownTimerProps) {
 
   return (
     <div>
-      <p className="text-stone-500 text-xs mb-2 font-medium text-center">Comienza en:</p>
+      <p className={`${labelClass} text-xs mb-2 font-medium text-center`}>Comienza en:</p>
       <div className="flex justify-center gap-1.5">
         <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-stone-800">{timeLeft.days}</div>
-          <div className="text-[9px] text-stone-400 font-medium">días</div>
+          <div className={`text-base font-bold ${numberClass}`}>{timeLeft.days}</div>
+          <div className={`text-[9px] ${unitClass} font-medium`}>días</div>
         </div>
         <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-stone-800">{timeLeft.hours}</div>
-          <div className="text-[9px] text-stone-400 font-medium">hrs</div>
+          <div className={`text-base font-bold ${numberClass}`}>{timeLeft.hours}</div>
+          <div className={`text-[9px] ${unitClass} font-medium`}>hrs</div>
         </div>
         <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-stone-800">{timeLeft.minutes}</div>
-          <div className="text-[9px] text-stone-400 font-medium">min</div>
+          <div className={`text-base font-bold ${numberClass}`}>{timeLeft.minutes}</div>
+          <div className={`text-[9px] ${unitClass} font-medium`}>min</div>
         </div>
         <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className="text-base font-bold text-stone-800">
-            {Math.max(0, Math.floor((endDate.getTime() - Date.now()) / 1000) % 60)}
+          <div className={`text-base font-bold ${numberClass}`}>
+            {Math.max(0, Math.floor((targetDate.getTime() - Date.now()) / 1000) % 60)}
           </div>
-          <div className="text-[9px] text-stone-400 font-medium">seg</div>
+          <div className={`text-[9px] ${unitClass} font-medium`}>seg</div>
         </div>
       </div>
     </div>

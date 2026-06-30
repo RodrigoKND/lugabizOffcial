@@ -89,15 +89,15 @@ export default function EventDetailSidebar({
 
         <div className="flex items-start gap-3">
           <div className="bg-amber-50 p-2.5 rounded-xl"><MapPin className="w-5 h-5 text-amber-500" /></div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-semibold text-stone-400 uppercase">Ubicación</p>
-            <p className="text-sm font-medium text-stone-700 truncate">{event.address}</p>
+            <p className="text-sm font-medium text-stone-700 break-words">{event.address}</p>
           </div>
         </div>
 
         <div className="flex items-start gap-3">
           <div className="bg-amber-50 p-2.5 rounded-xl"><Clock className="w-5 h-5 text-amber-500" /></div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-semibold text-stone-400 uppercase">Fecha y Hora</p>
             <p className="text-sm font-medium text-stone-700 truncate">{formattedDate}</p>
             <p className="text-sm text-stone-500">{event.timeStart}{event.timeEnd ? ` - ${event.timeEnd}` : ''}</p>
@@ -107,7 +107,7 @@ export default function EventDetailSidebar({
         {event.capacity && (
           <div className="flex items-start gap-3">
             <div className="bg-amber-50 p-2.5 rounded-xl"><Info className="w-5 h-5 text-amber-500" /></div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold text-stone-400 uppercase">Capacidad</p>
               <p className="text-sm font-medium text-stone-700 truncate">{event.capacity} personas</p>
             </div>

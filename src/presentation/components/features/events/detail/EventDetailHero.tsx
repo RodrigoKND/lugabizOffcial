@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Share2, X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 import { Event } from '@domain/entities';
 
@@ -9,6 +9,7 @@ interface EventDetailHeroProps {
 
 export default function EventDetailHero({ event, onShare }: EventDetailHeroProps) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const touchStartX = useRef(0);
 
   // All images: cover + gallery extras (deduped)
   const allImages = [
@@ -20,6 +21,16 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
   const closeLightbox = useCallback(() => setLightboxIdx(null), []);
   const prev = useCallback(() => setLightboxIdx(i => (i !== null && i > 0 ? i - 1 : i)), []);
   const next = useCallback(() => setLightboxIdx(i => (i !== null && i < allImages.length - 1 ? i + 1 : i)), [allImages.length]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? next() : prev();
+    }
+  }, [next, prev]);
 
   return (
     <>
@@ -80,7 +91,14 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
         <div
           className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center"
           onClick={closeLightbox}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
+          {/* Blurred background */}
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-40 scale-110"
+            style={{ backgroundImage: `url(${allImages[lightboxIdx]})` }}
+          />
           <div
             className="relative max-w-5xl max-h-[90vh] mx-4 w-full flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
@@ -88,25 +106,25 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
             {/* Close */}
             <button
               onClick={closeLightbox}
-              className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors"
+              className="absolute top-0 right-0 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 text-white/70 hover:text-white hover:bg-black/70 transition-all md:-top-12 md:right-0"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
 
             {/* Image */}
             <img
               src={allImages[lightboxIdx]}
               alt=""
-              className="max-w-full max-h-[80vh] object-contain rounded-2xl select-none"
+              className="max-w-full max-h-[80vh] object-contain rounded-2xl select-none pointer-events-none relative z-10"
             />
 
             {/* Prev */}
             {lightboxIdx > 0 && (
               <button
                 onClick={(e) => { e.stopPropagation(); prev(); }}
-                className="absolute left-0 -translate-x-14 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center hover:bg-black/70 transition-all text-white/80 hover:text-white"
               >
-                <ChevronLeft className="w-5 h-5 text-white" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
             )}
 
@@ -114,9 +132,9 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
             {lightboxIdx < allImages.length - 1 && (
               <button
                 onClick={(e) => { e.stopPropagation(); next(); }}
-                className="absolute right-0 translate-x-14 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white/25 transition-all"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center hover:bg-black/70 transition-all text-white/80 hover:text-white"
               >
-                <ChevronRight className="w-5 h-5 text-white" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             )}
 

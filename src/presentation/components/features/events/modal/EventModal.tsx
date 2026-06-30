@@ -35,7 +35,6 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
   }, [event.id]);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   const images = event.images?.length ? event.images : [event.imageUrl];
   const [imgIdx, setImgIdx] = useState(0);
@@ -47,17 +46,8 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
   }, [event.id]);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  useEffect(() => {
-    if ((!isMobile || showComments) && commentsEndRef.current) {
-      commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [comments, isMobile, showComments]);
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [comments]);
 
   // Focus input when reply is set
   useEffect(() => {
@@ -101,7 +91,15 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
         >
 
           {/* ── IMAGE PANEL ── */}
-          <div className="relative md:w-[58%] lg:w-[60%] h-[46vh] md:h-full bg-black flex items-center justify-center overflow-hidden">
+          <div className="relative md:w-[58%] lg:w-[60%] h-[30vh] md:h-full shrink-0 bg-black flex items-center justify-center overflow-hidden">
+
+            {/* Blurred background */}
+            {images[imgIdx] && (
+              <div
+                className="absolute inset-0 bg-cover bg-center blur-3xl opacity-40 scale-110"
+                style={{ backgroundImage: `url(${images[imgIdx]})` }}
+              />
+            )}
 
             {/* Image progress bars */}
             {images.length > 1 && (
@@ -117,12 +115,12 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
 
             {/* Image */}
             {!imgLoaded && !imgError && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div className="w-8 h-8 border-2 border-white/10 border-t-amber-500 rounded-full animate-spin" />
               </div>
             )}
             {imgError ? (
-              <div className="flex flex-col items-center gap-2 text-white/25">
+              <div className="flex flex-col items-center gap-2 text-white/25 z-10">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
                   <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -141,7 +139,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
                   onError={() => setImgError(true)}
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className={`w-full h-full object-contain ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className={`relative z-10 w-full h-full object-contain ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                 />
               </AnimatePresence>
             )}
@@ -161,7 +159,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             )}
 
             {/* Mobile top bar */}
-            <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 z-10 md:hidden">
+            <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 pb-8 z-10 md:hidden bg-gradient-to-b from-black/75 via-black/35 to-transparent">
               <div className="flex items-center gap-2.5">
                 <div className="ring-2 ring-amber-400/60 rounded-full p-[1.5px]">
                   <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name}
@@ -178,19 +176,11 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
               </button>
             </div>
 
-            {/* Mobile bottom info */}
-            <div className="md:hidden absolute bottom-0 inset-x-0 p-4 pt-14 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
-              <CountdownTimer endDate={event.startDate} onExpired={handleEventEnd} />
+            {/* Mobile bottom badge */}
+            <div className="md:hidden absolute bottom-0 inset-x-0 p-3 pt-10 bg-gradient-to-t from-black/85 via-black/45 to-transparent">
+              <CountdownTimer endDate={event.startDate} time={event.availableHours?.start} onExpired={handleEventEnd} variant="dark" />
               <h3 className="text-white font-bold text-sm mt-1">{event.title}</h3>
-              <p className={`text-white/70 text-xs mt-0.5 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>
-                {event.description}
-              </p>
-              {event.description.length > 100 && (
-                <button onClick={() => setIsExpanded(v => !v)} className="text-amber-400 text-[10px] font-bold mt-0.5">
-                  {isExpanded ? 'ver menos' : 'ver más'}
-                </button>
-              )}
-              <div className="flex items-center gap-3 mt-1.5">
+              <div className="flex items-center gap-3 mt-1">
                 <div className="flex items-center gap-1 text-white/50">
                   <MapPin className="w-3 h-3 text-amber-400" />
                   <span className="text-[10px] truncate max-w-[130px]">{event.location}</span>
@@ -200,18 +190,14 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
                   <span className="text-[10px]">{event.availableHours?.start}</span>
                 </div>
               </div>
-              <Link to={`/event/${event.id}`} onClick={onClose}
-                className="mt-2 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
-                Asistiré
-              </Link>
             </div>
           </div>
 
           {/* ── SIDE PANEL ── */}
-          <div className={`md:w-[42%] lg:w-[40%] flex flex-col bg-[#0a0a0a] border-l border-white/5 ${showComments ? 'flex' : 'hidden md:flex'}`}>
+          <div className="flex-1 md:w-[42%] lg:w-[40%] flex flex-col bg-[#0a0a0a] border-l border-white/5 overflow-y-auto">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="ring-2 ring-amber-400/50 rounded-full p-[2px]">
                   <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name}
@@ -229,8 +215,8 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             </div>
 
             {/* Description */}
-            <div className="px-4 pt-3 pb-3 border-b border-white/5">
-              <CountdownTimer endDate={event.startDate} onExpired={handleEventEnd} />
+            <div className="px-4 pt-3 pb-3 border-b border-white/5 shrink-0">
+              <CountdownTimer endDate={event.startDate} time={event.availableHours?.start} onExpired={handleEventEnd} variant="dark" />
               <h2 className="text-white font-bold text-sm mt-2 leading-snug">{event.title}</h2>
               <p className={`text-white/55 text-xs mt-1 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>
                 {event.description}
@@ -254,9 +240,9 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             </div>
 
             {/* Comments list */}
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            <div className="md:flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
               {comments.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-10 text-white/20">
+                <div className="flex flex-col items-center justify-center py-10 text-white/20">
                   <MessageCircle className="w-9 h-9 mb-2" />
                   <p className="text-xs font-medium">Sin comentarios aún</p>
                   <p className="text-[10px] mt-0.5 text-white/15">Sé el primero en comentar</p>
@@ -272,14 +258,14 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             </div>
 
             {/* Actions bar */}
-            <div className="border-t border-white/5 px-4 py-2.5">
+            <div className="border-t border-white/5 px-4 py-2.5 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <button onClick={toggleLike} className="flex items-center gap-1.5 group">
                     <Heart className={`w-5 h-5 transition-all duration-200 ${liked ? 'text-rose-500 fill-rose-500 scale-110' : 'text-white/50 group-hover:text-white'}`} />
                     <span className="text-[11px] font-medium text-white/40">{likesCount}</span>
                   </button>
-                  <button onClick={() => { setShowComments(v => !v); inputRef.current?.focus(); }}
+                  <button onClick={() => inputRef.current?.focus()}
                     className="flex items-center gap-1.5 group">
                     <MessageCircle className="w-5 h-5 text-white/50 group-hover:text-white transition-colors" />
                     <span className="text-[11px] font-medium text-white/40">{comments.length}</span>
@@ -305,7 +291,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
                 <motion.div
                   initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }}
-                  className="overflow-hidden"
+                  className="overflow-hidden shrink-0"
                 >
                   <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-t border-white/5">
                     <span className="text-[11px] text-white/50">
@@ -320,7 +306,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             </AnimatePresence>
 
             {/* Comment input */}
-            <div className="border-t border-white/5 px-4 py-3">
+            <div className="border-t border-white/5 px-4 py-3 shrink-0">
               <div className="flex items-center gap-2">
                 {user?.id && (
                   <img src={(user as any).avatarUrl || '/avatar.png'} alt=""
@@ -351,19 +337,13 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             </div>
 
             {/* CTA */}
-            <div className="border-t border-white/5 px-4 py-3">
+            <div className="border-t border-white/5 px-4 py-3 shrink-0">
               <Link to={`/event/${event.id}`} onClick={onClose}
                 className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
                 Asistiré
               </Link>
             </div>
           </div>
-
-          {/* Mobile comments overlay backdrop */}
-          {showComments && isMobile && (
-            <button onClick={() => setShowComments(false)}
-              className="absolute inset-0 bg-black/40 z-[-1]" />
-          )}
         </div>
 
         {hasNext && (
