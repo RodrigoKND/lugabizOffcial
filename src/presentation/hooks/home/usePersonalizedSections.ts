@@ -118,6 +118,8 @@ export function usePersonalizedSections(
       loadingRef.current = true;
       setLoading(true);
       setSections([]);
+      // Siempre forzar si hay usuario logueado para que no sirva caché genérica
+      const forceIfLoggedIn = !!userId;
       try {
         const placeById = new Map(places.map(p => [p.id, p]));
         const eventById = new Map(events.map(e => [e.id, e]));
@@ -129,6 +131,7 @@ export function usePersonalizedSections(
             isWeekend: [0, 6].includes(new Date().getDay()),
             city: city || '',
             lat, lng,
+            force: forceIfLoggedIn,
           },
         });
 
