@@ -3,6 +3,7 @@ import { Event, CreateEventData } from '@domain/entities';
 import { transformEventData } from './eventsTransform';
 
 export async function getEvents(): Promise<Event[]> {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD en UTC
   const { data, error } = await supabase
     .from('events')
     .select(`
@@ -11,7 +12,8 @@ export async function getEvents(): Promise<Event[]> {
         user:users(name, avatar),
         event_attendance(user_id)
       `)
-    .order('date_start', { ascending: false });
+    .gte('date_start', today)
+    .order('date_start', { ascending: true });
 
   if (error) throw error;
   return (data || []).map((event) => transformEventData(event));

@@ -23,9 +23,15 @@ export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsRe
   }, [userId, viewedEvents]);
 
   const activeEvents = useMemo(() => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return events.filter(e => new Date(e.dateStart) >= today);
+    // La query ya filtra date_start >= hoy en UTC.
+    // Filtramos también en cliente por si hubiera datos en caché del contexto.
+    const todayStr = new Date().toISOString().slice(0, 10);
+    return events.filter(e => {
+      const d = e.dateStart instanceof Date
+        ? e.dateStart.toISOString().slice(0, 10)
+        : String(e.dateStart).slice(0, 10);
+      return d >= todayStr;
+    });
   }, [events]);
 
   const heroEvent = useMemo(
