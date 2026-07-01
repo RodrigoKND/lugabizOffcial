@@ -36,11 +36,6 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ image, name, description, categ
           <span className="flex items-center gap-1"><Clock className="w-3 h-3 shrink-0" /> {time}</span>
           <span className="flex items-center gap-1 min-w-0 max-w-full"><MapPin className="w-3 h-3 shrink-0" /> <span className="truncate min-w-0">{address}</span></span>
         </div>
-        <div className="mt-3 flex gap-2">
-          <span className="px-4 py-2 bg-primary-500 text-white rounded-lg text-xs font-semibold hover:bg-primary-600 transition-colors">
-            Asistiré
-          </span>
-        </div>
       </div>
     </div>
   );
