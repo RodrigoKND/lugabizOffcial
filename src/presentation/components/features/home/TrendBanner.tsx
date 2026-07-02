@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Star, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Place } from '@domain/entities';
@@ -20,8 +21,19 @@ const TrendBanner: React.FC<TrendBannerProps> = ({ places }) => {
       <div className="absolute inset-0 bg-linear-to-r from-primary-900/80 via-primary-800/40 to-transparent" />
       <div className="absolute inset-0 p-5 sm:p-8 flex flex-col justify-center">
         <span className="flex items-center gap-1.5 text-primary-200 text-xs font-semibold mb-2">
-          <Zap className="w-3.5 h-3.5 fill-primary-300 text-primary-300" />
-          #1 EN TENDENCIA
+          <motion.span
+            animate={{ y: [0, -4, 1, 0], scale: [1, 1.3, 0.88, 1], rotate: [0, -10, 5, 0] }}
+            transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.2 }}
+            className="inline-flex"
+          >
+            <Zap className="w-3.5 h-3.5 fill-primary-300 text-primary-300" />
+          </motion.span>
+          <motion.span
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity }}
+          >
+            #1 EN TENDENCIA
+          </motion.span>
         </span>
         <h2 className="text-white font-bold text-xl sm:text-3xl leading-tight max-w-lg">
           {top.name}

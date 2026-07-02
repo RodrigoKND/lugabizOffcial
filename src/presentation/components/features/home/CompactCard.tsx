@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,10 +13,18 @@ interface CompactCardProps {
 const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to }) => {
   const navigate = useNavigate();
   return (
-    <div
+    <motion.div
       onClick={() => navigate(to)}
-      className="shrink-0 w-40 snap-start group relative rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97] cursor-pointer"
+      whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+      className="shrink-0 w-40 snap-start group relative rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-lg transition-shadow cursor-pointer"
     >
+      {/* Shine sweep diagonal on hover */}
+      <div
+        className="absolute inset-y-0 left-0 w-2/5 z-20 pointer-events-none -translate-x-full skew-x-[-12deg] group-hover:translate-x-[420%] transition-transform duration-[560ms] ease-in-out"
+        style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%)' }}
+      />
       <div className="aspect-[3/4] relative overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
           style={{ backgroundImage: `url(${image || ''})` }} />
@@ -31,7 +40,7 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
           <p className="text-white font-bold text-xs leading-tight truncate">{name}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

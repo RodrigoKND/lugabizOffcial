@@ -212,6 +212,15 @@ h1, h2, h3, h4, h5, h6 {
   0% { transform: translateY(0); }
   100% { transform: translateY(-3px); }
 }
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes zap-bounce {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  35%       { transform: translateY(-4px) scale(1.3) rotate(-10deg); }
+  65%       { transform: translateY(1px) scale(0.88) rotate(5deg); }
+}
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
@@ -221,6 +230,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 .animate-glow-pulse {
   animation: glow-pulse 3s ease-in-out infinite;
+}
+.animate-zap-bounce {
+  animation: zap-bounce 2.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Gradiente animado para el título hero de la home */
+.text-gradient-shimmer {
+  background: linear-gradient(100deg, #a855f7 0%, #db2777 28%, #e879f9 50%, #db2777 72%, #a855f7 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 5s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════
