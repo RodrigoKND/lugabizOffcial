@@ -32,7 +32,7 @@ export default function EventDetailSidebar({
       )}
       {eventStatus === 'upcoming' && (
         <div className="mb-4">
-          <CountdownTimer endDate={event.dateStart} />
+          <CountdownTimer endDate={event.dateStart} time={event.timeStart} />
         </div>
       )}
 
