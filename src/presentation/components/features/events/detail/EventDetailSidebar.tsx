@@ -49,7 +49,7 @@ export default function EventDetailSidebar({
             <span className="font-semibold">{attendeeCount}</span>
             <span>asistentes</span>
           </div>
-          {event.capacity && (
+          {(event.capacity ?? 0) > 0 && (
             <p className="text-[10px] text-stone-400 mt-0.5">
               {event.capacity - attendeeCount} cupos disponibles
             </p>
@@ -104,7 +104,7 @@ export default function EventDetailSidebar({
           </div>
         </div>
 
-        {event.capacity && (
+        {(event.capacity ?? 0) > 0 && (
           <div className="flex items-start gap-3">
             <div className="bg-amber-50 p-2.5 rounded-xl"><Info className="w-5 h-5 text-amber-500" /></div>
             <div className="min-w-0">

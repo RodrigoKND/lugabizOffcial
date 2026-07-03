@@ -22,7 +22,7 @@ export default function EventDetailInfo({ event, formattedDate }: EventDetailInf
           <Clock className="w-4 h-4 text-amber-500" />
           <span className="font-medium text-stone-700">{event.timeStart}</span>
         </div>
-        {event.capacity && (
+        {(event.capacity ?? 0) > 0 && (
           <div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border border-stone-100 shadow-xs">
             <Users className="w-4 h-4 text-amber-500" />
             <span className="font-medium text-stone-700">{event.capacity} cupos</span>

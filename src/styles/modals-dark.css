@@ -27,7 +27,7 @@
   background: rgba(255, 255, 255, 0.06) !important;
   border-color: rgba(168, 128, 250, 0.12) !important;
 }
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-white"]:not([class*="rounded-3xl"]):not([class*="rounded-2xl"]) {
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-white"]:not([class*="rounded-3xl"]):not([class*="rounded-2xl"]):not(.address-suggest-panel) {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(168, 128, 250, 0.15) !important;
 }
