@@ -34,6 +34,12 @@ export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsRe
     });
   }, [events]);
 
+  const sortedActiveEvents = useMemo(() => {
+    const unviewed = activeEvents.filter(e => !viewedEvents.has(e.id));
+    const viewed = activeEvents.filter(e => viewedEvents.has(e.id));
+    return [...unviewed, ...viewed];
+  }, [activeEvents, viewedEvents]);
+
   const heroEvent = useMemo(
     () => activeEvents.length > 0 ? activeEvents[heroIndex % activeEvents.length] : null,
     [activeEvents, heroIndex]
@@ -49,6 +55,7 @@ export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsRe
 
   return {
     activeEvents,
+    sortedActiveEvents,
     heroEvent,
     heroIndex,
     setHeroIndex,

@@ -29,7 +29,7 @@ const Home: React.FC = () => {
   const { currentStep, showAuthModal, setShowAuthModal, handleAction, handleDismiss } = useOnboardingAlerts();
 
   const {
-    activeEvents, heroEvent, heroIndex,
+    activeEvents, sortedActiveEvents, heroEvent, heroIndex,
     setHeroIndex, viewedEvents, markEventViewed,
   } = useHomeEvents(events, user?.id);
 
@@ -94,8 +94,8 @@ const Home: React.FC = () => {
           <EmptyHomeState onPublish={() => navigate('/add-place')} />
         )}
 
-        {activeEvents.length > 0 && (
-          <StoriesRow events={activeEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} />
+        {sortedActiveEvents.length > 0 && (
+          <StoriesRow events={sortedActiveEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} />
         )}
 
         {heroEvent && (
@@ -108,10 +108,10 @@ const Home: React.FC = () => {
           />
         )}
 
-        {activeEvents.length > 0 && (
-          <ScrollRow title="Próximos Eventos" subtitle={`${activeEvents.length} disponibles`}
+        {sortedActiveEvents.length > 0 && (
+          <ScrollRow title="Próximos Eventos" subtitle={`${sortedActiveEvents.length} disponibles`}
             icon={<Calendar className="w-4 h-4 text-pink-500" />}>
-            {activeEvents.map((event) => (
+            {sortedActiveEvents.map((event) => (
               <EventCardSmall
                 key={event.id}
                 event={event}

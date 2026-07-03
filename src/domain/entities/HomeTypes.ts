@@ -20,6 +20,7 @@ export interface EmptyHomeStateProps {
 
 export interface UseHomeEventsReturn {
   activeEvents: Event[];
+  sortedActiveEvents: Event[];
   heroEvent: Event | null;
   heroIndex: number;
   setHeroIndex: (index: number) => void;
