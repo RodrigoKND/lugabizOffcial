@@ -19,6 +19,7 @@ export interface FormData {
   address: string;
   categoryId: string;
   dateStart: string;
+  dateEnd: string;
   timeStart: string;
   timeEnd: string;
   capacity: number;

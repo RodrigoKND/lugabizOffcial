@@ -14,6 +14,7 @@ export interface Event {
   image?: string;
   gallery?: string[];
   dateStart: Date;
+  dateEnd?: Date;
   timeStart: string;
   timeEnd?: string;
   price?: number;
@@ -40,6 +41,7 @@ export interface CreateEventData {
   image?: string;
   gallery?: string[];
   dateStart: string;
+  dateEnd?: string;
   timeStart: string;
   timeEnd?: string;
   price?: number;

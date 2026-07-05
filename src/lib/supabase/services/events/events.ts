@@ -12,7 +12,7 @@ export async function getEvents(): Promise<Event[]> {
         user:users(name, avatar),
         event_attendance(user_id)
       `)
-    .gte('date_start', today)
+    .or(`date_end.gte.${today},date_start.gte.${today}`)
     .order('date_start', { ascending: true });
 
   if (error) throw error;
@@ -81,6 +81,7 @@ export async function createEvent(eventData: CreateEventData): Promise<Event> {
       image: eventData.image,
       gallery: eventData.gallery || [],
       date_start: eventData.dateStart,
+      date_end: eventData.dateEnd || null,
       time_start: eventData.timeStart || null,
       time_end: eventData.timeEnd || null,
       price: eventData.price,
@@ -115,7 +116,7 @@ export async function updateEvent(id: string, updates: Partial<CreateEventData>)
   const fieldMap: Record<string, string> = {
     name: 'name', description: 'description', address: 'address',
     categoryId: 'category_id', image: 'image', gallery: 'gallery',
-    dateStart: 'date_start', timeStart: 'time_start', timeEnd: 'time_end',
+    dateStart: 'date_start', dateEnd: 'date_end', timeStart: 'time_start', timeEnd: 'time_end',
     price: 'price', capacity: 'capacity', isFree: 'is_free',
     tags: 'tags', coords: 'coords',
   };

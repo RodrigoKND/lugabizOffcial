@@ -38,7 +38,7 @@ const EditEventPage: React.FC = () => {
 
   const [form, setForm] = useState({
     name: '', description: '', address: '', categoryId: '',
-    dateStart: '', timeStart: '', timeEnd: '', price: 0, capacity: 0,
+    dateStart: '', dateEnd: '', timeStart: '', timeEnd: '', price: 0, capacity: 0,
     isFree: false, tags: '',
   });
 
@@ -56,6 +56,7 @@ const EditEventPage: React.FC = () => {
         address: data.address,
         categoryId: data.categoryId,
         dateStart: toLocalDateStr(data.dateStart instanceof Date ? data.dateStart : new Date(data.dateStart)),
+        dateEnd: data.dateEnd ? toLocalDateStr(data.dateEnd instanceof Date ? data.dateEnd : new Date(data.dateEnd)) : '',
         timeStart: data.timeStart,
         timeEnd: data.timeEnd || '',
         price: data.price || 0,
@@ -136,6 +137,7 @@ const EditEventPage: React.FC = () => {
         address: form.address,
         categoryId: form.categoryId,
         dateStart: form.dateStart,
+        dateEnd: form.dateEnd || undefined,
         timeStart: form.timeStart,
         timeEnd: form.timeEnd || undefined,
         price: form.price,
@@ -259,17 +261,23 @@ const EditEventPage: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-stone-500 uppercase">Fecha</label>
+              <label className="text-xs font-semibold text-stone-500 uppercase">Fecha inicio</label>
               <input type="date" value={form.dateStart} onChange={(e) => setForm(f => ({ ...f, dateStart: e.target.value }))} className={iCls} />
             </div>
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase">Fecha fin <span className="text-stone-400 font-normal">(opcional)</span></label>
+              <input type="date" value={form.dateEnd} min={form.dateStart || undefined} onChange={(e) => setForm(f => ({ ...f, dateEnd: e.target.value }))} className={iCls} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase">Hora inicio</label>
               <input type="time" value={form.timeStart} onChange={(e) => setForm(f => ({ ...f, timeStart: e.target.value }))} className={iCls} />
             </div>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase">Hora fin <span className="text-stone-400 font-normal">(opcional)</span></label>
-            <input type="time" value={form.timeEnd} onChange={(e) => setForm(f => ({ ...f, timeEnd: e.target.value }))} className={iCls} />
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase">Hora fin <span className="text-stone-400 font-normal">(opcional)</span></label>
+              <input type="time" value={form.timeEnd} onChange={(e) => setForm(f => ({ ...f, timeEnd: e.target.value }))} className={iCls} />
+            </div>
           </div>
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase">Tags (separados por coma)</label>

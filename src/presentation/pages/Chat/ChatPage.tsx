@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft, Send, RotateCcw, MapPin, Sun, Cloud, Sparkles,
-  CloudRain, Thermometer, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
+  CloudRain, Thermometer, ChevronDown, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
   Globe, Instagram, Facebook, MessageCircle, Music2, Phone,
 } from 'lucide-react'
 import LubiMascot, { type LubiExpression } from '@presentation/components/features/chatbot/LubiMascot'
@@ -406,8 +406,32 @@ const ChatPage: React.FC = () => {
   const inputRef        = useRef<HTMLTextAreaElement>(null)
   const lubiTimer       = useRef<ReturnType<typeof setTimeout>>()
   const hasConversation = messages.length > 0
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [showScrollDown, setShowScrollDown] = useState(false)
 
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, chatLoading])
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setShowScrollDown(false)
+  }, [])
+
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    const threshold = 120
+    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold
+    setShowScrollDown(!isBottom)
+  }, [])
+
+  useEffect(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    const threshold = 120
+    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold
+    if (isBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, chatLoading])
+
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 200) }, [])
 
   /* Expresiones de Lubi según el flujo del chat */
@@ -433,6 +457,7 @@ const ChatPage: React.FC = () => {
     // Reacción inmediata al envío del usuario
     clearTimeout(lubiTimer.current)
     setLubiExp('happy')
+    scrollToBottom()
     await sendMessage(msg)
   }
 
@@ -494,7 +519,7 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* ── Mensajes ────────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto overscroll-contain relative">
         <div className="max-w-2xl mx-auto px-4 py-6">
 
           {!hasConversation ? (
@@ -634,6 +659,24 @@ const ChatPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* ── Floating scroll-to-bottom button ──────────────────────────────── */}
+        <AnimatePresence>
+          {showScrollDown && hasConversation && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={scrollToBottom}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 w-11 h-11 rounded-full bg-feed-bg/80 backdrop-blur-lg border border-white/15 shadow-2xl flex items-center justify-center text-white hover:bg-white/15 active:bg-white/20 transition-colors cursor-pointer z-10"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Ideas como chips (conversación activa) ─────────────────────────── */}

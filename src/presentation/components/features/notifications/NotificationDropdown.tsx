@@ -82,6 +82,7 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
   const { notifications, unreadCount, markNotifAsRead, markAllNotifsAsRead } = useAuth();
   const { enablePushNotifications } = usePushNotifications();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
   const [nudgeDismissed, setNudgeDismissed_] = useState(false);
   const [nudgeLoading, setNudgeLoading] = useState(false);
@@ -92,6 +93,15 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
     ? Notification.permission
     : 'granted';
   const showNudge = open && pushPermission !== 'granted' && !nudgeDismissed && !getNudgeDismissed();
+
+  const toggleExpand = useCallback((e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
 
   const handleNudgeDismiss = useCallback(() => {
     setNudgeDismissed_(true);
@@ -271,9 +281,17 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
                         )}
                       </div>
                       {n.body && (
-                        <p className={`text-[11px] mt-0.5 line-clamp-2 ${isUnread ? 'text-stone-600' : 'text-stone-400'}`}>
-                          {n.body}
-                        </p>
+                        <>
+                          <p className={`text-[11px] mt-0.5 ${expandedIds.has(n.id) ? '' : 'line-clamp-2'} ${isUnread ? 'text-stone-600' : 'text-stone-400'}`}>
+                            {n.body}
+                          </p>
+                          {n.body.length > 100 && (
+                            <button onClick={(e) => toggleExpand(e, n.id)}
+                              className="text-[10px] font-medium text-primary-600 hover:text-primary-700 mt-0.5">
+                              {expandedIds.has(n.id) ? 'Ver menos' : 'Ver más'}
+                            </button>
+                          )}
+                        </>
                       )}
                       <div className="flex items-center gap-2 mt-1">
                         <Clock className="w-2.5 h-2.5 text-stone-300" />

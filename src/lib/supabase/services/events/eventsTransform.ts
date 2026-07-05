@@ -28,6 +28,7 @@ export function transformEventData(event: any): Event {
     image: event.image,
     gallery: event.gallery || [],
     dateStart: parseLocalDate(event.date_start),
+    dateEnd: event.date_end ? parseLocalDate(event.date_end) : undefined,
     timeStart: event.time_start,
     timeEnd: event.time_end,
     price: event.price,

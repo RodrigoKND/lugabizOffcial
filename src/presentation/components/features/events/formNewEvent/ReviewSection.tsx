@@ -49,7 +49,7 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
       <Row
         icon={<CalendarDays className="w-3.5 h-3.5 text-primary-600" />}
         label="Fecha y hora"
-        value={`${formData.dateStart} · ${formData.timeStart}${formData.timeEnd ? ` - ${formData.timeEnd}` : ''}`}
+        value={`${formData.dateStart}${formData.dateEnd ? ` → ${formData.dateEnd}` : ''} · ${formData.timeStart}${formData.timeEnd ? ` - ${formData.timeEnd}` : ''}`}
       />
       <Row
         icon={<MapPin className="w-3.5 h-3.5 text-primary-600" />}

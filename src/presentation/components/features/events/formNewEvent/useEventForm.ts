@@ -11,6 +11,7 @@ const initialState: FormData = {
   address: '',
   categoryId: '',
   dateStart: '',
+  dateEnd: '',
   timeStart: '',
   timeEnd: '',
   capacity: 0,
@@ -73,6 +74,7 @@ export function useEventForm(onClose: () => void) {
     else if (formData.description.length < 10) errs.description = 'Mínimo 10 caracteres';
     if (!formData.categoryId) errs.categoryId = 'Selecciona una categoría';
     if (!formData.dateStart) errs.dateStart = 'Selecciona una fecha';
+    if (formData.dateEnd && formData.dateStart && formData.dateEnd < formData.dateStart) errs.dateStart = 'La fecha de fin debe ser posterior a la de inicio';
     if (!formData.timeStart) errs.timeStart = 'Selecciona una hora';
     if (!formData.address?.trim()) errs.address = 'La dirección es obligatoria';
     if (formData.coords.length !== 2) errs.coords = 'Selecciona una ubicación en el mapa';

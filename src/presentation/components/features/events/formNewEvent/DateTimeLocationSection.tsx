@@ -146,6 +146,58 @@ const DateTimeLocationSection: React.FC<Props> = ({
           />
           {renderError('dateStart', errors, touched)}
         </div>
+
+        {/* ── Fecha de fin (opcional) ────────────────────── */}
+        <div className="mt-4">
+          {formData.dateEnd ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-amber-500" />
+                  <h4 className="text-sm font-semibold text-stone-700">Fecha de fin</h4>
+                  <span className="text-stone-400 font-normal text-xs">(opcional)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { onChange('dateEnd', ''); }}
+                  className="text-[11px] text-red-400 hover:text-red-600 font-medium transition-colors"
+                >
+                  Quitar
+                </button>
+              </div>
+              <input
+                type="date"
+                value={formData.dateEnd}
+                min={formData.dateStart || undefined}
+                onChange={e => onChange('dateEnd', e.target.value)}
+                className={iCls()}
+              />
+              <p className="text-[11px] text-stone-400">Para eventos que duran más de un día</p>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                const next = formData.dateStart
+                  ? (() => {
+                      const d = new Date(formData.dateStart + 'T12:00:00');
+                      d.setDate(d.getDate() + 1);
+                      const y = d.getFullYear();
+                      const m = String(d.getMonth() + 1).padStart(2, '0');
+                      const day = String(d.getDate()).padStart(2, '0');
+                      return `${y}-${m}-${day}`;
+                    })()
+                  : '';
+                onChange('dateEnd', next);
+              }}
+              disabled={!formData.dateStart}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-stone-200 text-sm text-stone-500 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Calendar className="w-4 h-4" />
+              Agregar fecha de fin
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Hora inicio ──────────────────────────────────── */}
