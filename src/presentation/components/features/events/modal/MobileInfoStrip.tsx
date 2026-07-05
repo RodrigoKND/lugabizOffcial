@@ -13,7 +13,7 @@ interface MobileInfoProps {
 export function MobileInfoStrip({ event, isExpanded, onToggleExpand, onClose }: MobileInfoProps) {
   return (
     <div className="md:hidden absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-10">
-      <CountdownTimer endDate={event.startDate} />
+      <CountdownTimer endDate={event.startDate} time={event.availableHours?.start} />
       <h3 className="text-white font-bold text-base mt-1">{event.title}</h3>
       <p className={`text-white/70 text-xs mt-0.5 leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}>{event.description}</p>
       {event.description.length > 100 && (

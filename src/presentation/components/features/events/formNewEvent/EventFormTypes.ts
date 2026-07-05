@@ -11,7 +11,16 @@ export interface ValidationErrors {
   dateStart?: string;
   timeStart?: string;
   coords?: string;
+  schedules?: string;
 }
+
+export interface ScheduleEntry {
+  date: string;
+  timeStart: string;
+  timeEnd: string;
+}
+
+export type ScheduleMode = 'single' | 'range' | 'custom';
 
 export interface FormData {
   name: string;
@@ -27,6 +36,8 @@ export interface FormData {
   isFree: boolean;
   tags: string;
   coords: number[];
+  scheduleMode: ScheduleMode;
+  schedules: ScheduleEntry[];
 }
 
 export const TOTAL_STEPS = 3;

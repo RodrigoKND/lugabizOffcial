@@ -79,9 +79,7 @@ export function CountdownTimer({ endDate, time, onExpired, variant = 'light' }: 
           <div className={`text-[9px] ${unitClass} font-medium`}>min</div>
         </div>
         <div className="rounded-lg px-2 py-1.5 min-w-9.5 text-center">
-          <div className={`text-base font-bold ${numberClass}`}>
-            {Math.max(0, Math.floor((targetDate.getTime() - Date.now()) / 1000) % 60)}
-          </div>
+          <div className={`text-base font-bold ${numberClass}`}>{timeLeft.seconds}</div>
           <div className={`text-[9px] ${unitClass} font-medium`}>seg</div>
         </div>
       </div>

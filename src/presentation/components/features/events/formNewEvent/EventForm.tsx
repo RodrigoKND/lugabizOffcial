@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { EventFormProps } from './EventFormTypes';
@@ -50,6 +50,11 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
     handleSubmit, goNext, goBack,
   } = useEventForm(onClose);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const scrollRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const handlePublishRequest = () => setShowPublishConfirm(true);
 
@@ -84,6 +89,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
 
             {/* Content */}
             <form
+              ref={scrollRef}
               onSubmit={e => { e.preventDefault(); handlePublishRequest(); }}
               onKeyDown={e => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault(); }}
               className="px-5 sm:px-6 py-5 space-y-5 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] pb-20 md:pb-5 scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent"

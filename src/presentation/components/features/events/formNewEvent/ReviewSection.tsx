@@ -49,7 +49,20 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
       <Row
         icon={<CalendarDays className="w-3.5 h-3.5 text-primary-600" />}
         label="Fecha y hora"
-        value={`${formData.dateStart}${formData.dateEnd ? ` → ${formData.dateEnd}` : ''} · ${formData.timeStart}${formData.timeEnd ? ` - ${formData.timeEnd}` : ''}`}
+        value={
+          formData.scheduleMode === 'custom' && formData.schedules.length > 0
+            ? (
+              <div className="space-y-1">
+                {formData.schedules.map((s, i) => (
+                  <div key={i} className="text-xs text-stone-600">
+                    <span className="font-semibold">{s.date}</span>
+                    {s.timeStart && <span className="text-stone-400"> · {s.timeStart}{s.timeEnd ? ` – ${s.timeEnd}` : ''}</span>}
+                  </div>
+                ))}
+              </div>
+            )
+            : `${formData.dateStart}${formData.dateEnd ? ` → ${formData.dateEnd}` : ''} · ${formData.timeStart}${formData.timeEnd ? ` - ${formData.timeEnd}` : ''}`
+        }
       />
       <Row
         icon={<MapPin className="w-3.5 h-3.5 text-primary-600" />}

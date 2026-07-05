@@ -33,6 +33,12 @@ export interface Event {
   updatedAt: Date;
 }
 
+export interface ScheduleEntry {
+  date: string;
+  timeStart: string;
+  timeEnd: string;
+}
+
 export interface CreateEventData {
   name: string;
   description: string;
@@ -50,6 +56,7 @@ export interface CreateEventData {
   tags?: string[];
   coords: number[];
   userId: string;
+  schedules?: ScheduleEntry[] | null;
 }
 
 export interface EventAttendance {

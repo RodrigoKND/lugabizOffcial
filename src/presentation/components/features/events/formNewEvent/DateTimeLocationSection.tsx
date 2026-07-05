@@ -1,9 +1,8 @@
 import React, { useMemo, lazy, Suspense, useCallback, useRef } from 'react';
-import { X, Image, MapPin, Users, Clock, Calendar, Zap, Loader2, Locate } from 'lucide-react';
+import { X, Image, MapPin, Users, Clock, Calendar, Zap, Loader2, Locate, Plus, Trash2 } from 'lucide-react';
 import AddressAutocomplete from '@presentation/components/ui/address/AddressAutocomplete';
-import { FormData, ValidationErrors } from './EventFormTypes';
+import { FormData, ValidationErrors, ScheduleMode, ScheduleEntry } from './EventFormTypes';
 import { reverseGeocode } from '@lib/geocoding/geocodingService';
-import type { GeoResult } from '@lib/geocoding/geocodingService';
 
 const MapPicker = lazy(() => import('./MapPicker'));
 
@@ -25,11 +24,12 @@ const iCls = (hasError?: boolean) =>
   }`;
 
 const renderError = (field: string, errors: ValidationErrors, touched: Record<string, boolean>) => {
-  if (!touched[field] || !errors[field as keyof ValidationErrors]) return null;
+  const msg = errors[field as keyof ValidationErrors];
+  if (!touched[field] || !msg) return null;
   return (
     <p className="flex items-center gap-1.5 text-[11px] text-red-500 mt-1.5 ml-0.5">
       <span className="w-3.5 h-3.5 inline-flex items-center justify-center rounded-full bg-red-100 text-red-500 text-[8px] font-bold">!</span>
-      {errors[field as keyof ValidationErrors]}
+      {msg}
     </p>
   );
 };
@@ -41,6 +41,12 @@ function toLocalDate(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+function addDays(dateStr: string, n: number): string {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return toLocalDate(d);
+}
+
 function addHours(time: string, hours: number): string {
   if (!time) return '';
   const [h, min] = time.split(':').map(Number);
@@ -49,16 +55,12 @@ function addHours(time: string, hours: number): string {
   return `${String(total).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
 }
 
-const TIME_PRESETS = [
-  { label: '08:00', value: '08:00' },
-  { label: '10:00', value: '10:00' },
-  { label: '12:00', value: '12:00' },
-  { label: '15:00', value: '15:00' },
-  { label: '18:00', value: '18:00' },
-  { label: '19:00', value: '19:00' },
-  { label: '20:00', value: '20:00' },
-  { label: '21:00', value: '21:00' },
-  { label: '22:00', value: '22:00' },
+const TIME_PRESETS = ['08:00', '09:00', '10:00', '12:00', '15:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
+
+const MODES: { value: ScheduleMode; label: string; desc: string }[] = [
+  { value: 'single', label: 'Un día', desc: 'El evento es en una sola fecha' },
+  { value: 'range',  label: 'Varios días', desc: 'Mismo horario todos los días' },
+  { value: 'custom', label: 'Sesiones', desc: 'Horario diferente por día' },
 ];
 
 const DateTimeLocationSection: React.FC<Props> = ({
@@ -66,36 +68,28 @@ const DateTimeLocationSection: React.FC<Props> = ({
 }) => {
   const quickDates = useMemo(() => {
     const today = new Date();
-    const dow = today.getDay(); // 0=Dom, 6=Sáb
+    const dow = today.getDay();
     const daysToSat = ((6 - dow) + 7) % 7 || 7;
     const daysToSun = ((0 - dow) + 7) % 7 || 7;
     const add = (n: number) => { const d = new Date(today); d.setDate(today.getDate() + n); return d; };
     const candidates = [
-      { label: 'Hoy', value: toLocalDate(today) },
+      { label: 'Hoy',    value: toLocalDate(today) },
       { label: 'Mañana', value: toLocalDate(add(1)) },
-      { label: 'Sábado', value: toLocalDate(add(daysToSat)) },
-      { label: 'Domingo', value: toLocalDate(add(daysToSun)) },
+      { label: 'Sáb',    value: toLocalDate(add(daysToSat)) },
+      { label: 'Dom',    value: toLocalDate(add(daysToSun)) },
     ];
-    // Deduplicate: when tomorrow IS Saturday or Sunday, skip the redundant chip
     const seen = new Set<string>();
-    return candidates.filter(d => {
-      if (seen.has(d.value)) return false;
-      seen.add(d.value);
-      return true;
-    });
+    return candidates.filter(d => { if (seen.has(d.value)) return false; seen.add(d.value); return true; });
   }, []);
 
   const endTimePresets = useMemo(() => {
     if (!formData.timeStart) return [];
-    return [1, 2, 3, 4]
-      .map(h => {
-        const v = addHours(formData.timeStart, h);
-        return v ? { label: `+${h}h (${v})`, value: v } : null;
-      })
-      .filter(Boolean) as { label: string; value: string }[];
+    return [1, 2, 3, 4].map(h => {
+      const v = addHours(formData.timeStart, h);
+      return v ? { label: `+${h}h (${v})`, value: v } : null;
+    }).filter(Boolean) as { label: string; value: string }[];
   }, [formData.timeStart]);
 
-  // Al mover el pin del mapa, rellenamos la dirección automáticamente (reverse geocoding).
   const revTimer = useRef<ReturnType<typeof setTimeout>>();
   const handleMapCoords = useCallback((lat: number, lng: number) => {
     onCoordsChange?.(lat, lng);
@@ -107,171 +101,290 @@ const DateTimeLocationSection: React.FC<Props> = ({
     }, 600);
   }, [onCoordsChange, onChange, onBlur]);
 
+  // ── Mode switch helpers ─────────────────────────────────────────────────────
+  const switchMode = (mode: ScheduleMode) => {
+    if (mode === formData.scheduleMode) return;
+
+    if (mode === 'custom') {
+      // Seed schedules from current single/range data
+      const entries: ScheduleEntry[] = [];
+      if (formData.scheduleMode === 'range' && formData.dateStart && formData.dateEnd && formData.dateStart !== formData.dateEnd) {
+        // expand date range (max 14 days)
+        let cur = formData.dateStart;
+        let count = 0;
+        while (cur <= formData.dateEnd && count < 14) {
+          entries.push({ date: cur, timeStart: formData.timeStart, timeEnd: formData.timeEnd });
+          cur = addDays(cur, 1);
+          count++;
+        }
+      } else if (formData.dateStart) {
+        entries.push({ date: formData.dateStart, timeStart: formData.timeStart, timeEnd: formData.timeEnd });
+      } else {
+        entries.push({ date: '', timeStart: '', timeEnd: '' });
+      }
+      onChange('schedules', entries);
+    } else if (mode === 'single' || mode === 'range') {
+      // Pull first schedule back into simple fields
+      if (formData.scheduleMode === 'custom' && formData.schedules.length > 0) {
+        const first = formData.schedules[0];
+        onChange('dateStart', first.date);
+        onChange('timeStart', first.timeStart);
+        onChange('timeEnd', first.timeEnd);
+        if (mode === 'range' && formData.schedules.length > 1) {
+          const last = formData.schedules[formData.schedules.length - 1];
+          onChange('dateEnd', last.date);
+        } else {
+          onChange('dateEnd', '');
+        }
+      }
+    }
+    onChange('scheduleMode', mode);
+  };
+
+  const updateSession = (i: number, field: keyof ScheduleEntry, value: string) => {
+    const next = formData.schedules.map((s, idx) => idx === i ? { ...s, [field]: value } : s);
+    onChange('schedules', next);
+  };
+
+  const addSession = () => {
+    const last = formData.schedules[formData.schedules.length - 1];
+    const nextDate = last?.date ? addDays(last.date, 1) : '';
+    onChange('schedules', [...formData.schedules, { date: nextDate, timeStart: last?.timeStart ?? '', timeEnd: last?.timeEnd ?? '' }]);
+  };
+
+  const removeSession = (i: number) => {
+    onChange('schedules', formData.schedules.filter((_, idx) => idx !== i));
+  };
+
+  const mode = formData.scheduleMode;
+
   return (
     <div className="space-y-6">
 
-      {/* ── Fecha ─────────────────────────────────────────── */}
+      {/* ── Selector de modo ─────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="w-4 h-4 text-primary-500" />
           <h4 className="text-sm font-semibold text-stone-700">Fecha del evento</h4>
         </div>
 
-        {/* Quick-select chips */}
-        <div className="flex flex-wrap gap-2 mb-2">
-          {quickDates.map(qd => (
+        <div className="flex gap-1 p-1 bg-stone-100 rounded-xl mb-4">
+          {MODES.map(m => (
             <button
-              key={qd.value}
+              key={m.value}
               type="button"
-              onClick={() => { onChange('dateStart', qd.value); onBlur('dateStart'); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                formData.dateStart === qd.value
-                  ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
-                  : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
+              onClick={() => switchMode(m.value)}
+              className={`flex-1 px-2 py-2 rounded-lg text-xs font-semibold transition-all ${
+                mode === m.value
+                  ? 'bg-white text-primary-700 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-700'
               }`}
             >
-              {qd.label}
+              {m.label}
             </button>
           ))}
-          <span className="px-2 py-1.5 text-xs text-stone-400 self-center">o elige:</span>
         </div>
 
-        <div className="space-y-1">
-          <input
-            type="date"
-            value={formData.dateStart}
-            onChange={e => onChange('dateStart', e.target.value)}
-            onBlur={() => onBlur('dateStart')}
-            className={iCls(!!(touched.dateStart && errors.dateStart))}
-          />
-          {renderError('dateStart', errors, touched)}
-        </div>
-
-        {/* ── Fecha de fin (opcional) ────────────────────── */}
-        <div className="mt-4">
-          {formData.dateEnd ? (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-500" />
-                  <h4 className="text-sm font-semibold text-stone-700">Fecha de fin</h4>
-                  <span className="text-stone-400 font-normal text-xs">(opcional)</span>
-                </div>
+        {/* ── Modo: Un día ──────────────────────────────────── */}
+        {mode === 'single' && (
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {quickDates.map(qd => (
                 <button
+                  key={qd.value}
                   type="button"
-                  onClick={() => { onChange('dateEnd', ''); }}
-                  className="text-[11px] text-red-400 hover:text-red-600 font-medium transition-colors"
+                  onClick={() => { onChange('dateStart', qd.value); onBlur('dateStart'); }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    formData.dateStart === qd.value
+                      ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
+                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
+                  }`}
                 >
-                  Quitar
+                  {qd.label}
                 </button>
-              </div>
+              ))}
+              <span className="px-1 py-1.5 text-xs text-stone-400 self-center">o elige:</span>
+            </div>
+            <div className="space-y-1">
               <input
                 type="date"
-                value={formData.dateEnd}
-                min={formData.dateStart || undefined}
-                onChange={e => onChange('dateEnd', e.target.value)}
-                className={iCls()}
+                value={formData.dateStart}
+                onChange={e => onChange('dateStart', e.target.value)}
+                onBlur={() => onBlur('dateStart')}
+                className={iCls(!!(touched.dateStart && errors.dateStart))}
               />
-              <p className="text-[11px] text-stone-400">Para eventos que duran más de un día</p>
+              {renderError('dateStart', errors, touched)}
             </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                const next = formData.dateStart
-                  ? (() => {
-                      const d = new Date(formData.dateStart + 'T12:00:00');
-                      d.setDate(d.getDate() + 1);
-                      const y = d.getFullYear();
-                      const m = String(d.getMonth() + 1).padStart(2, '0');
-                      const day = String(d.getDate()).padStart(2, '0');
-                      return `${y}-${m}-${day}`;
-                    })()
-                  : '';
-                onChange('dateEnd', next);
-              }}
-              disabled={!formData.dateStart}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-stone-200 text-sm text-stone-500 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <Calendar className="w-4 h-4" />
-              Agregar fecha de fin
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ── Hora inicio ──────────────────────────────────── */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Hora de inicio</h4>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-2">
-          {TIME_PRESETS.map(tp => (
-            <button
-              key={tp.value}
-              type="button"
-              onClick={() => { onChange('timeStart', tp.value); onBlur('timeStart'); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                formData.timeStart === tp.value
-                  ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
-                  : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
-              }`}
-            >
-              {tp.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-1 max-w-xs">
-          <input
-            type="time"
-            value={formData.timeStart}
-            onChange={e => onChange('timeStart', e.target.value)}
-            onBlur={() => onBlur('timeStart')}
-            className={iCls(!!(touched.timeStart && errors.timeStart))}
-          />
-          {renderError('timeStart', errors, touched)}
-        </div>
-      </div>
-
-      {/* ── Hora fin ─────────────────────────────────────── */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Zap className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Hora de fin <span className="text-stone-400 font-normal text-xs">(opcional)</span></h4>
-        </div>
-
-        {endTimePresets.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {endTimePresets.map(tp => (
-              <button
-                key={tp.value}
-                type="button"
-                onClick={() => onChange('timeEnd', tp.value)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                  formData.timeEnd === tp.value
-                    ? 'bg-stone-700 text-white border-stone-700'
-                    : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-400'
-                }`}
-              >
-                {tp.label}
-              </button>
-            ))}
           </div>
         )}
-        {!formData.timeStart && (
-          <p className="text-[11px] text-stone-400 mb-2">Selecciona la hora de inicio primero para ver sugerencias.</p>
+
+        {/* ── Modo: Varios días ─────────────────────────────── */}
+        {mode === 'range' && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Inicio</label>
+                <input
+                  type="date"
+                  value={formData.dateStart}
+                  onChange={e => onChange('dateStart', e.target.value)}
+                  onBlur={() => onBlur('dateStart')}
+                  className={iCls(!!(touched.dateStart && errors.dateStart))}
+                />
+                {renderError('dateStart', errors, touched)}
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Fin</label>
+                <input
+                  type="date"
+                  value={formData.dateEnd}
+                  min={formData.dateStart || undefined}
+                  onChange={e => onChange('dateEnd', e.target.value)}
+                  onBlur={() => onBlur('dateEnd')}
+                  className={iCls()}
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-400">El mismo horario aplica a todos los días del evento.</p>
+          </div>
         )}
 
-        <input
-          type="time"
-          value={formData.timeEnd}
-          onChange={e => onChange('timeEnd', e.target.value)}
-          className="max-w-xs px-4 py-3 bg-stone-50 border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
-        />
+        {/* ── Modo: Sesiones ────────────────────────────────── */}
+        {mode === 'custom' && (
+          <div className="space-y-2">
+            {formData.schedules.map((session, i) => (
+              <div key={i} className="bg-stone-50 rounded-xl p-3 space-y-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-semibold text-stone-500">Sesión {i + 1}</span>
+                  {formData.schedules.length > 1 && (
+                    <button type="button" onClick={() => removeSession(i)}
+                      className="text-red-400 hover:text-red-600 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <div>
+                    <label className="text-[10px] text-stone-400 font-medium">Fecha</label>
+                    <input
+                      type="date"
+                      value={session.date}
+                      onChange={e => updateSession(i, 'date', e.target.value)}
+                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-stone-400 font-medium">Hora inicio</label>
+                    <input
+                      type="time"
+                      value={session.timeStart}
+                      onChange={e => updateSession(i, 'timeStart', e.target.value)}
+                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-stone-400 font-medium">Hora fin</label>
+                    <input
+                      type="time"
+                      value={session.timeEnd}
+                      onChange={e => updateSession(i, 'timeEnd', e.target.value)}
+                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            {touched.schedules && errors.schedules && (
+              <p className="flex items-center gap-1.5 text-[11px] text-red-500">
+                <span className="w-3.5 h-3.5 inline-flex items-center justify-center rounded-full bg-red-100 text-red-500 text-[8px] font-bold">!</span>
+                {errors.schedules}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={addSession}
+              className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border-2 border-dashed border-stone-200 text-sm text-stone-500 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/30 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar sesión
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* ── Hora inicio / fin (solo para modos single y range) ─ */}
+      {mode !== 'custom' && (
+        <>
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-4 h-4 text-primary-500" />
+              <h4 className="text-sm font-semibold text-stone-700">Hora de inicio</h4>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {TIME_PRESETS.map(tp => (
+                <button
+                  key={tp}
+                  type="button"
+                  onClick={() => { onChange('timeStart', tp); onBlur('timeStart'); }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    formData.timeStart === tp
+                      ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
+                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
+                  }`}
+                >
+                  {tp}
+                </button>
+              ))}
+            </div>
+            <div className="space-y-1 max-w-xs">
+              <input
+                type="time"
+                value={formData.timeStart}
+                onChange={e => onChange('timeStart', e.target.value)}
+                onBlur={() => onBlur('timeStart')}
+                className={iCls(!!(touched.timeStart && errors.timeStart))}
+              />
+              {renderError('timeStart', errors, touched)}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-4 h-4 text-primary-500" />
+              <h4 className="text-sm font-semibold text-stone-700">
+                Hora de fin <span className="text-stone-400 font-normal text-xs">(opcional)</span>
+              </h4>
+            </div>
+            {endTimePresets.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {endTimePresets.map(tp => (
+                  <button
+                    key={tp.value}
+                    type="button"
+                    onClick={() => onChange('timeEnd', tp.value)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      formData.timeEnd === tp.value
+                        ? 'bg-stone-700 text-white border-stone-700'
+                        : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-400'
+                    }`}
+                  >
+                    {tp.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {!formData.timeStart && (
+              <p className="text-[11px] text-stone-400 mb-2">Selecciona la hora de inicio primero.</p>
+            )}
+            <input
+              type="time"
+              value={formData.timeEnd}
+              onChange={e => onChange('timeEnd', e.target.value)}
+              className="max-w-xs px-4 py-3 bg-stone-50 border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
+            />
+          </div>
+        </>
+      )}
 
       {/* ── Capacidad ────────────────────────────────────── */}
       <div>
@@ -300,9 +413,9 @@ const DateTimeLocationSection: React.FC<Props> = ({
             value={formData.address}
             onChange={(val) => onChange('address', val)}
             onSelect={(result) => {
-              onChange('address', result.displayName)
-              onCoordsChange?.(result.lat, result.lng)
-              onBlur('coords')
+              onChange('address', result.displayName);
+              onCoordsChange?.(result.lat, result.lng);
+              onBlur('coords');
             }}
             onBlur={() => onBlur('address')}
             placeholder="Dirección del evento"
@@ -312,7 +425,6 @@ const DateTimeLocationSection: React.FC<Props> = ({
           {renderError('address', errors, touched)}
         </div>
 
-        {/* Mapa justo debajo de la dirección: buscar y ubicar van de la mano */}
         <div className="space-y-1 mt-3">
           <p className="text-[11px] text-stone-500 mb-2">
             Confirma la ubicación en el mapa. Haz clic o arrastra el marcador para ajustarla.

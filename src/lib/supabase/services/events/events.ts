@@ -84,6 +84,7 @@ export async function createEvent(eventData: CreateEventData): Promise<Event> {
       date_end: eventData.dateEnd || null,
       time_start: eventData.timeStart || null,
       time_end: eventData.timeEnd || null,
+      schedules: eventData.schedules || null,
       price: eventData.price,
       capacity: eventData.capacity,
       is_free: eventData.isFree,

@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { usePlaces, useAuth } from '@presentation/context';
 import { storageService } from '@lib/supabase';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
-import { FormData, ValidationErrors } from './EventFormTypes';
+import { FormData, ValidationErrors, ScheduleEntry } from './EventFormTypes';
 
 const initialState: FormData = {
   name: '',
@@ -19,6 +19,8 @@ const initialState: FormData = {
   isFree: true,
   tags: '',
   coords: [],
+  scheduleMode: 'single',
+  schedules: [],
 };
 
 export function useEventForm(onClose: () => void) {
@@ -73,9 +75,16 @@ export function useEventForm(onClose: () => void) {
     if (!formData.description?.trim()) errs.description = 'La descripción es obligatoria';
     else if (formData.description.length < 10) errs.description = 'Mínimo 10 caracteres';
     if (!formData.categoryId) errs.categoryId = 'Selecciona una categoría';
-    if (!formData.dateStart) errs.dateStart = 'Selecciona una fecha';
-    if (formData.dateEnd && formData.dateStart && formData.dateEnd < formData.dateStart) errs.dateStart = 'La fecha de fin debe ser posterior a la de inicio';
-    if (!formData.timeStart) errs.timeStart = 'Selecciona una hora';
+
+    if (formData.scheduleMode === 'custom') {
+      if (formData.schedules.length === 0) errs.schedules = 'Agrega al menos una sesión';
+      else if (formData.schedules.some(s => !s.date || !s.timeStart)) errs.schedules = 'Completa la fecha y hora de inicio de cada sesión';
+    } else {
+      if (!formData.dateStart) errs.dateStart = 'Selecciona una fecha';
+      if (formData.dateEnd && formData.dateStart && formData.dateEnd < formData.dateStart) errs.dateStart = 'La fecha de fin debe ser posterior a la de inicio';
+      if (!formData.timeStart) errs.timeStart = 'Selecciona una hora';
+    }
+
     if (!formData.address?.trim()) errs.address = 'La dirección es obligatoria';
     if (formData.coords.length !== 2) errs.coords = 'Selecciona una ubicación en el mapa';
 
@@ -120,12 +129,32 @@ export function useEventForm(onClose: () => void) {
         gallery = urls;
       }
 
+      let dateStart = formData.dateStart;
+      let dateEnd = formData.dateEnd || undefined;
+      let timeStart = formData.timeStart;
+      let timeEnd = formData.timeEnd || undefined;
+      let schedules: ScheduleEntry[] | null = null;
+
+      if (formData.scheduleMode === 'custom' && formData.schedules.length > 0) {
+        const sorted = [...formData.schedules].sort((a, b) => a.date.localeCompare(b.date));
+        dateStart = sorted[0].date;
+        dateEnd = sorted[sorted.length - 1].date;
+        timeStart = sorted[0].timeStart;
+        timeEnd = sorted[0].timeEnd || undefined;
+        schedules = sorted;
+      }
+
       const eventData = {
         ...formData,
+        dateStart,
+        dateEnd,
+        timeStart,
+        timeEnd,
         image: imageUrl,
         gallery,
         tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
         userId: user.id,
+        schedules,
       };
 
       const event = await addEvent(eventData);
@@ -145,7 +174,12 @@ export function useEventForm(onClose: () => void) {
   const isStepValid = () => {
     switch (step) {
       case 0: return formData.name.length >= 3 && formData.description.length >= 10 && formData.categoryId;
-      case 1: return formData.dateStart && formData.timeStart && formData.address.trim() && formData.coords.length === 2;
+      case 1: {
+        const dateTimeOk = formData.scheduleMode === 'custom'
+          ? formData.schedules.length > 0 && formData.schedules.every(s => s.date && s.timeStart)
+          : !!(formData.dateStart && formData.timeStart);
+        return dateTimeOk && formData.address.trim() && formData.coords.length === 2;
+      }
       case 2: return true;
       default: return true;
     }

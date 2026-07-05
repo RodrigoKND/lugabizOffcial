@@ -13,7 +13,7 @@ interface InfoProps {
 export function EventModalInfo({ event, isExpanded, onToggleExpand, onClose }: InfoProps) {
   return (
     <div className="space-y-2.5">
-      <CountdownTimer endDate={event.startDate} />
+      <CountdownTimer endDate={event.startDate} time={event.availableHours?.start} />
 
       <div>
         <h3 className="text-xl font-bold text-white leading-tight">{event.title}</h3>
