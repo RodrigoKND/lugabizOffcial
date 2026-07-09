@@ -1,3 +1,5 @@
+import type { PriceOption, CouponEntry, SocialLinks } from '@domain/entities';
+
 export interface EventFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,8 +35,12 @@ export interface FormData {
   timeEnd: string;
   capacity: number;
   price: number;
+  priceOptions: PriceOption[];
+  priceNote: string;
+  coupons: CouponEntry[];
   isFree: boolean;
   tags: string;
+  socialLinks: SocialLinks;
   coords: number[];
   scheduleMode: ScheduleMode;
   schedules: ScheduleEntry[];

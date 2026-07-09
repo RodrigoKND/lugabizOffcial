@@ -1,6 +1,7 @@
 import { Category } from './Category';
 import { SocialGroup } from './SocialGroup';
 import { Review } from './Review';
+import type { SocialLinks } from './SocialLinks';
 
 export interface Place {
   id: string;
@@ -24,6 +25,7 @@ export interface Place {
   coords?: number[];
   amenities?: string[];
   gallery?: string[];
+  socialLinks?: SocialLinks;
   viewsCount?: number;
 }
 
@@ -40,6 +42,7 @@ export interface CreatePlaceData {
   longitude?: number;
   coords?: number[];
   amenities?: string[];
+  socialLinks?: SocialLinks;
 }
 
 export interface UpdatePlaceData {
@@ -53,6 +56,7 @@ export interface UpdatePlaceData {
   featured?: boolean;
   latitude?: number;
   longitude?: number;
+  socialLinks?: SocialLinks;
 }
 
 export interface PlaceShareConfirmation {

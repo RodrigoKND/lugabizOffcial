@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Tag, DollarSign, Loader2 } from 'lucide-react';
+import { ChevronDown, Tag, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateDescription } from '@lib/supabase/services/description/descriptionGenerator';
 import { FormData, ValidationErrors } from './EventFormTypes';
@@ -116,26 +116,6 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
             placeholder="música, arte, cultura" />
         </div>
       </div>
-    </div>
-
-    <div className="flex items-center gap-3 p-4 bg-primary-50/50 border border-primary-100/60 rounded-xl">
-      <div className="relative">
-        <input type="checkbox" id="isFree" checked={formData.isFree}
-          onChange={e => onChange('isFree', e.target.checked)}
-          className="peer w-4 h-4 rounded border-stone-300 text-primary-500 focus:ring-primary-400 cursor-pointer" />
-        <div className="absolute inset-0 rounded border-2 border-transparent peer-focus:border-primary-400 pointer-events-none" />
-      </div>
-      <label htmlFor="isFree" className="text-sm font-medium text-stone-700 cursor-pointer select-none flex-1">Evento gratuito</label>
-      {!formData.isFree && (
-        <div className="flex items-center gap-2">
-          <DollarSign className="w-3.5 h-3.5 text-stone-400" />
-          <input type="number" min={0} value={formData.price || ''}
-            onChange={e => onChange('price', Number(e.target.value))}
-            className="w-24 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm outline-none focus:border-primary-400 focus:ring-0 text-right"
-            placeholder="0" />
-          <span className="text-[11px] font-medium text-stone-400">Bs</span>
-        </div>
-      )}
     </div>
   </div>
   );

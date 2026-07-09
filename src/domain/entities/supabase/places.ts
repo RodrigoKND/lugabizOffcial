@@ -15,6 +15,7 @@ export interface PlacesRow {
   coords?: number[];
   amenities?: string[];
   gallery?: string[];
+  social_links?: { instagram?: string; tiktok?: string; facebook?: string; website?: string };
   views_count?: number;
   created_at: string;
   updated_at: string;
@@ -37,6 +38,7 @@ export interface PlacesInsert {
   coords?: number[];
   amenities?: string[];
   gallery?: string[];
+  social_links?: { instagram?: string; tiktok?: string; facebook?: string; website?: string };
   views_count?: number;
   created_at?: string;
   updated_at?: string;
@@ -58,6 +60,7 @@ export interface PlacesUpdate {
   coords?: number[];
   amenities?: string[];
   gallery?: string[];
+  social_links?: { instagram?: string; tiktok?: string; facebook?: string; website?: string };
   views_count?: number;
   updated_at?: string;
 }

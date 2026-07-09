@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { TikTokCardVideo } from '@presentation/components/reusables';
+import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface CompactCardProps {
   image?: string;
@@ -8,10 +10,12 @@ interface CompactCardProps {
   rating: number;
   category: string;
   to: string;
+  tiktokUrl?: string;
 }
 
-const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to }) => {
+const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to, tiktokUrl }) => {
   const navigate = useNavigate();
+  const tiktokId = extractTikTokVideoId(tiktokUrl);
   return (
     <motion.div
       onClick={() => navigate(to)}
@@ -28,6 +32,7 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
       <div className="aspect-[3/4] relative overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
           style={{ backgroundImage: `url(${image || ''})` }} />
+        {tiktokId && <TikTokCardVideo videoId={tiktokId} className="rounded-none" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         <span className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-semibold text-primary-600 shadow-xs z-10">
           {category}

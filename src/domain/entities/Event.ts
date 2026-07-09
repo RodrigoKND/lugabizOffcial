@@ -1,3 +1,16 @@
+import type { SocialLinks } from './SocialLinks';
+
+export interface PriceOption {
+  label: string;
+  price: number;
+  priceMax?: number;
+}
+
+export interface CouponEntry {
+  code: string;
+  description: string;
+}
+
 export interface Event {
   id: string;
   name: string;
@@ -18,9 +31,13 @@ export interface Event {
   timeStart: string;
   timeEnd?: string;
   price?: number;
+  priceOptions?: PriceOption[];
+  priceNote?: string;
+  coupons?: CouponEntry[];
   capacity?: number;
   isFree: boolean;
   tags?: string[];
+  socialLinks?: SocialLinks;
   coords: number[];
   userId: string;
   user?: {
@@ -51,9 +68,13 @@ export interface CreateEventData {
   timeStart: string;
   timeEnd?: string;
   price?: number;
+  priceOptions?: PriceOption[];
+  priceNote?: string;
+  coupons?: CouponEntry[];
   capacity?: number;
   isFree: boolean;
   tags?: string[];
+  socialLinks?: SocialLinks;
   coords: number[];
   userId: string;
   schedules?: ScheduleEntry[] | null;

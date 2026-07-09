@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { PlaceFormData, ValidationErrors } from '../../pages/Places/formAddNewPlace/types';
+import type { SocialLinks } from '@domain/entities';
 
 export function usePlaceForm(setFormData: React.Dispatch<React.SetStateAction<PlaceFormData>>) {
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -47,9 +48,13 @@ export function usePlaceForm(setFormData: React.Dispatch<React.SetStateAction<Pl
     setFormData(prev => ({ ...prev, discountInfo }));
   }, [setFormData]);
 
+  const handleSocialLinksChange = useCallback((socialLinks: SocialLinks) => {
+    setFormData(prev => ({ ...prev, socialLinks }));
+  }, [setFormData]);
+
   return {
     errors, setErrors, touched, setTouched, step, setStep, totalSteps,
     validate, isStepValid, handleBlur,
-    handleSocialGroupsChange, handleAmenitiesChange, handleDiscountChange,
+    handleSocialGroupsChange, handleAmenitiesChange, handleDiscountChange, handleSocialLinksChange,
   };
 }

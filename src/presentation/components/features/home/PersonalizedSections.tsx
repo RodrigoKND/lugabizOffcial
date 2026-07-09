@@ -66,6 +66,7 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
                         rating={place.rating}
                         category={place.category?.name}
                         to={`/place/${place.id}`}
+                        tiktokUrl={place.socialLinks?.tiktok}
                       />
                     )),
                     ...section.events.map(event => (
@@ -84,6 +85,7 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
                       rating={place.rating}
                       category={place.category?.name}
                       to={`/place/${place.id}`}
+                      tiktokUrl={place.socialLinks?.tiktok}
                     />
                   ))}
           </ScrollRow>

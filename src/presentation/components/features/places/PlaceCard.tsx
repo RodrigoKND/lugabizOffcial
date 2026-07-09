@@ -2,6 +2,8 @@ import React from 'react';
 import { Star } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { Place } from '@domain/entities';
+import { TikTokCardVideo } from '@presentation/components/reusables';
+import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface PlaceCardProps {
   place: Place;
@@ -12,6 +14,7 @@ interface PlaceCardProps {
 const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' }) => {
   const primarySocialGroup = place.socialGroups[0];
   const SocialGroupIcon = Icons[primarySocialGroup?.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+  const tiktokId = extractTikTokVideoId(place.socialLinks?.tiktok);
 
   return (
     <article
@@ -19,12 +22,18 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' })
       onClick={onClick}
     >
       <header>
-        <img
-          loading="lazy"
-          src={place?.image}
-          alt={place?.name}
-          className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
-        />
+        <div className="relative w-full h-48">
+          {tiktokId ? (
+            <TikTokCardVideo videoId={tiktokId} fallbackImageUrl={place?.image} className="rounded-md" />
+          ) : (
+            <img
+              loading="lazy"
+              src={place?.image}
+              alt={place?.name}
+              className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
+            />
+          )}
+        </div>
         <div className="absolute top-4 right-4 flex flex-col space-y-2">
           {primarySocialGroup && (
             <div className={`px-3 py-1 rounded-full text-xs font-medium text-white flex items-center space-x-1`}

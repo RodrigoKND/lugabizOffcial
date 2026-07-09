@@ -86,9 +86,13 @@ export async function createEvent(eventData: CreateEventData): Promise<Event> {
       time_end: eventData.timeEnd || null,
       schedules: eventData.schedules || null,
       price: eventData.price,
+      price_options: eventData.priceOptions || null,
+      price_note: eventData.priceNote || null,
+      coupons: eventData.coupons || null,
       capacity: eventData.capacity,
       is_free: eventData.isFree,
       tags: eventData.tags,
+      social_links: eventData.socialLinks || null,
       coords: eventData.coords,
       user_id: eventData.userId,
     })
@@ -118,8 +122,9 @@ export async function updateEvent(id: string, updates: Partial<CreateEventData>)
     name: 'name', description: 'description', address: 'address',
     categoryId: 'category_id', image: 'image', gallery: 'gallery',
     dateStart: 'date_start', dateEnd: 'date_end', timeStart: 'time_start', timeEnd: 'time_end',
-    price: 'price', capacity: 'capacity', isFree: 'is_free',
-    tags: 'tags', coords: 'coords',
+    price: 'price', priceOptions: 'price_options', priceNote: 'price_note', coupons: 'coupons',
+    capacity: 'capacity', isFree: 'is_free',
+    tags: 'tags', socialLinks: 'social_links', coords: 'coords',
   };
   const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const [key, dbKey] of Object.entries(fieldMap)) {

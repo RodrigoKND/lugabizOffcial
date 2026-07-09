@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { usePlaces, useAuth } from '@presentation/context';
+import type { SocialLinks } from '@domain/entities';
 import { useForm } from '@presentation/hooks';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { usePlaceForm } from '@presentation/hooks/places/usePlaceForm';
@@ -25,6 +26,7 @@ const AddPlace: React.FC = () => {
     socialGroups: [] as string[],
     amenities: [] as string[],
     discountInfo: undefined as any,
+    socialLinks: {} as SocialLinks,
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,
   });
@@ -101,6 +103,7 @@ const AddPlace: React.FC = () => {
               formData={formData}
               handleAmenitiesChange={formUtils.handleAmenitiesChange}
               handleDiscountChange={formUtils.handleDiscountChange}
+              handleSocialLinksChange={formUtils.handleSocialLinksChange}
               isValid={formUtils.isStepValid(formData, formUtils.step)}
               isSubmitting={submitUtils.isSubmitting}
               handleSubmit={submitUtils.handleSubmit}

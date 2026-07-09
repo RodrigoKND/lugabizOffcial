@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { usePlaces, useAuth } from '@presentation/context';
 import { storageService } from '@lib/supabase';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
+import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
 import { FormData, ValidationErrors, ScheduleEntry } from './EventFormTypes';
 
 const initialState: FormData = {
@@ -16,8 +17,12 @@ const initialState: FormData = {
   timeEnd: '',
   capacity: 0,
   price: 0,
+  priceOptions: [],
+  priceNote: '',
+  coupons: [],
   isFree: true,
   tags: '',
+  socialLinks: {},
   coords: [],
   scheduleMode: 'single',
   schedules: [],
@@ -102,6 +107,11 @@ export function useEventForm(onClose: () => void) {
       toast.error('Debes iniciar sesión');
       return;
     }
+    const socialLinksError = validateSocialLinks(formData.socialLinks);
+    if (socialLinksError) {
+      toast.error(socialLinksError);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -144,12 +154,19 @@ export function useEventForm(onClose: () => void) {
         schedules = sorted;
       }
 
+      const price = formData.priceOptions.length > 0
+        ? Math.min(...formData.priceOptions.map(o => o.price))
+        : formData.price;
+      const isFree = formData.priceOptions.length > 0 ? false : formData.isFree;
+
       const eventData = {
         ...formData,
         dateStart,
         dateEnd,
         timeStart,
         timeEnd,
+        price,
+        isFree,
         image: imageUrl,
         gallery,
         tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),

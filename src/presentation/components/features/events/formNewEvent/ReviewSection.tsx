@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, MapPin, DollarSign, Users, Tag, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
+import { CalendarDays, MapPin, DollarSign, Users, Tag, Image as ImageIcon, CheckCircle2, Ticket } from 'lucide-react';
 import { FormData } from './EventFormTypes';
 
 interface Props {
@@ -76,8 +76,37 @@ const ReviewSection: React.FC<Props> = ({ formData, categories, imageFiles }) =>
       <Row
         icon={<DollarSign className="w-3.5 h-3.5 text-primary-600" />}
         label="Precio"
-        value={formData.isFree ? <span className="text-green-600 font-semibold">Gratuito</span> : `Bs. ${formData.price}`}
+        value={
+          formData.isFree
+            ? <span className="text-green-600 font-semibold">Gratuito</span>
+            : formData.priceOptions.length > 0
+              ? (
+                <div className="space-y-0.5">
+                  {formData.priceOptions.map((o, i) => (
+                    <div key={i} className="text-xs text-stone-600">
+                      {o.label ? `${o.label} — ` : ''}
+                      Bs. {o.price}{o.priceMax ? ` - ${o.priceMax}` : ''}
+                    </div>
+                  ))}
+                </div>
+              )
+              : `Bs. ${formData.price}`
+        }
       />
+      {formData.priceNote && (
+        <Row
+          icon={<DollarSign className="w-3.5 h-3.5 text-primary-600" />}
+          label="Nota"
+          value={<span className="text-xs text-stone-500">{formData.priceNote}</span>}
+        />
+      )}
+      {formData.coupons.length > 0 && (
+        <Row
+          icon={<Ticket className="w-3.5 h-3.5 text-primary-600" />}
+          label="Cupones"
+          value={<span className="text-xs text-stone-500">{formData.coupons.length} cupón(es), visibles mientras el evento esté en curso</span>}
+        />
+      )}
       <Row
         icon={<Users className="w-3.5 h-3.5 text-primary-600" />}
         label="Capacidad"

@@ -70,6 +70,7 @@ export async function createPlace(placeData: CreatePlaceData) {
       coords: placeData.coords,
       amenities: placeData.amenities,
       gallery: placeData.gallery,
+      social_links: placeData.socialLinks || null,
     })
     .select()
     .single();
@@ -99,7 +100,7 @@ export async function updatePlace(id: string, updates: Partial<CreatePlaceData>)
     name: 'name', description: 'description', address: 'address',
     categoryId: 'category_id', image: 'image', gallery: 'gallery',
     latitude: 'latitude', longitude: 'longitude', coords: 'coords',
-    amenities: 'amenities', authorId: 'author_id',
+    amenities: 'amenities', authorId: 'author_id', socialLinks: 'social_links',
   };
   const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const [key, dbKey] of Object.entries(fieldMap)) {

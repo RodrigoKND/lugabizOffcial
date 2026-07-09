@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { usePlaces, useAuth } from '@presentation/context';
 import { storageService } from '@lib/supabase';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
+import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
 import type { PlaceFormData } from '../../pages/Places/formAddNewPlace/types';
 
 export function usePlaceSubmit(
@@ -26,6 +27,11 @@ export function usePlaceSubmit(
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate(formData, imageFiles)) return;
+    const socialLinksError = validateSocialLinks(formData.socialLinks);
+    if (socialLinksError) {
+      toast.error(socialLinksError);
+      return;
+    }
     setIsSubmitting(true);
     try {
       const contentToCheck = `${formData.name} ${formData.description}`.trim();

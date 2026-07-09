@@ -97,6 +97,7 @@ export function usePlacesProvider(): PlacesContextType {
         longitude: placeData.longitude,
         coords: placeData.latitude && placeData.longitude ? [placeData.latitude, placeData.longitude] : undefined,
         amenities: placeData.amenities,
+        socialLinks: placeData.socialLinks,
       };
 
       await placesService.createPlace(createPlaceData);
@@ -129,9 +130,13 @@ export function usePlacesProvider(): PlacesContextType {
         timeStart: eventData.timeStart,
         timeEnd: eventData.timeEnd,
         price: eventData.price,
+        priceOptions: eventData.priceOptions,
+        priceNote: eventData.priceNote,
+        coupons: eventData.coupons,
         capacity: eventData.capacity,
         isFree: eventData.isFree,
         tags: eventData.tags || [],
+        socialLinks: eventData.socialLinks,
         coords: eventData.coords || [],
         userId: user.id,
       });

@@ -1,20 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Send, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Loader2, AlertCircle, Share2 } from 'lucide-react';
 import { AmenitySelector } from '@presentation/components/features';
-import { CollapsibleSection, DiscountSection } from '@presentation/components/reusables';
+import { CollapsibleSection, DiscountSection, SocialLinksSection } from '@presentation/components/reusables';
+import type { SocialLinks } from '@domain/entities';
 
 interface ExtraStepProps {
-  formData: { amenities: string[]; discountInfo: any };
+  formData: { amenities: string[]; discountInfo: any; socialLinks: SocialLinks };
   handleAmenitiesChange: (amenities: string[]) => void;
   handleDiscountChange: (discountInfo: any) => void;
+  handleSocialLinksChange: (socialLinks: SocialLinks) => void;
   isValid: boolean;
   isSubmitting: boolean;
   handleSubmit: (e: React.FormEvent) => void;
 }
 
 const ExtraStep: React.FC<ExtraStepProps> = ({
-  formData, handleAmenitiesChange, handleDiscountChange,
+  formData, handleAmenitiesChange, handleDiscountChange, handleSocialLinksChange,
   isValid, isSubmitting, handleSubmit,
 }) => (
   <motion.div key="s2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
@@ -24,6 +26,9 @@ const ExtraStep: React.FC<ExtraStepProps> = ({
       </CollapsibleSection>
       <CollapsibleSection title="Descuentos y Beneficios">
         <DiscountSection discountInfo={formData.discountInfo || { hasDiscount: false }} onChange={handleDiscountChange} />
+      </CollapsibleSection>
+      <CollapsibleSection title="Redes sociales" icon={<Share2 className="w-4 h-4" />}>
+        <SocialLinksSection value={formData.socialLinks || {}} onChange={handleSocialLinksChange} />
       </CollapsibleSection>
     </div>
 

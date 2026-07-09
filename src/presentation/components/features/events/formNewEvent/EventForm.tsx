@@ -4,6 +4,8 @@ import { X } from 'lucide-react';
 import { EventFormProps } from './EventFormTypes';
 import { useEventForm } from './useEventForm';
 import BasicInfoSection from './BasicInfoSection';
+import EventPricingSection from './EventPricingSection';
+import { SocialLinksSection } from '@presentation/components/reusables';
 import DateTimeLocationSection from './DateTimeLocationSection';
 import ReviewSection from './ReviewSection';
 import FormNavigation from './FormNavigation';
@@ -105,6 +107,20 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
                       formData={formData} errors={errors} touched={touched}
                       categories={categories} onChange={handleChange} onBlur={handleBlur}
                     />
+                    <div className="mt-5">
+                      <EventPricingSection
+                        isFree={formData.isFree} price={formData.price}
+                        priceOptions={formData.priceOptions} priceNote={formData.priceNote}
+                        coupons={formData.coupons} onChange={handleChange}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block mb-2">Redes sociales (opcional)</label>
+                      <SocialLinksSection
+                        value={formData.socialLinks}
+                        onChange={links => handleChange('socialLinks', links)}
+                      />
+                    </div>
                   </motion.div>
                 )}
                 {step === 1 && (

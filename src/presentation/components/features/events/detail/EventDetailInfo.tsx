@@ -1,5 +1,6 @@
 import { Calendar, Clock, Users, Tag } from 'lucide-react';
 import { Event } from '@domain/entities';
+import { SocialLinksRow } from '@presentation/components/reusables';
 
 interface EventDetailInfoProps {
   event: Event;
@@ -43,6 +44,8 @@ export default function EventDetailInfo({ event, formattedDate }: EventDetailInf
           ))}
         </div>
       )}
+
+      <SocialLinksRow links={event.socialLinks} />
     </>
   );
 }

@@ -3,9 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Loader2, Send, Image, X, Plus } from 'lucide-react';
 import { eventsService } from '@lib/supabase';
-import { Event } from '@domain/entities';
+import { Event, PriceOption, CouponEntry, SocialLinks } from '@domain/entities';
 import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
+import EventPricingSection from '@presentation/components/features/events/formNewEvent/EventPricingSection';
+import { SocialLinksSection } from '@presentation/components/reusables';
+import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
 
 const MAX_GALLERY_BYTES = 10 * 1024 * 1024; // 10 MB total
 
@@ -40,6 +43,8 @@ const EditEventPage: React.FC = () => {
     name: '', description: '', address: '', categoryId: '',
     dateStart: '', dateEnd: '', timeStart: '', timeEnd: '', price: 0, capacity: 0,
     isFree: false, tags: '',
+    priceOptions: [] as PriceOption[], priceNote: '', coupons: [] as CouponEntry[],
+    socialLinks: {} as SocialLinks,
   });
 
   useSEO({ title: 'Editar Evento', description: 'Editar evento en Lugabiz' });
@@ -63,6 +68,10 @@ const EditEventPage: React.FC = () => {
         capacity: data.capacity || 0,
         isFree: data.isFree,
         tags: (data.tags || []).join(', '),
+        priceOptions: data.priceOptions || [],
+        priceNote: data.priceNote || '',
+        coupons: data.coupons || [],
+        socialLinks: data.socialLinks || {},
       });
       if (data.image) setCoverPreview(data.image);
       if (data.gallery?.length) setGalleryUrls(data.gallery);
@@ -116,6 +125,11 @@ const EditEventPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+    const socialLinksError = validateSocialLinks(form.socialLinks);
+    if (socialLinksError) {
+      toast.error(socialLinksError);
+      return;
+    }
     setSaving(true);
     try {
       let coverUrl = coverPreview && !coverFile ? coverPreview : undefined;
@@ -131,6 +145,11 @@ const EditEventPage: React.FC = () => {
       }
       const finalGallery = [...galleryUrls, ...uploadedGallery];
 
+      const price = form.priceOptions.length > 0
+        ? Math.min(...form.priceOptions.map(o => o.price))
+        : form.price;
+      const isFree = form.priceOptions.length > 0 ? false : form.isFree;
+
       await eventsService.updateEvent(id, {
         name: form.name,
         description: form.description,
@@ -140,10 +159,14 @@ const EditEventPage: React.FC = () => {
         dateEnd: form.dateEnd || undefined,
         timeStart: form.timeStart,
         timeEnd: form.timeEnd || undefined,
-        price: form.price,
+        price,
+        priceOptions: form.priceOptions,
+        priceNote: form.priceNote,
+        coupons: form.coupons,
         capacity: form.capacity || undefined,
-        isFree: form.isFree,
+        isFree,
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+        socialLinks: form.socialLinks,
         image: coverUrl,
         gallery: finalGallery,
       });
@@ -282,6 +305,22 @@ const EditEventPage: React.FC = () => {
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase">Tags (separados por coma)</label>
             <input type="text" value={form.tags} onChange={(e) => setForm(f => ({ ...f, tags: e.target.value }))} className={iCls} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Precio</label>
+            <EventPricingSection
+              isFree={form.isFree} price={form.price}
+              priceOptions={form.priceOptions} priceNote={form.priceNote}
+              coupons={form.coupons}
+              onChange={(field, value) => setForm(f => ({ ...f, [field]: value }))}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Redes sociales (opcional)</label>
+            <SocialLinksSection
+              value={form.socialLinks}
+              onChange={links => setForm(f => ({ ...f, socialLinks: links }))}
+            />
           </div>
           <button type="submit" disabled={saving}
             className="w-full py-3.5 bg-amber-500 text-white rounded-xl font-semibold text-sm hover:bg-amber-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">

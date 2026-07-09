@@ -3,7 +3,8 @@ export { type Category, type CreateCategoryData, type UpdateCategoryData } from 
 export { type SocialGroup, type CreateSocialGroupData, type UpdateSocialGroupData } from './SocialGroup';
 export { type Place, type CreatePlaceData, type UpdatePlaceData, type PlaceShareConfirmation } from './Place';
 export { type Review, type CreateReviewData, type UpdateReviewData } from './Review';
-export { type Event, type CreateEventData, type EventAttendance, type EventShare } from './Event';
+export { type Event, type CreateEventData, type EventAttendance, type EventShare, type PriceOption, type CouponEntry } from './Event';
+export { type SocialLinks } from './SocialLinks';
 export { type GeoPosition, type OverpassElement, type OverpassResponse, type UserPosition } from './Geo';
 export { type PlaceFormData } from './PlaceFormData';
 export { type PlacesContextType, type PlacesProviderProps } from './PlacesContextTypes';

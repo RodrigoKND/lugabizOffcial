@@ -46,6 +46,7 @@ export function transformPlaceData(place: any): Place {
     coords: place.coords,
     amenities: place.amenities,
     gallery: place.gallery,
+    socialLinks: place.social_links || undefined,
     viewsCount: place.views_count,
   };
 }

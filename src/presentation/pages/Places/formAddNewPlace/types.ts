@@ -1,3 +1,5 @@
+import type { SocialLinks } from '@domain/entities';
+
 export interface PlaceFormData {
   name: string;
   description: string;
@@ -6,6 +8,7 @@ export interface PlaceFormData {
   socialGroups: string[];
   amenities: string[];
   discountInfo: any;
+  socialLinks: SocialLinks;
   latitude: number | undefined;
   longitude: number | undefined;
 }

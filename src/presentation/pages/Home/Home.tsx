@@ -138,6 +138,7 @@ const Home: React.FC = () => {
                   rating={place.rating}
                   category={place.category?.name}
                   to={`/place/${place.id}`}
+                  tiktokUrl={place.socialLinks?.tiktok}
                 />
               ))}
             </ScrollRow>
@@ -155,6 +156,7 @@ const Home: React.FC = () => {
                 rating={place.rating}
                 category={place.category?.name}
                 to={`/place/${place.id}`}
+                tiktokUrl={place.socialLinks?.tiktok}
               />
             ))}
           </ScrollRow>

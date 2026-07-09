@@ -39,9 +39,24 @@ export default function EventDetailSidebar({
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Precio</p>
-          <p className="text-2xl font-bold text-stone-800">
-            {event.isFree ? 'Gratis' : `Bs. ${event.price}`}
-          </p>
+          {event.isFree ? (
+            <p className="text-2xl font-bold text-stone-800">Gratis</p>
+          ) : event.priceOptions && event.priceOptions.length > 0 ? (
+            <>
+              <p className="text-2xl font-bold text-stone-800">
+                Desde Bs. {Math.min(...event.priceOptions.map(o => o.price))}
+              </p>
+              <div className="mt-1 space-y-0.5">
+                {event.priceOptions.map((o, i) => (
+                  <p key={i} className="text-xs text-stone-500">
+                    {o.label ? `${o.label} — ` : ''}Bs. {o.price}{o.priceMax ? ` - ${o.priceMax}` : ''}
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-2xl font-bold text-stone-800">Bs. {event.price}</p>
+          )}
         </div>
         <div className="text-right">
           <div className="flex items-center gap-1 text-sm text-stone-500">
@@ -56,6 +71,25 @@ export default function EventDetailSidebar({
           )}
         </div>
       </div>
+
+      {event.priceNote && (
+        <div className="mb-6 -mt-3 p-3 bg-amber-50/60 border border-amber-100 rounded-xl text-xs text-stone-600">
+          {event.priceNote}
+        </div>
+      )}
+
+      {eventStatus === 'ongoing' && event.coupons && event.coupons.length > 0 && (
+        <div className="mb-6 -mt-3 p-3 bg-primary-50/60 border border-primary-100 rounded-xl space-y-1.5">
+          <p className="text-[11px] font-semibold text-primary-700 uppercase tracking-wider flex items-center gap-1.5">
+            <Ticket className="w-3.5 h-3.5" /> Cupones activos
+          </p>
+          {event.coupons.map((c, i) => (
+            <p key={i} className="text-xs text-stone-600">
+              <span className="font-mono font-bold text-primary-700">{c.code}</span> — {c.description}
+            </p>
+          ))}
+        </div>
+      )}
 
       <div className="space-y-4 mb-6">
         {hasCoords && (

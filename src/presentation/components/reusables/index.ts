@@ -3,3 +3,6 @@ export { default as LoadingScreen } from '@presentation/components/reusables/Loa
 export { default as ImageUploader } from '@presentation/components/reusables/ImageUploader';
 export { default as DiscountSection } from '@presentation/components/reusables/DiscountSection';
 export { default as OnboardingAlert } from '@presentation/components/reusables/OnboardingAlert';
+export { default as SocialLinksSection } from '@presentation/components/reusables/SocialLinksSection';
+export { default as SocialLinksRow } from '@presentation/components/reusables/SocialLinksRow';
+export { default as TikTokCardVideo } from '@presentation/components/reusables/TikTokCardVideo';

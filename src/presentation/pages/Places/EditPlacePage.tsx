@@ -6,6 +6,9 @@ import { supabase } from '@lib/supabase/client';
 import { placesService } from '@lib/supabase';
 import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
+import { SocialLinksSection } from '@presentation/components/reusables';
+import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
+import type { SocialLinks } from '@domain/entities';
 
 const EditPlacePage: React.FC = () => {
   const { id } = useParams();
@@ -23,6 +26,7 @@ const EditPlacePage: React.FC = () => {
   });
   const [image, setImage] = useState<string | null>(null);
   const [gallery, setGallery] = useState<string[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
 
   useSEO({ title: 'Editar Lugar', description: 'Editar lugar en Lugabiz' });
 
@@ -41,6 +45,7 @@ const EditPlacePage: React.FC = () => {
       });
       setImage(data.image || null);
       setGallery(data.gallery || []);
+      setSocialLinks(data.socialLinks || {});
       setLoading(false);
     }).catch((err) => {
       console.error('Error loading place:', err);
@@ -98,6 +103,11 @@ const EditPlacePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+    const socialLinksError = validateSocialLinks(socialLinks);
+    if (socialLinksError) {
+      toast.error(socialLinksError);
+      return;
+    }
     setSaving(true);
     try {
       await placesService.updatePlace(id, {
@@ -109,6 +119,7 @@ const EditPlacePage: React.FC = () => {
         longitude: form.longitude || undefined,
         image: image || undefined,
         gallery: gallery.length > 0 ? gallery : undefined,
+        socialLinks,
       });
       toast.success('Lugar actualizado');
       navigate(`/place/${id}`);
@@ -147,6 +158,11 @@ const EditPlacePage: React.FC = () => {
             <label className="text-xs font-semibold text-stone-500 uppercase">Dirección</label>
             <input type="text" value={form.address} onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
               className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-primary-400" />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Redes sociales (opcional)</label>
+            <SocialLinksSection value={socialLinks} onChange={setSocialLinks} />
           </div>
 
           {/* Imagen principal */}

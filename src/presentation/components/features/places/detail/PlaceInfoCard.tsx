@@ -2,6 +2,7 @@ import { Star, Calendar, Eye, Share2, Heart, HeartOff } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { PlaceInfoCardProps } from '@domain/entities/PlaceDetailTypes';
+import { SocialLinksRow } from '@presentation/components/reusables';
 
 export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onToggleSave }: PlaceInfoCardProps) {
   return (
@@ -48,6 +49,8 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
           })}
         </div>
       )}
+
+      <SocialLinksRow links={place.socialLinks} variant="dark" className="mb-6" />
 
       <div className="flex flex-col sm:flex-row gap-3">
         <button onClick={onShare}

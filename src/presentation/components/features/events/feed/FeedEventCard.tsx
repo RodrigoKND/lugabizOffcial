@@ -4,11 +4,14 @@ import { Heart, MessageCircle, Bookmark, MapPin, Calendar } from 'lucide-react';
 import { FeedEventProps } from '@domain/entities/EventFeedTypes';
 import { useEventLikes } from '@presentation/hooks/useEventLikes';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
+import { TikTokCardVideo } from '@presentation/components/reusables';
+import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 export function FeedEventCard({ event, isActive, onPrev, onNext, onCommentOpen, userId }: FeedEventProps) {
   const { liked, likesCount, toggleLike } = useEventLikes(event.id, userId);
   const { saved, toggleSave } = useEventSaves(event.id, userId);
   const dragY = useRef(0);
+  const tiktokId = extractTikTokVideoId(event.socialLinks?.tiktok);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     const threshold = 80;
@@ -33,11 +36,19 @@ export function FeedEventCard({ event, isActive, onPrev, onNext, onCommentOpen, 
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="absolute inset-0">
-        <img
-          src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
-          alt={event.name}
-          className="w-full h-full object-cover"
-        />
+        {tiktokId ? (
+          <TikTokCardVideo
+            videoId={tiktokId}
+            fallbackImageUrl={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
+            className="rounded-none"
+          />
+        ) : (
+          <img
+            src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
+            alt={event.name}
+            className="w-full h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent via-40% to-black/85" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
       </div>
