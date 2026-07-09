@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
-import { Share2, X, ChevronLeft, ChevronRight, Images, Image as ImageIcon, Play } from 'lucide-react';
+import { Share2, X, ChevronLeft, ChevronRight, Images, Play } from 'lucide-react';
 import { Event } from '@domain/entities';
-import { TikTokHeroEmbed } from '@presentation/components/reusables';
+import { TikTokVideoModal } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface EventDetailHeroProps {
@@ -13,7 +13,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const touchStartX = useRef(0);
   const tiktokId = extractTikTokVideoId(event.socialLinks?.tiktok);
-  const [showVideo, setShowVideo] = useState(!!tiktokId);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   // All images: cover + gallery extras (deduped)
   const allImages = [
@@ -38,21 +38,17 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
 
   return (
     <>
-      {/* Cover image / video */}
+      {/* Cover image */}
       <div
-        className={`relative aspect-video rounded-3xl overflow-hidden bg-stone-100 shadow-sm group ${showVideo ? '' : 'cursor-pointer'}`}
-        onClick={() => !showVideo && openLightbox(0)}
+        className="relative aspect-video rounded-3xl overflow-hidden bg-stone-100 shadow-sm cursor-pointer group"
+        onClick={() => openLightbox(0)}
       >
-        {showVideo && tiktokId ? (
-          <TikTokHeroEmbed videoId={tiktokId} videoUrl={event.socialLinks!.tiktok!} fallbackImageUrl={event.image} />
-        ) : (
-          <img
-            src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            alt={event.name}
-          />
-        )}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
+        <img
+          src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          alt={event.name}
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
 
         <div className="absolute bottom-4 left-4 flex items-center gap-3">
           <button
@@ -70,7 +66,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
 
         <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
           {/* Gallery count badge */}
-          {!showVideo && allImages.length > 1 && (
+          {allImages.length > 1 && (
             <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
               <Images className="w-3.5 h-3.5 text-white" />
               <span className="text-white text-xs font-semibold">{allImages.length}</span>
@@ -78,14 +74,23 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
           )}
           {tiktokId && (
             <button
-              onClick={(e) => { e.stopPropagation(); setShowVideo(v => !v); }}
-              className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-stone-700 shadow-sm hover:bg-white transition-colors"
+              onClick={(e) => { e.stopPropagation(); setVideoOpen(true); }}
+              className="flex items-center gap-2 bg-black text-white px-4 py-2.5 rounded-full text-sm font-bold shadow-lg hover:scale-105 active:scale-100 transition-transform"
             >
-              {showVideo ? <><ImageIcon className="w-3.5 h-3.5" /> Ver fotos</> : <><Play className="w-3.5 h-3.5" /> Ver video</>}
+              <Play className="w-4 h-4 fill-white" /> Ver video de TikTok
             </button>
           )}
         </div>
       </div>
+
+      {tiktokId && (
+        <TikTokVideoModal
+          open={videoOpen}
+          onClose={() => setVideoOpen(false)}
+          videoId={tiktokId}
+          videoUrl={event.socialLinks!.tiktok!}
+        />
+      )}
 
       {/* Gallery thumbnails */}
       {allImages.length > 1 && (

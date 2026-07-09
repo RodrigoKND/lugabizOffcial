@@ -6,4 +6,5 @@ export { default as OnboardingAlert } from '@presentation/components/reusables/O
 export { default as SocialLinksSection } from '@presentation/components/reusables/SocialLinksSection';
 export { default as SocialLinksRow } from '@presentation/components/reusables/SocialLinksRow';
 export { default as TikTokHeroEmbed } from '@presentation/components/reusables/TikTokHeroEmbed';
+export { default as TikTokVideoModal } from '@presentation/components/reusables/TikTokVideoModal';
 export { default as TikTokBadge } from '@presentation/components/reusables/TikTokBadge';
