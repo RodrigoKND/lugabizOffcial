@@ -21,6 +21,15 @@ export const eventLikesService = {
     return count || 0;
   },
 
+  async getLikedEventIds(userId: string): Promise<string[]> {
+    const { data } = await supabase
+      .from('event_likes')
+      .select('event_id')
+      .eq('user_id', userId);
+
+    return (data || []).map(item => item.event_id);
+  },
+
   async toggleLike(eventId: string, userId: string): Promise<{ liked: boolean; count: number }> {
     const existing = await this.getLike(eventId, userId);
 

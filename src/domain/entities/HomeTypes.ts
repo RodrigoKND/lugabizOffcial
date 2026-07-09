@@ -4,6 +4,7 @@ export interface StoriesRowProps {
   events: Event[];
   onEventClick: (eventId: string) => void;
   viewedEvents?: Set<string>;
+  likedEvents?: Set<string>;
 }
 
 export interface FeaturedHeroSectionProps {
@@ -26,6 +27,7 @@ export interface UseHomeEventsReturn {
   setHeroIndex: (index: number) => void;
   viewedEvents: Set<string>;
   markEventViewed: (eventId: string) => void;
+  likedEvents: Set<string>;
 }
 
 export interface UseTrendingPlacesReturn {

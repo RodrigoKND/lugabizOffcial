@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
+import { Heart } from 'lucide-react';
 import { StoriesRowProps } from '@domain/entities/HomeTypes';
 import { TikTokBadge } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
-const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEvents }) => (
+const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEvents, likedEvents }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -57,6 +58,22 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                       transition={{ rotate: { duration: 8, repeat: Infinity, ease: 'linear' }, scale: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
                     />
                   </>
+                )}
+                {/* Corazón: aparece solo si el usuario le dio me encanta a este evento */}
+                {likedEvents?.has(event.id) && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0, rotate: -20 }}
+                    animate={{ scale: [0, 1.35, 1], opacity: 1, rotate: 0 }}
+                    transition={{ duration: 0.55, delay: 0.15 * i, ease: 'easeOut' }}
+                    className="absolute -top-1.5 -right-1.5 z-20 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center ring-2 ring-white"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut', delay: 0.7 + 0.15 * i }}
+                    >
+                      <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
+                    </motion.div>
+                  </motion.div>
                 )}
                 {/* Avatar circular */}
                 <div className="relative rounded-full bg-white p-[2px]">

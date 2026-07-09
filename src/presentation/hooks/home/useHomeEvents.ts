@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Event } from '@domain/entities';
-import { eventViewsService } from '@lib/supabase';
+import { eventViewsService, eventLikesService } from '@lib/supabase';
 import { UseHomeEventsReturn } from '@domain/entities/HomeTypes';
 
 export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsReturn {
   const [viewedEvents, setViewedEvents] = useState<Set<string>>(new Set());
+  const [likedEvents, setLikedEvents] = useState<Set<string>>(new Set());
   const [heroIndex, setHeroIndex] = useState(0);
   const heroTimer = useRef<ReturnType<typeof setInterval>>();
 
@@ -12,6 +13,9 @@ export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsRe
     if (!userId) return;
     eventViewsService.getViewedEventIds(userId).then(ids => {
       setViewedEvents(new Set(ids));
+    }).catch(() => {});
+    eventLikesService.getLikedEventIds(userId).then(ids => {
+      setLikedEvents(new Set(ids));
     }).catch(() => {});
   }, [userId]);
 
@@ -61,5 +65,6 @@ export function useHomeEvents(events: Event[], userId?: string): UseHomeEventsRe
     setHeroIndex,
     viewedEvents,
     markEventViewed,
+    likedEvents,
   };
 }

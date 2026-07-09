@@ -14,7 +14,7 @@ interface EventPricingSectionProps {
 
 const MAX_ROWS = 10;
 
-const inputCls = 'w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm outline-none focus:border-primary-400 focus:ring-0';
+const inputCls = 'w-full px-3 py-2 bg-stone-50 border-2 border-transparent rounded-lg text-sm outline-none transition-all duration-200 focus:ring-0 focus:border-primary-400 hover:border-stone-200';
 
 const EventPricingSection: React.FC<EventPricingSectionProps> = ({
   isFree, price, priceOptions, priceNote, coupons, onChange,
@@ -58,7 +58,7 @@ const EventPricingSection: React.FC<EventPricingSectionProps> = ({
             <DollarSign className="w-3.5 h-3.5 text-stone-400" />
             <input type="number" min={0} value={price || ''}
               onChange={e => onChange('price', Number(e.target.value))}
-              className="w-24 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm outline-none focus:border-primary-400 focus:ring-0 text-right"
+              className={`${inputCls} w-24 text-right`}
               placeholder="0" />
             <span className="text-[11px] font-medium text-stone-400">Bs</span>
           </div>

@@ -30,7 +30,7 @@ const Home: React.FC = () => {
 
   const {
     activeEvents, sortedActiveEvents, heroEvent, heroIndex,
-    setHeroIndex, viewedEvents, markEventViewed,
+    setHeroIndex, viewedEvents, markEventViewed, likedEvents,
   } = useHomeEvents(events, user?.id);
 
   const { trendingPlaces, trendingLoading } = useTrendingPlaces();
@@ -95,7 +95,7 @@ const Home: React.FC = () => {
         )}
 
         {sortedActiveEvents.length > 0 && (
-          <StoriesRow events={sortedActiveEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} />
+          <StoriesRow events={sortedActiveEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} likedEvents={likedEvents} />
         )}
 
         {heroEvent && (
