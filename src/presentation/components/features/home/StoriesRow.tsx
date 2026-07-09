@@ -11,7 +11,9 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
     transition={{ duration: 0.5, delay: 0.1 }}
     className="mb-6"
   >
-    <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2">
+    {/* pt-3: overflow-x-auto por sí solo también recorta el eje vertical (regla CSS de overflow
+        computado), así que sin este padding arriba el corazón que sobresale del círculo se corta */}
+    <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-4 px-4 pt-3 pb-2">
       {events?.map((event, i) => {
         const isViewed = viewedEvents?.has(event.id);
         return (
@@ -62,16 +64,20 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                 {/* Corazón: aparece solo si el usuario le dio me encanta a este evento */}
                 {likedEvents?.has(event.id) && (
                   <motion.div
-                    initial={{ scale: 0, opacity: 0, rotate: -20 }}
-                    animate={{ scale: [0, 1.35, 1], opacity: 1, rotate: 0 }}
-                    transition={{ duration: 0.55, delay: 0.15 * i, ease: 'easeOut' }}
-                    className="absolute -top-1.5 -right-1.5 z-20 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center ring-2 ring-white"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 480, damping: 16, delay: 0.15 * i }}
+                    className="absolute -top-1 -right-1 z-20 w-6 h-6 rounded-full bg-white shadow-md ring-2 ring-rose-100 flex items-center justify-center"
                   >
                     <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut', delay: 0.7 + 0.15 * i }}
+                      animate={{ scale: [1, 1.28, 1, 1.15, 1] }}
+                      transition={{
+                        duration: 1.6, times: [0, 0.18, 0.36, 0.54, 1],
+                        repeat: Infinity, repeatDelay: 0.9, ease: 'easeInOut',
+                        delay: 0.6 + 0.15 * i,
+                      }}
                     >
-                      <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
+                      <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
                     </motion.div>
                   </motion.div>
                 )}
