@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, MessageCircle, Bookmark, Share2, Send,
   MapPin, Clock, X, ChevronLeft, ChevronRight,
-  Loader2, Calendar,
+  Loader2, Calendar, Image as ImageIcon, Play,
 } from 'lucide-react';
+import { TikTokHeroEmbed } from '@presentation/components/reusables';
+import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@presentation/context';
 import { useEventFeed } from '@presentation/hooks/events/useEventFeed';
@@ -54,6 +56,8 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
   const images = [event.image, ...(event.gallery ?? [])].filter(Boolean) as string[];
   const dateStr = new Date(event.dateStart).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' });
   const timeStr = event.timeStart + (event.timeEnd ? ` – ${event.timeEnd}` : '');
+  const tiktokId = extractTikTokVideoId(event.socialLinks?.tiktok);
+  const [showVideo, setShowVideo] = useState(!!tiktokId);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -109,63 +113,78 @@ function EventPanel({ event, userId, onClose, onNext, onPrev, hasNext, hasPrev }
       {/* ── IMAGE PANEL ── */}
       <div className="relative w-full md:w-[58%] lg:w-[60%] h-full bg-black flex items-center justify-center overflow-hidden">
 
-        {/* Blurred background behind image (fills empty space — like Instagram stories) */}
-        {images.length > 0 && !imgError && (
-          <div
-            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-60 scale-110"
-            style={{ backgroundImage: `url(${images[imgIdx]})` }}
-          />
-        )}
-
-        {/* Progress bars */}
-        {images.length > 1 && (
-          <div className="absolute top-3 inset-x-3 flex gap-1 z-20">
-            {images.map((_, i) => (
-              <div key={i} className="flex-1 h-0.5 rounded-full bg-white/20 overflow-hidden">
-                <div className="h-full bg-white/75 rounded-full"
-                  style={{ width: i <= imgIdx ? '100%' : '0%', transition: 'width 0.3s' }} />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Image */}
-        {!imgLoaded && !imgError && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="w-8 h-8 border-2 border-white/10 border-t-amber-500 rounded-full animate-spin" />
-          </div>
-        )}
-        {images.length === 0 || imgError ? (
-          <div className="flex flex-col items-center gap-2 text-white/20 z-10">
-            <Calendar className="w-12 h-12" />
-            <p className="text-sm">{event.name}</p>
-          </div>
+        {showVideo && tiktokId ? (
+          <TikTokHeroEmbed videoId={tiktokId} videoUrl={event.socialLinks!.tiktok!} fallbackImageUrl={images[0]} />
         ) : (
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={imgIdx}
-              src={images[imgIdx]}
-              alt={event.name}
-              onLoad={() => setImgLoaded(true)}
-              onError={() => setImgError(true)}
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className={`relative z-10 w-full h-full object-contain transition-opacity drop-shadow-2xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-            />
-          </AnimatePresence>
+          <>
+            {/* Blurred background behind image (fills empty space — like Instagram stories) */}
+            {images.length > 0 && !imgError && (
+              <div
+                className="absolute inset-0 bg-cover bg-center blur-3xl opacity-60 scale-110"
+                style={{ backgroundImage: `url(${images[imgIdx]})` }}
+              />
+            )}
+
+            {/* Progress bars */}
+            {images.length > 1 && (
+              <div className="absolute top-3 inset-x-3 flex gap-1 z-20">
+                {images.map((_, i) => (
+                  <div key={i} className="flex-1 h-0.5 rounded-full bg-white/20 overflow-hidden">
+                    <div className="h-full bg-white/75 rounded-full"
+                      style={{ width: i <= imgIdx ? '100%' : '0%', transition: 'width 0.3s' }} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Image */}
+            {!imgLoaded && !imgError && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="w-8 h-8 border-2 border-white/10 border-t-amber-500 rounded-full animate-spin" />
+              </div>
+            )}
+            {images.length === 0 || imgError ? (
+              <div className="flex flex-col items-center gap-2 text-white/20 z-10">
+                <Calendar className="w-12 h-12" />
+                <p className="text-sm">{event.name}</p>
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={imgIdx}
+                  src={images[imgIdx]}
+                  alt={event.name}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgError(true)}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`relative z-10 w-full h-full object-contain transition-opacity drop-shadow-2xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                />
+              </AnimatePresence>
+            )}
+
+            {/* Gallery arrows */}
+            {images.length > 1 && imgIdx > 0 && (
+              <button onClick={e => { e.stopPropagation(); prevImg(); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
+            {images.length > 1 && imgIdx < images.length - 1 && (
+              <button onClick={e => { e.stopPropagation(); nextImg(); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </>
         )}
 
-        {/* Gallery arrows */}
-        {images.length > 1 && imgIdx > 0 && (
-          <button onClick={e => { e.stopPropagation(); prevImg(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-        )}
-        {images.length > 1 && imgIdx < images.length - 1 && (
-          <button onClick={e => { e.stopPropagation(); nextImg(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 text-white/80 hover:bg-black/70 flex items-center justify-center backdrop-blur-sm transition-all">
-            <ChevronRight className="w-4 h-4" />
+        {tiktokId && (
+          <button
+            onClick={e => { e.stopPropagation(); setShowVideo(v => !v); }}
+            className="absolute top-16 md:top-4 right-3 md:right-4 z-30 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-stone-700 shadow-md hover:bg-white transition-colors"
+          >
+            {showVideo ? <><ImageIcon className="w-3.5 h-3.5" /> Ver fotos</> : <><Play className="w-3.5 h-3.5" /> Ver video</>}
           </button>
         )}
 

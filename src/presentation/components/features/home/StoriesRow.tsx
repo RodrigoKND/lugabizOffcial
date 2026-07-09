@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { StoriesRowProps } from '@domain/entities/HomeTypes';
+import { TikTokBadge } from '@presentation/components/reusables';
+import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEvents }) => (
   <motion.div
@@ -68,6 +70,9 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold ${isViewed ? 'bg-stone-100 text-stone-400' : 'bg-primary-100 text-primary-500'}`}>
                       {event.name.charAt(0)}
                     </div>
+                  )}
+                  {extractTikTokVideoId(event.socialLinks?.tiktok) && (
+                    <TikTokBadge className="absolute bottom-0 right-0 w-5 h-5 ring-2 ring-white" />
                   )}
                 </div>
               </motion.div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Star } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { Place } from '@domain/entities';
-import { TikTokCardVideo } from '@presentation/components/reusables';
+import { TikTokBadge } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface PlaceCardProps {
@@ -22,19 +22,14 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' })
       onClick={onClick}
     >
       <header>
-        <div className="relative w-full h-48">
-          {tiktokId ? (
-            <TikTokCardVideo videoId={tiktokId} fallbackImageUrl={place?.image} className="rounded-md" />
-          ) : (
-            <img
-              loading="lazy"
-              src={place?.image}
-              alt={place?.name}
-              className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
-            />
-          )}
-        </div>
-        <div className="absolute top-4 right-4 flex flex-col space-y-2">
+        <img
+          loading="lazy"
+          src={place?.image}
+          alt={place?.name}
+          className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
+        />
+        <div className="absolute top-4 right-4 flex flex-col items-end space-y-2">
+          {tiktokId && <TikTokBadge />}
           {primarySocialGroup && (
             <div className={`px-3 py-1 rounded-full text-xs font-medium text-white flex items-center space-x-1`}
               style={{ backgroundColor: primarySocialGroup.color }}>
