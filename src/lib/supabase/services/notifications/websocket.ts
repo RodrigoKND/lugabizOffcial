@@ -1,6 +1,6 @@
 import { supabase } from '@lib/supabase';
 
-type RealtimeCallback = (payload: any) => void;
+type RealtimeCallback = (payload: Record<string, unknown>) => void;
 
 export const realtimeService = {
   subscribeToTable(table: string, callback: RealtimeCallback, filter?: string) {

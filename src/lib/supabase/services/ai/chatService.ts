@@ -82,7 +82,7 @@ export const chatService = {
   async loadHistory(): Promise<ChatMessage[]> {
     const { data } = await supabase.functions.invoke('ai-chat', { body: { action: 'load-history' } }).catch(() => ({ data: null }))
     if (!data?.messages) return []
-    return (data.messages as any[]).map(m => ({
+    return (data.messages as Record<string, unknown>[]).map(m => ({
       role:        m.role as 'user' | 'assistant',
       content:     m.content ?? '',
       timestamp:   new Date(m.ts ?? Date.now()),

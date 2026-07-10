@@ -12,7 +12,7 @@ function getLoginDismissed(): boolean {
   try { return localStorage.getItem(LS_LOGIN_KEY) === '1'; } catch { return false; }
 }
 function setLoginDismissed() {
-  try { localStorage.setItem(LS_LOGIN_KEY, '1'); } catch {}
+  try { localStorage.setItem(LS_LOGIN_KEY, '1'); } catch { /* intentional */ }
 }
 // Session-level flag: prevents the popup from re-showing after dismissal even if user
 // object is refreshed by auth events (e.g. token renewal) during the same session
@@ -20,7 +20,7 @@ function getSessionDone(): boolean {
   try { return sessionStorage.getItem(SS_DONE_KEY) === '1'; } catch { return false; }
 }
 function setSessionDone() {
-  try { sessionStorage.setItem(SS_DONE_KEY, '1'); } catch {}
+  try { sessionStorage.setItem(SS_DONE_KEY, '1'); } catch { /* intentional */ }
 }
 
 export function useOnboardingAlerts() {

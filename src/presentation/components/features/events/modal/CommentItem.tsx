@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { EventComment } from '@lib/supabase/services/events/eventComments';
 import { reportsService } from '@lib/supabase';
 import toast from 'react-hot-toast';
+import MentionText from './MentionText';
+import { REPORT_REASONS } from './reportReasons';
 
 export type ReplyTarget = { id: string; userName: string };
 
@@ -14,27 +16,6 @@ interface CommentItemProps {
   userId?: string;
   /** ID del comentario raíz (top-level). Todas las respuestas van a este hilo. */
   rootId?: string;
-}
-
-const REPORT_REASONS = [
-  'Comentario ofensivo',
-  'Spam',
-  'Información falsa',
-  'Contenido inapropiado',
-  'Otro',
-];
-
-function MentionText({ text }: { text: string }) {
-  const parts = text.split(/(@\w+)/g);
-  return (
-    <>
-      {parts.map((p, i) =>
-        p.startsWith('@')
-          ? <span key={i} className="font-bold text-amber-400">{p}</span>
-          : <span key={i}>{p}</span>,
-      )}
-    </>
-  );
 }
 
 export function CommentItem({ comment, onReply, depth = 0, userId, rootId }: CommentItemProps) {

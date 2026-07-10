@@ -5,45 +5,13 @@ import { useAuth } from '@presentation/context';
 import { ownerBusinessesService, ownerVerificationService, MAX_BUSINESSES, type OwnerBusiness } from '@lib/supabase';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
+import DocPicker from './DocPicker';
+import StatusBadge from './StatusBadge';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
-
-// Selector de un documento con vista previa (estilo de la app).
-const DocPicker: React.FC<{ label: string; hint: string; file: File | null; onSelect: (f: File | null) => void }> = ({ label, hint, file, onSelect }) => {
-  const ref = useRef<HTMLInputElement>(null);
-  const preview = file ? URL.createObjectURL(file) : null;
-  return (
-    <button type="button" onClick={() => ref.current?.click()}
-      className="w-full flex items-center gap-3 p-3 bg-primary-50/50 border border-primary-100 rounded-xl text-left hover:border-primary-300 transition-all">
-      <div className="w-11 h-11 rounded-lg bg-white border border-primary-100 flex items-center justify-center overflow-hidden shrink-0">
-        {preview ? <img src={preview} alt="" className="w-full h-full object-cover" /> : <FileCheck2 className="w-5 h-5 text-primary-400" />}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-text-primary truncate">{file ? file.name : label}</p>
-        <p className="text-[11px] text-text-secondary">{file ? 'Toca para cambiar' : hint}</p>
-      </div>
-      <input ref={ref} type="file" accept="image/*,application/pdf" className="hidden"
-        onChange={(e) => onSelect(e.target.files?.[0] ?? null)} />
-    </button>
-  );
-};
-
-// Insignia del estado de verificación de documentos de UN negocio.
-const StatusBadge: React.FC<{ status: OwnerBusiness['docsStatus'] }> = ({ status }) => {
-  if (status === 'approved') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold ring-1 ring-amber-200"><BadgeCheck className="w-3 h-3" /> Verificado</span>
-  );
-  if (status === 'pending') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold ring-1 ring-blue-200"><Clock className="w-3 h-3" /> En revisión</span>
-  );
-  if (status === 'rejected') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 rounded-full text-[10px] font-bold ring-1 ring-red-200"><AlertTriangle className="w-3 h-3" /> No aprobado</span>
-  );
-  return null;
-};
 
 const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { user, updateProfile } = useAuth();
@@ -96,7 +64,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
       // de subir sus documentos (puede saltarlo y hacerlo después).
       setVerifyTarget(created); setDocFiles([]); setView('verify');
       toast.success('Negocio registrado');
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? 'No se pudo registrar el negocio.');
     } finally {
       setBusy(false);
@@ -136,7 +104,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
       setList(prev => prev.map(b => b.id === verifyTarget.id ? { ...b, docsStatus: 'pending' } : b));
       toast.success('Documentos enviados a revisión');
       setView('list'); setVerifyTarget(null); setDocFiles([]);
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? 'No se pudieron enviar los documentos.');
     } finally {
       setBusy(false);

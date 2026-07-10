@@ -40,7 +40,7 @@ export function useEventDetail() {
           if (user?.id) {
             userActivityService.trackAction(user.id, 'view_event', {
               event: id,
-              category: (eventData as any).category?.name,
+              category: eventData.category?.name,
             }).catch(() => {});
           }
 

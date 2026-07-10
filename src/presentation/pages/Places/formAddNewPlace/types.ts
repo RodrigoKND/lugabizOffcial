@@ -1,5 +1,12 @@
 import type { SocialLinks } from '@domain/entities';
 
+interface DiscountInfo {
+  hasDiscount: boolean;
+  description?: string;
+  code?: string;
+  percentage?: number;
+}
+
 export interface PlaceFormData {
   name: string;
   description: string;
@@ -7,7 +14,7 @@ export interface PlaceFormData {
   category: string;
   socialGroups: string[];
   amenities: string[];
-  discountInfo: any;
+  discountInfo: DiscountInfo | undefined;
   socialLinks: SocialLinks;
   latitude: number | undefined;
   longitude: number | undefined;

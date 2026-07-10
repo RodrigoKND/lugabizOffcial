@@ -39,7 +39,7 @@ export const adminService = {
 
     const stats = { users: 0, places: 0, events: 0, reviews: 0, surveys: 0, notifications: 0 };
     (data || []).forEach((row: { name: string; count: number }) => {
-      if (row.name in stats) (stats as any)[row.name] = row.count;
+      if (row.name in stats) (stats as Record<string, number>)[row.name] = row.count;
     });
     return stats;
   },
@@ -143,15 +143,15 @@ export const adminService = {
       .limit(200);
 
     if (error) throw error;
-    return (data || []).map((p: any) => ({
+    return (data || []).map((p: Record<string, unknown>) => ({
       id: p.id,
       name: p.name,
       description: p.description,
       image: p.image,
       author_id: p.author_id,
       created_at: p.created_at,
-      user_name: p.author?.name || 'Usuario',
-      user_avatar: p.author?.avatar,
+      user_name: (p.author as Record<string, unknown> | undefined)?.name as string || 'Usuario',
+      user_avatar: (p.author as Record<string, unknown> | undefined)?.avatar,
     }));
   },
 
@@ -163,12 +163,12 @@ export const adminService = {
       .limit(200);
 
     if (error) throw error;
-    return (data || []).map((p: any) => ({
+    return (data || []).map((p: Record<string, unknown>) => ({
       id: p.id,
-      name: p.name,
+      name: p.name as string,
       author_id: p.user_id,
       created_at: p.created_at,
-      user_name: p.author?.name || 'Usuario',
+      user_name: (p.author as Record<string, unknown> | undefined)?.name as string || 'Usuario',
     }));
   },
 
@@ -195,7 +195,7 @@ export const adminService = {
       .in('target_id', ids.length > 0 ? ids : ['none'])
       .eq('target_type', 'review');
 
-    const reportMap = new Map((reportCounts || []).map((r: any) => [r.target_id, Number(r.count) || 0]));
+    const reportMap = new Map((reportCounts || []).map((r: Record<string, unknown>) => [r.target_id, Number(r.count) || 0]));
 
     return reviews.map(r => ({ ...r, report_count: reportMap.get(r.id) || 0 }));
   },
@@ -273,10 +273,10 @@ export const adminService = {
 
     const recentAuthorIds = new Set<string>();
     if (recentPlacesRes.status === 'fulfilled') {
-      (recentPlacesRes.value.data || []).forEach((r: any) => recentAuthorIds.add(r.author_id));
+      (recentPlacesRes.value.data || []).forEach((r: Record<string, unknown>) => recentAuthorIds.add(r.author_id as string));
     }
     if (recentEventsRes.status === 'fulfilled') {
-      (recentEventsRes.value.data || []).forEach((r: any) => recentAuthorIds.add(r.user_id));
+      (recentEventsRes.value.data || []).forEach((r: Record<string, unknown>) => recentAuthorIds.add(r.user_id as string));
     }
     const activeOwners = Math.min(owners, recentAuthorIds.size);
 
@@ -312,20 +312,20 @@ export const adminService = {
     };
 
     if (usersRes.status === 'fulfilled') {
-      (usersRes.value.data || []).forEach((r: any) => {
-        const k = bucket(r.created_at);
+      (usersRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const k = bucket(r.created_at as string);
         if (months[k]) months[k].users++;
       });
     }
     if (placesRes.status === 'fulfilled') {
-      (placesRes.value.data || []).forEach((r: any) => {
-        const k = bucket(r.created_at);
+      (placesRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const k = bucket(r.created_at as string);
         if (months[k]) months[k].places++;
       });
     }
     if (eventsRes.status === 'fulfilled') {
-      (eventsRes.value.data || []).forEach((r: any) => {
-        const k = bucket(r.created_at);
+      (eventsRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const k = bucket(r.created_at as string);
         if (months[k]) months[k].events++;
       });
     }
@@ -342,19 +342,19 @@ export const adminService = {
     const dist: Record<string, { name: string; color: string; places: number; events: number }> = {};
 
     if (placesRes.status === 'fulfilled') {
-      (placesRes.value.data || []).forEach((r: any) => {
-        const cat = r.category;
+      (placesRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const cat = r.category as Record<string, unknown> | undefined;
         if (!cat?.id) return;
-        if (!dist[cat.id]) dist[cat.id] = { name: cat.name, color: cat.color || '#f59e0b', places: 0, events: 0 };
-        dist[cat.id].places++;
+        if (!dist[cat.id as string]) dist[cat.id as string] = { name: cat.name as string, color: (cat.color as string) || '#f59e0b', places: 0, events: 0 };
+        dist[cat.id as string].places++;
       });
     }
     if (eventsRes.status === 'fulfilled') {
-      (eventsRes.value.data || []).forEach((r: any) => {
-        const cat = r.category;
+      (eventsRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const cat = r.category as Record<string, unknown> | undefined;
         if (!cat?.id) return;
-        if (!dist[cat.id]) dist[cat.id] = { name: cat.name, color: cat.color || '#f59e0b', places: 0, events: 0 };
-        dist[cat.id].events++;
+        if (!dist[cat.id as string]) dist[cat.id as string] = { name: cat.name as string, color: (cat.color as string) || '#f59e0b', places: 0, events: 0 };
+        dist[cat.id as string].events++;
       });
     }
 
@@ -373,11 +373,11 @@ export const adminService = {
     if (error) return [];
 
     const dist: Record<string, { name: string; color: string; places: number }> = {};
-    (data || []).forEach((r: any) => {
-      const sg = r.social_group;
+    (data || []).forEach((r: Record<string, unknown>) => {
+      const sg = r.social_group as Record<string, unknown> | undefined;
       if (!sg?.id) return;
-      if (!dist[sg.id]) dist[sg.id] = { name: sg.name, color: sg.color || '#8b5cf6', places: 0 };
-      dist[sg.id].places++;
+      if (!dist[sg.id as string]) dist[sg.id as string] = { name: sg.name as string, color: (sg.color as string) || '#8b5cf6', places: 0 };
+      dist[sg.id as string].places++;
     });
 
     return Object.values(dist)
@@ -404,7 +404,7 @@ export const adminService = {
       .limit(30);
 
     if (!ownerRoles?.length) return [];
-    const ownerIds = ownerRoles.map((r: any) => r.user_id);
+    const ownerIds = ownerRoles.map((r: Record<string, unknown>) => r.user_id as string);
 
     const [placesRes, eventsRes, activityRes] = await Promise.allSettled([
       supabase.from('places').select('author_id, created_at').in('author_id', ownerIds),
@@ -419,33 +419,35 @@ export const adminService = {
     const placesByOwner: Record<string, number> = {};
     const recentPlace: Record<string, boolean> = {};
     if (placesRes.status === 'fulfilled') {
-      (placesRes.value.data || []).forEach((r: any) => {
-        placesByOwner[r.author_id] = (placesByOwner[r.author_id] || 0) + 1;
-        if (r.created_at >= thirtyDaysAgo) recentPlace[r.author_id] = true;
+      (placesRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const aid = r.author_id as string;
+        placesByOwner[aid] = (placesByOwner[aid] || 0) + 1;
+        if ((r.created_at as string) >= thirtyDaysAgo) recentPlace[aid] = true;
       });
     }
 
     const eventsByOwner: Record<string, number> = {};
     const recentEvent: Record<string, boolean> = {};
     if (eventsRes.status === 'fulfilled') {
-      (eventsRes.value.data || []).forEach((r: any) => {
-        eventsByOwner[r.user_id] = (eventsByOwner[r.user_id] || 0) + 1;
-        if (r.created_at >= thirtyDaysAgo) recentEvent[r.user_id] = true;
+      (eventsRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        const uid = r.user_id as string;
+        eventsByOwner[uid] = (eventsByOwner[uid] || 0) + 1;
+        if ((r.created_at as string) >= thirtyDaysAgo) recentEvent[uid] = true;
       });
     }
 
     const lastActivity: Record<string, string> = {};
     if (activityRes.status === 'fulfilled') {
       // RPC returns { user_id, last_activity }[]
-      (activityRes.value.data || []).forEach((r: any) => {
-        lastActivity[r.user_id] = r.last_activity;
+      (activityRes.value.data || []).forEach((r: Record<string, unknown>) => {
+        lastActivity[r.user_id as string] = r.last_activity as string;
       });
     }
 
     return ownerRoles
-      .map((r: any) => {
-        const uid = r.user_id;
-        const user = r.user || {};
+      .map((r: Record<string, unknown>) => {
+        const uid = r.user_id as string;
+        const user = (r.user as Record<string, unknown>) || {};
         return {
           userId: uid,
           name: user.name || 'Dueño',

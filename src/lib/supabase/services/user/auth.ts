@@ -77,7 +77,7 @@ export const authService = {
   },
 
   async updateUserProfile(userId: string, updates: Partial<Pick<User, 'name' | 'avatar' | 'phone' | 'bio' | 'isOwner' | 'ownerBusinessName'>>) {
-    const dbUpdates: any = { updated_at: new Date().toISOString() };
+    const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.avatar !== undefined) dbUpdates.avatar = updates.avatar;
     if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
@@ -157,7 +157,7 @@ export const authService = {
       .eq('id', userId);
   },
 
-  transformUserData(data: any): User {
+  transformUserData(data: Record<string, unknown>): User {
     return {
       id: data.id,
       name: data.name,

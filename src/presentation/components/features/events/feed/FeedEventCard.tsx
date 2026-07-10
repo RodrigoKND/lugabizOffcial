@@ -13,7 +13,7 @@ export function FeedEventCard({ event, isActive, onPrev, onNext, onCommentOpen, 
   const dragY = useRef(0);
   const tiktokId = extractTikTokVideoId(event.socialLinks?.tiktok);
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
     const threshold = 80;
     if (info.offset.y < -threshold) {
       onNext();

@@ -12,7 +12,7 @@ const MapPicker = lazy(() => import('@presentation/components/features/events/fo
 
 interface LocationStepProps {
   formData: PlaceFormData;
-  handleInputChange: (e: any) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   errors: ValidationErrors;
   touched: Record<string, boolean>;
   handleBlur: (field: string) => void;
@@ -41,7 +41,7 @@ const LocationStep: React.FC<LocationStepProps> = ({
       const addr = await reverseGeocode(lat, lng)
       if (addr) {
         // Dispatch a synthetic event to update the address field
-        handleInputChange({ target: { name: 'address', value: addr } } as any)
+        handleInputChange({ target: { name: 'address', value: addr } } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>)
       }
     }, 600)
   }, [handleCoordsChange, handleInputChange])
@@ -54,7 +54,7 @@ const LocationStep: React.FC<LocationStepProps> = ({
           <label className="text-xs font-semibold text-stone-500 uppercase">Dirección</label>
           <AddressAutocomplete
             value={formData.address}
-            onChange={(val) => handleInputChange({ target: { name: 'address', value: val } } as any)}
+            onChange={(val) => handleInputChange({ target: { name: 'address', value: val } } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>)}
             onSelect={handleAddressSelect}
             onBlur={() => handleBlur('address')}
             placeholder="Calle, número, ciudad..."

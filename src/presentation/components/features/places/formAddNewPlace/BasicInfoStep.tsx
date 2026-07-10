@@ -36,7 +36,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     const result = await generateDescription(formData.name, catName, 'place')
     setGenLoading(false)
     if (result.description) {
-      handleInputChange({ target: { name: 'description', value: result.description } } as any)
+      handleInputChange({ target: { name: 'description', value: result.description } } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>)
       setCooldown(10)
       const timer = setInterval(() => setCooldown(prev => { if (prev <= 1) { clearInterval(timer); return 0 }; return prev - 1 }), 1000)
     } else {

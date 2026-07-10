@@ -154,7 +154,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
       setReplyText('');
       setReplyingTo(null);
       toast.success('Respuesta publicada');
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err?.message === 'Usuario suspendido' ? 'Tu cuenta ha sido suspendida' : 'Error al responder');
     }
     setSendingReply(false);

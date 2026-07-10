@@ -44,7 +44,7 @@ export function usePlaceForm(setFormData: React.Dispatch<React.SetStateAction<Pl
     setFormData(prev => ({ ...prev, amenities }));
   }, [setFormData]);
 
-  const handleDiscountChange = useCallback((discountInfo: any) => {
+  const handleDiscountChange = useCallback((discountInfo: Record<string, unknown>) => {
     setFormData(prev => ({ ...prev, discountInfo }));
   }, [setFormData]);
 

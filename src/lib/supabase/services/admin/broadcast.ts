@@ -49,8 +49,8 @@ export const broadcastService = {
       body: { action: 'preview', audience, userIds },
     });
     if (error) throw new Error(error.message ?? 'No se pudo calcular la audiencia.');
-    if ((data as any)?.error) throw new Error((data as any).error);
-    return { total: (data as any).total ?? 0 };
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    return { total: ((data as Record<string, unknown>).total as number) ?? 0 };
   },
 
   /** Envía la campaña por campana + push del navegador. Devuelve el resumen. */
@@ -59,14 +59,14 @@ export const broadcastService = {
       body: { action: 'send', ...campaign },
     });
     if (error) throw new Error(error.message ?? 'No se pudo enviar la campaña.');
-    if ((data as any)?.error) throw new Error((data as any).error);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
     return {
-      recipients: (data as any).recipients ?? 0,
-      inApp: (data as any).inApp ?? 0,
-      pushSent: (data as any).pushSent ?? 0,
-      push: (data as any).push,
-      fcmSent: (data as any).fcmSent ?? 0,
-      fcm: (data as any).fcm,
+      recipients: ((data as Record<string, unknown>).recipients as number) ?? 0,
+      inApp: ((data as Record<string, unknown>).inApp as number) ?? 0,
+      pushSent: ((data as Record<string, unknown>).pushSent as number) ?? 0,
+      push: (data as Record<string, unknown>).push as BroadcastPush | undefined,
+      fcmSent: ((data as Record<string, unknown>).fcmSent as number) ?? 0,
+      fcm: (data as Record<string, unknown>).fcm as BroadcastFcm | undefined,
     };
   },
 };

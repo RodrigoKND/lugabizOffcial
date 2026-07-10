@@ -34,7 +34,7 @@ async function autoBanIfNeeded(userId: string, reporterId: string, threshold: nu
     data: { reason: banReason, report_threshold: threshold, banned_at: bannedAt, source: 'community_reports' },
     user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'system',
     session_id: crypto.randomUUID(),
-  }).catch(() => {});
+  });
 }
 
 export async function createReport(data: CreateReportData): Promise<void> {
@@ -135,79 +135,128 @@ export async function hasUserReported(targetType: string, targetId: string, user
   return !!data;
 }
 
-export async function getFlaggedContent(minReports: number = REPORT_THRESHOLD): Promise<FlaggedContent[]> {
-  const { data: reviewReports, error: reviewError } = await supabase
+async function fetchReportsByType(targetType: string): Promise<Array<{ target_id: string; target_type: string; reason: string }>> {
+  const { data, error } = await supabase
     .from('reports')
     .select('target_id, target_type, reason')
-    .eq('target_type', 'review');
+    .eq('target_type', targetType);
+  if (error) throw error;
+  return data || [];
+}
 
-  if (reviewError) throw reviewError;
-
-  const { data: commentReports, error: commentError } = await supabase
-    .from('reports')
-    .select('target_id, target_type, reason')
-    .eq('target_type', 'event_comment');
-
-  if (commentError) throw commentError;
-
-  const allReports = [...(reviewReports || []), ...(commentReports || [])];
-  const grouped = new Map<string, { targetType: string; reasons: string[]; count: number }>();
-
-  for (const r of allReports) {
+function groupReports(
+  reports: Array<{ target_id: string; target_type: string; reason: string }>,
+): Map<string, { targetId: string; targetType: string; count: number; reasons: string[] }> {
+  const grouped = new Map<string, { targetId: string; targetType: string; count: number; reasons: string[] }>();
+  for (const r of reports) {
     const key = `${r.target_type}:${r.target_id}`;
     const existing = grouped.get(key);
     if (existing) {
       existing.count += 1;
       existing.reasons.push(r.reason);
     } else {
-      grouped.set(key, { targetType: r.target_type, count: 1, reasons: [r.reason] });
+      grouped.set(key, {
+        targetId: r.target_id,
+        targetType: r.target_type,
+        count: 1,
+        reasons: [r.reason],
+      });
     }
   }
+  return grouped;
+}
 
-  const result: FlaggedContent[] = [];
+function filterFlagged(
+  grouped: Map<string, { targetId: string; targetType: string; count: number; reasons: string[] }>,
+  minReports: number,
+): Array<{ targetId: string; targetType: string; count: number; reasons: string[] }> {
+  return [...grouped.values()].filter(g => g.count >= minReports);
+}
 
-  for (const [key, data] of grouped) {
-    if (data.count < minReports) continue;
-    const [, targetId] = key.split(':');
+async function fetchReviewDetails(
+  flagged: Array<{ targetId: string; targetType: string; count: number; reasons: string[] }>,
+): Promise<FlaggedContent[]> {
+  const targetIds = flagged.filter(r => r.targetType === 'review').map(r => r.targetId);
+  if (targetIds.length === 0) return [];
 
-    if (data.targetType === 'review') {
-      const { data: review } = await supabase
-        .from('reviews')
-        .select('comment, user_id, user:users(name)')
-        .eq('id', targetId)
-        .maybeSingle();
-      if (review) {
-        result.push({
-          targetId,
-          targetType: 'review',
-          reportCount: data.count,
-          content: review.comment,
-          authorId: review.user_id,
-          authorName: review.user?.name || 'Usuario',
-          latestReason: data.reasons[data.reasons.length - 1],
-        });
-      }
-    } else {
-      const { data: comment } = await supabase
-        .from('event_comments')
-        .select('text, user_id, user:users(name)')
-        .eq('id', targetId)
-        .maybeSingle();
-      if (comment) {
-        result.push({
-          targetId,
-          targetType: 'event_comment',
-          reportCount: data.count,
-          content: comment.text,
-          authorId: comment.user_id,
-          authorName: comment.user?.name || 'Usuario',
-          latestReason: data.reasons[data.reasons.length - 1],
-        });
-      }
-    }
-  }
+  const { data: reviews, error } = await supabase
+    .from('reviews')
+    .select('id, comment, user_id, user:users(name)')
+    .in('id', targetIds);
 
-  return result.sort((a, b) => b.reportCount - a.reportCount);
+  if (error) throw error;
+  if (!reviews) return [];
+
+  const reviewMap = new Map(reviews.map(r => [r.id, r]));
+
+  return flagged
+    .filter(r => r.targetType === 'review')
+    .map(r => {
+      const review = reviewMap.get(r.targetId);
+      if (!review) return null;
+      return {
+        targetId: r.targetId,
+        targetType: 'review' as const,
+        reportCount: r.count,
+        content: review.comment,
+        authorId: review.user_id,
+        authorName: review.user?.name || 'Usuario',
+        latestReason: r.reasons[r.reasons.length - 1],
+      };
+    })
+    .filter((v): v is FlaggedContent => v !== null);
+}
+
+async function fetchEventCommentDetails(
+  flagged: Array<{ targetId: string; targetType: string; count: number; reasons: string[] }>,
+): Promise<FlaggedContent[]> {
+  const targetIds = flagged.filter(r => r.targetType === 'event_comment').map(r => r.targetId);
+  if (targetIds.length === 0) return [];
+
+  const { data: comments, error } = await supabase
+    .from('event_comments')
+    .select('id, text, user_id, user:users(name)')
+    .in('id', targetIds);
+
+  if (error) throw error;
+  if (!comments) return [];
+
+  const commentMap = new Map(comments.map(c => [c.id, c]));
+
+  return flagged
+    .filter(r => r.targetType === 'event_comment')
+    .map(r => {
+      const comment = commentMap.get(r.targetId);
+      if (!comment) return null;
+      return {
+        targetId: r.targetId,
+        targetType: 'event_comment' as const,
+        reportCount: r.count,
+        content: comment.text,
+        authorId: comment.user_id,
+        authorName: comment.user?.name || 'Usuario',
+        latestReason: r.reasons[r.reasons.length - 1],
+      };
+    })
+    .filter((v): v is FlaggedContent => v !== null);
+}
+
+export async function getFlaggedContent(minReports: number = REPORT_THRESHOLD): Promise<FlaggedContent[]> {
+  const [reviewReports, commentReports] = await Promise.all([
+    fetchReportsByType('review'),
+    fetchReportsByType('event_comment'),
+  ]);
+
+  const allReports = [...reviewReports, ...commentReports];
+  const grouped = groupReports(allReports);
+  const flagged = filterFlagged(grouped, minReports);
+
+  const [reviews, comments] = await Promise.all([
+    fetchReviewDetails(flagged),
+    fetchEventCommentDetails(flagged),
+  ]);
+
+  return [...reviews, ...comments].sort((a, b) => b.reportCount - a.reportCount);
 }
 
 export { REPORT_THRESHOLD };

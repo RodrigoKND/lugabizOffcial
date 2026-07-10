@@ -8,7 +8,7 @@ function getStorage(key: string): string | null {
 }
 
 function setStorage(key: string, value: string) {
-  try { localStorage.setItem(key, value) } catch {}
+  try { localStorage.setItem(key, value) } catch { /* intentional */ }
 }
 
 let currentUserId: string | null = null
@@ -44,7 +44,7 @@ async function flushPendingActions() {
     await Promise.allSettled(
       batch.map(p => userActivityService.trackAction(currentUserId!, p.action, p.data))
     )
-  } catch {}
+  } catch (err) { console.error('[tracking:flushPendingActions]', err); }
 }
 
 export const tracking = {
@@ -72,7 +72,7 @@ export const tracking = {
       if (pendingActions.length >= 10) {
         await flushPendingActions()
       }
-    } catch {}
+    } catch (err) { console.error('[tracking:trackAction]', err); }
   },
 
   trackPageView(page?: string) {

@@ -5,7 +5,7 @@ import { usePlaces, useAuth } from '@presentation/context';
 import { placesService, placeSharesService, reviewsService } from '@lib/supabase';
 import { realtimeService } from '@lib/supabase/services/notifications/websocket';
 import { userActivityService } from '@lib/supabase/services/places/userActivity';
-import { Place, Review } from '@domain/entities';
+import { Place, Review, SocialGroup } from '@domain/entities';
 
 export function usePlaceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +33,7 @@ export function usePlaceDetail() {
           place: id,
           placeName: found.name,
           category: found.category?.name,
-          socialGroups: (found.socialGroups ?? []).map((sg: any) => sg.name),
+          socialGroups: (found.socialGroups ?? []).map((sg: SocialGroup) => sg.name),
         }).catch(() => {});
       }
       return;
@@ -47,7 +47,7 @@ export function usePlaceDetail() {
             place: id,
             placeName: p.name,
             category: p.category?.name,
-            socialGroups: (p.socialGroups ?? []).map((sg: any) => sg.name),
+            socialGroups: (p.socialGroups ?? []).map((sg: SocialGroup) => sg.name),
           }).catch(() => {});
         }
       })
@@ -65,7 +65,7 @@ export function usePlaceDetail() {
         setReviews(data);
       }
       setHasMoreReviews(data.length === REVIEWS_PER_PAGE);
-    } catch {}
+    } catch (err) { console.error('[usePlaceDetail:loadReviews]', err); }
   }, [id]);
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export function usePlaceDetail() {
         await navigator.clipboard.writeText(shareUrl);
         toast.success('Enlace de invitación copiado!');
       }
-    } catch (err: any) {
+    } catch (err) {
       if (err?.name !== 'AbortError') {
         toast.error('Error al compartir');
       }

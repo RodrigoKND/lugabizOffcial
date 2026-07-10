@@ -29,7 +29,7 @@ export interface PendingVerification extends OwnerVerification {
   docUrls: string[]; // URLs firmadas de corta duración (solo admin)
 }
 
-function mapRow(r: any): OwnerVerification {
+function mapRow(r: Record<string, unknown>): OwnerVerification {
   return {
     id: r.id,
     userId: r.user_id,
@@ -94,12 +94,12 @@ export const ownerVerificationService = {
       },
     });
     if (error) throw new Error(error.message ?? 'No se pudo analizar la verificación.');
-    if ((data as any)?.error) throw new Error((data as any).error);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
     return {
-      verdict: (data as any).verdict,
-      message: (data as any).message,
-      extracted: (data as any).extracted ?? {},
-      aiScore: (data as any).aiScore ?? null,
+      verdict: (data as Record<string, unknown>).verdict as IdentityPrecheck['verdict'],
+      message: (data as Record<string, unknown>).message as string,
+      extracted: ((data as Record<string, unknown>).extracted ?? {}) as Record<string, unknown>,
+      aiScore: (data as Record<string, unknown>).aiScore as number | null,
       docPaths,
     };
   },
@@ -124,8 +124,8 @@ export const ownerVerificationService = {
       },
     });
     if (error) throw new Error(error.message ?? 'No se pudo enviar la verificación.');
-    if ((data as any)?.error) throw new Error((data as any).error);
-    return mapRow((data as any).verification);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    return mapRow((data as Record<string, unknown>).verification as Record<string, unknown>);
   },
 
   /** Envía documentos de negocio (NIT/SEPREC/licencia) de UN negocio concreto para su insignia dorada. */
@@ -141,8 +141,8 @@ export const ownerVerificationService = {
       body: { action: 'submit-business-docs', businessId: params.businessId, businessName: params.businessName, docPaths },
     });
     if (error) throw new Error(error.message ?? 'No se pudieron enviar los documentos.');
-    if ((data as any)?.error) throw new Error((data as any).error);
-    return mapRow((data as any).verification);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    return mapRow((data as Record<string, unknown>).verification as Record<string, unknown>);
   },
 
   /** Descarta el borrador de identidad en el servidor (al reintentar fotos). */
@@ -169,8 +169,8 @@ export const ownerVerificationService = {
       body: { action: 'admin-list' },
     });
     if (error) throw new Error(error.message ?? 'No se pudo cargar la cola.');
-    if ((data as any)?.error) throw new Error((data as any).error);
-    return ((data as any).pending || []).map((r: any) => ({
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    return (((data as Record<string, unknown>).pending as Record<string, unknown>[]) || []).map((r: Record<string, unknown>) => ({
       ...mapRow(r),
       userName: r.user_name,
       userEmail: r.user_email,
@@ -185,7 +185,7 @@ export const ownerVerificationService = {
       body: { action: decision === 'approve' ? 'admin-approve' : 'admin-reject', verificationId, notes },
     });
     if (error) throw new Error(error.message ?? 'No se pudo procesar la decisión.');
-    if ((data as any)?.error) throw new Error((data as any).error);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
   },
 
   /**
@@ -198,6 +198,6 @@ export const ownerVerificationService = {
       body: { action: 'admin-revoke', ...params },
     });
     if (error) throw new Error(error.message ?? 'No se pudo retirar la insignia.');
-    if ((data as any)?.error) throw new Error((data as any).error);
+    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
   },
 };

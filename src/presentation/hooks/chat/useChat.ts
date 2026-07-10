@@ -46,7 +46,7 @@ export function useChat(isOpen: boolean) {
               reject, { enableHighAccuracy: true, timeout: 6000 },
             )
           ).then(c => { coordsRef.current = c; return c })
-        } catch {}
+        } catch (err) { console.error('[useChat:geolocation]', err); }
       }
       try {
         const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
@@ -54,7 +54,7 @@ export function useChat(isOpen: boolean) {
           const d = await r.json()
           if (d.latitude && !d.error) { const c = { lat: +d.latitude, lng: +d.longitude }; coordsRef.current = c; return c }
         }
-      } catch {}
+      } catch (err) { console.error('[useChat:ipGeolocation]', err); }
       return null
     })()
   }, [])
@@ -71,7 +71,7 @@ export function useChat(isOpen: boolean) {
     })()
       .then(r => {
         setIdeas(r.ideas); setCity(r.city); setWeather(r.weather); setTimeLabel(r.timeLabel)
-        try { if (r.city !== 'tu ciudad') localStorage.setItem('_lugabiz_city', r.city) } catch {}
+        try { if (r.city !== 'tu ciudad') localStorage.setItem('_lugabiz_city', r.city) } catch { /* intentional */ }
       })
       .catch(() => {})
       .finally(() => setIdeasLoading(false))

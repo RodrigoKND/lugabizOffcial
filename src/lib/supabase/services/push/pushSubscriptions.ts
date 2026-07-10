@@ -1,5 +1,13 @@
 import { supabase } from '@lib/supabase/client';
 
+interface PushSubscriptionRow {
+  id: string;
+  user_id: string;
+  endpoint: string;
+  subscription: Record<string, unknown>;
+  created_at: string;
+}
+
 export const pushSubscriptionsService = {
   async save(userId: string, subscription: PushSubscription): Promise<void> {
     // Upsert por endpoint: permite múltiples dispositivos por usuario.
@@ -13,7 +21,7 @@ export const pushSubscriptionsService = {
     if (error) throw error;
   },
 
-  async getByUserIds(userIds: string[]): Promise<any[]> {
+  async getByUserIds(userIds: string[]): Promise<PushSubscriptionRow[]> {
     if (userIds.length === 0) return [];
     const { data, error } = await supabase
       .from('push_subscriptions')

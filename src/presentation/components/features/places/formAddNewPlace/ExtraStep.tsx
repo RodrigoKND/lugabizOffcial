@@ -5,10 +5,17 @@ import { AmenitySelector } from '@presentation/components/features';
 import { CollapsibleSection, DiscountSection, SocialLinksSection } from '@presentation/components/reusables';
 import type { SocialLinks } from '@domain/entities';
 
+interface DiscountInfo {
+  hasDiscount: boolean;
+  description?: string;
+  code?: string;
+  percentage?: number;
+}
+
 interface ExtraStepProps {
-  formData: { amenities: string[]; discountInfo: any; socialLinks: SocialLinks };
+  formData: { amenities: string[]; discountInfo: DiscountInfo | undefined; socialLinks: SocialLinks };
   handleAmenitiesChange: (amenities: string[]) => void;
-  handleDiscountChange: (discountInfo: any) => void;
+  handleDiscountChange: (discountInfo: DiscountInfo) => void;
   handleSocialLinksChange: (socialLinks: SocialLinks) => void;
   isValid: boolean;
   isSubmitting: boolean;

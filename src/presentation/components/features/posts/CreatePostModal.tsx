@@ -119,7 +119,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
         toast.success('¡Post publicado!');
         handleClose();
       }
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err?.message || 'Error al publicar');
     } finally {
       setLoading(false);

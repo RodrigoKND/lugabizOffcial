@@ -27,7 +27,7 @@ function updateStatus(updatedAt?: Date) {
 const BusinessSearchCard: React.FC<BusinessSearchCardProps> = ({ place, reportCount = 0 }) => {
   const location = useLocation();
   const rep = reputationLabel(place.rating, reportCount);
-  const status = updateStatus((place as any).updatedAt);
+  const status = updateStatus((place as Place & { updatedAt?: Date }).updatedAt);
 
   return (
     <Link

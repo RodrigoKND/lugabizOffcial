@@ -9,7 +9,7 @@ interface Props {
   errors: ValidationErrors;
   touched: Record<string, boolean>;
   categories: { id: string; name: string }[];
-  onChange: (field: string, value: any) => void;
+  onChange: (field: string, value: string | number | boolean | string[]) => void;
   onBlur: (field: string) => void;
 }
 

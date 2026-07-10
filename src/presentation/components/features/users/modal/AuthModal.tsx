@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useAuthModal } from '@presentation/hooks/auth/useAuthModal';
-import { AuthModalProps } from './AuthModal.types';
+import type { AuthModalProps } from '@domain/entities/props/AuthProps';
 import AuthModalHeader from './AuthModalHeader';
 import SocialLogin from './SocialLogin';
 import LoginForm from './LoginForm';

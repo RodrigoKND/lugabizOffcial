@@ -56,7 +56,7 @@ export async function searchPlaces(
       .from('place_social_groups')
       .select('place_id')
       .eq('social_group_id', filters.socialGroupId);
-    const ids = (placeIds || []).map((r: any) => r.place_id);
+    const ids = (placeIds || []).map((r: Record<string, unknown>) => r.place_id as string);
     if (ids.length === 0) return { data: [], total: 0, hasMore: false };
     query = query.in('id', ids);
   }

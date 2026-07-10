@@ -49,7 +49,7 @@ export async function getModerationLogs(): Promise<ModerationLog[]> {
 
   if (error || !data) return [];
 
-  return data.map((row: any) => ({
+  return data.map((row: Record<string, unknown>) => ({
     id: row.id,
     userId: row.user_id,
     userName: row.user_name,

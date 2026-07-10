@@ -14,6 +14,8 @@ export default defineConfig({
       '@presentation': path.resolve(__dirname, './src/presentation'),
       '@constants': path.resolve(__dirname, './src/constants'),
       '@application': path.resolve(__dirname, './src/application'),
+      '@icons': path.resolve(__dirname, './src/icons'),
+      '@errors': path.resolve(__dirname, './src/lib/errors'),
     },
   },
   build: {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { marketSurveysService } from '@lib/supabase';
-import { MarketSurvey } from '@domain/entities';
+import { MarketSurvey, SurveyNotification } from '@domain/entities';
 import { useAuth } from '@presentation/context';
 
 export function useUnreadSurveys() {
@@ -31,8 +31,8 @@ export function usePendingsurveys() {
     if (!user) { setSurveys([]); setLoading(false); return; }
     try {
       const notifications = await marketSurveysService.getNotificationsForUser(user.id);
-      const unread = notifications.filter((n: any) => !n.read);
-      const surveyIds = [...new Set(unread.map((n: any) => n.survey_id))];
+      const unread = notifications.filter((n: SurveyNotification) => !n.read);
+      const surveyIds = [...new Set(unread.map((n: SurveyNotification) => n.surveyId))];
       const result: MarketSurvey[] = [];
       for (const sid of surveyIds) {
         const s = await marketSurveysService.getById(sid);

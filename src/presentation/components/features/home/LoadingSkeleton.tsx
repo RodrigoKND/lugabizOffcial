@@ -1,6 +1,4 @@
-const Pulse = ({ className }: { className: string }) => (
-  <div className={`animate-pulse rounded-xl bg-white/6 ${className}`} />
-);
+import Pulse from './Pulse';
 
 const LoadingSkeleton: React.FC = () => (
   <div className="space-y-8 mt-2">

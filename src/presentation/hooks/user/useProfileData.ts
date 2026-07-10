@@ -18,7 +18,7 @@ export function useProfileData() {
     try {
       const surveys = await marketSurveysService.getByUser(user.id);
       setMySurveys(surveys);
-    } catch {}
+    } catch (err) { console.error('[useProfileData:refreshSurveys]', err); }
   };
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function useProfileData() {
       try {
         const surveys = await marketSurveysService.getByUser(user.id);
         setMySurveys(surveys);
-      } catch {}
+      } catch (err) { console.error('[useProfileData:init]', err); }
       setIsLoading(false);
     };
     init();

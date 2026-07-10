@@ -1,28 +1,19 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
+import { Button } from '@presentation/components/ui/button';
+import type { ConfirmDialogProps } from '@domain/entities/ui/ModalProps';
 
-interface ConfirmDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  variant?: 'danger' | 'warning' | 'info';
-}
-
-const variants = {
-  danger: { icon: 'text-red-500', bg: 'bg-red-50', btn: 'bg-red-500 hover:bg-red-600', border: 'border-red-100' },
-  warning: { icon: 'text-amber-500', bg: 'bg-amber-50', btn: 'bg-amber-500 hover:bg-amber-600', border: 'border-amber-100' },
-  info: { icon: 'text-blue-500', bg: 'bg-blue-50', btn: 'bg-blue-500 hover:bg-blue-600', border: 'border-blue-100' },
+const variantStyles = {
+  danger: { icon: 'text-red-500', bg: 'bg-red-50', btn: 'danger', border: 'border-red-100' },
+  warning: { icon: 'text-amber-500', bg: 'bg-amber-50', btn: 'warning' as const, border: 'border-amber-100' },
+  info: { icon: 'text-blue-500', bg: 'bg-blue-50', btn: 'primary' as const, border: 'border-blue-100' },
 };
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   open, onClose, onConfirm, title, message,
   confirmLabel = 'Eliminar', cancelLabel = 'Cancelar', variant = 'danger',
 }) => {
-  const v = variants[variant];
+  const v = variantStyles[variant];
 
   return (
     <AnimatePresence>
@@ -56,14 +47,13 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             <p className="text-sm text-stone-500 mb-6 leading-relaxed">{message}</p>
 
             <div className="flex gap-3">
-              <button onClick={onClose}
-                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 font-semibold text-sm hover:bg-stone-50 transition-all">
+              <Button variant="secondary" size="lg" fullWidth onClick={onClose}>
                 {cancelLabel}
-              </button>
-              <button onClick={() => { onConfirm(); onClose(); }}
-                className={`flex-1 py-2.5 rounded-xl text-white font-semibold text-sm transition-all shadow-sm ${v.btn}`}>
+              </Button>
+              <Button variant={v.btn === 'danger' ? 'danger' : v.btn === 'warning' ? 'primary' : 'primary'} size="lg" fullWidth
+                onClick={() => { onConfirm(); onClose(); }}>
                 {confirmLabel}
-              </button>
+              </Button>
             </div>
           </motion.div>
         </motion.div>

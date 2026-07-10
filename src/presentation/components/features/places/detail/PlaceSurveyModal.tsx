@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ThumbsUp, ThumbsDown, Star, Loader2, Send } from 'lucide-react';
+import { X, Star, ThumbsUp, ThumbsDown, Send } from 'lucide-react';
+import { LocationIcon, ChatIcon, CheckCircleIcon } from '@icons/index';
 import { surveysService } from '@lib/supabase';
 import { useAuth } from '@presentation/context';
+import { Button } from '@presentation/components/ui/button';
+import { ErrorFeedback } from '@presentation/components/ui/error-feedback';
+import { useWizardState } from '@presentation/hooks/form/useWizardState';
+import { SURVEY_STEPS, SURVEY_STEP_ORDER } from '@constants/steps';
+import { ERROR_MESSAGES, createError } from '@errors/index';
 import toast from 'react-hot-toast';
 
 interface PlaceSurveyModalProps {
@@ -12,42 +18,71 @@ interface PlaceSurveyModalProps {
   placeName: string;
 }
 
+interface SurveyState {
+  isNearby: boolean | null;
+  rating: number;
+  hoverRating: number;
+  wouldRecommend: boolean | null;
+  comment: string;
+  error: string | null;
+}
+
+const INITIAL_STATE: SurveyState = {
+  isNearby: null,
+  rating: 0,
+  hoverRating: 0,
+  wouldRecommend: null,
+  comment: '',
+  error: null,
+};
+
+const STEP_CONFIG = {
+  [SURVEY_STEPS.ENTER]: { icon: LocationIcon, title: '', subtitle: '' },
+  [SURVEY_STEPS.RATE]: { icon: Star, title: '¿Qué te pareció?', subtitle: 'Tu opinión ayuda a otros usuarios' },
+  [SURVEY_STEPS.RECOMMEND]: { icon: ThumbsUp, title: '¿Lo recomendarías?', subtitle: 'Tu recomendación ayuda a la comunidad' },
+  [SURVEY_STEPS.COMMENT]: { icon: ChatIcon, title: 'Algo más que agregar?', subtitle: 'Cuéntanos tu experiencia (opcional)' },
+};
+
 const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, placeId, placeName }) => {
   const { user } = useAuth();
-  const [step, setStep] = useState<'enter' | 'rate' | 'recommend' | 'comment' | 'done'>('enter');
-  const [isNearby, setIsNearby] = useState<boolean | null>(null);
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [wouldRecommend, setWouldRecommend] = useState<boolean | null>(null);
-  const [comment, setComment] = useState('');
+  const wizard = useWizardState({ steps: SURVEY_STEP_ORDER, initialStep: SURVEY_STEPS.ENTER });
+  const [survey, setSurvey] = useState<SurveyState>(INITIAL_STATE);
   const [submitting, setSubmitting] = useState(false);
 
+  const updateSurvey = (partial: Partial<SurveyState>) => setSurvey(prev => ({ ...prev, ...partial }));
+
   const handleSubmit = async () => {
-    if (!user) { toast.error('Inicia sesión'); return; }
+    if (!user) {
+      updateSurvey({ error: ERROR_MESSAGES.AUTH.SESSION_EXPIRED });
+      return;
+    }
     setSubmitting(true);
+    updateSurvey({ error: null });
     try {
       await surveysService.submitSurvey({
         userId: user.id,
         placeId,
-        isNearby: isNearby === true,
-        rating: rating > 0 ? rating : undefined,
-        wouldRecommend: wouldRecommend === true ? true : undefined,
-        comment: comment.trim() || undefined,
+        isNearby: survey.isNearby === true,
+        rating: survey.rating > 0 ? survey.rating : undefined,
+        wouldRecommend: survey.wouldRecommend === true ? true : undefined,
+        comment: survey.comment.trim() || undefined,
       });
-      setStep('done');
+      wizard.goToStep(SURVEY_STEPS.DONE);
     } catch {
-      toast.error('Error al enviar');
+      updateSurvey({ error: ERROR_MESSAGES.REVIEW.SUBMIT_FAILED });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const reset = () => {
-    setStep('enter');
-    setIsNearby(null);
-    setRating(0);
-    setWouldRecommend(null);
-    setComment('');
+  const resetAll = () => {
+    setSurvey(INITIAL_STATE);
+    wizard.goToStep(SURVEY_STEPS.ENTER);
+  };
+
+  const handleClose = () => {
+    resetAll();
+    onClose();
   };
 
   return (
@@ -58,7 +93,7 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <motion.div
             initial={{ scale: 0.92, opacity: 0, y: 20 }}
@@ -67,133 +102,130 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-stone-100"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Encuesta del lugar"
           >
-            {/* Progress dots */}
-            {step !== 'done' && (
-              <div className="flex gap-1.5 mb-5 justify-center">
-                {['enter', 'rate', 'recommend', 'comment'].map((s) => (
-                  <div key={s} className={`h-1.5 rounded-full transition-all duration-300 ${
-                    ['enter', 'rate', 'recommend', 'comment'].indexOf(s) <= ['enter', 'rate', 'recommend', 'comment'].indexOf(step)
-                      ? 'w-6 bg-amber-500' : 'w-1.5 bg-stone-200'
-                  }`} />
+            {wizard.currentStep !== SURVEY_STEPS.DONE && (
+              <nav className="flex gap-1.5 mb-5 justify-center" aria-label="Progreso de la encuesta">
+                {SURVEY_STEP_ORDER.map((s) => (
+                  <div
+                    key={s}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      SURVEY_STEP_ORDER.indexOf(s) <= SURVEY_STEP_ORDER.indexOf(wizard.currentStep)
+                        ? 'w-6 bg-amber-500' : 'w-1.5 bg-stone-200'
+                    }`}
+                    role="progressbar"
+                    aria-valuenow={SURVEY_STEP_ORDER.indexOf(wizard.currentStep) + 1}
+                    aria-valuemin={1}
+                    aria-valuemax={SURVEY_STEP_ORDER.length}
+                  />
                 ))}
-              </div>
+              </nav>
             )}
 
-            <button onClick={() => { reset(); onClose(); }}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors">
+            <button onClick={handleClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors" aria-label="Cerrar">
               <X className="w-4 h-4 text-stone-500" />
             </button>
 
-            {step === 'enter' && (
-              <div className="text-center">
+            {survey.error && (
+              <ErrorFeedback error={createError('SURVEY_ERROR', survey.error)} onDismiss={() => updateSurvey({ error: null })} />
+            )}
+
+            {wizard.currentStep === SURVEY_STEPS.ENTER && (
+              <article className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <LocationIcon size={32} className="text-amber-600" />
                 </div>
                 <h3 className="text-lg font-bold text-stone-800 mb-1">{placeName}</h3>
                 <p className="text-sm text-stone-500 mb-6">¿Estuviste en este lugar?</p>
                 <div className="flex gap-3">
-                  <button onClick={() => { setIsNearby(true); setStep('rate'); }}
-                    className="flex-1 py-3 rounded-2xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition-all active:scale-[0.97]">
+                  <Button onClick={() => { updateSurvey({ isNearby: true }); wizard.goNext(); }} size="lg" fullWidth>
                     Sí, entré
-                  </button>
-                  <button onClick={() => { setIsNearby(false); setStep('rate'); }}
-                    className="flex-1 py-3 rounded-2xl border border-stone-200 text-stone-600 font-semibold text-sm hover:bg-stone-50 transition-all active:scale-[0.97]">
+                  </Button>
+                  <Button onClick={() => { updateSurvey({ isNearby: false }); wizard.goNext(); }} variant="secondary" size="lg" fullWidth>
                     No, solo pasé
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </article>
             )}
 
-            {step === 'rate' && (
-              <div className="text-center">
+            {wizard.currentStep === SURVEY_STEPS.RATE && (
+              <article className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <Star className="w-8 h-8 text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">¿Qué te pareció?</h3>
-                <p className="text-sm text-stone-500 mb-5">Tu opinión ayuda a otros usuarios</p>
+                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.RATE].title}</h3>
+                <p className="text-sm text-stone-500 mb-5">{STEP_CONFIG[SURVEY_STEPS.RATE].subtitle}</p>
                 <div className="flex justify-center gap-2 mb-6">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} onClick={() => { setRating(s); setStep('recommend'); }}
-                      onMouseEnter={() => setHoverRating(s)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      className="transition-all hover:scale-110 active:scale-95">
+                    <button key={s} onClick={() => { updateSurvey({ rating: s }); wizard.goNext(); }}
+                      onMouseEnter={() => updateSurvey({ hoverRating: s })}
+                      onMouseLeave={() => updateSurvey({ hoverRating: 0 })}
+                      className="transition-all hover:scale-110 active:scale-95" aria-label={`Calificar ${s} estrellas`}>
                       <Star className={`w-10 h-10 ${
-                        s <= (hoverRating || rating) ? 'fill-amber-400 text-amber-400' : 'text-stone-200'
+                        s <= (survey.hoverRating || survey.rating) ? 'fill-amber-400 text-amber-400' : 'text-stone-200'
                       }`} />
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setStep('recommend')}
-                  className="text-xs text-stone-400 hover:text-stone-600 underline transition-colors">
+                <button onClick={() => wizard.goNext()} className="text-xs text-stone-400 hover:text-stone-600 underline transition-colors">
                   Saltar
                 </button>
-              </div>
+              </article>
             )}
 
-            {step === 'recommend' && (
-              <div className="text-center">
+            {wizard.currentStep === SURVEY_STEPS.RECOMMEND && (
+              <article className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <ThumbsUp className="w-8 h-8 text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">¿Lo recomendarías?</h3>
-                <p className="text-sm text-stone-500 mb-6">Tu recomendación ayuda a la comunidad</p>
+                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].title}</h3>
+                <p className="text-sm text-stone-500 mb-6">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].subtitle}</p>
                 <div className="flex gap-3">
-                  <button onClick={() => { setWouldRecommend(true); setStep('comment'); }}
-                    className="flex-1 py-3 rounded-2xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 transition-all active:scale-[0.97] flex items-center justify-center gap-2">
+                  <Button onClick={() => { updateSurvey({ wouldRecommend: true }); wizard.goNext(); }} size="lg" fullWidth className="!bg-emerald-500 hover:!bg-emerald-600">
                     <ThumbsUp className="w-4 h-4" /> Sí
-                  </button>
-                  <button onClick={() => { setWouldRecommend(false); setStep('comment'); }}
-                    className="flex-1 py-3 rounded-2xl border border-stone-200 text-stone-600 font-semibold text-sm hover:bg-stone-50 transition-all active:scale-[0.97] flex items-center justify-center gap-2">
+                  </Button>
+                  <Button onClick={() => { updateSurvey({ wouldRecommend: false }); wizard.goNext(); }} variant="secondary" size="lg" fullWidth>
                     <ThumbsDown className="w-4 h-4" /> No
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </article>
             )}
 
-            {step === 'comment' && (
-              <div className="text-center">
+            {wizard.currentStep === SURVEY_STEPS.COMMENT && (
+              <article className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                  </svg>
+                  <ChatIcon size={32} className="text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">Algo más que agregar?</h3>
-                <p className="text-sm text-stone-500 mb-5">Cuéntanos tu experiencia (opcional)</p>
-                <textarea value={comment} onChange={(e) => setComment(e.target.value)}
+                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.COMMENT].title}</h3>
+                <p className="text-sm text-stone-500 mb-5">{STEP_CONFIG[SURVEY_STEPS.COMMENT].subtitle}</p>
+                <textarea value={survey.comment} onChange={(e) => updateSurvey({ comment: e.target.value })}
                   className="w-full px-4 py-3 border border-stone-200 rounded-2xl text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all resize-none"
                   rows={3} placeholder="Ej. La atención fue excelente..." />
-                <div className="flex gap-3 mt-4">
-                  <button onClick={handleSubmit} disabled={submitting}
-                    className="flex-1 py-3 rounded-2xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:opacity-50">
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <footer className="flex gap-3 mt-4">
+                  <Button onClick={handleSubmit} disabled={submitting} loading={submitting} size="lg" fullWidth>
+                    {submitting ? null : <Send className="w-4 h-4" />}
                     {submitting ? 'Enviando...' : 'Enviar'}
-                  </button>
-                  <button onClick={handleSubmit} disabled={submitting}
-                    className="py-3 px-5 rounded-2xl border border-stone-200 text-stone-500 text-sm font-medium hover:bg-stone-50 transition-all">
+                  </Button>
+                  <Button onClick={handleSubmit} disabled={submitting} variant="secondary" size="lg">
                     Saltar
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </footer>
+              </article>
             )}
 
-            {step === 'done' && (
-              <div className="text-center py-4">
+            {wizard.currentStep === SURVEY_STEPS.DONE && (
+              <article className="text-center py-4">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <CheckCircleIcon size={32} className="text-emerald-600" />
                 </div>
                 <h3 className="text-lg font-bold text-stone-800 mb-1">¡Gracias por tu opinión!</h3>
                 <p className="text-sm text-stone-500 mb-6">Tu feedback ayuda a mejorar la comunidad</p>
-                <button onClick={() => { reset(); onClose(); }}
-                  className="w-full py-3 rounded-2xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition-all">
+                <Button onClick={handleClose} size="lg" fullWidth>
                   Cerrar
-                </button>
-              </div>
+                </Button>
+              </article>
             )}
           </motion.div>
         </motion.div>

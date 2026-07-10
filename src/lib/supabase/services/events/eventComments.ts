@@ -30,7 +30,7 @@ export const eventCommentsService = {
     if (error) throw error;
 
     const comments = await Promise.all(
-      (data || []).map(async (item: any) => {
+      (data || []).map(async (item: Record<string, unknown>) => {
         const replies = await this.getReplies(item.id);
         return {
           id: item.id,
@@ -64,7 +64,7 @@ export const eventCommentsService = {
 
     if (error) throw error;
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
       id: item.id,
       eventId: item.event_id,
       userId: item.user_id,

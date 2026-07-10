@@ -83,7 +83,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ isVisible, onClick }) => {
         setOffset(newOffset)
         try {
           localStorage.setItem(POS_KEY, JSON.stringify(newOffset))
-        } catch {}
+        } catch { /* intentional */ }
       }}
     >
       {/* ── Speech bubble — se desvanece/colapsa suavemente en mareo ── */}

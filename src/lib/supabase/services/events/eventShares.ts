@@ -53,7 +53,7 @@ export const eventSharesService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
       id: item.id,
       eventId: item.event_id,
       sharedBy: item.shared_by,

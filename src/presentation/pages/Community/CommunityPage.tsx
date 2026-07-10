@@ -341,7 +341,7 @@ const CommunityPage: React.FC = () => {
       setHasMorePlaces(result.hasMore);
       setPlaces(prev => append ? [...prev, ...result.data] : result.data);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching places:', err);
       if (!append) setPlaces([]);
       setError(err?.message || 'Error al cargar lugares');
@@ -360,7 +360,7 @@ const CommunityPage: React.FC = () => {
       setHasMoreEvents(result.hasMore);
       setEvents(prev => append ? [...prev, ...result.data] : result.data);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching events:', err);
       if (!append) setEvents([]);
       setError(err?.message || 'Error al cargar eventos');

@@ -1,8 +1,4 @@
-import { AuthMode } from './AuthModal.types';
-
-interface AuthModalHeaderProps {
-  mode: AuthMode;
-}
+import type { AuthModalHeaderProps } from '@domain/entities/props/AuthProps';
 
 export default function AuthModalHeader({ mode }: AuthModalHeaderProps) {
   return (

@@ -39,15 +39,15 @@ export async function getEventAttendees(eventId: string): Promise<EventAttendanc
     .eq('confirmed', true);
 
   if (error) throw error;
-  return (data || []).map((item: any) => ({
+  return (data || []).map((item: Record<string, unknown>) => ({
     id: item.id,
     eventId: item.event_id,
     userId: item.user_id,
-    userName: item.attendee?.name,
-    userAvatar: item.attendee?.avatar,
+    userName: (item.attendee as Record<string, unknown> | undefined)?.name,
+    userAvatar: (item.attendee as Record<string, unknown> | undefined)?.avatar,
     sharedBy: item.shared_by,
     confirmed: item.confirmed,
-    createdAt: new Date(item.created_at),
+    createdAt: new Date(item.created_at as string),
   }));
 }
 
@@ -58,13 +58,13 @@ export async function getUserAttendance(userId: string): Promise<EventAttendance
     .eq('user_id', userId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => ({
+  return (data || []).map((item: Record<string, unknown>) => ({
     id: item.id,
     eventId: item.event_id,
     userId: item.user_id,
     sharedBy: item.shared_by,
     confirmed: item.confirmed,
-    createdAt: new Date(item.created_at),
+    createdAt: new Date(item.created_at as string),
   }));
 }
 

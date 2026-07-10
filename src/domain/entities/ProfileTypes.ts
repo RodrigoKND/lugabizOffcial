@@ -1,7 +1,9 @@
 import { ComponentType } from 'react';
 
+export type TabId = 'saved' | 'events' | 'attending' | 'dashboard' | 'admin';
+
 export interface ProfileTab {
-  id: string;
+  id: TabId;
   label: string;
   icon: ComponentType<{ className?: string }>;
 }

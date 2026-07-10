@@ -11,7 +11,10 @@
       "@infrastructure/*": ["./src/infrastructure/*"],
       "@domain/*": ["./src/domain/*"],
       "@constants/*": ["./src/constants/*"],
-      "@application/*": ["./src/application/*"]
+      "@application/*": ["./src/application/*"],
+      "@icons/*": ["./src/icons/*"],
+      "@/*": ["./src/*"],
+      "@errors/*": ["./src/lib/errors/*"]
     },
 
     /* Bundler mode */

@@ -6,7 +6,7 @@ import { useAuth, usePlaces } from '@presentation/context';
 import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
 import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal, VerificationWizard, MyBusinessesModal } from '@presentation/components/features/users';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
-import { MarketSurvey, ProfileTab } from '@domain/entities';
+import { MarketSurvey, ProfileTab, TabId } from '@domain/entities';
 import { eventsService, ownerBusinessesService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
@@ -20,7 +20,7 @@ const Profile: React.FC = () => {
   const { savedPlaces, myEvents, attendingEvents, mySurveys, setMyEvents, refreshSurveys } = useProfileData();
   const { isEditing, editData, isUploadingAvatar, avatarInputRef, setIsEditing, setEditData, handleAvatarChange, handleSaveProfile } = useProfileEdit();
 
-  const [activeTab, setActiveTab] = useState('saved');
+  const [activeTab, setActiveTab] = useState<TabId>('saved');
   const [showEventForm, setShowEventForm] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -82,36 +82,30 @@ const Profile: React.FC = () => {
   }, [user.isOwner, isAdmin]);
 
   const renderTabContent = () => {
-    switch (activeTab) {
-      case 'saved':
-        return <SavedPlacesTab places={savedPlaces} />;
-      case 'events':
-        return <MyEventsTab events={myEvents} onEventCreate={() => setShowEventForm(true)} onDelete={setDeleteConfirmId} />;
-      case 'attending':
-        return <AttendingEventsTab events={attendingEvents} />;
-      case 'dashboard':
-        return (
-          <DashboardTab
-            myPlaces={myPlacesArr}
-            myEvents={myEvents}
-            mySurveys={mySurveys}
-            onAnnouncement={() => setShowAnnouncement(true)}
-            onSurveyCreate={() => setShowSurveyModal(true)}
-            onSurveyStats={setStatsTarget}
-          />
-        );
-      case 'admin':
-        return (
-          <AdminTab
-            myPlacesCount={myPlacesArr.length}
-            myEventsCount={myEvents.length}
-            unreadCount={unreadCount}
-            notifications={notifications}
-          />
-        );
-      default:
-        return null;
-    }
+    const tabComponents: Record<TabId, React.ReactNode> = {
+      saved: <SavedPlacesTab places={savedPlaces} />,
+      events: <MyEventsTab events={myEvents} onEventCreate={() => setShowEventForm(true)} onDelete={setDeleteConfirmId} />,
+      attending: <AttendingEventsTab events={attendingEvents} />,
+      dashboard: (
+        <DashboardTab
+          myPlaces={myPlacesArr}
+          myEvents={myEvents}
+          mySurveys={mySurveys}
+          onAnnouncement={() => setShowAnnouncement(true)}
+          onSurveyCreate={() => setShowSurveyModal(true)}
+          onSurveyStats={setStatsTarget}
+        />
+      ),
+      admin: (
+        <AdminTab
+          myPlacesCount={myPlacesArr.length}
+          myEventsCount={myEvents.length}
+          unreadCount={unreadCount}
+          notifications={notifications}
+        />
+      ),
+    };
+    return tabComponents[activeTab] ?? null;
   };
 
   return (

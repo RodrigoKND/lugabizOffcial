@@ -20,7 +20,7 @@ export const edgeService = {
   async getTrendingPlaces() {
     const { data, error } = await supabase.functions.invoke('trending-places')
     if (error) throw error
-    return data as any[]
+    return data as Record<string, unknown>[]
   },
 
   async sendSurveyPush(surveyId: string, title: string, body: string, categoryIds: string[]) {

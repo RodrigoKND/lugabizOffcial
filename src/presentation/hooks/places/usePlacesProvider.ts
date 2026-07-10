@@ -109,7 +109,7 @@ export function usePlacesProvider(): PlacesContextType {
     }
   };
 
-  const addEvent = async (eventData: any): Promise<Event | null> => {
+  const addEvent = async (eventData: Record<string, unknown>): Promise<Event | null> => {
     if (!user) return null;
     try {
       let imageUrl: string | undefined;

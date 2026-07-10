@@ -1,4 +1,5 @@
 import { Event } from './Event';
+import { Place } from './Place';
 
 export interface StoriesRowProps {
   events: Event[];
@@ -31,6 +32,6 @@ export interface UseHomeEventsReturn {
 }
 
 export interface UseTrendingPlacesReturn {
-  trendingPlaces: any[];
+  trendingPlaces: Place[];
   trendingLoading: boolean;
 }

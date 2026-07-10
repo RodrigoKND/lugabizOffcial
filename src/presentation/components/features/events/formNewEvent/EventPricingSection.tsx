@@ -9,7 +9,7 @@ interface EventPricingSectionProps {
   priceOptions: PriceOption[];
   priceNote: string;
   coupons: CouponEntry[];
-  onChange: (field: 'isFree' | 'price' | 'priceOptions' | 'priceNote' | 'coupons', value: any) => void;
+  onChange: (field: 'isFree' | 'price' | 'priceOptions' | 'priceNote' | 'coupons', value: boolean | number | PriceOption[] | string | CouponEntry[]) => void;
 }
 
 const MAX_ROWS = 10;

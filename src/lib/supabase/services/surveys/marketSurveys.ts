@@ -1,7 +1,20 @@
 import { supabase } from '@lib/supabase';
 import { MarketSurvey, CreateSurveyData } from '@domain/entities';
 
-function transform(survey: any, categoryIds: string[], responseCount: number): MarketSurvey {
+interface SurveyRow {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  about?: string;
+  problem_solved?: string;
+  questions?: { id: string; question: string; options: string[] }[];
+  response_count?: { count: number }[];
+  created_at: string;
+  survey_categories?: { category?: { id: string; name: string; icon?: string; color?: string } }[];
+}
+
+function transform(survey: SurveyRow, categoryIds: string[], responseCount: number): MarketSurvey {
   return {
     id: survey.id,
     userId: survey.user_id,
@@ -11,7 +24,7 @@ function transform(survey: any, categoryIds: string[], responseCount: number): M
     problemSolved: survey.problem_solved,
     questions: survey.questions || [],
     categoryIds,
-    categories: (survey.survey_categories || []).map((sc: any) => ({
+    categories: (survey.survey_categories || []).map(sc => ({
       id: sc.category?.id,
       name: sc.category?.name,
       icon: sc.category?.icon,
@@ -67,9 +80,9 @@ export async function getAll(): Promise<MarketSurvey[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map((s: any) => transform(s,
-    (s.survey_categories || []).map((sc: any) => sc.category?.id).filter(Boolean),
-    s.response_count?.[0]?.count || 0
+  return (data || []).map((s: SurveyRow) => transform(s,
+    (s.survey_categories || []).map(sc => sc.category?.id).filter(Boolean) as string[],
+    (s.response_count?.[0]?.count) || 0
   ));
 }
 
@@ -85,9 +98,9 @@ export async function getByUser(userId: string): Promise<MarketSurvey[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map((s: any) => transform(s,
-    (s.survey_categories || []).map((sc: any) => sc.category?.id).filter(Boolean),
-    s.response_count?.[0]?.count || 0
+  return (data || []).map((s: SurveyRow) => transform(s,
+    (s.survey_categories || []).map(sc => sc.category?.id).filter(Boolean) as string[],
+    (s.response_count?.[0]?.count) || 0
   ));
 }
 
@@ -109,13 +122,23 @@ export async function getById(id: string): Promise<MarketSurvey | null> {
     .select('id', { count: 'exact', head: true })
     .eq('survey_id', id);
 
-  return transform(data,
-    (data.survey_categories || []).map((sc: any) => sc.category?.id).filter(Boolean),
+  return transform(data as SurveyRow,
+    ((data.survey_categories || []).map(sc => (sc as { category?: { id: string } })?.category?.id).filter(Boolean)) as string[],
     count || 0
   );
 }
 
-export async function getResponses(surveyId: string): Promise<any[]> {
+interface SurveyResponseRow {
+  id: string;
+  surveyId: string;
+  userId: string;
+  userName: string;
+  userAvatar: string | null;
+  answers: unknown[];
+  createdAt: Date;
+}
+
+export async function getResponses(surveyId: string): Promise<SurveyResponseRow[]> {
   const { data, error } = await supabase
     .from('survey_responses')
     .select('*')
@@ -134,7 +157,7 @@ export async function getResponses(surveyId: string): Promise<any[]> {
     (users || []).map(u => [u.id, { name: u.name, avatar: u.avatar }])
   );
 
-  return (data || []).map((r: any) => ({
+  return (data || []).map(r => ({
     id: r.id,
     surveyId: r.survey_id,
     userId: r.user_id,

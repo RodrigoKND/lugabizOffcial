@@ -1,62 +1,27 @@
-import { MapPin, Clock, Users, Info, XCircle, CheckCircle2, Ticket, Navigation } from 'lucide-react';
-import { Event } from '@domain/entities';
-import type { EventStatus } from '@domain/entities/EventDetailTypes';
-import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
-import { CountdownTimer } from '@presentation/components/features/events/modal/CountdownTimer';
-
-interface EventDetailSidebarProps {
-  event: Event;
-  eventStatus: EventStatus;
-  isAttending: boolean;
-  isFull: boolean;
-  attendeeCount: number;
-  formattedDate: string;
-  hasCoords: boolean;
-  onAttend: () => void;
-}
+import { MapPin, Clock, Users, Info, XCircle, CheckCircle2, Ticket } from 'lucide-react';
+import { Button } from '@presentation/components/ui/button';
+import { Section } from '@presentation/components/ui/section';
+import { EVENT_STATUS } from '@constants/steps';
+import { EventStatusBadge } from './EventStatusBadge';
+import type { EventDetailSidebarProps } from '@domain/entities/props/EventSidebarProps';
+import { formatPrice, CouponsSection, LocationMapSection, InfoRow, StatusBlock } from './sidebar';
 
 export default function EventDetailSidebar({
   event, eventStatus, isAttending, isFull, attendeeCount, formattedDate, hasCoords, onAttend,
 }: EventDetailSidebarProps) {
-  return (
-    <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm sticky top-24">
-      {eventStatus === 'finished' && (
-        <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-xs font-bold border border-red-100">
-          <XCircle className="w-3.5 h-3.5" /> Evento Finalizado
-        </div>
-      )}
-      {eventStatus === 'ongoing' && (
-        <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> En Curso
-        </div>
-      )}
-      {eventStatus === 'upcoming' && (
-        <div className="mb-4">
-          <CountdownTimer endDate={event.dateStart} time={event.timeStart} />
-        </div>
-      )}
+  const capacity = event.capacity ?? 0;
+  const availableSpots = capacity - attendeeCount;
 
-      <div className="flex items-center justify-between mb-6">
+  return (
+    <Section level="card" className="sticky top-24" as="aside">
+      <EventStatusBadge eventStatus={eventStatus} dateStart={event.dateStart} timeStart={event.timeStart} />
+
+      <header className="flex items-center justify-between mb-6">
         <div>
           <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Precio</p>
-          {event.isFree ? (
-            <p className="text-2xl font-bold text-stone-800">Gratis</p>
-          ) : event.priceOptions && event.priceOptions.length > 0 ? (
-            <>
-              <p className="text-2xl font-bold text-stone-800">
-                Desde Bs. {Math.min(...event.priceOptions.map(o => o.price))}
-              </p>
-              <div className="mt-1 space-y-0.5">
-                {event.priceOptions.map((o, i) => (
-                  <p key={i} className="text-xs text-stone-500">
-                    {o.label ? `${o.label} — ` : ''}Bs. {o.price}{o.priceMax ? ` - ${o.priceMax}` : ''}
-                  </p>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className="text-2xl font-bold text-stone-800">Bs. {event.price}</p>
-          )}
+          <p className="text-2xl font-bold text-stone-800">
+            {event.isFree ? 'Gratis' : formatPrice(event)}
+          </p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-1 text-sm text-stone-500">
@@ -64,13 +29,11 @@ export default function EventDetailSidebar({
             <span className="font-semibold">{attendeeCount}</span>
             <span>asistentes</span>
           </div>
-          {(event.capacity ?? 0) > 0 && (
-            <p className="text-[10px] text-stone-400 mt-0.5">
-              {event.capacity - attendeeCount} cupos disponibles
-            </p>
+          {capacity > 0 && (
+            <p className="text-[10px] text-stone-400 mt-0.5">{availableSpots} cupos disponibles</p>
           )}
         </div>
-      </div>
+      </header>
 
       {event.priceNote && (
         <div className="mb-6 -mt-3 p-3 bg-amber-50/60 border border-amber-100 rounded-xl text-xs text-stone-600">
@@ -78,94 +41,44 @@ export default function EventDetailSidebar({
         </div>
       )}
 
-      {eventStatus === 'ongoing' && event.coupons && event.coupons.length > 0 && (
-        <div className="mb-6 -mt-3 p-3 bg-primary-50/60 border border-primary-100 rounded-xl space-y-1.5">
-          <p className="text-[11px] font-semibold text-primary-700 uppercase tracking-wider flex items-center gap-1.5">
-            <Ticket className="w-3.5 h-3.5" /> Cupones activos
-          </p>
-          {event.coupons.map((c, i) => (
-            <p key={i} className="text-xs text-stone-600">
-              <span className="font-mono font-bold text-primary-700">{c.code}</span> — {c.description}
-            </p>
-          ))}
-        </div>
+      {eventStatus === EVENT_STATUS.ONGOING && event.coubons && event.coubons.length > 0 && (
+        <CouponsSection coupons={event.coubons} />
       )}
 
-      <div className="space-y-4 mb-6">
+      <nav className="space-y-4 mb-6">
         {hasCoords && (
-          <>
-            <div className="rounded-2xl overflow-hidden border border-stone-100" style={{ height: '160px' }}>
-              <Map center={[event.coords[1], event.coords[0]]} zoom={15} style={{ width: '100%', height: '100%' }}>
-                <MapMarker longitude={event.coords[1]} latitude={event.coords[0]}>
-                  <MarkerContent>
-                    <div style={{ width: 36, height: 36, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
-                      <svg viewBox="0 0 48 48" fill="none">
-                        <path d="M24 2C15.164 2 8 9.164 8 18c0 12 16 28 16 28s16-16 16-28C40 9.164 32.836 2 24 2z" fill="#D4785C" />
-                        <path d="M24 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z" fill="white" />
-                        <circle cx="24" cy="10" r="4" fill="#D4785C" />
-                      </svg>
-                    </div>
-                  </MarkerContent>
-                </MapMarker>
-              </Map>
-            </div>
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${event.coords[0]},${event.coords[1]}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-transparent hover:bg-purple-50 text-purple-600 rounded-xl text-sm font-semibold transition-all border border-purple-200"
-            >
-              <Navigation className="w-4 h-4" />
-              Cómo llegar
-            </a>
-          </>
+          <LocationMapSection coords={event.coords} />
         )}
-
-        <div className="flex items-start gap-3">
-          <div className="bg-amber-50 p-2.5 rounded-xl"><MapPin className="w-5 h-5 text-amber-500" /></div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-stone-400 uppercase">Ubicación</p>
-            <p className="text-sm font-medium text-stone-700 break-words">{event.address}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <div className="bg-amber-50 p-2.5 rounded-xl"><Clock className="w-5 h-5 text-amber-500" /></div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-stone-400 uppercase">Fecha y Hora</p>
-            <p className="text-sm font-medium text-stone-700 truncate">{formattedDate}</p>
-            <p className="text-sm text-stone-500">{event.timeStart}{event.timeEnd ? ` - ${event.timeEnd}` : ''}</p>
-          </div>
-        </div>
-
-        {(event.capacity ?? 0) > 0 && (
-          <div className="flex items-start gap-3">
-            <div className="bg-amber-50 p-2.5 rounded-xl"><Info className="w-5 h-5 text-amber-500" /></div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-stone-400 uppercase">Capacidad</p>
-              <p className="text-sm font-medium text-stone-700 truncate">{event.capacity} personas</p>
-            </div>
-          </div>
+        <InfoRow icon={<MapPin />} label="Ubicación" value={event.address} />
+        <InfoRow
+          icon={<Clock />}
+          label="Fecha y Hora"
+          value={`${formattedDate} ${event.timeStart}${event.timeEnd ? ` - ${event.timeEnd}` : ''}`}
+        />
+        {capacity > 0 && (
+          <InfoRow icon={<Info />} label="Capacidad" value={`${capacity} personas`} />
         )}
-      </div>
+      </nav>
 
-      {eventStatus === 'finished' ? (
-        <div className="w-full py-4 rounded-2xl font-bold text-base bg-stone-100 text-stone-400 border border-stone-200 flex items-center justify-center gap-3 cursor-not-allowed">
-          <XCircle className="w-5 h-5" /> Evento Finalizado
-        </div>
-      ) : isFull && !isAttending ? (
-        <div className="w-full py-4 rounded-2xl font-bold text-base bg-red-50 text-red-400 border border-red-200 flex items-center justify-center gap-3 cursor-not-allowed">
-          <XCircle className="w-5 h-5" /> Cupo Lleno
-        </div>
-      ) : (
-        <button onClick={onAttend}
-          className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-3 ${isAttending
-            ? 'bg-stone-100 text-stone-600 border border-stone-200 hover:bg-stone-200'
-            : 'bg-amber-500 text-white hover:bg-amber-600 shadow-md active:scale-[0.98]'
-            }`}>
-          {isAttending ? <><CheckCircle2 className="w-5 h-5" /> Asistiré</> : <><Ticket className="w-5 h-5" /> Confirmar Asistencia</>}
-        </button>
-      )}
-    </div>
+      <footer>
+        {eventStatus === EVENT_STATUS.FINISHED ? (
+          <StatusBlock icon={<XCircle />} text="Evento Finalizado" />
+        ) : isFull && !isAttending ? (
+          <StatusBlock icon={<XCircle />} text="Cupo Lleno" className="bg-red-50 text-red-400 border-red-200" />
+        ) : (
+          <Button
+            onClick={onAttend}
+            variant={isAttending ? 'secondary' : 'primary'}
+            size="lg"
+            fullWidth
+            className={isAttending ? '!bg-stone-100 !text-stone-600 !border !border-stone-200 hover:!bg-stone-200' : ''}
+          >
+            {isAttending ? <><CheckCircle2 className="w-5 h-5" /> Asistiré</> : <><Ticket className="w-5 h-5" /> Confirmar Asistencia</>}
+          </Button>
+        )}
+      </footer>
+    </Section>
   );
 }
+
+

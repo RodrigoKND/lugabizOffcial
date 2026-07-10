@@ -1,7 +1,7 @@
 import { supabase } from '@lib/supabase';
 import { Review } from '@domain/entities';
 
-function mapReview(review: any): Review {
+function mapReview(review: Record<string, unknown>): Review {
   return {
     id: review.id,
     userId: review.user_id,
@@ -72,7 +72,7 @@ export async function getReviewsForPlace(placeId: string, limit = 10, offset = 0
       .in('parent_id', ids);
 
     const countMap: Record<string, number> = {};
-    (replyCounts || []).forEach((r: any) => {
+    (replyCounts || []).forEach((r: Record<string, unknown>) => {
       countMap[r.parent_id] = (countMap[r.parent_id] || 0) + 1;
     });
     return reviews.map(r => ({ ...r, replyCount: countMap[r.id] || 0 }));

@@ -8,10 +8,9 @@ export async function sendBrowserPush(title: string, body: string, url?: string,
       body,
       icon: '/L.ico',
       badge: '/L.ico',
-      vibrate: [200, 100, 200],
       data: { url: url || '/', ...data },
     });
-  } catch {}
+  } catch (err) { console.error('[sendPush:showNotification]', err); }
 }
 
 export async function sendSurveyPushNotification(surveyId: string, surveyTitle: string) {

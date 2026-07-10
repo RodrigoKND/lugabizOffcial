@@ -11,7 +11,7 @@ export { type PlacesContextType, type PlacesProviderProps } from './PlacesContex
 export { type AppNotification, type PlaceSurvey, type NearbyPlace } from './Notification';
 export { type EventStatus, type EventAttendee } from './EventDetailTypes';
 export { type MarketSurvey, type SurveyResponse, type SurveyNotification, type CreateSurveyData, type SurveyQuestion} from './MarketSurvey';
-export { type ProfileTab, type EditProfileData, type StatCardProps } from './ProfileTypes';
+export { type TabId, type ProfileTab, type EditProfileData, type StatCardProps } from './ProfileTypes';
 export {
   type StoriesRowProps,
   type FeaturedHeroSectionProps,

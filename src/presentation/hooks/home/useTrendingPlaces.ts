@@ -3,7 +3,7 @@ import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions'
 import { supabase } from '@lib/supabase/client';
 import { UseTrendingPlacesReturn } from '@domain/entities/HomeTypes';
 
-async function fetchTrendingFallback(): Promise<any[]> {
+async function fetchTrendingFallback(): Promise<Record<string, unknown>[]> {
   const { data, error } = await supabase
     .from('places')
     .select('id, name, image, rating, category:categories(id, name, color)')
@@ -11,7 +11,7 @@ async function fetchTrendingFallback(): Promise<any[]> {
     .limit(10);
 
   if (error) throw error;
-  return (data || []).map((p: any) => ({
+  return (data || []).map((p: Record<string, unknown>) => ({
     id: p.id,
     name: p.name,
     image: p.image,
@@ -21,7 +21,7 @@ async function fetchTrendingFallback(): Promise<any[]> {
 }
 
 export function useTrendingPlaces(): UseTrendingPlacesReturn {
-  const [trendingPlaces, setTrendingPlaces] = useState<any[]>([]);
+  const [trendingPlaces, setTrendingPlaces] = useState<Record<string, unknown>[]>([]);
   const [trendingLoading, setTrendingLoading] = useState(true);
 
   useEffect(() => {
@@ -34,13 +34,13 @@ export function useTrendingPlaces(): UseTrendingPlacesReturn {
           setTrendingPlaces(data);
           return;
         }
-      } catch {}
+      } catch (err) { console.error('[useTrendingPlaces:edgeFunction]', err); }
 
       // Edge function failed or returned empty — use direct query fallback
       try {
         const data = await fetchTrendingFallback();
         if (!cancelled) setTrendingPlaces(data);
-      } catch {}
+      } catch (err) { console.error('[useTrendingPlaces:fallback]', err); }
     }
 
     load().finally(() => { if (!cancelled) setTrendingLoading(false); });

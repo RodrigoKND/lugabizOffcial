@@ -8,9 +8,9 @@ function parseLocalDate(dateStr: string): Date {
   return new Date(y, m - 1, d);
 }
 
-export function transformEventData(event: any): Event {
-  const attendees = event.event_attendance || [];
-  const uniqueAttendees = new Set(attendees.map((a: any) => a.user_id || a.userId));
+export function transformEventData(event: Record<string, unknown>): Event {
+  const attendees = (event.event_attendance as Record<string, unknown>[]) || [];
+  const uniqueAttendees = new Set(attendees.map((a: Record<string, unknown>) => a.user_id || a.userId));
 
   return {
     id: event.id,

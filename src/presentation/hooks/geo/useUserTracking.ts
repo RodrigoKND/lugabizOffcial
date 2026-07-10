@@ -27,7 +27,7 @@ export function useUserTracking() {
     if (!position) return;
     try {
       sessionStorage.setItem('_lugabiz_last_pos', JSON.stringify({ lat: position.lat, lng: position.lon }));
-    } catch {}
+    } catch { /* intentional */ }
   }, [position?.lat, position?.lon]);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function useUserTracking() {
             body: { placeId: place.id, placeName: place.name },
           }).catch(() => {});
         }
-      } catch {}
+      } catch (err) { console.error('[useUserTracking:track]', err); }
     };
 
     track();

@@ -4,6 +4,9 @@ import { X, ShieldCheck, Camera, CreditCard, FileCheck2, Loader2, Clock, CheckCi
 import { useAuth } from '@presentation/context';
 import { ownerVerificationService, type OwnerVerification, type IdentityPrecheck } from '@lib/supabase';
 import toast from 'react-hot-toast';
+import FilePicker from './FilePicker';
+import { verdictStyles } from './verdictStyles';
+import type { Step } from './VerificationWizard.types';
 
 interface Props {
   isOpen: boolean;
@@ -13,34 +16,6 @@ interface Props {
 // El wizard verifica SOLO la identidad de la persona (una vez por cuenta).
 // Los documentos de cada negocio se suben por separado desde "Mis negocios"
 // (cada negocio es una entidad distinta con su propia insignia dorada).
-type Step = 'intro' | 'business' | 'identity' | 'analyzing' | 'review' | 'sending' | 'done' | 'pending' | 'verified';
-
-// Selector de un solo archivo con vista previa, estilo de la app (primary-*)
-const FilePicker: React.FC<{
-  label: string;
-  hint: string;
-  icon: React.ReactNode;
-  file: File | null;
-  onSelect: (f: File | null) => void;
-}> = ({ label, hint, icon, file, onSelect }) => {
-  const ref = useRef<HTMLInputElement>(null);
-  const preview = file ? URL.createObjectURL(file) : null;
-  return (
-    <button type="button" onClick={() => ref.current?.click()}
-      className="w-full flex items-center gap-3 p-3 bg-primary-50/50 border border-primary-100 rounded-xl text-left hover:border-primary-300 transition-all">
-      <div className="w-12 h-12 rounded-lg bg-white border border-primary-100 flex items-center justify-center overflow-hidden shrink-0">
-        {preview ? <img src={preview} alt="" className="w-full h-full object-cover" /> : icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-text-primary truncate">{file ? file.name : label}</p>
-        <p className="text-[11px] text-text-secondary">{file ? 'Toca para cambiar' : hint}</p>
-      </div>
-      {file && <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />}
-      <input ref={ref} type="file" accept="image/*" className="hidden"
-        onChange={(e) => onSelect(e.target.files?.[0] ?? null)} />
-    </button>
-  );
-};
 
 const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
@@ -77,7 +52,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
 
         const draft = vs.find(v => v.kind === 'identity' && v.status === 'draft');
         if (draft) {
-          const ex = (draft.extracted ?? {}) as any;
+          const ex = draft.extracted ?? {};
           setBusinessName(draft.businessName || user.ownerBusinessName || '');
           setFullName(ex.claimedName || '');
           setPrecheck({
@@ -119,7 +94,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
       });
       setPrecheck(result);
       setStep('review');
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? 'No se pudo analizar. Intentá de nuevo.');
       setStep('identity');
     }
@@ -142,17 +117,11 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
       // No marcamos al usuario como dueño aquí: el rol se otorga solo cuando el
       // admin aprueba la identidad. Mientras tanto la solicitud queda "en revisión".
       setStep('done');
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? 'No se pudo enviar la verificación.');
       setStep('review');
     }
   };
-
-  const verdictStyles = {
-    ok:   { wrap: 'bg-green-50 border-green-200', icon: <CheckCircle2 className="w-5 h-5 text-green-500" />, text: 'text-green-700' },
-    warn: { wrap: 'bg-amber-50 border-amber-200', icon: <AlertTriangle className="w-5 h-5 text-amber-500" />, text: 'text-amber-700' },
-    fail: { wrap: 'bg-red-50 border-red-200', icon: <AlertTriangle className="w-5 h-5 text-red-500" />, text: 'text-red-700' },
-  } as const;
 
   return (
     <AnimatePresence>

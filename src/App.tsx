@@ -30,10 +30,10 @@ function ScrollRestorer() {
       }
     }
     // Skip scroll reset when opening a modal sheet (background state present)
-    if (!(state as any)?.background) {
+    if (!(state as Record<string, unknown>)?.background) {
       window.scrollTo(0, 0);
     }
-  }, [pathname, key, navType, (state as any)?.background]);
+  }, [pathname, key, navType, (state as Record<string, unknown>)?.background]);
 
   useEffect(() => {
     const save = () => sessionStorage.setItem(`scroll:${pathname}:${key}`, String(window.scrollY));
@@ -79,7 +79,7 @@ function recordPushDismiss() {
     const c = getPushDismissCount();
     localStorage.setItem(PUSH_DIS_CT, String(c + 1));
     localStorage.setItem(PUSH_DIS_AT, String(Date.now()));
-  } catch {}
+  } catch { /* intentional */ }
 }
 
 function PushEnableBanner() {
@@ -212,9 +212,9 @@ function PendingSurveys() {
           if (!user) return;
           try {
             const notifs = await marketSurveysService.getNotificationsForUser(user.id);
-            const match = notifs.find((n: any) => n.survey_id === current.id);
+            const match = notifs.find((n: Record<string, unknown>) => n.survey_id === current.id);
             if (match) await marketSurveysService.markAsRead(match.id);
-          } catch {}
+          } catch (err) { console.error('[App:markSurveyRead]', err); }
           setVisible(null);
         }}
         onResponded={refresh}

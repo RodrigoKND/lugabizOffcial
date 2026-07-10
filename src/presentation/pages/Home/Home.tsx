@@ -130,7 +130,7 @@ const Home: React.FC = () => {
             </div>
             <TrendBanner places={trendingPlaces} />
             <ScrollRow title="" subtitle="Más lugares populares">
-              {trendingPlaces.slice(1, 8).map((place: any) => (
+              {trendingPlaces.slice(1, 8).map((place: Record<string, unknown>) => (
                 <CompactCard
                   key={place.id}
                   image={place.image}

@@ -79,7 +79,7 @@ export function useEventNotifications() {
             );
           }
         }
-      } catch {}
+      } catch (err) { console.error('[useEventNotifications:check]', err); }
     };
 
     check();

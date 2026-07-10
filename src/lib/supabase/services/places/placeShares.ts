@@ -11,6 +11,33 @@ export interface PlaceShare {
   placeImage?: string;
 }
 
+interface ShareRowWithPlace {
+  id: string;
+  place_id: string;
+  shared_by: string;
+  shared_url: string;
+  created_at: string;
+  place?: { id: string; name: string; image: string } | null;
+}
+
+interface ConfirmationRowWithUser {
+  id: string;
+  share_id: string;
+  user_id: string;
+  confirmed: boolean;
+  created_at: string;
+  user?: { id: string; name: string; avatar: string } | null;
+}
+
+interface ConfirmationRowWithShare {
+  id: string;
+  share_id: string;
+  user_id: string;
+  confirmed: boolean;
+  created_at: string;
+  share?: { place_id: string; shared_by: string; created_at: string } | null;
+}
+
 export const placeSharesService = {
   async createShare(placeId: string, sharedBy: string): Promise<PlaceShare> {
     const shareId = crypto.randomUUID();
@@ -63,7 +90,7 @@ export const placeSharesService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: ShareRowWithPlace) => ({
       id: item.id,
       placeId: item.place_id,
       sharedBy: item.shared_by,
@@ -96,7 +123,7 @@ export const placeSharesService = {
       .eq('share_id', shareId);
 
     if (error) throw error;
-    return (data || []).map((c: any) => ({
+    return (data || []).map((c: ConfirmationRowWithUser) => ({
       id: c.id,
       shareId: c.share_id,
       userId: c.user_id,
@@ -117,7 +144,7 @@ export const placeSharesService = {
       .eq('user_id', userId);
 
     if (error) throw error;
-    return (data || []).map((c: any) => ({
+    return (data || []).map((c: ConfirmationRowWithUser) => ({
       id: c.id,
       shareId: c.share_id,
       userId: c.user_id,

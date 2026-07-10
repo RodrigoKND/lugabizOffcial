@@ -37,7 +37,7 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
       // Edge function — maneja rate limiting en el backend
       try {
         await edgeService.createOwnerAnnouncement(title.trim(), body.trim());
-      } catch (edgeErr: any) {
+      } catch (edgeErr) {
         const msg = edgeErr?.message ?? '';
         if (msg.includes('Espera') || msg.includes('429')) {
           toast.error(msg || 'Espera antes de enviar otro anuncio');

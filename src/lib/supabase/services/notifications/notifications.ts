@@ -11,7 +11,7 @@ export const notificationsService = {
       .limit(50);
 
     if (error) throw error;
-    return (data || []).map((n: any) => ({
+    return (data || []).map((n: Record<string, unknown>) => ({
       id: n.id,
       userId: n.user_id,
       type: n.type,
@@ -81,7 +81,7 @@ export const notificationsService = {
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${userId}`,
-      }, (payload: any) => {
+      }, (payload: Record<string, unknown>) => {
         const n = payload.new;
         callback({
           id: n.id,

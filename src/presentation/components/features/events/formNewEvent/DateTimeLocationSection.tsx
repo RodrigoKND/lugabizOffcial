@@ -11,7 +11,7 @@ interface Props {
   errors: ValidationErrors;
   touched: Record<string, boolean>;
   imagePreviews: string[];
-  onChange: (field: string, value: any) => void;
+  onChange: (field: string, value: string | number | boolean | string[] | ScheduleEntry[]) => void;
   onBlur: (field: string) => void;
   onImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;

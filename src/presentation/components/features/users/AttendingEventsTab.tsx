@@ -36,7 +36,7 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
           }))
         );
         setSharedConfirmations(results.filter(r => r.confirmations.length > 0));
-      } catch {}
+      } catch (err) { console.error('[AttendingEventsTab:loadShared]', err); }
     })();
   }, [user]);
 

@@ -1,6 +1,6 @@
 import { Place } from '@domain/entities';
 
-export function transformPlaceData(place: any): Place {
+export function transformPlaceData(place: Record<string, unknown>): Place {
   return {
     id: place.id,
     name: place.name,
@@ -13,9 +13,9 @@ export function transformPlaceData(place: any): Place {
       color: place.category.color,
       description: place.category.description,
     } : { id: '', name: 'Sin categoría', icon: 'Store', color: '#8B5CF6', description: '' },
-    socialGroups: (place.place_social_groups || [])
-      .filter((psg: any) => psg?.social_group)
-      .map((psg: any) => ({
+    socialGroups: ((place.place_social_groups as Record<string, unknown>[]) || [])
+      .filter((psg: Record<string, unknown>) => psg?.social_group)
+      .map((psg: Record<string, unknown>) => ({
         id: psg.social_group.id,
         name: psg.social_group.name,
         icon: psg.social_group.icon,
@@ -26,7 +26,7 @@ export function transformPlaceData(place: any): Place {
     rating: place.rating,
     reviewCount: place.review_count,
     reviews:
-      place.reviews?.map((review: any) => ({
+      (place.reviews as Record<string, unknown>[])?.map((review: Record<string, unknown>) => ({
         id: review.id,
         userId: review.user_id,
         userName: review.user?.name || 'Usuario',

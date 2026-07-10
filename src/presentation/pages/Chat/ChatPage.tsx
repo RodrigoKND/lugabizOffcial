@@ -1,11 +1,12 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft, Send, RotateCcw, MapPin, Sun, Cloud, Sparkles,
   CloudRain, Thermometer, ChevronDown, ChevronRight, Play, X, Star, Navigation, Clock, CalendarDays,
   Globe, Instagram, Facebook, MessageCircle, Music2, Phone,
 } from 'lucide-react'
-import LubiMascot, { type LubiExpression } from '@presentation/components/features/chatbot/LubiMascot'
+import LubiMascot from '@presentation/components/features/chatbot/LubiMascot'
+import { type LubiExpression } from '@presentation/components/features/chatbot/types'
 import { useChat } from '@presentation/hooks/chat/useChat'
 import { useAuth } from '@presentation/context'
 import { useSmartBack } from '@presentation/hooks/useSmartBack'
@@ -243,7 +244,7 @@ function EventCardComponent({ event }: { event: EventCard }) {
 }
 
 // ── Web result card (negocio encontrado en la web) ───────────────────────────────
-const SOCIAL_META: Record<string, { icon: any; color: string; label: string }> = {
+const SOCIAL_META: Record<string, { icon: React.ElementType; color: string; label: string }> = {
   instagram: { icon: Instagram,     color: 'text-pink-600 bg-pink-50',     label: 'Instagram' },
   facebook:  { icon: Facebook,      color: 'text-blue-600 bg-blue-50',     label: 'Facebook' },
   tiktok:    { icon: Music2,        color: 'text-text-primary bg-feed-bg/5',  label: 'TikTok' },

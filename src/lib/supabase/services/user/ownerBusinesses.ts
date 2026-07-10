@@ -18,7 +18,7 @@ export interface AdminOwnerBusiness extends OwnerBusiness {
   ownerEmail?: string;
 }
 
-function mapRow(r: any): OwnerBusiness {
+function mapRow(r: Record<string, unknown>): OwnerBusiness {
   return {
     id: r.id,
     userId: r.user_id,

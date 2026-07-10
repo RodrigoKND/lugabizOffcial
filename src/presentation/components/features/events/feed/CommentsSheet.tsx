@@ -33,7 +33,7 @@ export function CommentsSheet({ eventId, userId, onClose }: CommentsSheetProps) 
     try {
       await addComment(userId, text.trim());
       setText('');
-    } catch { }
+    } catch (err) { console.error('[CommentsSheet:handleSend]', err); }
     setSending(false);
   };
 

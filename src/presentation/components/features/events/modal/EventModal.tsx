@@ -309,7 +309,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             <div className="border-t border-white/5 px-4 py-3 shrink-0">
               <div className="flex items-center gap-2">
                 {user?.id && (
-                  <img src={(user as any).avatarUrl || '/avatar.png'} alt=""
+                  <img src={user?.avatar || '/avatar.png'} alt=""
                     className="w-7 h-7 rounded-full object-cover shrink-0" />
                 )}
                 <input

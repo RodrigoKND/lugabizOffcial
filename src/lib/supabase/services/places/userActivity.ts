@@ -65,8 +65,8 @@ export const userActivityService = {
       });
 
       const inserts = nearby
-        .filter((p: any) => !existingIds.has(p.id))
-        .map((p: any) => ({
+        .filter((p: Record<string, unknown>) => !existingIds.has(p.id as string))
+        .map((p: Record<string, unknown>) => ({
           user_id: userId,
           type: 'nearby' as const,
           title: p.name,
@@ -95,7 +95,7 @@ export const userActivityService = {
       .limit(limit);
 
     if (error) throw error;
-    return (data || []).map((a: any) => ({
+    return (data || []).map((a: Record<string, unknown>) => ({
       id: a.id,
       userId: a.user_id,
       action: a.action,

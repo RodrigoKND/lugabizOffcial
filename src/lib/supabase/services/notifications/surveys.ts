@@ -25,7 +25,7 @@ export const surveysService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map((s: any) => ({
+    return (data || []).map((s: Record<string, unknown>) => ({
       id: s.id,
       userId: s.user_id,
       placeId: s.place_id,
@@ -33,7 +33,7 @@ export const surveysService = {
       rating: s.rating,
       wouldRecommend: s.would_recommend,
       comment: s.comment,
-      createdAt: new Date(s.created_at),
+      createdAt: new Date(s.created_at as string),
     }));
   },
 
@@ -45,7 +45,7 @@ export const surveysService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map((s: any) => ({
+    return (data || []).map((s: Record<string, unknown>) => ({
       id: s.id,
       userId: s.user_id,
       placeId: s.place_id,
@@ -53,7 +53,7 @@ export const surveysService = {
       rating: s.rating,
       wouldRecommend: s.would_recommend,
       comment: s.comment,
-      createdAt: new Date(s.created_at),
+      createdAt: new Date(s.created_at as string),
     }));
   },
 

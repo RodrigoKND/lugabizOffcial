@@ -25,7 +25,7 @@ const AddPlace: React.FC = () => {
     category: '',
     socialGroups: [] as string[],
     amenities: [] as string[],
-    discountInfo: undefined as any,
+    discountInfo: undefined as { hasDiscount: boolean; description?: string; code?: string; percentage?: number } | undefined,
     socialLinks: {} as SocialLinks,
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,

@@ -65,9 +65,9 @@ export async function getEventsAttending(userId: string): Promise<Event[]> {
 
   if (error) throw error;
   return (data || [])
-    .map((item: any) => item.event)
+    .map((item: Record<string, unknown>) => item.event)
     .filter(Boolean)
-    .map((event: any) => transformEventData(event));
+    .map((event: Record<string, unknown>) => transformEventData(event));
 }
 
 export async function createEvent(eventData: CreateEventData): Promise<Event> {

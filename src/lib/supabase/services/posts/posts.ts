@@ -39,8 +39,23 @@
 import { supabase } from '@lib/supabase/client';
 import { BusinessPost, CreatePostData, PostReactionCounts } from '@domain/entities/Post';
 
-function transformPost(row: any, userId?: string): BusinessPost {
-  const reactions: any[] = row.reactions || [];
+interface PostRow {
+  id: string;
+  user_id: string;
+  place_id?: string;
+  images: string[];
+  description: string;
+  flash_offer?: Record<string, unknown>;
+  comments_count: number;
+  reactions?: { id: string; user_id: string; emoji: string }[];
+  created_at: string;
+  updated_at: string;
+  place?: { id?: string; name?: string };
+  user?: { id?: string; name?: string; avatar?: string };
+}
+
+function transformPost(row: PostRow, userId?: string): BusinessPost {
+  const reactions = row.reactions || [];
   const counts: PostReactionCounts = { heart: 0, fire: 0, wow: 0, clap: 0 };
   let userReaction: BusinessPost['userReaction'] = null;
 

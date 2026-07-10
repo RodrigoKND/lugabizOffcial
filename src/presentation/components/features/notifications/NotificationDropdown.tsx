@@ -14,30 +14,32 @@ function getNudgeDismissed(): boolean {
   } catch { return false; }
 }
 function setNudgeDismissed() {
-  try { localStorage.setItem(NOTIF_NUDGE_KEY, String(Date.now())); } catch {}
+  try { localStorage.setItem(NOTIF_NUDGE_KEY, String(Date.now())); } catch { /* intentional */ }
 }
+
+const navUrls: Record<string, string | ((n: AppNotification) => string)> = {
+  market_survey: '/',
+  survey: '/',
+  nearby: (n) => {
+    const pid = n.data?.place_id || (n.data?.places?.[0]);
+    return pid ? `/place/${pid}` : '/';
+  },
+  new_place: (n) => {
+    const pid = n.data?.place_id || (n.data?.places?.[0]);
+    return pid ? `/place/${pid}` : '/';
+  },
+  event_invite: (n) => (n.data?.event_id ? `/event/${n.data.event_id}` : '/'),
+  event_start: (n) => (n.data?.event_id ? `/event/${n.data.event_id}` : '/'),
+  new_review: (n) => (n.data?.place_id ? `/place/${n.data.place_id}` : '/'),
+};
 
 function getNavUrl(n: AppNotification): string {
   // Edge functions always store the target URL in data.url — prefer it
   if (n.data?.url && typeof n.data.url === 'string') return n.data.url;
 
-  switch (n.type) {
-    case 'market_survey':
-    case 'survey':
-      return '/';
-    case 'nearby':
-    case 'new_place': {
-      const pid = n.data?.place_id || (n.data?.places?.[0]);
-      return pid ? `/place/${pid}` : '/';
-    }
-    case 'event_invite':
-    case 'event_start':
-      return n.data?.event_id ? `/event/${n.data.event_id}` : '/';
-    case 'new_review':
-      return n.data?.place_id ? `/place/${n.data.place_id}` : '/';
-    default:
-      return '/';
-  }
+  const entry = navUrls[n.type];
+  if (!entry) return '/';
+  return typeof entry === 'function' ? entry(n) : entry;
 }
 
 function timeAgo(date: Date): string {
@@ -235,20 +237,16 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
                 const isUnread = !n.read;
                 const isHovered = hoveredId === n.id;
 
-                let icon: React.ReactNode;
-                if (n.type === 'market_survey' || n.type === 'survey') {
-                  icon = <ClipboardList className="w-3.5 h-3.5" />;
-                } else if (n.type === 'nearby') {
-                  icon = <MapPin className="w-3.5 h-3.5" />;
-                } else if (n.type === 'event_invite') {
-                  icon = <Calendar className="w-3.5 h-3.5" />;
-                } else if (n.type === 'new_review') {
-                  icon = <Star className="w-3.5 h-3.5" />;
-                } else if (n.type === 'owner_announcement') {
-                  icon = <Megaphone className="w-3.5 h-3.5" />;
-                } else {
-                  icon = <Bell className="w-3.5 h-3.5" />;
-                }
+                const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+                  market_survey: ClipboardList,
+                  survey: ClipboardList,
+                  nearby: MapPin,
+                  event_invite: Calendar,
+                  new_review: Star,
+                  owner_announcement: Megaphone,
+                };
+                const IconComp = typeIcons[n.type] || Bell;
+                const icon = <IconComp className="w-3.5 h-3.5" />;
 
                 return (
                   <motion.button

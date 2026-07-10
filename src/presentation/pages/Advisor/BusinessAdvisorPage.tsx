@@ -83,6 +83,15 @@ const Kpi = ({ icon, label, value, tone }: { icon: React.ReactNode; label: strin
 
 type Tab = 'veredicto' | 'oferta' | 'competencia' | 'alternativas' | 'encuesta' | 'plan'
 
+const TAB_COMPONENT: Record<Tab, ({ r }: { r: BusinessAdvisorReport }) => JSX.Element> = {
+  veredicto: TabVerdict,
+  oferta: TabOffer,
+  competencia: TabCompetition,
+  alternativas: TabAlternatives,
+  encuesta: TabSurvey,
+  plan: TabPlan,
+}
+
 export default function BusinessAdvisorPage() {
   const goBack = useSmartBack('/')
 
@@ -143,8 +152,8 @@ export default function BusinessAdvisorPage() {
         idea: idea.trim() || undefined, lat: location.lat, lng: location.lng, city: location.city,
       })
       setReport(r); setTab('veredicto')
-    } catch (e: any) {
-      setError(e?.message ?? 'No se pudo completar el análisis. Intentá de nuevo.')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'No se pudo completar el análisis. Intentá de nuevo.')
     } finally { setLoading(false) }
   }, [idea, location])
 
@@ -220,7 +229,25 @@ export default function BusinessAdvisorPage() {
 }
 
 // ── Panel del formulario ─────────────────────────────────────────────────────
-function FormPanel(p: any) {
+interface FormPanelProps {
+  idea: string
+  setIdea: React.Dispatch<React.SetStateAction<string>>
+  location: ChosenLocation | null
+  setLocation: React.Dispatch<React.SetStateAction<ChosenLocation | null>>
+  zoneQuery: string
+  setZoneQuery: React.Dispatch<React.SetStateAction<string>>
+  geoResults: GeoResult[]
+  pickZone: (g: GeoResult) => void
+  searchingZone: boolean
+  runZoneSearch: () => void
+  locating: boolean
+  useMyLocation: () => void
+  canAnalyze: boolean
+  loading: boolean
+  analyze: () => void
+}
+
+function FormPanel(p: FormPanelProps) {
   return (
     <>
       <div className="rounded-2xl border border-white/8 bg-white/5 overflow-hidden">
@@ -237,7 +264,7 @@ function FormPanel(p: any) {
             <label className="block text-[13px] font-medium text-white/60 mb-2">
               Idea de negocio <span className="text-white/30 font-normal">· opcional</span>
             </label>
-            <input value={p.idea} onChange={(e: any) => p.setIdea(e.target.value)} maxLength={160}
+            <input value={p.idea} onChange={(e: React.ChangeEvent<HTMLInputElement>) => p.setIdea(e.target.value)} maxLength={160}
               placeholder="Ej: pollería, cafetería de especialidad, parrillada dominical…"
               className="w-full px-4 py-3 rounded-xl bg-white/6 border border-white/10 text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-primary-400/50 focus:bg-white/8 transition-all" />
             <p className="text-[11px] text-white/25 mt-2">
@@ -269,8 +296,8 @@ function FormPanel(p: any) {
                   <div className="flex-1 h-px bg-white/8" /> o escribí una zona <div className="flex-1 h-px bg-white/8" />
                 </div>
                 <div className="flex gap-2">
-                  <input value={p.zoneQuery} onChange={(e: any) => p.setZoneQuery(e.target.value)}
-                    onKeyDown={(e: any) => e.key === 'Enter' && p.runZoneSearch()}
+                  <input value={p.zoneQuery} onChange={(e: React.ChangeEvent<HTMLInputElement>) => p.setZoneQuery(e.target.value)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && p.runZoneSearch()}
                     placeholder="Ej: Zona Norte, Cochabamba"
                     className="flex-1 px-4 py-3 rounded-xl bg-white/6 border border-white/10 text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-primary-400/50 focus:bg-white/8 transition-all" />
                   <button onClick={p.runZoneSearch} disabled={p.searchingZone || p.zoneQuery.trim().length < 3}
@@ -311,6 +338,7 @@ function FormPanel(p: any) {
 // ── Informe (pestañas) ───────────────────────────────────────────────────────
 function ReportView({ report, tab, setTab }: { report: BusinessAdvisorReport; tab: Tab; setTab: (t: Tab) => void }) {
   const hasAlt = report.alternatives.length > 0
+  const TabComponent = TAB_COMPONENT[tab]
   const tabs: { id: Tab; label: string; show: boolean }[] = [
     { id: 'veredicto',    label: 'Veredicto',    show: true },
     { id: 'oferta',       label: 'Qué ofrecer',  show: report.products.length > 0 || report.differentiators.length > 0 },
@@ -343,12 +371,7 @@ function ReportView({ report, tab, setTab }: { report: BusinessAdvisorReport; ta
       <div className="p-5">
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-            {tab === 'veredicto'    && <TabVerdict r={report} />}
-            {tab === 'oferta'       && <TabOffer r={report} />}
-            {tab === 'competencia'  && <TabCompetition r={report} />}
-            {tab === 'alternativas' && <TabAlternatives r={report} />}
-            {tab === 'encuesta'     && <TabSurvey r={report} />}
-            {tab === 'plan'         && <TabPlan r={report} />}
+            <TabComponent r={report} />
           </motion.div>
         </AnimatePresence>
       </div>

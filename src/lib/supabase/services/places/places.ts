@@ -50,7 +50,7 @@ export async function getPlaceById(id: string): Promise<Place | null> {
     throw error;
   }
 
-  try { await supabase.rpc('increment_place_views', { place_id: id }) } catch {}
+  try { await supabase.rpc('increment_place_views', { place_id: id }) } catch (err) { console.error('[places:getPlaceById:incrementViews]', err); }
 
   return transformPlaceData(data);
 }
@@ -104,8 +104,8 @@ export async function updatePlace(id: string, updates: Partial<CreatePlaceData>)
   };
   const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const [key, dbKey] of Object.entries(fieldMap)) {
-    if ((updates as any)[key] !== undefined) {
-      dbUpdates[dbKey] = (updates as any)[key];
+    if ((updates as Record<string, unknown>)[key] !== undefined) {
+      dbUpdates[dbKey] = (updates as Record<string, unknown>)[key];
     }
   }
   const { data, error } = await supabase
