@@ -6,6 +6,7 @@ import { postsService } from '@lib/supabase/services/posts/posts';
 import { useAuth } from '@presentation/context';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { CdnImage, getCdnImageSrc } from '@presentation/components/reusables';
 
 const REACTIONS = [
   { key: 'heart', emoji: '❤️' },
@@ -115,7 +116,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
           <AnimatePresence mode="wait">
             <motion.img
               key={imgIndex}
-              src={localPost.images[imgIndex]}
+              src={getCdnImageSrc(localPost.images[imgIndex], 640)}
               alt=""
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -200,7 +201,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
         >
           <div className="w-5 h-5 rounded-full overflow-hidden bg-primary-100 ring-1 ring-primary-200 shrink-0">
             {localPost.userAvatar ? (
-              <img src={localPost.userAvatar} alt="" className="w-full h-full object-cover" />
+              <CdnImage src={localPost.userAvatar} width={40} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-400 to-primary-600">
                 <Store className="w-2.5 h-2.5 text-white" />
@@ -319,8 +320,9 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
             >
               <X className="w-6 h-6" />
             </button>
-            <img
+            <CdnImage
               src={localPost.images[galleryIndex]}
+              width={1080}
               alt=""
               className="max-w-full max-h-[80vh] object-contain rounded-xl mx-auto block"
             />

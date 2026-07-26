@@ -8,3 +8,4 @@ export { default as SocialLinksRow } from '@presentation/components/reusables/So
 export { default as TikTokHeroEmbed } from '@presentation/components/reusables/TikTokHeroEmbed';
 export { default as TikTokVideoModal } from '@presentation/components/reusables/TikTokVideoModal';
 export { default as TikTokBadge } from '@presentation/components/reusables/TikTokBadge';
+export { default as CdnImage, getCdnImageSrc } from '@presentation/components/reusables/CdnImage';

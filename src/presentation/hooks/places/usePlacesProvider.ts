@@ -3,7 +3,18 @@ import { Place, PlaceFormData, Category, SocialGroup, Event } from '@domain/enti
 import { useAuth } from '@presentation/context';
 import { placesService, categoriesService, socialGroupsService, reviewsService, eventsService } from '@lib/supabase';
 import { realtimeService } from '@lib/supabase/services/notifications/websocket';
+import { idbGet, idbSet } from '@lib/cache/idbCache';
 import type { PlacesContextType } from '@domain/entities/PlacesContextTypes';
+
+// Cuánto tiempo se considera "fresco" lo pintado desde IndexedDB antes de
+// mostrar el spinner de carga en un reload. La revalidación en red se
+// dispara SIEMPRE al montar, esto solo decide si se ve un loader o los
+// datos de la última visita mientras esa revalidación corre en segundo plano.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const IDB_KEY_PLACES = 'home:places';
+const IDB_KEY_EVENTS = 'home:events';
+const IDB_KEY_CATEGORIES = 'home:categories';
+const IDB_KEY_SOCIAL_GROUPS = 'home:socialGroups';
 
 export function usePlacesProvider(): PlacesContextType {
   const { user } = useAuth();
@@ -42,20 +53,50 @@ export function usePlacesProvider(): PlacesContextType {
   }, []);
 
   const loadInitialData = async () => {
+    // 1) Pintar al instante con lo que quedó en IndexedDB de la última visita
+    // (sobrevive a un F5, a diferencia de tenerlo solo en memoria). Si no hay
+    // nada o expiró, seguimos mostrando el spinner mientras llega la red.
+    const [cachedPlaces, cachedEvents, cachedCategories, cachedSocialGroups] = await Promise.all([
+      idbGet<Place[]>(IDB_KEY_PLACES, CACHE_TTL_MS),
+      idbGet<Event[]>(IDB_KEY_EVENTS, CACHE_TTL_MS),
+      idbGet<Category[]>(IDB_KEY_CATEGORIES, CACHE_TTL_MS),
+      idbGet<SocialGroup[]>(IDB_KEY_SOCIAL_GROUPS, CACHE_TTL_MS),
+    ]);
+    const hadCache = !!(cachedPlaces || cachedEvents || cachedCategories || cachedSocialGroups);
+    if (cachedPlaces) setPlaces(cachedPlaces);
+    if (cachedEvents) setEvents(cachedEvents);
+    if (cachedCategories) setCategories(cachedCategories);
+    if (cachedSocialGroups) setSocialGroups(cachedSocialGroups);
+    if (hadCache) setIsLoading(false);
+
+    // 2) Revalidar siempre contra Supabase (stale-while-revalidate). Esto NO
+    // es opcional: garantiza que nunca se muestren datos desactualizados por
+    // más de lo que tarda esta request, el caché solo evita la pantalla en
+    // blanco mientras tanto.
     try {
-      setIsLoading(true);
+      if (!hadCache) setIsLoading(true);
       const [placesResult, categoriesResult, socialGroupsResult, eventsResult] = await Promise.allSettled([
         placesService.getPlaces(),
         categoriesService.getCategories(),
         socialGroupsService.getSocialGroups(),
         eventsService.getEvents(),
       ]);
-      if (placesResult.status === 'fulfilled') setPlaces(placesResult.value);
-      if (categoriesResult.status === 'fulfilled') setCategories(categoriesResult.value);
-      else console.error('Error loading categories:', categoriesResult.reason);
-      if (socialGroupsResult.status === 'fulfilled') setSocialGroups(socialGroupsResult.value);
-      else console.error('Error loading social groups:', socialGroupsResult.reason);
-      if (eventsResult.status === 'fulfilled') setEvents(eventsResult.value);
+      if (placesResult.status === 'fulfilled') {
+        setPlaces(placesResult.value);
+        idbSet(IDB_KEY_PLACES, placesResult.value);
+      }
+      if (categoriesResult.status === 'fulfilled') {
+        setCategories(categoriesResult.value);
+        idbSet(IDB_KEY_CATEGORIES, categoriesResult.value);
+      } else console.error('Error loading categories:', categoriesResult.reason);
+      if (socialGroupsResult.status === 'fulfilled') {
+        setSocialGroups(socialGroupsResult.value);
+        idbSet(IDB_KEY_SOCIAL_GROUPS, socialGroupsResult.value);
+      } else console.error('Error loading social groups:', socialGroupsResult.reason);
+      if (eventsResult.status === 'fulfilled') {
+        setEvents(eventsResult.value);
+        idbSet(IDB_KEY_EVENTS, eventsResult.value);
+      }
     } catch (error) {
       console.error('Error loading initial data:', error);
     } finally {
@@ -67,6 +108,7 @@ export function usePlacesProvider(): PlacesContextType {
     try {
       const placesData = await placesService.getPlaces();
       setPlaces(placesData);
+      idbSet(IDB_KEY_PLACES, placesData);
     } catch (error) {
       console.error('Error refreshing places:', error);
     }
@@ -76,6 +118,7 @@ export function usePlacesProvider(): PlacesContextType {
     try {
       const eventsData = await eventsService.getEvents();
       setEvents(eventsData);
+      idbSet(IDB_KEY_EVENTS, eventsData);
     } catch (error) {
       console.error('Error refreshing events:', error);
     }

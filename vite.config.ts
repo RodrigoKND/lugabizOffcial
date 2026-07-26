@@ -22,9 +22,29 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          // maplibre-gl es pesado (~800KB) y solo lo usan las páginas de
+          // detalle/formularios (ya lazy-loaded); pinearlo evita que Rollup
+          // duplique su código entre esos chunks.
           'maplibre': ['maplibre-gl'],
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['framer-motion', 'lucide-react'],
+          // react/react-router/framer-motion se usan eager desde App.tsx y
+          // Navbar en TODAS las rutas, así que igual viajan en el primer
+          // request. Los agrupamos en un vendor chunk aparte (en vez de
+          // dejar que Rollup los mezcle con el código de la app) para que
+          // el hash de este chunk no cambie en cada deploy: el navegador lo
+          // sirve desde cache (Cache-Control immutable) en vez de volver a
+          // descargarlo cada vez que se toca código propio.
+          'vendor': ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
+          // lucide-react NO se fuerza a un chunk global: dejamos que Rollup
+          // lo agrupe por límite de import dinámico, así los íconos
+          // exclusivos de páginas lazy (admin, chat, asesor, etc.) no
+          // inflan el bundle inicial.
+          //
+          // firebase/app + firebase/messaging: el import() dinámico no
+          // generaba chunk en este proyecto (ver comentario en
+          // usePushNotifications.ts), así que quedó como import estático.
+          // Lo aislamos igual en su propio chunk para que no infle el
+          // bundle de código propio y quede cacheado por separado.
+          'firebase': ['firebase/app', 'firebase/messaging'],
         },
       },
     },

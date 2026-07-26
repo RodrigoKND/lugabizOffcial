@@ -2,6 +2,20 @@ import { useState, useEffect } from 'react';
 import { useAuth, usePlaces } from '@presentation/context';
 import { Event, Place, MarketSurvey } from '@domain/entities';
 import { marketSurveysService } from '@lib/supabase';
+import { idbGet, idbSet } from '@lib/cache/idbCache';
+
+// Datos propios del usuario (guardados/asistencia/encuestas) cambian más
+// seguido que el catálogo general, así que el TTL es más corto: solo evita
+// el parpadeo de loading al volver a /profile dentro de la misma sesión o
+// tras un F5 reciente, no reemplaza la revalidación de red.
+const CACHE_TTL_MS = 2 * 60 * 1000;
+
+interface ProfileCachePayload {
+  savedPlaces: Place[];
+  myEvents: Event[];
+  attendingEvents: Event[];
+  mySurveys: MarketSurvey[];
+}
 
 export function useProfileData() {
   const { user } = useAuth();
@@ -26,8 +40,19 @@ export function useProfileData() {
       setIsLoading(false);
       return;
     }
+    const cacheKey = `profile:${user.id}`;
     const init = async () => {
-      setIsLoading(true);
+      const cached = await idbGet<ProfileCachePayload>(cacheKey, CACHE_TTL_MS);
+      if (cached) {
+        setSavedPlaces(cached.savedPlaces);
+        setMyEvents(cached.myEvents);
+        setAttendingEvents(cached.attendingEvents);
+        setMySurveys(cached.mySurveys);
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+      }
+
       const [saved, events, attending] = await Promise.all([
         getSavedPlacesByUserId(user.id),
         getUserEvents(user.id),
@@ -36,11 +61,13 @@ export function useProfileData() {
       if (saved) setSavedPlaces(saved);
       setMyEvents(events);
       setAttendingEvents(attending);
+      let surveys: MarketSurvey[] = cached?.mySurveys ?? [];
       try {
-        const surveys = await marketSurveysService.getByUser(user.id);
+        surveys = await marketSurveysService.getByUser(user.id);
         setMySurveys(surveys);
       } catch (err) { console.error('[useProfileData:init]', err); }
       setIsLoading(false);
+      idbSet(cacheKey, { savedPlaces: saved || [], myEvents: events, attendingEvents: attending, mySurveys: surveys });
     };
     init();
   }, [user]);

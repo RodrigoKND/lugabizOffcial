@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Heart, MessageCircle, Calendar } from 'lucide-react';
+import { CdnImage } from '@presentation/components/reusables';
 
 interface Event {
   id: string;
@@ -32,7 +33,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       <div className="absolute top-3 left-3 z-10">
         <div className={`p-0.5 rounded-full ${event.organizer.isNew ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500' : 'bg-gray-400'}`}>
           <div className="p-0.5 bg-white rounded-full">
-            <img src={event.organizer.avatar} alt={event.organizer.name} className="w-10 h-10 rounded-full object-cover" />
+            <CdnImage src={event.organizer.avatar} width={80} alt={event.organizer.name} className="w-10 h-10 rounded-full object-cover" />
           </div>
         </div>
       </div>

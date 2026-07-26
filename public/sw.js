@@ -15,28 +15,34 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
-  let data = {};
+  let payload = {};
   try {
-    data = event.data.json();
+    payload = event.data.json();
   } catch {
-    data = { title: 'Lugabiz', body: event.data.text() };
+    payload = { title: 'Lugabiz', body: event.data.text() };
   }
 
-  const title = data.title || 'Lugabiz';
+  // Firebase Cloud Messaging entrega { notification: { title, body }, data: {...} }
+  // con `data` siempre string→string. El web-push nativo (en desuso, puede quedar
+  // algún dispositivo viejo en transición) mandaba title/body/data sueltos en la raíz.
+  const notif = payload.notification || payload;
+  const extra = payload.data || {};
+
+  const title = notif.title || 'Lugabiz';
+  const tag = extra.tag
+    || (extra.surveyId ? `survey-${extra.surveyId}` : undefined)
+    || (extra.place_id ? `nearby-${extra.place_id}` : undefined);
+
   const options = {
-    body: data.body || '',
-    icon: data.icon || '/L.ico',
+    body: notif.body || '',
+    icon: '/L.ico',
     badge: '/L.ico',
-    vibrate: data.vibrate || [200, 100, 200],
-    tag: data.data?.surveyId
-      ? `survey-${data.data.surveyId}`
-      : data.data?.place_id
-        ? `nearby-${data.data.place_id}`
-        : undefined,
+    vibrate: [200, 100, 200],
+    tag,
     renotify: true,
     data: {
-      url: data.data?.url || '/',
-      surveyId: data.data?.surveyId || null,
+      url: extra.url || '/',
+      surveyId: extra.surveyId || null,
     },
     actions: [
       { action: 'open', title: 'Ver' },
@@ -74,33 +80,6 @@ self.addEventListener('notificationclick', (event) => {
       // Si no hay ventana abierta, abre una nueva
       if (clients.openWindow) return clients.openWindow(urlToOpen);
     })
-  );
-});
-
-// Chrome renueva la suscripción push automáticamente. Cuando lo hace, el
-// endpoint viejo muere y el nuevo debe guardarse en la DB.
-// Este evento notifica a las pestañas abiertas para que re-registren.
-self.addEventListener('pushsubscriptionchange', (event) => {
-  event.waitUntil(
-    (async () => {
-      try {
-        const newSub = await self.registration.pushManager.subscribe(
-          event.oldSubscription
-            ? event.oldSubscription.options
-            : { userVisibleOnly: true }
-        );
-        const allClients = await clients.matchAll({ includeUncontrolled: true, type: 'window' });
-        allClients.forEach((client) =>
-          client.postMessage({
-            type: 'PUSH_SUBSCRIPTION_CHANGED',
-            subscription: JSON.parse(JSON.stringify(newSub)),
-          })
-        );
-      } catch {
-        // Si no hay clientes abiertos, el hook registrará la nueva suscripción
-        // la próxima vez que el usuario abra la app.
-      }
-    })()
   );
 });
 

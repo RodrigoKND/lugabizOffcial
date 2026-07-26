@@ -1,5 +1,6 @@
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { PlaceGalleryProps } from '@domain/entities/PlaceDetailTypes';
+import { CdnImage } from '@presentation/components/reusables';
 
 export default function PlaceGallery({ place, galleryIdx, onThumbnailClick, onClose, onPrev, onNext }: PlaceGalleryProps) {
   const hasGallery = place.gallery && place.gallery.length > 1;
@@ -11,7 +12,7 @@ export default function PlaceGallery({ place, galleryIdx, onThumbnailClick, onCl
           {place.gallery!.map((url, i) => (
             <button key={i} onClick={() => onThumbnailClick(i)}
               className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all hover:opacity-90 ${url === place.image ? 'border-amber-400' : 'border-transparent'}`}>
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              <CdnImage src={url} width={160} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
@@ -24,7 +25,7 @@ export default function PlaceGallery({ place, galleryIdx, onThumbnailClick, onCl
               className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors">
               <X className="w-6 h-6" />
             </button>
-            <img src={place.gallery[galleryIdx]} alt="" className="max-w-full max-h-[85vh] object-contain rounded-2xl" />
+            <CdnImage src={place.gallery[galleryIdx]} width={1920} priority alt="" className="max-w-full max-h-[85vh] object-contain rounded-2xl" />
             <div className="absolute inset-y-0 left-0 flex items-center">
               {galleryIdx > 0 && (
                 <button onClick={onPrev}

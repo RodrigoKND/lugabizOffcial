@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, Plus, Pencil, Menu, LogOut, BarChart3, Loader2, Award, BadgeCheck, Sparkles } from 'lucide-react';
 import { User } from '@domain/entities';
+import { CdnImage } from '@presentation/components/reusables';
 
 interface ProfileHeaderProps {
   user: User;
@@ -32,7 +33,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   <div className="bg-white rounded-2xl p-5 sm:p-6 border border-primary-100/40 shadow-xs mb-6">
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
       <div className="relative shrink-0">
-        <img src={user.avatar || '/avatar.png'}
+        <CdnImage src={user.avatar || '/avatar.png'} width={160} priority
           className="w-20 h-20 rounded-2xl object-cover shadow-sm ring-2 ring-primary-100" alt={user.name} />
         <button onClick={() => avatarInputRef.current?.click()} disabled={isUploadingAvatar}
           className="absolute -bottom-1 -right-1 bg-primary-500 text-white p-1.5 rounded-lg hover:scale-110 transition-transform shadow-sm disabled:opacity-50">

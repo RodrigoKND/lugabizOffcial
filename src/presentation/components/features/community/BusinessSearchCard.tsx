@@ -1,6 +1,7 @@
 import { Star, Eye, Flag, TrendingUp, Clock } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Place } from '@domain/entities';
+import { CdnImage } from '@presentation/components/reusables';
 
 interface BusinessSearchCardProps {
   place: Place;
@@ -37,7 +38,7 @@ const BusinessSearchCard: React.FC<BusinessSearchCardProps> = ({ place, reportCo
     >
       <div className="shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-primary-50">
         {place.image ? (
-          <img src={place.image} alt={place.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <CdnImage src={place.image} width={160} alt={place.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200">
             <TrendingUp className="w-6 h-6 text-primary-400" />

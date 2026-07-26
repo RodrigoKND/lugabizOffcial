@@ -1,3 +1,5 @@
+import { CdnImage } from '@presentation/components/reusables';
+
 interface StoryCardProps {
   image?: string;
   name: string;
@@ -16,8 +18,9 @@ const StoryCard: React.FC<StoryCardProps> = ({ image, name, onClick, isViewed, e
       // Ring is handled by StoriesRow — just show the avatar
       <div className="p-[2px] bg-white rounded-full">
         {image ? (
-          <img
+          <CdnImage
             src={image}
+            width={128}
             alt={name}
             className={`w-16 h-16 rounded-full object-cover ${isViewed ? 'grayscale-[40%]' : ''}`}
           />
@@ -32,8 +35,9 @@ const StoryCard: React.FC<StoryCardProps> = ({ image, name, onClick, isViewed, e
       <div className={`p-[2px] rounded-full group-active:scale-90 transition-transform ${isViewed ? 'bg-stone-300' : 'bg-gradient-to-br from-primary-400 via-pink-400 to-orange-400'}`}>
         <div className="p-[2px] bg-white rounded-full">
           {image ? (
-            <img
+            <CdnImage
               src={image}
+              width={128}
               alt={name}
               className={`w-16 h-16 rounded-full object-cover ${isViewed ? 'grayscale-[40%]' : ''}`}
             />

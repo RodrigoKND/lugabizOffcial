@@ -21,6 +21,18 @@ export const pushSubscriptionsService = {
     if (error) throw error;
   },
 
+  /** Guarda un token de Firebase Cloud Messaging (reemplaza gradualmente a `save`). */
+  async saveFcmToken(userId: string, token: string): Promise<void> {
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .upsert({
+        user_id: userId,
+        fcm_token: token,
+        provider: 'fcm',
+      }, { onConflict: 'fcm_token' });
+    if (error) throw error;
+  },
+
   async getByUserIds(userIds: string[]): Promise<PushSubscriptionRow[]> {
     if (userIds.length === 0) return [];
     const { data, error } = await supabase

@@ -11,7 +11,7 @@ import { Section } from '@presentation/components/ui/section';
 const EditEventPage: React.FC = () => {
   const {
     id, event, loading, saving, form, formInputClass, coverPreview,
-    coverRef, galleryUrls, galleryPreviews, galleryRef, totalNewMB,
+    coverRef, galleryUrls, galleryPreviews, galleryFiles, galleryRef, totalNewMB,
     handleCoverChange, clearCover, handleGalleryAdd,
     removeExistingGallery, removeNewGallery, handleSubmit, setForm,
   } = useEditEventForm();

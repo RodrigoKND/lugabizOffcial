@@ -2,6 +2,7 @@ import { Calendar, MapPin, Users, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Event } from '@domain/entities';
 import { getCategoryColor } from '@presentation/components/features/home/categoryColors';
+import { CdnImage } from '@presentation/components/reusables';
 
 interface EventSearchCardProps {
   event: Event;
@@ -19,7 +20,7 @@ const EventSearchCard: React.FC<EventSearchCardProps> = ({ event }) => {
     >
       <div className="shrink-0 w-20 h-20 rounded-xl overflow-hidden relative bg-primary-50">
         {event.image ? (
-          <img src={event.image} alt={event.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <CdnImage src={event.image} width={160} alt={event.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradient}`} />
         )}

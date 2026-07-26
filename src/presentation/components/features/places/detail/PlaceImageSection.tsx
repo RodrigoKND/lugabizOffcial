@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pencil, Trash2, Play } from 'lucide-react';
 import type { PlaceImageSectionProps } from '@domain/entities/PlaceDetailTypes';
-import { TikTokVideoModal } from '@presentation/components/reusables';
+import { TikTokVideoModal, CdnImage } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 export default function PlaceImageSection({ place, user, onEdit, onDeleteClick }: PlaceImageSectionProps) {
@@ -10,7 +10,7 @@ export default function PlaceImageSection({ place, user, onEdit, onDeleteClick }
 
   return (
     <div className="relative rounded-3xl overflow-hidden bg-white/5 aspect-4/3 lg:aspect-auto lg:h-125">
-      <img src={place.image} alt={place.name} className="w-full h-full object-cover" loading="lazy" />
+      <CdnImage src={place.image} width={1080} priority alt={place.name} className="w-full h-full object-cover" />
       {tiktokId && (
         <button
           onClick={() => setVideoOpen(true)}

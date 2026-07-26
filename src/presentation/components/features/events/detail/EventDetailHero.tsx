@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { Share2, X, ChevronLeft, ChevronRight, Images, Play } from 'lucide-react';
 import { Event } from '@domain/entities';
-import { TikTokVideoModal } from '@presentation/components/reusables';
+import { TikTokVideoModal, CdnImage, getCdnImageSrc } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface EventDetailHeroProps {
@@ -43,8 +43,10 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
         className="relative aspect-video rounded-3xl overflow-hidden bg-stone-100 shadow-sm cursor-pointer group"
         onClick={() => openLightbox(0)}
       >
-        <img
+        <CdnImage
           src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
+          width={1080}
+          priority
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           alt={event.name}
         />
@@ -103,7 +105,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
                 i === 0 ? 'border-amber-400' : 'border-transparent hover:border-amber-300'
               }`}
             >
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              <CdnImage src={url} width={160} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
@@ -120,7 +122,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
           {/* Blurred background */}
           <div
             className="absolute inset-0 bg-cover bg-center blur-3xl opacity-40 scale-110"
-            style={{ backgroundImage: `url(${allImages[lightboxIdx]})` }}
+            style={{ backgroundImage: `url(${getCdnImageSrc(allImages[lightboxIdx], 256, 40)})` }}
           />
           <div
             className="relative max-w-5xl max-h-[90vh] mx-4 w-full flex items-center justify-center"
@@ -135,8 +137,10 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
             </button>
 
             {/* Image */}
-            <img
+            <CdnImage
               src={allImages[lightboxIdx]}
+              width={1920}
+              priority
               alt=""
               className="max-w-full max-h-[80vh] object-contain rounded-2xl select-none pointer-events-none relative z-10"
             />

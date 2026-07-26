@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { createPushSender } from './webpush.ts'
+import { parseServiceAccount, getFcmAccessToken, sendFcmMessage } from './fcm.ts'
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -126,35 +126,26 @@ serve(async (req) => {
     })
   }
 
-  // Enviar push real a los usuarios que tengan suscripción
-  const vapidPublicKey = Deno.env.get('VITE_VAPID_PUBLIC_KEY') || Deno.env.get('VAPID_PUBLIC_KEY') || ''
-  const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY') || ''
-
+  // Enviar push real (FCM) a los usuarios que tengan token registrado
   let pushSent = 0
-  if (vapidPublicKey && vapidPrivateKey && users.length > 0) {
-    const sender = await createPushSender({
-      subject: 'mailto:support@lugabiz.com',
-      publicKey: vapidPublicKey,
-      privateKey: vapidPrivateKey,
-    })
+  const saRaw = Deno.env.get('FIREBASE_SERVICE_ACCOUNT') || ''
+  if (saRaw && users.length > 0) {
+    const sa = parseServiceAccount(saRaw)
+    const accessToken = await getFcmAccessToken(sa)
 
     const userIds = users.map((u: { id: string }) => u.id)
     const { data: subscriptions } = await supabaseClient
       .from('push_subscriptions')
-      .select('id, subscription')
+      .select('id, fcm_token')
       .in('user_id', userIds)
+      .not('fcm_token', 'is', null)
 
     if (subscriptions && subscriptions.length > 0) {
-      const pushPayload = JSON.stringify({
-        title: `📢 ${title}`,
-        body,
-        icon: '/L.ico',
-        badge: '/L.ico',
-        vibrate: [200, 100, 200],
-        data: { url: notifData?.url || '/' },
+      const notifTitle = `📢 ${title}`
+      const pushData: Record<string, string> = {
+        url: notifData?.url || '/',
         tag: `announcement-${user.id}`,
-        renotify: true,
-      })
+      }
 
       const staleIds: string[] = []
       const CHUNK_SIZE = 50
@@ -162,19 +153,15 @@ serve(async (req) => {
         const chunk = subscriptions.slice(i, i + CHUNK_SIZE)
         const results = await Promise.allSettled(
           chunk.map(async (sub: any) => {
-            try {
-              await sender.send(sub.subscription, pushPayload, { urgency: 'high', ttl: 86400 })
-              return true
-            } catch (e: any) {
-              const code = e?.statusCode ?? e?.status
-              // Solo borrar si la suscripción está muerta (404/410); un 403 (VAPID) o
-              // un timeout NO debe eliminar una suscripción válida.
-              if (code === 404 || code === 410) staleIds.push(sub.id)
-              return false
+            const r = await sendFcmMessage(sub.fcm_token, notifTitle, body, pushData, sa.project_id, accessToken)
+            if (!r.ok) {
+              if (r.stale) staleIds.push(sub.id)
+              throw new Error(`${r.status ?? '?'}`)
             }
+            return true
           })
         )
-        pushSent += results.filter(r => r.status === 'fulfilled' && (r as any).value).length
+        pushSent += results.filter(r => r.status === 'fulfilled').length
       }
       if (staleIds.length > 0) {
         await supabaseClient.from('push_subscriptions').delete().in('id', staleIds)

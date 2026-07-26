@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Store, Star } from 'lucide-react';
 import type { Place } from '@domain/entities';
+import { CdnImage } from '@presentation/components/reusables';
 
 interface SearchResultItemProps {
   place: Place;
@@ -21,7 +22,7 @@ export function SearchResultItem({ place, index, onSelect }: SearchResultItemPro
     >
       <div className="w-10 h-10 rounded-xl bg-white/8 overflow-hidden shrink-0">
         {place.image ? (
-          <img src={place.image} alt={place.name} className="w-full h-full object-cover" />
+          <CdnImage src={place.image} width={80} alt={place.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
             <Store className="w-5 h-5 text-white/25" />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Star } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { Place } from '@domain/entities';
-import { TikTokBadge } from '@presentation/components/reusables';
+import { TikTokBadge, CdnImage } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 interface PlaceCardProps {
@@ -22,9 +22,9 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick, className = '' })
       onClick={onClick}
     >
       <header>
-        <img
-          loading="lazy"
+        <CdnImage
           src={place?.image}
+          width={480}
           alt={place?.name}
           className="object-cover hover:scale-125 transition duration-200 cursor-pointer w-full h-48 rounded-md"
         />

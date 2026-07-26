@@ -7,14 +7,30 @@ import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, PlacesProvider, useAuth } from '@presentation/context';
 import { Navbar, Footer, AuthModal, ChatButton, SurveyCard, Preferences } from '@presentation/components/features';
 import BannedAccountModal from '@presentation/components/features/users/modal/BannedAccountModal';
-import { Home, PlaceDetail, AddPlace, Profile, EventDetailPage, EventFeedPage, EditEventPage, EditPlacePage, Confirmation, SharedPlacePage, CommunityPage, ChatPage, BusinessAdvisorPage } from '@presentation/pages';
+import { Home } from '@presentation/pages';
 import { useEventNotifications } from '@presentation/hooks/useEventNotifications';
 import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
 import { useUserTracking } from '@presentation/hooks/geo/useUserTracking';
-import { marketSurveysService } from '@lib/supabase';
+import { marketSurveysService } from '@lib/supabase/services/surveys';
 
+// Solo Home carga eager (es la landing). El resto de las páginas se parte en
+// chunks separados que el navegador pide bajo demanda al navegar a esa ruta,
+// así el bundle inicial no arrastra código de páginas que la mayoría de las
+// visitas nunca abre (admin, chat, editar evento/lugar, etc.).
+const PlaceDetail = lazy(() => import('@presentation/pages/Places/PlaceDetail'));
+const AddPlace = lazy(() => import('@presentation/pages/Places/formAddNewPlace/AddPlace'));
+const Profile = lazy(() => import('@presentation/pages/User/Profile'));
+const EventDetailPage = lazy(() => import('@presentation/pages/Events/EventDetailPage'));
+const EventFeedPage = lazy(() => import('@presentation/pages/Events/EventFeedPage'));
+const EditEventPage = lazy(() => import('@presentation/pages/Events/EditEventPage'));
+const EditPlacePage = lazy(() => import('@presentation/pages/Places/EditPlacePage'));
+const SharedPlacePage = lazy(() => import('@presentation/pages/Places/SharedPlacePage'));
+const Confirmation = lazy(() => import('@presentation/pages/Confirmation/Confirmation'));
 const AdminPanel = lazy(() => import('@presentation/pages/Admin/AdminPanel'));
+const CommunityPage = lazy(() => import('@presentation/pages/Community/CommunityPage'));
+const ChatPage = lazy(() => import('@presentation/pages/Chat/ChatPage'));
+const BusinessAdvisorPage = lazy(() => import('@presentation/pages/Advisor/BusinessAdvisorPage'));
 
 // ── Scroll restoration for BrowserRouter (no data-router needed) ─────────────
 function ScrollRestorer() {

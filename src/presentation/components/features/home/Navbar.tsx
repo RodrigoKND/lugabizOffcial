@@ -5,6 +5,7 @@ import { useAuth } from '@presentation/context/AuthContext';
 import { useUnreadSurveys } from '@presentation/hooks/useSurveys';
 import { SearchModal } from '@presentation/components/ui/SearchModal';
 import NotificationDropdown from '@presentation/components/features/notifications/NotificationDropdown';
+import { CdnImage } from '@presentation/components/reusables';
 
 const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
   const location = useLocation();
@@ -95,7 +96,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
                   </button>
                   <button onClick={() => navigate('/profile')}
                     className="p-1 rounded-full hover:bg-white/8 transition-colors">
-                    <img src={user.avatar || '/avatar.png'} alt={user.name}
+                    <CdnImage src={user.avatar || '/avatar.png'} width={64} alt={user.name}
                       className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-400/40" />
                   </button>
                 </div>
@@ -162,7 +163,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
               <Link to="/profile"
                 className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-xl transition-all ${isActive('/profile') ? 'text-white' : 'text-white/35'}`}>
                 <div className={`w-5 h-5 rounded-full overflow-hidden ${isActive('/profile') ? 'ring-1 ring-primary-400' : ''}`}>
-                  <img src={user.avatar || '/avatar.png'} alt={user.name} className="w-full h-full object-cover" />
+                  <CdnImage src={user.avatar || '/avatar.png'} width={40} alt={user.name} className="w-full h-full object-cover" />
                 </div>
                 <span className="text-[9px] font-medium">Perfil</span>
               </Link>

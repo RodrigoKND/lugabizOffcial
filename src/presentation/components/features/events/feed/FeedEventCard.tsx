@@ -4,7 +4,7 @@ import { Heart, MessageCircle, Bookmark, MapPin, Calendar } from 'lucide-react';
 import { FeedEventProps } from '@domain/entities/EventFeedTypes';
 import { useEventLikes } from '@presentation/hooks/useEventLikes';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
-import { TikTokHeroEmbed } from '@presentation/components/reusables';
+import { TikTokHeroEmbed, CdnImage } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 
 export function FeedEventCard({ event, isActive, onPrev, onNext, onCommentOpen, userId }: FeedEventProps) {
@@ -43,8 +43,10 @@ export function FeedEventCard({ event, isActive, onPrev, onNext, onCommentOpen, 
             fallbackImageUrl={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
           />
         ) : (
-          <img
+          <CdnImage
             src={event.image || 'https://images.unsplash.com/photo-1514525253361-bee8a187499b?w=800'}
+            width={828}
+            priority={isActive}
             alt={event.name}
             className="w-full h-full object-cover"
           />

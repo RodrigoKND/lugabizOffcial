@@ -4,5 +4,37 @@
             "source": "/(.*)",
             "destination": "/"
         }
+    ],
+    "images": {
+        "sizes": [64, 128, 256, 384, 640, 828, 1080, 1200, 1920],
+        "domains": ["fmujhdpqbmbfcottifpc.supabase.co"],
+        "minimumCacheTTL": 2678400,
+        "formats": ["image/avif", "image/webp"]
+    },
+    "headers": [
+        {
+            "source": "/assets/(.*)",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+            ]
+        },
+        {
+            "source": "/(.*)\\.(woff2|woff|ttf)",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+            ]
+        },
+        {
+            "source": "/sw.js",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+            ]
+        },
+        {
+            "source": "/(.*)\\.(png|jpg|jpeg|webp|avif|ico|svg)",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+            ]
+        }
     ]
 }
