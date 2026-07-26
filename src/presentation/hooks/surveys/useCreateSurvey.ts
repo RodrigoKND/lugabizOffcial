@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { marketSurveysService } from '@lib/supabase';
-import { sendSurveyPushNotification } from '@lib/supabase/services/push/sendPush';
+import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 import { useAuth, usePlaces } from '@presentation/context';
 import type { SurveyQuestion } from '@domain/entities';
@@ -137,7 +137,7 @@ export function useCreateSurvey(onCreated: () => void, onClose: () => void) {
         console.error('Error notifying users:', notifErr);
       }
       try {
-        await sendSurveyPushNotification(survey.id, form.title);
+        await edgeService.sendSurveyPush(survey.id, form.title, form.description, selectedCats);
       } catch (pushErr) {
         console.error('Error sending push:', pushErr);
       }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@presentation/context';
 import { authService } from '@lib/supabase';
+import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 
 const LS_LOGIN_KEY = '_lugabiz_login_dismissed';
 
@@ -16,6 +17,7 @@ function setLoginDismissed() {
 
 export function useOnboardingAlerts() {
   const { user, isLoading, showPreferences } = useAuth();
+  const { enablePushNotifications } = usePushNotifications();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [ready, setReady] = useState(false);
   const [localStep, setLocalStep] = useState<OnboardingStep>('login');
@@ -88,7 +90,10 @@ export function useOnboardingAlerts() {
 
     if (localStep === 'notifications') {
       if (typeof window !== 'undefined' && 'Notification' in window) {
-        Notification.requestPermission().then(() => {
+        // Pide el permiso Y registra el token FCM en push_subscriptions — antes
+        // esto solo pedía el permiso del navegador sin registrar nada, así que
+        // el usuario "aceptaba" pero nunca quedaba suscrito de verdad.
+        enablePushNotifications().finally(() => {
           const next = 'geolocation' as OnboardingStep;
           setLocalStep(next);
           saveToDb(next, true, user?.geoDismissed ?? false);
@@ -112,7 +117,7 @@ export function useOnboardingAlerts() {
       }
       return;
     }
-  }, [localStep, user, saveToDb]);
+  }, [localStep, user, saveToDb, enablePushNotifications]);
 
   const handleDismiss = useCallback(() => {
     if (localStep === 'login') {

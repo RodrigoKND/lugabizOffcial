@@ -22,7 +22,7 @@ export { adminService } from '@lib/supabase/services/admin/admin';
 export { broadcastService } from '@lib/supabase/services/admin/broadcast';
 export type { BroadcastAudience, BroadcastCampaign, BroadcastResult } from '@lib/supabase/services/admin/broadcast';
 export { marketSurveysService } from '@lib/supabase/services/surveys';
-export { pushSubscriptionsService, sendBrowserPush, sendSurveyPushNotification, sendAnnouncementPushNotification } from '@lib/supabase/services/push';
+export { pushSubscriptionsService, sendBrowserPush } from '@lib/supabase/services/push';
 export { placeSharesService } from '@lib/supabase/services/places/placeShares';
 export { userActivityService } from '@lib/supabase/services/places/userActivity';
 export { reportsService } from '@lib/supabase/services/reports';

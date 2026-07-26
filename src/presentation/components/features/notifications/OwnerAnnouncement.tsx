@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { supabase } from '@lib/supabase/client';
 import { useAuth } from '@presentation/context';
-import { sendAnnouncementPushNotification } from '@lib/supabase/services/push/sendPush';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 
 interface OwnerAnnouncementProps {
@@ -60,7 +59,6 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
         );
       }
 
-      sendAnnouncementPushNotification(title.trim(), body.trim());
       toast.success('Anuncio publicado en la plataforma');
       setTitle('');
       setBody('');

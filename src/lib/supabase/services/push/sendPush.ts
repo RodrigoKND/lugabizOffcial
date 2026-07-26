@@ -1,3 +1,8 @@
+// Eco local de una notificación ya insertada en la tabla `notifications` (ver
+// suscripción realtime en useAuthProvider.ts): NO es push real, solo evita que
+// el usuario logueado con la pestaña abierta tenga que esperar el round-trip
+// del push para ver el aviso. El push que llega con la app cerrada/en
+// background es 100% responsabilidad de las Edge Functions (FCM).
 export async function sendBrowserPush(title: string, body: string, url?: string, data?: Record<string, unknown>) {
   if (!('serviceWorker' in navigator)) return;
   if (Notification.permission !== 'granted') return;
@@ -11,17 +16,4 @@ export async function sendBrowserPush(title: string, body: string, url?: string,
       data: { url: url || '/', ...data },
     });
   } catch (err) { console.error('[sendPush:showNotification]', err); }
-}
-
-export async function sendSurveyPushNotification(surveyId: string, surveyTitle: string) {
-  const title = 'Nueva encuesta disponible';
-  const body = `"${surveyTitle}" — danos tu opinión`;
-  const url = '/';
-  await sendBrowserPush(title, body, url, { surveyId });
-}
-
-export async function sendAnnouncementPushNotification(announcementTitle: string, announcementBody: string) {
-  const title = `📢 ${announcementTitle}`;
-  const body = announcementBody;
-  await sendBrowserPush(title, body, '/');
 }
