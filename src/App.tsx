@@ -1,6 +1,6 @@
-import { useState, useEffect, lazy, Suspense, useRef, createContext, useContext } from 'react';
+import { useState, useEffect, lazy, Suspense, createContext, useContext } from 'react';
 import { Bell, BellOff, X } from 'lucide-react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
@@ -31,37 +31,6 @@ const AdminPanel = lazy(() => import('@presentation/pages/Admin/AdminPanel'));
 const CommunityPage = lazy(() => import('@presentation/pages/Community/CommunityPage'));
 const ChatPage = lazy(() => import('@presentation/pages/Chat/ChatPage'));
 const BusinessAdvisorPage = lazy(() => import('@presentation/pages/Advisor/BusinessAdvisorPage'));
-
-// ── Scroll restoration for BrowserRouter (no data-router needed) ─────────────
-function ScrollRestorer() {
-  const { pathname, key, state } = useLocation();
-  const navType = useNavigationType();
-
-  useEffect(() => {
-    if (navType === 'POP') {
-      const saved = sessionStorage.getItem(`scroll:${pathname}:${key}`);
-      if (saved) {
-        requestAnimationFrame(() => window.scrollTo(0, Number(saved)));
-        return;
-      }
-    }
-    // Skip scroll reset when opening a modal sheet (background state present)
-    if (!(state as Record<string, unknown>)?.background) {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname, key, navType, (state as Record<string, unknown>)?.background]);
-
-  useEffect(() => {
-    const save = () => sessionStorage.setItem(`scroll:${pathname}:${key}`, String(window.scrollY));
-    window.addEventListener('beforeunload', save);
-    return () => {
-      save();
-      window.removeEventListener('beforeunload', save);
-    };
-  }, [pathname, key]);
-
-  return null;
-}
 
 // Contexto global para que cualquier componente pueda pedir "activar push"
 const PushCtx = createContext<{ enable: () => Promise<boolean> }>({ enable: async () => false });
@@ -145,6 +114,7 @@ function PushEnableBanner() {
     const ok = await enable();
     setLoading(false);
     if (ok) { setShow(false); return; }
+    if (!ok) { setShow(true); return; }
     if (Notification.permission === 'denied') setDenied(true);
   };
 
@@ -180,7 +150,7 @@ function PushEnableBanner() {
                 <Bell className="w-4 h-4 text-primary-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-stone-800">Activá las notificaciones</p>
+                <p className="text-sm font-semibold text-stone-800">Activa las notificaciones</p>
                 <p className="text-xs text-stone-500 leading-snug">Enteráte de eventos y lugares aunque no estés en la app.</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -228,7 +198,7 @@ function PendingSurveys() {
           if (!user) return;
           try {
             const notifs = await marketSurveysService.getNotificationsForUser(user.id);
-            const match = notifs.find((n: Record<string, unknown>) => n.survey_id === current.id);
+            const match = notifs.find((n) => n.surveyId === current.id);
             if (match) await marketSurveysService.markAsRead(match.id);
           } catch (err) { console.error('[App:markSurveyRead]', err); }
           setVisible(null);
@@ -272,7 +242,6 @@ function AppRoutes() {
 
   return (
     <>
-      <ScrollRestorer />
       <EventNotificationsManager />
       <GlobalPreferences />
       <GlobalBanModal />

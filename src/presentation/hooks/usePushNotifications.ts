@@ -22,8 +22,8 @@ async function getFcmToken(): Promise<string | null> {
     console.warn('[push] El navegador no soporta push notifications');
     return null;
   }
+  
   if (!firebaseVapidKey) {
-    console.error('[push] Falta VITE_FIREBASE_VAPID_KEY (Firebase Console → Cloud Messaging → Web Push certificates)');
     return null;
   }
 
