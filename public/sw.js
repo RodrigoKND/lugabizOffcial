@@ -12,28 +12,43 @@ self.addEventListener('activate', (event) => {
   // Sin claim() Chrome deja de mostrar el toast de "actualización en segundo plano".
 });
 
-self.addEventListener('push', (event) => {
-  if (!event.data) return;
+// ── Firebase Cloud Messaging ─────────────────────────────────────────────────
+// Los mensajes FCM que incluyen `notification` (como los que mandan las Edge
+// Functions) llegan al evento 'push' nativo en un formato propio de Firebase
+// que un `event.data.json()` genérico NO puede decodificar — probamos eso y
+// Chrome mostraba el aviso genérico "Este sitio se actualizó en segundo
+// plano" en vez de la notificación real, porque nuestro handler no llamaba a
+// showNotification(). El SDK de Firebase Messaging (cargado acá vía
+// importScripts, build "compat" porque un Service Worker clásico no soporta
+// ESM) sabe decodificar ese formato — así que dejamos que él escuche 'push' y
+// solo le decimos qué hacer con cada mensaje.
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
-  let payload = {};
-  try {
-    payload = event.data.json();
-  } catch {
-    payload = { title: 'Lugabiz', body: event.data.text() };
-  }
+// Config pública de Firebase (no es secreta, está restringida por dominio/appId
+// en la consola). No se puede leer de env vars acá: este archivo se sirve tal
+// cual desde /public, Vite no lo procesa.
+firebase.initializeApp({
+  apiKey: 'AIzaSyC7_FDAQqFovzbDbKyJ7KMZsH7aRSshywA',
+  authDomain: 'lugabiz-mobile.firebaseapp.com',
+  projectId: 'lugabiz-mobile',
+  storageBucket: 'lugabiz-mobile.firebasestorage.app',
+  messagingSenderId: '259194666195',
+  appId: '1:259194666195:web:f668bb8d45c5443634e826',
+});
 
-  // Firebase Cloud Messaging entrega { notification: { title, body }, data: {...} }
-  // con `data` siempre string→string. El web-push nativo (en desuso, puede quedar
-  // algún dispositivo viejo en transición) mandaba title/body/data sueltos en la raíz.
-  const notif = payload.notification || payload;
-  const extra = payload.data || {};
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  const notif = payload.notification || {};
+  const data = payload.data || {};
 
   const title = notif.title || 'Lugabiz';
-  const tag = extra.tag
-    || (extra.surveyId ? `survey-${extra.surveyId}` : undefined)
-    || (extra.place_id ? `nearby-${extra.place_id}` : undefined);
+  const tag = data.tag
+    || (data.surveyId ? `survey-${data.surveyId}` : undefined)
+    || (data.place_id ? `nearby-${data.place_id}` : undefined);
 
-  const options = {
+  self.registration.showNotification(title, {
     body: notif.body || '',
     icon: '/L.ico',
     badge: '/L.ico',
@@ -41,18 +56,14 @@ self.addEventListener('push', (event) => {
     tag,
     renotify: true,
     data: {
-      url: extra.url || '/',
-      surveyId: extra.surveyId || null,
+      url: data.url || '/',
+      surveyId: data.surveyId || null,
     },
     actions: [
       { action: 'open', title: 'Ver' },
       { action: 'close', title: 'Cerrar' },
     ],
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  });
 });
 
 self.addEventListener('notificationclick', (event) => {
