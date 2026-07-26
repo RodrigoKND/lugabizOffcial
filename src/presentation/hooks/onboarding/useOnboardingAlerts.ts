@@ -3,7 +3,6 @@ import { useAuth } from '@presentation/context';
 import { authService } from '@lib/supabase';
 
 const LS_LOGIN_KEY = '_lugabiz_login_dismissed';
-const SS_DONE_KEY = '_lugabiz_onboarding_done';
 
 type OnboardingStep = 'login' | 'notifications' | 'geolocation' | 'done';
 
@@ -14,23 +13,18 @@ function getLoginDismissed(): boolean {
 function setLoginDismissed() {
   try { localStorage.setItem(LS_LOGIN_KEY, '1'); } catch { /* intentional */ }
 }
-// Session-level flag: prevents the popup from re-showing after dismissal even if user
-// object is refreshed by auth events (e.g. token renewal) during the same session
-function getSessionDone(): boolean {
-  try { return sessionStorage.getItem(SS_DONE_KEY) === '1'; } catch { return false; }
-}
-function setSessionDone() {
-  try { sessionStorage.setItem(SS_DONE_KEY, '1'); } catch { /* intentional */ }
-}
 
 export function useOnboardingAlerts() {
   const { user, isLoading, showPreferences } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [ready, setReady] = useState(false);
   const [localStep, setLocalStep] = useState<OnboardingStep>('login');
-  // Once the user dismisses any step in this session, lock to 'done' so auth
-  // token-refresh events don't cause the popup to reappear
-  const sessionDoneRef = useRef(getSessionDone());
+  // En memoria, NO persistido: una vez descartado/completado un paso, evita que
+  // se re-muestre por eventos de auth (ej. refresh de token) MIENTRAS la página
+  // sigue montada. Al recargar la página se resetea solo (es una variable JS
+  // nueva), así cada carga vuelve a evaluar el estado real (DB para
+  // notif/geoDismissed, localStorage solo para el paso de login).
+  const sessionDoneRef = useRef(false);
 
   // Wait for auth to resolve + small buffer before showing popups
   useEffect(() => {
@@ -87,7 +81,6 @@ export function useOnboardingAlerts() {
     if (localStep === 'login') {
       setLoginDismissed();
       sessionDoneRef.current = true;
-      setSessionDone();
       setLocalStep('done');
       setShowAuthModal(true);
       return;
@@ -95,7 +88,7 @@ export function useOnboardingAlerts() {
 
     if (localStep === 'notifications') {
       if (typeof window !== 'undefined' && 'Notification' in window) {
-        Notification.requestPermission().then(perm => {
+        Notification.requestPermission().then(() => {
           const next = 'geolocation' as OnboardingStep;
           setLocalStep(next);
           saveToDb(next, true, user?.geoDismissed ?? false);
@@ -110,7 +103,6 @@ export function useOnboardingAlerts() {
 
     if (localStep === 'geolocation') {
       sessionDoneRef.current = true;
-      setSessionDone();
       setLocalStep('done');
       saveToDb('done', user?.notifDismissed ?? false, true);
       // Request permission in background after popup closes
@@ -126,7 +118,6 @@ export function useOnboardingAlerts() {
     if (localStep === 'login') {
       setLoginDismissed();
       sessionDoneRef.current = true;
-      setSessionDone();
       setLocalStep('done');
       return;
     }
@@ -138,7 +129,6 @@ export function useOnboardingAlerts() {
     }
     if (localStep === 'geolocation') {
       sessionDoneRef.current = true;
-      setSessionDone();
       setLocalStep('done');
       saveToDb('done', user?.notifDismissed ?? false, true);
       return;
