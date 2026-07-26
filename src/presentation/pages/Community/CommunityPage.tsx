@@ -462,13 +462,13 @@ const CommunityPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-5">
         {/* Tabs + mobile filter toggle */}
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center gap-3 mb-5 overflow-x-auto scrollbar-hide">
           {([
             { key: 'places' as Tab, label: 'Negocios', icon: Store, count: totalPlaces },
             { key: 'events' as Tab, label: 'Eventos', icon: Calendar, count: totalEvents },
           ] as const).map(({ key, label, icon: Icon, count }) => (
             <button key={key} onClick={() => setTab(key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                 tab === key
                   ? 'bg-primary-500 text-white shadow-sm'
                   : 'bg-white/6 text-white/50 border border-white/10 hover:text-white/75 hover:bg-white/10'
@@ -484,7 +484,7 @@ const CommunityPage: React.FC = () => {
           ))}
 
           <button onClick={() => setShowFilters(v => !v)}
-            className={`md:hidden ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border transition-all ${
+            className={`md:hidden shrink-0 ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border transition-all ${
               showFilters || activeFiltersCount > 0
                 ? 'bg-primary-500/20 border-primary-400/30 text-primary-300'
                 : 'bg-white/6 border-white/10 text-white/50'

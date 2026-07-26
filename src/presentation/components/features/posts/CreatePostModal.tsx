@@ -213,7 +213,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                     <Lock className="w-4 h-4 text-stone-400 mt-0.5 shrink-0" />
                     <div className="text-xs text-text-secondary">
                       <p className="font-semibold text-text-primary">Ofertas con código bloqueadas</p>
-                      <p>Verificá tu identidad en tu perfil para crear ofertas. Así protegemos a la comunidad de estafas. Mientras tanto, podés publicar fotos y novedades sin límite.</p>
+                      <p>Verifica tu identidad en tu perfil para crear ofertas. Así protegemos a la comunidad de estafas. Mientras tanto, podés publicar fotos y novedades sin límite.</p>
                     </div>
                   </div>
                 ) : (

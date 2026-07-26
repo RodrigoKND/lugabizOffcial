@@ -202,13 +202,13 @@ const PlaceDetail: React.FC = () => {
                 Más de {place.category?.name}
               </h3>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
               {relatedPlaces.map(p => (
                 <Link
                   key={p.id}
                   to={`/place/${p.id}`}
                   state={{ background: isModal ? routerLocation.state.background : routerLocation }}
-                  className="group rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
+                  className="group shrink-0 w-32 rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
                 >
                   <div className="aspect-square relative overflow-hidden bg-primary-50">
                     {p.image ? (

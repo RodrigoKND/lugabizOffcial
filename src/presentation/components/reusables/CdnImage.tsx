@@ -2,7 +2,18 @@ import React from 'react';
 
 // Debe coincidir con vercel.json → images.domains
 const OPTIMIZABLE_HOSTS = ['fmujhdpqbmbfcottifpc.supabase.co'];
-const MAX_WIDTH = 1920;
+
+// Debe coincidir EXACTO con vercel.json → images.sizes. El endpoint de Vercel
+// rechaza con 400 (INVALID_IMAGE_OPTIMIZE_REQUEST) cualquier ancho `w` que no
+// esté en esa lista — no vale pedir un ancho "parecido", tiene que matchear
+// uno de estos valores sí o sí.
+const ALLOWED_WIDTHS = [64, 128, 256, 384, 640, 828, 1080, 1200, 1920];
+
+function snapWidth(w: number): number {
+  return ALLOWED_WIDTHS.reduce((best, cur) =>
+    Math.abs(cur - w) < Math.abs(best - w) ? cur : best
+  );
+}
 
 function isOptimizable(src: string): boolean {
   try {
@@ -14,7 +25,7 @@ function isOptimizable(src: string): boolean {
 }
 
 function vercelImageUrl(src: string, width: number, quality: number): string {
-  return `/_vercel/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`;
+  return `/_vercel/image?url=${encodeURIComponent(src)}&w=${snapWidth(width)}&q=${quality}`;
 }
 
 /**
@@ -55,7 +66,7 @@ const CdnImage: React.FC<CdnImageProps> = ({
   }
 
   const widths = Array.from(new Set(
-    [width, Math.round(width * 1.5), width * 2].map(w => Math.min(w, MAX_WIDTH))
+    [width, width * 1.5, width * 2].map(snapWidth)
   ));
   const srcSet = widths.map(w => `${vercelImageUrl(src, w, quality)} ${w}w`).join(', ');
 
