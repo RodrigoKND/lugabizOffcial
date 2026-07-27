@@ -1,20 +1,37 @@
-import { CalendarCheck2 } from 'lucide-react';
-import { usePlans } from '@presentation/hooks';
+import { useState } from 'react';
+import { CalendarCheck2, Loader2 } from 'lucide-react';
+import { usePlans, useInfiniteScroll } from '@presentation/hooks';
 import { useAuth } from '@presentation/context';
+import { Plan } from '@domain/entities';
 import PlanListItem from './PlanListItem';
+import PlanCard from './PlanCard';
+import CancelPlanModal from './CancelPlanModal';
 import PushEnableBanner from './PushEnableBanner';
 
 const PlansTab: React.FC = () => {
   const { user } = useAuth();
-  const { plans, respondToInvite } = usePlans();
+  const { plans, isLoading, isLoadingMore, hasMore, loadMore, respondToInvite, cancelPlan } = usePlans();
+  const [planToCancel, setPlanToCancel] = useState<Plan | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const sentinelRef = useInfiniteScroll(loadMore, hasMore && !isLoading);
+
   if (!user) return null;
 
-  const pendingInvites = plans.filter((plan) =>
+  const activePlans = plans.filter((plan) => plan.status === 'active');
+  const pendingInvites = activePlans.filter((plan) =>
     plan.participants.some((p) => p.userId === user.id && p.role === 'invitee' && p.rsvpStatus === 'pending')
   );
-  const confirmedPlans = plans.filter((plan) => !pendingInvites.includes(plan));
+  const confirmedPlans = activePlans.filter((plan) => !pendingInvites.includes(plan));
 
-  if (plans.length === 0) {
+  const handleConfirmCancel = async (reason: string) => {
+    if (!planToCancel) return;
+    setIsCancelling(true);
+    await cancelPlan(planToCancel.id, reason);
+    setIsCancelling(false);
+    setPlanToCancel(null);
+  };
+
+  if (!isLoading && plans.length === 0) {
     return (
       <div className="space-y-3">
         <PushEnableBanner />
@@ -53,13 +70,34 @@ const PlansTab: React.FC = () => {
       {confirmedPlans.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">Mis planes</p>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {confirmedPlans.map((plan) => (
-              <PlanListItem key={plan.id} plan={plan} currentUserId={user.id} />
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                currentUserId={user.id}
+                onCancel={plan.createdBy === user.id ? () => setPlanToCancel(plan) : undefined}
+              />
             ))}
           </div>
         </div>
       )}
+
+      {/* Centinela: al entrar en pantalla dispara la carga de la siguiente
+          tanda (scroll progresivo, sin botón "cargar más" ni paginación). */}
+      <div ref={sentinelRef} className="h-1" />
+      {isLoadingMore && (
+        <div className="flex justify-center py-3">
+          <Loader2 className="w-5 h-5 animate-spin text-primary-400" />
+        </div>
+      )}
+
+      <CancelPlanModal
+        isOpen={!!planToCancel}
+        onClose={() => setPlanToCancel(null)}
+        onConfirm={handleConfirmCancel}
+        isSubmitting={isCancelling}
+      />
     </div>
   );
 };

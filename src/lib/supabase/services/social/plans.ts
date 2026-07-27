@@ -28,6 +28,7 @@ interface PlanRow {
   visibility: PlanVisibility;
   note?: string;
   status: 'active' | 'cancelled';
+  cancel_reason?: string;
   created_at: string;
   place?: { name: string; image?: string } | null;
   event?: { name: string; image?: string } | null;
@@ -73,6 +74,7 @@ async function mapPlan(row: PlanRow): Promise<Plan> {
     visibility: row.visibility,
     note: row.note,
     status: row.status,
+    cancelReason: row.cancel_reason,
     createdAt: new Date(row.created_at),
     participants: participantRows.map((p) => mapParticipant(p, usersMap)),
   };
@@ -119,14 +121,21 @@ export const plansService = {
     edgeService.sendPlanResponsePush(participantId).catch(() => {});
   },
 
-  async cancelPlan(planId: string): Promise<void> {
-    const { error } = await supabase.from('plans').update({ status: 'cancelled' }).eq('id', planId);
+  // El motivo es obligatorio: se lo notifica (in-app + push) a todos los
+  // invitados que ya habían confirmado (trigger `notify_plan_cancelled`).
+  async cancelPlan(planId: string, reason: string): Promise<void> {
+    const { error } = await supabase
+      .from('plans')
+      .update({ status: 'cancelled', cancel_reason: reason })
+      .eq('id', planId);
     if (error) throw error;
   },
 
   // Cubre planes propios e invitaciones recibidas: el dueño también queda como
-  // participant (role='owner') gracias al trigger de la migración.
-  async listMyPlans(userId: string): Promise<Plan[]> {
+  // participant (role='owner') gracias al trigger de la migración. Paginado
+  // (limit/offset) para que "Mis planes" siga siendo rápido con cientos de
+  // planes — la carga adicional es progresiva (scroll), no trae todo de una.
+  async listMyPlans(userId: string, limit = 12, offset = 0): Promise<Plan[]> {
     const { data: participantRows, error: participantsError } = await supabase
       .from('plan_participants')
       .select('plan_id')
@@ -140,7 +149,8 @@ export const plansService = {
       .from('plans')
       .select('*, place:places(name, image), event:events(name, image), plan_participants(*)')
       .in('id', planIds)
-      .order('plan_date', { ascending: true });
+      .order('plan_date', { ascending: true })
+      .range(offset, offset + limit - 1);
     if (error) throw error;
 
     return Promise.all((data || []).map((row) => mapPlan(row as unknown as PlanRow)));

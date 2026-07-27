@@ -77,11 +77,10 @@ const Profile: React.FC = () => {
       .catch(() => setPrincipalDocsApproved(false));
   }, [user?.id, user?.isOwner, user?.ownerBusinessName, user?.businessDocsVerified]);
 
-  if (!user) return <Navigate to="/" replace />;
-
-  const myPlacesArr = getLengthPlacesByUserId(user.id);
-  const reviewsCount = getLengthReviewsByUserId(user.id);
-
+  // Hook llamado SIEMPRE (antes del return condicional de abajo): un useMemo
+  // que solo se ejecuta cuando hay user rompe el orden de hooks entre renders
+  // (el primer render sin user todavía no lo llama, el siguiente sí) y React
+  // tira "Rendered fewer/more hooks than expected".
   const tabs: ProfileTab[] = useMemo(() => {
     const items: ProfileTab[] = [
       { id: 'saved', label: 'Colección', icon: Bookmark },
@@ -90,10 +89,15 @@ const Profile: React.FC = () => {
       { id: 'friends', label: 'Amigos', icon: Users },
       { id: 'plans', label: 'Planes', icon: CalendarCheck2 },
     ];
-    if (user.isOwner) items.push({ id: 'dashboard', label: 'Dashboard', icon: BarChart3 });
+    if (user?.isOwner) items.push({ id: 'dashboard', label: 'Dashboard', icon: BarChart3 });
     if (isAdmin) items.push({ id: 'admin', label: 'Admin', icon: Activity });
     return items;
-  }, [user.isOwner, isAdmin]);
+  }, [user?.isOwner, isAdmin]);
+
+  if (!user) return <Navigate to="/" replace />;
+
+  const myPlacesArr = getLengthPlacesByUserId(user.id);
+  const reviewsCount = getLengthReviewsByUserId(user.id);
 
   const renderTabContent = () => {
     const tabComponents: Record<TabId, React.ReactNode> = {

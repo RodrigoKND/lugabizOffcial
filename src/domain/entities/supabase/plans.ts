@@ -8,6 +8,7 @@ export interface PlansRow {
   visibility: 'private' | 'friends' | 'public';
   note?: string;
   status: 'active' | 'cancelled';
+  cancel_reason?: string;
   created_at: string;
 }
 
@@ -29,6 +30,7 @@ export interface PlansUpdate {
   visibility?: 'private' | 'friends' | 'public';
   note?: string;
   status?: 'active' | 'cancelled';
+  cancel_reason?: string;
 }
 
 export interface PlanParticipantsRow {

@@ -12,4 +12,6 @@ export { default as FriendTile } from './FriendTile';
 export { default as PrivacySettingsModal } from './PrivacySettingsModal';
 export { default as FriendsTab } from './FriendsTab';
 export { default as PlanListItem } from './PlanListItem';
+export { default as PlanCard } from './PlanCard';
+export { default as CancelPlanModal } from './CancelPlanModal';
 export { default as PlansTab } from './PlansTab';

@@ -26,6 +26,7 @@ export interface Plan {
   visibility: PlanVisibility;
   note?: string;
   status: 'active' | 'cancelled';
+  cancelReason?: string;
   createdAt: Date;
   participants: PlanParticipant[];
 }
