@@ -78,4 +78,12 @@ export const edgeService = {
     if (error) throw error
     return result as { sent: number }
   },
+
+  async sendPlanResponsePush(participantId: string) {
+    const { data: result, error } = await supabase.functions.invoke('send-plan-response-push', {
+      body: { participantId },
+    })
+    if (error) throw error
+    return result as { sent: number }
+  },
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { adminService } from '@lib/supabase/services/admin/admin';
-import { Search, Shield, Loader2, Trash2, Clock, Users, MapPin } from 'lucide-react';
+import { placeFakeReportsService } from '@lib/supabase';
+import { Search, Shield, Loader2, Trash2, Clock, Users, MapPin, AlertTriangle, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { timeAgo } from '../helpers';
@@ -15,6 +16,8 @@ interface ContentItem {
   user_name?: string;
   user_avatar?: string;
   rating?: number;
+  hidden?: boolean;
+  hidden_reason?: string;
   created_at: string;
 }
 
@@ -24,6 +27,7 @@ export function ContentModeration({ type }: { type: 'places' | 'events' | 'revie
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState<string | null>(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -42,6 +46,15 @@ export function ContentModeration({ type }: { type: 'places' | 'events' | 'revie
       setItems(prev => prev.filter(i => i.id !== id));
       toast.success('Contenido eliminado');
     } catch { toast.error('Error al eliminar'); } finally { setDeleting(null); }
+  };
+
+  const handleRestore = async (id: string) => {
+    setRestoring(id);
+    try {
+      await placeFakeReportsService.restore(id);
+      setItems(prev => prev.map(i => i.id === id ? { ...i, hidden: false } : i));
+      toast.success('Lugar restaurado');
+    } catch { toast.error('Solo un admin puede restaurar'); } finally { setRestoring(null); }
   };
 
   const q = search.toLowerCase();
@@ -72,7 +85,14 @@ export function ContentModeration({ type }: { type: 'places' | 'events' | 'revie
                     : <div className="w-full h-full flex items-center justify-center"><MapPin className="w-5 h-5 text-stone-300" /></div>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-stone-800 truncate">{item.name || 'Sin nombre'}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-stone-800 truncate">{item.name || 'Sin nombre'}</p>
+                    {item.hidden && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-500 text-[10px] font-semibold shrink-0">
+                        <AlertTriangle className="w-3 h-3" /> Oculto
+                      </span>
+                    )}
+                  </div>
                   {item.description && <p className="text-xs text-stone-500 mt-0.5 line-clamp-2 leading-relaxed">{item.description}</p>}
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <div className="flex items-center gap-1.5">
@@ -89,10 +109,18 @@ export function ContentModeration({ type }: { type: 'places' | 'events' | 'revie
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setConfirmDeleteId(item.id)} disabled={deleting === item.id}
-                  className="p-2 rounded-xl text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50 shrink-0 self-start mt-1">
-                  {deleting === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                </button>
+                <div className="flex items-center gap-1 shrink-0 self-start mt-1">
+                  {item.hidden && (
+                    <button onClick={() => handleRestore(item.id)} disabled={restoring === item.id}
+                      className="p-2 rounded-xl text-stone-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-50">
+                      {restoring === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                    </button>
+                  )}
+                  <button onClick={() => setConfirmDeleteId(item.id)} disabled={deleting === item.id}
+                    className="p-2 rounded-xl text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
+                    {deleting === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             ) : (
               <div key={item.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 transition-colors">

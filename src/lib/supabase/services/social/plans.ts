@@ -116,6 +116,7 @@ export const plansService = {
       .update({ rsvp_status: accept ? 'accepted' : 'declined' })
       .eq('id', participantId);
     if (error) throw error;
+    edgeService.sendPlanResponsePush(participantId).catch(() => {});
   },
 
   async cancelPlan(planId: string): Promise<void> {

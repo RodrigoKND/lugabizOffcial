@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import type { PlaceInfoCardProps } from '@domain/entities/PlaceDetailTypes';
 import { SocialLinksRow } from '@presentation/components/reusables';
 import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
+import ReportFakePlaceAction from './ReportFakePlaceAction';
 
 export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onToggleSave }: PlaceInfoCardProps) {
   return (
@@ -73,6 +74,8 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
           {isPlaceSaved ? 'Guardado' : 'Guardar'}
         </button>
       </div>
+
+      <ReportFakePlaceAction placeId={place.id} authorId={place.authorId} userId={user?.id} />
     </div>
   );
 }

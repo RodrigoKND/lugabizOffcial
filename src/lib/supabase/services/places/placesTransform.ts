@@ -49,5 +49,7 @@ export function transformPlaceData(place: Record<string, unknown>): Place {
     socialLinks: place.social_links || undefined,
     viewsCount: place.views_count,
     plansCount: place.plans_count,
+    hidden: place.hidden,
+    hiddenReason: place.hidden_reason,
   };
 }

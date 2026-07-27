@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, BellOff, BellRing, MapPin, Calendar, Star, Megaphone, ClipboardList, CheckCheck, Clock, X, UserPlus, UserCheck, CalendarCheck2 } from 'lucide-react';
+import { Bell, BellOff, BellRing, MapPin, Calendar, Star, Megaphone, ClipboardList, CheckCheck, Clock, X, UserPlus, UserCheck, CalendarCheck2, Flag, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@presentation/context';
 import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { AppNotification } from '@domain/entities';
@@ -34,6 +34,7 @@ const navUrls: Record<string, string | ((n: AppNotification) => string)> = {
   friend_request: '/profile?tab=friends',
   friend_accept: '/profile?tab=friends',
   plan_invite: '/profile?tab=plans',
+  plan_response: '/profile?tab=plans',
 };
 
 function getNavUrl(n: AppNotification): string {
@@ -250,6 +251,10 @@ const NotificationDropdown: React.FC<Props> = ({ open, onClose }) => {
                   friend_request: UserPlus,
                   friend_accept: UserCheck,
                   plan_invite: CalendarCheck2,
+                  plan_response: CalendarCheck2,
+                  place_hidden: AlertTriangle,
+                  place_hidden_review: Flag,
+                  place_appeal: Flag,
                 };
                 const IconComp = typeIcons[n.type] || Bell;
                 const icon = <IconComp className="w-3.5 h-3.5" />;

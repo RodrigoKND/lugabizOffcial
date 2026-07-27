@@ -1,5 +1,6 @@
 export { default as UsernameField } from './UsernameField';
 export { default as PlansCountBadge } from './PlansCountBadge';
+export { default as PushEnableBanner } from './PushEnableBanner';
 export { default as PlanButton } from './PlanButton';
 export { default as CreatePlanModal } from './CreatePlanModal';
 export { default as FriendPickerItem } from './FriendPickerItem';

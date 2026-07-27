@@ -18,6 +18,9 @@ export interface PlacesRow {
   social_links?: { instagram?: string; tiktok?: string; facebook?: string; website?: string };
   views_count?: number;
   plans_count?: number;
+  hidden?: boolean;
+  hidden_reason?: string;
+  hidden_at?: string;
   created_at: string;
   updated_at: string;
 }

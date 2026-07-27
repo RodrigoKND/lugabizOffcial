@@ -12,6 +12,7 @@ export { useTrendingPlaces } from './home/useTrendingPlaces';
 export { usePlaceDetail } from './places/usePlaceDetail';
 export { usePlaceGallery } from './places/usePlaceGallery';
 export { useSmartBack } from './useSmartBack';
+export { useLockBodyScroll } from './useLockBodyScroll';
 export { useUsernameAvailability } from './social/useUsernameAvailability';
 export { useUserSearch } from './social/useUserSearch';
 export { useFriendRequests } from './social/useFriendRequests';

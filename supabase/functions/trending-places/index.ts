@@ -39,6 +39,7 @@ serve(async (req) => {
       place_social_groups(social_group:social_groups(*)),
       reviews(*, user:users(name, avatar))
     `)
+    .eq('hidden', false)
     .or(`review_count.gt.0,saved_count.gt.0,views_count.gt.10`)
     .limit(50)
 

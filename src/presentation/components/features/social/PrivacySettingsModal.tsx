@@ -1,6 +1,8 @@
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, X } from 'lucide-react';
 import { useAuth } from '@presentation/context';
+import { useLockBodyScroll } from '@presentation/hooks';
 
 interface PrivacySettingsModalProps {
   isOpen: boolean;
@@ -9,12 +11,13 @@ interface PrivacySettingsModalProps {
 
 const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onClose }) => {
   const { user, updateProfile } = useAuth();
+  useLockBodyScroll(isOpen);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { e.stopPropagation(); onClose(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
             className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
@@ -55,7 +58,8 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

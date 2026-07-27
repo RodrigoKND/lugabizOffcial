@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Search, UserPlus, Users, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@presentation/context';
-import { useCreatePlan, useFriendSearch, useUserSearch } from '@presentation/hooks';
+import { useCreatePlan, useFriendSearch, useUserSearch, useLockBodyScroll } from '@presentation/hooks';
 import { friendshipsService } from '@lib/supabase';
 import { PlanVisibility } from '@domain/entities';
 import FriendPickerItem from './FriendPickerItem';
 import UserSearchResultItem from './UserSearchResultItem';
+import PushEnableBanner from './PushEnableBanner';
 
 interface CreatePlanModalProps {
   isOpen: boolean;
@@ -25,6 +27,7 @@ const VISIBILITY_OPTIONS: { value: PlanVisibility; label: string; hint: string }
 
 const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targetName, placeId, eventId }) => {
   const { user } = useAuth();
+  useLockBodyScroll(isOpen);
   const [friendFilter, setFriendFilter] = useState('');
   const [showAddPeople, setShowAddPeople] = useState(false);
   const [peopleQuery, setPeopleQuery] = useState('');
@@ -56,11 +59,11 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const today = new Date().toISOString().split('T')[0];
   const noFriendsAtAll = !friendFilter.trim() && !isLoadingFriends && friendOptions.length === 0;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { e.stopPropagation(); onClose(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
             className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden max-h-[85vh] flex flex-col"
@@ -76,6 +79,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
             </div>
 
             <div className="p-5 space-y-4 overflow-y-auto">
+              <PushEnableBanner />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Fecha</label>
@@ -94,10 +98,14 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                 <div className="grid grid-cols-3 gap-2">
                   {VISIBILITY_OPTIONS.map((opt) => (
                     <button key={opt.value} type="button" onClick={() => setVisibility(opt.value)}
-                      className={`px-2 py-2 rounded-xl border text-center transition-colors ${
-                        visibility === opt.value ? 'bg-primary-50 border-primary-300' : 'border-primary-100 hover:bg-primary-50/40'
+                      className={`px-2 py-2.5 rounded-xl border-2 text-center transition-all ${
+                        visibility === opt.value
+                          ? 'bg-primary-500 border-primary-500 shadow-sm'
+                          : 'bg-white border-primary-100 hover:border-primary-200 hover:bg-primary-50/40'
                       }`}>
-                      <p className="text-xs font-semibold text-text-primary">{opt.label}</p>
+                      <p className={`text-xs font-semibold ${visibility === opt.value ? 'text-white' : 'text-text-primary'}`}>
+                        {opt.label}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -147,7 +155,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
 
                 <button type="button" onClick={() => setShowAddPeople((v) => !v)}
                   className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors">
-                  <UserPlus className="w-3.5 h-3.5" /> {showAddPeople ? 'Ocultar búsqueda' : '¿No lo encontrás? Buscar y agregar'}
+                  <UserPlus className="w-3.5 h-3.5" /> {showAddPeople ? 'Ocultar búsqueda' : '¿No encuentras a tus amigos? Buscar y agregar'}
                 </button>
 
                 {showAddPeople && (
@@ -175,7 +183,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
               </div>
             </div>
 
-            <div className="flex gap-3 p-5 border-t border-primary-100">
+            <div className="flex gap-3 p-5 mb-12 border-t border-primary-100">
               <button onClick={submit} disabled={isSubmitting || !planDate || !planTime}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all disabled:opacity-50">
                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -189,7 +197,8 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

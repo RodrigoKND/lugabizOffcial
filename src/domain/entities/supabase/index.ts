@@ -37,6 +37,9 @@ import type {
   PlansRow, PlansInsert, PlansUpdate,
   PlanParticipantsRow, PlanParticipantsInsert, PlanParticipantsUpdate,
 } from './plans';
+import type {
+  PlaceFakeReportsRow, PlaceFakeReportsInsert, PlaceFakeReportsUpdate,
+} from './placeFakeReports';
 
 export type {
   UsersRow, UsersInsert, UsersUpdate,
@@ -74,6 +77,9 @@ export type {
   PlansRow, PlansInsert, PlansUpdate,
   PlanParticipantsRow, PlanParticipantsInsert, PlanParticipantsUpdate,
 } from './plans';
+export type {
+  PlaceFakeReportsRow, PlaceFakeReportsInsert, PlaceFakeReportsUpdate,
+} from './placeFakeReports';
 
 export interface Database {
   public: {
@@ -96,6 +102,7 @@ export interface Database {
       blocked_users: { Row: BlockedUsersRow; Insert: BlockedUsersInsert; Update: BlockedUsersUpdate };
       plans: { Row: PlansRow; Insert: PlansInsert; Update: PlansUpdate };
       plan_participants: { Row: PlanParticipantsRow; Insert: PlanParticipantsInsert; Update: PlanParticipantsUpdate };
+      place_fake_reports: { Row: PlaceFakeReportsRow; Insert: PlaceFakeReportsInsert; Update: PlaceFakeReportsUpdate };
     };
   };
 }

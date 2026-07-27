@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { friendshipsService } from '@lib/supabase';
-import { useUserSearch } from '@presentation/hooks';
+import { useUserSearch, useLockBodyScroll } from '@presentation/hooks';
 import { useAuth } from '@presentation/context';
 import UserSearchResultItem from './UserSearchResultItem';
+import PushEnableBanner from './PushEnableBanner';
 
 interface AddFriendModalProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ interface AddFriendModalProps {
 
 const AddFriendModal: React.FC<AddFriendModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  useLockBodyScroll(isOpen);
   const [query, setQuery] = useState('');
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [sendingId, setSendingId] = useState<string | null>(null);
@@ -33,11 +36,11 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { e.stopPropagation(); onClose(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
             className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden max-h-[80vh] flex flex-col"
@@ -49,7 +52,8 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            <div className="p-5 pb-3">
+            <div className="p-5 pb-3 space-y-3">
+              <PushEnableBanner />
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                 <input
@@ -82,7 +86,8 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ isOpen, onClose }) => {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

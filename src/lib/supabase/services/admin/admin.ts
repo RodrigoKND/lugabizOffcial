@@ -22,6 +22,8 @@ interface ModItem {
   user_name?: string;
   user_avatar?: string;
   author_id?: string;
+  hidden?: boolean;
+  hidden_reason?: string;
   created_at: string;
 }
 
@@ -138,7 +140,7 @@ export const adminService = {
   async getAllPlaces(): Promise<ModItem[]> {
     const { data, error } = await supabase
       .from('places')
-      .select('id, name, description, image, author_id, created_at, author:users(name, avatar)')
+      .select('id, name, description, image, author_id, hidden, hidden_reason, created_at, author:users(name, avatar)')
       .order('created_at', { ascending: false })
       .limit(200);
 
@@ -149,6 +151,8 @@ export const adminService = {
       description: p.description,
       image: p.image,
       author_id: p.author_id,
+      hidden: p.hidden,
+      hidden_reason: p.hidden_reason,
       created_at: p.created_at,
       user_name: (p.author as Record<string, unknown> | undefined)?.name as string || 'Usuario',
       user_avatar: (p.author as Record<string, unknown> | undefined)?.avatar,

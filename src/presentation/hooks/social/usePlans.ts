@@ -15,7 +15,10 @@ export function usePlans() {
     setIsLoading(true);
     try {
       setPlans(await plansService.listMyPlans(user.id));
-    } catch (err) { console.error('[usePlans:reload]', err); }
+    } catch (err) {
+      console.error('[usePlans:reload]', err);
+      toast.error('No se pudieron cargar tus planes');
+    }
     setIsLoading(false);
   }, [user]);
 

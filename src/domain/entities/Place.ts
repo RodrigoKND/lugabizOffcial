@@ -28,6 +28,8 @@ export interface Place {
   socialLinks?: SocialLinks;
   viewsCount?: number;
   plansCount?: number;
+  hidden?: boolean;
+  hiddenReason?: string;
 }
 
 export interface CreatePlaceData {

@@ -10,6 +10,7 @@ import SentRequestItem from './SentRequestItem';
 import FriendTile from './FriendTile';
 import AddFriendModal from './AddFriendModal';
 import PrivacySettingsModal from './PrivacySettingsModal';
+import PushEnableBanner from './PushEnableBanner';
 
 const PAGE_SIZE = 30;
 
@@ -39,6 +40,8 @@ const FriendsTab: React.FC = () => {
 
   return (
     <div className="space-y-5">
+      <PushEnableBanner />
+
       {pending.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">
@@ -124,7 +127,7 @@ const FriendsTab: React.FC = () => {
         onClose={() => setFriendToRemove(null)}
         onConfirm={handleConfirmRemove}
         title="Eliminar amigo"
-        message={`¿Seguro que querés eliminar a ${friendToRemove?.name} de tus amigos? Vas a tener que volver a enviarle una solicitud si querés agregarlo de nuevo.`}
+        message={`¿Seguro que quieres eliminar a ${friendToRemove?.name} de tus amigos? Vas a tener que volver a enviarle una solicitud si querés agregarlo de nuevo.`}
         confirmLabel={isRemoving ? 'Eliminando...' : 'Eliminar'}
         variant="danger"
       />

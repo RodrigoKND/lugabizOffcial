@@ -3,7 +3,7 @@ import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useSmartBack } from '@presentation/hooks';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2, LogIn } from 'lucide-react';
-import { usePlaces } from '@presentation/context';
+import { usePlaces, useAuth } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
 import { ReviewSection } from '@presentation/components/features';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
@@ -17,6 +17,7 @@ import PlaceInfoCard from '@presentation/components/features/places/detail/Place
 import PlaceLocationCard from '@presentation/components/features/places/detail/PlaceLocationCard';
 import PlaceSurveyModal from '@presentation/components/features/places/detail/PlaceSurveyModal';
 import PlaceSurveyStats from '@presentation/components/features/places/detail/PlaceSurveyStats';
+import HiddenPlaceBanner from '@presentation/components/features/places/detail/HiddenPlaceBanner';
 
 const PlaceDetail: React.FC = () => {
   const goBack = useSmartBack('/');
@@ -29,6 +30,7 @@ const PlaceDetail: React.FC = () => {
     showDeleteConfirm, setShowDeleteConfirm, sharePlace, handleDelete,
   } = usePlaceDetail();
   const { galleryIdx, openGallery, closeGallery, prevImage, nextImage } = usePlaceGallery();
+  const { isAdmin } = useAuth();
   const relatedPlaces = useMemo(() => {
     if (!place) return [];
     return places
@@ -126,6 +128,12 @@ const PlaceDetail: React.FC = () => {
             </button>
           )}
         </motion.div>
+
+        {place.hidden && (
+          <div className="mb-6">
+            <HiddenPlaceBanner placeId={place.id} isOwner={user?.id === place.authorId} />
+          </div>
+        )}
 
         <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
