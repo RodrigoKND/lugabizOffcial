@@ -3,6 +3,7 @@ import * as Icons from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { PlaceInfoCardProps } from '@domain/entities/PlaceDetailTypes';
 import { SocialLinksRow } from '@presentation/components/reusables';
+import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
 
 export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onToggleSave }: PlaceInfoCardProps) {
   return (
@@ -29,6 +30,7 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
             <span>{place.viewsCount}</span>
           </div>
         )}
+        <PlansCountBadge count={place.plansCount} variant="dark" />
       </div>
 
       <p className="text-white/55 leading-relaxed mb-6">
@@ -53,6 +55,7 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
       <SocialLinksRow links={place.socialLinks} variant="dark" className="mb-6" />
 
       <div className="flex flex-col sm:flex-row gap-3">
+        <PlanButton targetName={place.name} placeId={place.id} variant="detail" className="flex-1" />
         <button onClick={onShare}
           className="flex items-center justify-center gap-2 px-4 py-3 bg-white/6 border border-white/10 rounded-2xl text-white/55 hover:bg-white/10 hover:text-white/80 font-medium transition-all text-sm flex-1">
           <Share2 className="w-4 h-4" /> Compartir

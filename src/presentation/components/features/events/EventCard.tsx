@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Heart, MessageCircle, Calendar } from 'lucide-react';
 import { CdnImage } from '@presentation/components/reusables';
+import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
 
 interface Event {
   id: string;
@@ -13,6 +14,7 @@ interface Event {
   organizer: { name: string; avatar: string; isNew: boolean };
   likes: number;
   comments: number;
+  plansCount?: number;
 }
 
 interface EventCardProps {
@@ -38,8 +40,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         </div>
       </div>
 
-      <div className="absolute top-3 right-3 bg-gradient-to-r from-primary-500 to-tomato px-3 py-1 rounded-full shadow-lg">
-        <span className="text-white text-xs font-semibold">{event.category}</span>
+      <div className="absolute top-3 right-3 flex items-center gap-2">
+        <PlanButton targetName={event.title} eventId={event.id} />
+        <div className="bg-gradient-to-r from-primary-500 to-tomato px-3 py-1 rounded-full shadow-lg">
+          <span className="text-white text-xs font-semibold">{event.category}</span>
+        </div>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
@@ -68,6 +73,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
             <MessageCircle className="w-3.5 h-3.5" />
             <span className="font-semibold">{event.comments}</span>
           </div>
+          <PlansCountBadge count={event.plansCount} variant="dark" />
         </div>
       </div>
     </div>

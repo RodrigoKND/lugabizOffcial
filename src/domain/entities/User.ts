@@ -20,6 +20,10 @@ export interface User {
   onboardingStep?: string;
   notifDismissed?: boolean;
   geoDismissed?: boolean;
+  // Apodo único (feature Planes): permite buscar/agregar amigos sin exponer el nombre real.
+  username?: string;
+  searchable?: boolean;
+  whoCanRequest?: 'everyone' | 'nobody';
 }
 
 export interface CreateUserData {
@@ -35,4 +39,7 @@ export interface UpdateUserData {
   bio?: string;
   isOwner?: boolean;
   ownerBusinessName?: string;
+  username?: string;
+  searchable?: boolean;
+  whoCanRequest?: 'everyone' | 'nobody';
 }

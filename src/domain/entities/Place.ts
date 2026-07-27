@@ -27,6 +27,7 @@ export interface Place {
   gallery?: string[];
   socialLinks?: SocialLinks;
   viewsCount?: number;
+  plansCount?: number;
 }
 
 export interface CreatePlaceData {

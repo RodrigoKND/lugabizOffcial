@@ -17,6 +17,7 @@ export interface PlacesRow {
   gallery?: string[];
   social_links?: { instagram?: string; tiktok?: string; facebook?: string; website?: string };
   views_count?: number;
+  plans_count?: number;
   created_at: string;
   updated_at: string;
 }

@@ -29,6 +29,14 @@ import type {
 import type {
   NotificationsRow, NotificationsInsert, NotificationsUpdate,
 } from './notifications';
+import type {
+  FriendshipsRow, FriendshipsInsert, FriendshipsUpdate,
+  BlockedUsersRow, BlockedUsersInsert, BlockedUsersUpdate,
+} from './friendships';
+import type {
+  PlansRow, PlansInsert, PlansUpdate,
+  PlanParticipantsRow, PlanParticipantsInsert, PlanParticipantsUpdate,
+} from './plans';
 
 export type {
   UsersRow, UsersInsert, UsersUpdate,
@@ -58,6 +66,14 @@ export type {
 export type {
   NotificationsRow, NotificationsInsert, NotificationsUpdate,
 } from './notifications';
+export type {
+  FriendshipsRow, FriendshipsInsert, FriendshipsUpdate,
+  BlockedUsersRow, BlockedUsersInsert, BlockedUsersUpdate,
+} from './friendships';
+export type {
+  PlansRow, PlansInsert, PlansUpdate,
+  PlanParticipantsRow, PlanParticipantsInsert, PlanParticipantsUpdate,
+} from './plans';
 
 export interface Database {
   public: {
@@ -76,6 +92,10 @@ export interface Database {
       notifications: { Row: NotificationsRow; Insert: NotificationsInsert; Update: NotificationsUpdate };
       user_roles: { Row: UserRolesRow; Insert: UserRolesInsert; Update: UserRolesUpdate };
       push_subscriptions: { Row: PushSubscriptionsRow; Insert: PushSubscriptionsInsert; Update: PushSubscriptionsUpdate };
+      friendships: { Row: FriendshipsRow; Insert: FriendshipsInsert; Update: FriendshipsUpdate };
+      blocked_users: { Row: BlockedUsersRow; Insert: BlockedUsersInsert; Update: BlockedUsersUpdate };
+      plans: { Row: PlansRow; Insert: PlansInsert; Update: PlansUpdate };
+      plan_participants: { Row: PlanParticipantsRow; Insert: PlanParticipantsInsert; Update: PlanParticipantsUpdate };
     };
   };
 }

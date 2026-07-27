@@ -43,6 +43,7 @@ export function transformEventData(event: Record<string, unknown>): Event {
     userId: event.user_id,
     user: event.user ? { name: event.user.name, avatar: event.user.avatar } : undefined,
     attendeesCount: event.attendees_count ?? uniqueAttendees.size,
+    plansCount: event.plans_count,
     createdAt: new Date(event.created_at),
     updatedAt: new Date(event.updated_at || event.created_at),
   };

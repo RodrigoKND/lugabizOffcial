@@ -76,7 +76,7 @@ export const authService = {
     if (error) throw error;
   },
 
-  async updateUserProfile(userId: string, updates: Partial<Pick<User, 'name' | 'avatar' | 'phone' | 'bio' | 'isOwner' | 'ownerBusinessName'>>) {
+  async updateUserProfile(userId: string, updates: Partial<Pick<User, 'name' | 'avatar' | 'phone' | 'bio' | 'isOwner' | 'ownerBusinessName' | 'username' | 'searchable' | 'whoCanRequest'>>) {
     const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.avatar !== undefined) dbUpdates.avatar = updates.avatar;
@@ -84,6 +84,9 @@ export const authService = {
     if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
     if (updates.isOwner !== undefined) dbUpdates.is_owner = updates.isOwner;
     if (updates.ownerBusinessName !== undefined) dbUpdates.owner_business_name = updates.ownerBusinessName;
+    if (updates.username !== undefined) dbUpdates.username = updates.username || null;
+    if (updates.searchable !== undefined) dbUpdates.searchable = updates.searchable;
+    if (updates.whoCanRequest !== undefined) dbUpdates.who_can_request = updates.whoCanRequest;
 
     const { data, error } = await supabase
       .from('users')
@@ -175,6 +178,9 @@ export const authService = {
       onboardingStep: data.onboarding_step ?? 'login',
       notifDismissed: data.notif_dismissed ?? false,
       geoDismissed: data.geo_dismissed ?? false,
+      username: data.username || undefined,
+      searchable: data.searchable ?? true,
+      whoCanRequest: data.who_can_request || 'everyone',
     };
   },
 };

@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-export type TabId = 'saved' | 'events' | 'attending' | 'dashboard' | 'admin';
+export type TabId = 'saved' | 'events' | 'attending' | 'friends' | 'plans' | 'dashboard' | 'admin';
 
 export interface ProfileTab {
   id: TabId;
@@ -14,6 +14,7 @@ export interface EditProfileData {
   bio: string;
   isOwner: boolean;
   ownerBusinessName: string;
+  username: string;
 }
 
 export interface StatCardProps {

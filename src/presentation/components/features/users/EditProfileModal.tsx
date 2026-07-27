@@ -2,10 +2,12 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, Store } from 'lucide-react';
 import { EditProfileData } from '@domain/entities/ProfileTypes';
+import { UsernameField } from '@presentation/components/features/social';
 
 interface EditProfileModalProps {
   isOpen: boolean;
   editData: EditProfileData;
+  initialUsername?: string;
   onClose: () => void;
   onChange: (data: EditProfileData) => void;
   onSave: () => void;
@@ -13,7 +15,7 @@ interface EditProfileModalProps {
   onManageBusinesses?: () => void;
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, onClose, onChange, onSave, onVerify, onManageBusinesses }) => (
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, initialUsername, onClose, onChange, onSave, onVerify, onManageBusinesses }) => (
   <AnimatePresence>
     {isOpen && (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -29,6 +31,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, editData, o
             </button>
           </div>
           <div className="p-5 space-y-4">
+            <UsernameField
+              value={editData.username}
+              onChange={(username) => onChange({ ...editData, username })}
+              initialUsername={initialUsername}
+            />
             <div>
               <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Nombre</label>
               <input type="text" value={editData.name} onChange={e => onChange({ ...editData, name: e.target.value })}

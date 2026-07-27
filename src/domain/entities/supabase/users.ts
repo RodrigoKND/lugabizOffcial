@@ -7,6 +7,9 @@ export interface UsersRow {
   bio?: string;
   is_owner?: boolean;
   owner_business_name?: string;
+  username?: string;
+  searchable?: boolean;
+  who_can_request?: 'everyone' | 'nobody';
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +23,9 @@ export interface UsersInsert {
   bio?: string;
   is_owner?: boolean;
   owner_business_name?: string;
+  username?: string;
+  searchable?: boolean;
+  who_can_request?: 'everyone' | 'nobody';
   created_at?: string;
   updated_at?: string;
 }
@@ -33,6 +39,9 @@ export interface UsersUpdate {
   bio?: string;
   is_owner?: boolean;
   owner_business_name?: string;
+  username?: string;
+  searchable?: boolean;
+  who_can_request?: 'everyone' | 'nobody';
   updated_at?: string;
 }
 

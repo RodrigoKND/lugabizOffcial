@@ -13,6 +13,7 @@ export interface MappedEvent {
   organizer: { name: string; avatar: string; isNew: boolean };
   likes: number;
   comments: number;
+  plansCount?: number;
 }
 
 export interface EventsSectionProps {

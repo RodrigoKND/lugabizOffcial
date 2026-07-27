@@ -46,6 +46,7 @@ export interface Event {
   };
   attendeesCount: number;
   attendeeAvatars?: string[];
+  plansCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }

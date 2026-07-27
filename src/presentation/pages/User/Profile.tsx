@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { Bookmark, Calendar, CheckCircle2, BarChart3, Activity } from 'lucide-react';
+import { Bookmark, Calendar, CheckCircle2, BarChart3, Activity, Users, CalendarCheck2 } from 'lucide-react';
 import { useAuth, usePlaces } from '@presentation/context';
 import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
 import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal, VerificationWizard, MyBusinessesModal } from '@presentation/components/features/users';
+import { FriendsTab, PlansTab } from '@presentation/components/features/social';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { MarketSurvey, ProfileTab, TabId } from '@domain/entities';
 import { eventsService, ownerBusinessesService } from '@lib/supabase';
@@ -47,6 +48,17 @@ const Profile: React.FC = () => {
     }
   }, [searchParams, setSearchParams]);
 
+  // Abre la pestaña indicada al llegar desde una notificación (ej. ?tab=friends)
+  const VALID_TABS: TabId[] = ['saved', 'events', 'attending', 'friends', 'plans', 'dashboard', 'admin'];
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && (VALID_TABS as string[]).includes(tab)) {
+      setActiveTab(tab as TabId);
+      searchParams.delete('tab');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => { if (isAdmin) edgeService.createOwnerAnnouncement('', '').catch(() => {}); }, [isAdmin]);
 
   // Al entrar al perfil, re-leemos las banderas de verificación desde la DB: así la
@@ -75,6 +87,8 @@ const Profile: React.FC = () => {
       { id: 'saved', label: 'Colección', icon: Bookmark },
       { id: 'events', label: 'Mis Eventos', icon: Calendar },
       { id: 'attending', label: 'Asistiré', icon: CheckCircle2 },
+      { id: 'friends', label: 'Amigos', icon: Users },
+      { id: 'plans', label: 'Planes', icon: CalendarCheck2 },
     ];
     if (user.isOwner) items.push({ id: 'dashboard', label: 'Dashboard', icon: BarChart3 });
     if (isAdmin) items.push({ id: 'admin', label: 'Admin', icon: Activity });
@@ -86,6 +100,8 @@ const Profile: React.FC = () => {
       saved: <SavedPlacesTab places={savedPlaces} />,
       events: <MyEventsTab events={myEvents} onEventCreate={() => setShowEventForm(true)} onDelete={setDeleteConfirmId} />,
       attending: <AttendingEventsTab events={attendingEvents} />,
+      friends: <FriendsTab />,
+      plans: <PlansTab />,
       dashboard: (
         <DashboardTab
           myPlaces={myPlacesArr}
@@ -147,6 +163,7 @@ const Profile: React.FC = () => {
       <EditProfileModal
         isOpen={isEditing}
         editData={editData}
+        initialUsername={user.username}
         onClose={() => setIsEditing(false)}
         onChange={setEditData}
         onSave={handleSaveProfile}

@@ -20,4 +20,5 @@ export const mapToMockEvent = (event: Event): MappedEvent => ({
   },
   likes: event.attendeesCount || 0,
   comments: 0,
+  plansCount: event.plansCount,
 });

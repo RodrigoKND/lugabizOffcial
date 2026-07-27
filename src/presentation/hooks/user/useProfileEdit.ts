@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '@presentation/context';
 import { EditProfileData } from '@domain/entities/ProfileTypes';
 
@@ -9,7 +10,7 @@ export function useProfileEdit() {
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [editData, setEditData] = useState<EditProfileData>({
-    name: '', phone: '', bio: '', isOwner: false, ownerBusinessName: '',
+    name: '', phone: '', bio: '', isOwner: false, ownerBusinessName: '', username: '',
   });
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export function useProfileEdit() {
       bio: user.bio || '',
       isOwner: user.isOwner || false,
       ownerBusinessName: user.ownerBusinessName || '',
+      username: user.username || '',
     });
   }, [user]);
 
@@ -33,7 +35,8 @@ export function useProfileEdit() {
 
   const handleSaveProfile = async () => {
     const isOwner = !!editData.ownerBusinessName;
-    await updateProfile({ ...editData, isOwner });
+    const ok = await updateProfile({ ...editData, isOwner });
+    if (!ok) { toast.error('No se pudo guardar. ¿Ese nombre de usuario ya está en uso?'); return; }
     setIsEditing(false);
   };
 

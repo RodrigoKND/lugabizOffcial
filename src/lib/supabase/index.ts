@@ -27,3 +27,6 @@ export { placeSharesService } from '@lib/supabase/services/places/placeShares';
 export { userActivityService } from '@lib/supabase/services/places/userActivity';
 export { reportsService } from '@lib/supabase/services/reports';
 export { postsService } from '@lib/supabase/services/posts';
+export { usernameService } from '@lib/supabase/services/user/username';
+export { friendshipsService } from '@lib/supabase/services/social/friendships';
+export { plansService } from '@lib/supabase/services/social/plans';

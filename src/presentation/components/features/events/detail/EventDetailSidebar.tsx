@@ -5,6 +5,7 @@ import { EVENT_STATUS } from '@constants/steps';
 import { EventStatusBadge } from './EventStatusBadge';
 import type { EventDetailSidebarProps } from '@domain/entities/props/EventSidebarProps';
 import { formatPrice, CouponsSection, LocationMapSection, InfoRow, StatusBlock } from './sidebar';
+import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
 
 export default function EventDetailSidebar({
   event, eventStatus, isAttending, isFull, attendeeCount, formattedDate, hasCoords, onAttend,
@@ -32,6 +33,7 @@ export default function EventDetailSidebar({
           {capacity > 0 && (
             <p className="text-[10px] text-stone-400 mt-0.5">{availableSpots} cupos disponibles</p>
           )}
+          <PlansCountBadge count={event.plansCount} className="mt-1.5" />
         </div>
       </header>
 
@@ -60,7 +62,8 @@ export default function EventDetailSidebar({
         )}
       </nav>
 
-      <footer>
+      <footer className="space-y-3">
+        <PlanButton targetName={event.name} eventId={event.id} variant="detail" theme="light" className="w-full" />
         {eventStatus === EVENT_STATUS.FINISHED ? (
           <StatusBlock icon={<XCircle />} text="Evento Finalizado" />
         ) : isFull && !isAttending ? (

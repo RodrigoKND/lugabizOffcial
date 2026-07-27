@@ -19,6 +19,7 @@ export interface EventsRow {
   coords: number[];
   user_id: string;
   attendees_count?: number;
+  plans_count?: number;
   created_at: string;
   updated_at: string;
 }
