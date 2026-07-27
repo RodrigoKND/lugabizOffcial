@@ -63,6 +63,14 @@ export const edgeService = {
     return result as { sent: number }
   },
 
+  async sendFriendAcceptPush(friendshipId: string) {
+    const { data: result, error } = await supabase.functions.invoke('send-friend-accept-push', {
+      body: { friendshipId },
+    })
+    if (error) throw error
+    return result as { sent: number }
+  },
+
   async sendPlanInvitePush(participantId: string) {
     const { data: result, error } = await supabase.functions.invoke('send-plan-invite-push', {
       body: { participantId },

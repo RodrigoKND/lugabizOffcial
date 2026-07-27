@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TikTokBadge } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
+import { PlanButton } from '@presentation/components/features/social';
 
 interface CompactCardProps {
   image?: string;
@@ -11,9 +12,11 @@ interface CompactCardProps {
   category: string;
   to: string;
   tiktokUrl?: string;
+  placeId?: string;
+  eventId?: string;
 }
 
-const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to, tiktokUrl }) => {
+const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category, to, tiktokUrl, placeId, eventId }) => {
   const navigate = useNavigate();
   const tiktokId = extractTikTokVideoId(tiktokUrl);
   return (
@@ -37,6 +40,7 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
           {category}
         </span>
         <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+          {(placeId || eventId) && <PlanButton targetName={name} placeId={placeId} eventId={eventId} className="w-6 h-6" />}
           {tiktokId && <TikTokBadge className="w-5 h-5" />}
           <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-black/40 backdrop-blur-sm rounded-full text-[10px] font-semibold text-white">
             <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />

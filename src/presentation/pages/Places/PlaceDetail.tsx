@@ -202,7 +202,7 @@ const PlaceDetail: React.FC = () => {
                 Más de {place.category?.name}
               </h3>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide mb-24">
               {relatedPlaces.map(p => (
                 <Link
                   key={p.id}

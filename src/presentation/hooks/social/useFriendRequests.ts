@@ -4,23 +4,25 @@ import { friendshipsService } from '@lib/supabase';
 import { Friendship } from '@domain/entities';
 import { useAuth } from '@presentation/context';
 
-// Solicitudes pendientes recibidas + lista de amigos aceptados del usuario actual.
+// Solicitudes de amistad recibidas (pending) y enviadas (pending) del usuario
+// actual. Para listar amigos ya aceptados (potencialmente cientos) usar
+// useFriendSearch, que resuelve filtro+límite en el servidor.
 export function useFriendRequests() {
   const { user } = useAuth();
   const [pending, setPending] = useState<Friendship[]>([]);
-  const [friends, setFriends] = useState<Friendship[]>([]);
+  const [sent, setSent] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const reload = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const [pendingList, friendsList] = await Promise.all([
+      const [pendingList, sentList] = await Promise.all([
         friendshipsService.listPendingRequests(user.id),
-        friendshipsService.listFriends(user.id),
+        friendshipsService.listSentRequests(user.id),
       ]);
       setPending(pendingList);
-      setFriends(friendsList);
+      setSent(sentList);
     } catch (err) { console.error('[useFriendRequests:reload]', err); }
     setIsLoading(false);
   }, [user]);
@@ -35,5 +37,13 @@ export function useFriendRequests() {
     } catch { toast.error('No se pudo procesar la solicitud'); }
   }, [reload]);
 
-  return { pending, friends, isLoading, respond, reload };
+  const cancel = useCallback(async (friendshipId: string) => {
+    try {
+      await friendshipsService.removeFriendship(friendshipId);
+      toast.success('Solicitud cancelada');
+      reload();
+    } catch { toast.error('No se pudo cancelar la solicitud'); }
+  }, [reload]);
+
+  return { pending, sent, isLoading, respond, cancel, reload };
 }

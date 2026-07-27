@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Users, X } from 'lucide-react';
-import { useCreatePlan, useFriendRequests } from '@presentation/hooks';
+import { Loader2, Search, UserPlus, Users, X } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useAuth } from '@presentation/context';
+import { useCreatePlan, useFriendSearch, useUserSearch } from '@presentation/hooks';
+import { friendshipsService } from '@lib/supabase';
 import { PlanVisibility } from '@domain/entities';
 import FriendPickerItem from './FriendPickerItem';
+import UserSearchResultItem from './UserSearchResultItem';
 
 interface CreatePlanModalProps {
   isOpen: boolean;
@@ -20,19 +24,37 @@ const VISIBILITY_OPTIONS: { value: PlanVisibility; label: string; hint: string }
 ];
 
 const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targetName, placeId, eventId }) => {
-  const { friends } = useFriendRequests();
+  const { user } = useAuth();
   const [friendFilter, setFriendFilter] = useState('');
+  const [showAddPeople, setShowAddPeople] = useState(false);
+  const [peopleQuery, setPeopleQuery] = useState('');
+  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
+  const [sendingId, setSendingId] = useState<string | null>(null);
+
+  const { options: friendOptions, isLoading: isLoadingFriends } = useFriendSearch(friendFilter, 20);
+  const { results: peopleResults, isSearching: isSearchingPeople } = useUserSearch(peopleQuery);
+
   const {
     planDate, setPlanDate, planTime, setPlanTime, visibility, setVisibility,
     note, setNote, invitees, toggleInvitee, isSubmitting, submit,
   } = useCreatePlan({ placeId, eventId }, onClose);
 
-  const filteredFriends = friends.filter((f) =>
-    f.otherUserName.toLowerCase().includes(friendFilter.toLowerCase())
-    || f.otherUserUsername?.toLowerCase().includes(friendFilter.toLowerCase())
-  );
+  const handleSendRequest = async (targetId: string) => {
+    if (!user) return;
+    setSendingId(targetId);
+    try {
+      await friendshipsService.sendRequest(user.id, targetId);
+      setSentIds((prev) => new Set(prev).add(targetId));
+      toast.success('Solicitud enviada. Vas a poder invitarlo cuando la acepte.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'No se pudo enviar la solicitud');
+    } finally {
+      setSendingId(null);
+    }
+  };
 
   const today = new Date().toISOString().split('T')[0];
+  const noFriendsAtAll = !friendFilter.trim() && !isLoadingFriends && friendOptions.length === 0;
 
   return (
     <AnimatePresence>
@@ -94,27 +116,61 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                 <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">
                   Invitar amigos {invitees.length > 0 && `(${invitees.length})`}
                 </label>
-                {friends.length === 0 ? (
+
+                <div className="relative mb-2">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary" />
+                  <input type="text" value={friendFilter} onChange={(e) => setFriendFilter(e.target.value)}
+                    placeholder="Buscar entre tus amigos..."
+                    className="w-full pl-8 pr-3 py-2 bg-primary-50/50 border border-primary-100 rounded-lg text-xs outline-none focus:border-primary-300 focus:bg-white transition-all" />
+                </div>
+
+                {noFriendsAtAll ? (
                   <div className="text-center py-6 bg-primary-50/40 rounded-xl">
                     <Users className="w-6 h-6 text-primary-300 mx-auto mb-2" />
-                    <p className="text-xs text-text-secondary">Agregá amigos primero desde la pestaña "Amigos".</p>
+                    <p className="text-xs text-text-secondary">Todavía no tenés amigos. Buscalos abajo por @usuario.</p>
                   </div>
                 ) : (
-                  <>
-                    <input type="text" value={friendFilter} onChange={(e) => setFriendFilter(e.target.value)}
-                      placeholder="Filtrar por nombre..."
-                      className="w-full px-3 py-2 mb-2 bg-primary-50/50 border border-primary-100 rounded-lg text-xs outline-none focus:border-primary-300 focus:bg-white transition-all" />
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                      {filteredFriends.map((friend) => (
-                        <FriendPickerItem
-                          key={friend.id}
-                          friend={friend}
-                          selected={invitees.some((i) => i.id === friend.otherUserId)}
-                          onToggle={() => toggleInvitee({ id: friend.otherUserId, name: friend.otherUserName, username: friend.otherUserUsername || '', avatar: friend.otherUserAvatar })}
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                    {friendOptions.map((friend) => (
+                      <FriendPickerItem
+                        key={friend.friendshipId}
+                        friend={friend}
+                        selected={invitees.some((i) => i.id === friend.userId)}
+                        onToggle={() => toggleInvitee({ id: friend.userId, name: friend.name, username: friend.username || '', avatar: friend.avatar })}
+                      />
+                    ))}
+                    {!isLoadingFriends && friendFilter.trim() && friendOptions.length === 0 && (
+                      <p className="text-xs text-text-secondary text-center py-3">Sin resultados entre tus amigos.</p>
+                    )}
+                  </div>
+                )}
+
+                <button type="button" onClick={() => setShowAddPeople((v) => !v)}
+                  className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                  <UserPlus className="w-3.5 h-3.5" /> {showAddPeople ? 'Ocultar búsqueda' : '¿No lo encontrás? Buscar y agregar'}
+                </button>
+
+                {showAddPeople && (
+                  <div className="mt-1 space-y-2">
+                    <input type="text" value={peopleQuery} onChange={(e) => setPeopleQuery(e.target.value)}
+                      placeholder="Buscar por @usuario..." autoFocus
+                      className="w-full px-3 py-2 bg-primary-50/50 border border-primary-100 rounded-lg text-xs outline-none focus:border-primary-300 focus:bg-white transition-all" />
+                    {isSearchingPeople && <p className="text-[11px] text-text-secondary text-center py-2">Buscando...</p>}
+                    {!isSearchingPeople && peopleQuery.trim().length >= 3 && peopleResults.length === 0 && (
+                      <p className="text-[11px] text-text-secondary text-center py-2">No encontramos a nadie con ese apodo.</p>
+                    )}
+                    <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                      {peopleResults.map((result) => (
+                        <UserSearchResultItem
+                          key={result.id}
+                          result={result}
+                          onAdd={() => handleSendRequest(result.id)}
+                          isSending={sendingId === result.id}
+                          sent={sentIds.has(result.id)}
                         />
                       ))}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

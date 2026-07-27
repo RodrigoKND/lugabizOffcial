@@ -27,7 +27,7 @@ export {
 } from './AdminPanelTypes';
 export { type Report, type CreateReportData, type FlaggedContent } from './Report';
 export { type BusinessPost, type CreatePostData, type FlashOffer, type PostReactionCounts } from './Post';
-export { type FriendshipStatus, type Friendship, type UserSearchResult } from './Friendship';
+export { type FriendshipStatus, type Friendship, type UserSearchResult, type FriendOption } from './Friendship';
 export {
   type PlanVisibility, type PlanRsvpStatus, type PlanParticipantRole,
   type PlanParticipant, type Plan, type CreatePlanData,

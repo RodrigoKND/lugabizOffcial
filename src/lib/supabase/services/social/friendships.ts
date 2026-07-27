@@ -1,6 +1,14 @@
 import { supabase } from '@lib/supabase/client';
-import { Friendship, FriendshipStatus, UserSearchResult } from '@domain/entities';
+import { Friendship, FriendshipStatus, FriendOption, UserSearchResult } from '@domain/entities';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
+
+interface FriendOptionRow {
+  friendship_id: string;
+  user_id: string;
+  name: string;
+  username?: string;
+  avatar?: string;
+}
 
 interface UserLite {
   id: string;
@@ -55,6 +63,20 @@ export const friendshipsService = {
     return (data || []) as UserSearchResult[];
   },
 
+  // Filtro+límite resuelto en SQL (search_my_friends): funciona igual de rápido
+  // con 5 o 500 amigos, nunca trae la lista completa al cliente para filtrarla ahí.
+  async searchFriends(query: string, limit = 20): Promise<FriendOption[]> {
+    const { data, error } = await supabase.rpc('search_my_friends', { p_query: query, p_limit: limit });
+    if (error) throw error;
+    return ((data || []) as FriendOptionRow[]).map((r) => ({
+      friendshipId: r.friendship_id,
+      userId: r.user_id,
+      name: r.name,
+      username: r.username,
+      avatar: r.avatar,
+    }));
+  },
+
   async sendRequest(requesterId: string, addresseeId: string): Promise<void> {
     const { data, error } = await supabase
       .from('friendships')
@@ -71,24 +93,12 @@ export const friendshipsService = {
       .update({ status: accept ? 'accepted' : 'rejected' })
       .eq('id', friendshipId);
     if (error) throw error;
+    if (accept) edgeService.sendFriendAcceptPush(friendshipId).catch(() => {});
   },
 
   async removeFriendship(friendshipId: string): Promise<void> {
     const { error } = await supabase.from('friendships').delete().eq('id', friendshipId);
     if (error) throw error;
-  },
-
-  async listFriends(userId: string): Promise<Friendship[]> {
-    const { data, error } = await supabase
-      .from('friendships')
-      .select('*')
-      .eq('status', 'accepted')
-      .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
-    if (error) throw error;
-    const rows = (data || []) as FriendshipRow[];
-    const otherIds = rows.map((r) => (r.requester_id === userId ? r.addressee_id : r.requester_id));
-    const usersMap = await fetchUsersLite(otherIds);
-    return rows.map((r) => mapFriendship(r, userId, usersMap));
   },
 
   async listPendingRequests(userId: string): Promise<Friendship[]> {
@@ -101,6 +111,19 @@ export const friendshipsService = {
     if (error) throw error;
     const rows = (data || []) as FriendshipRow[];
     const usersMap = await fetchUsersLite(rows.map((r) => r.requester_id));
+    return rows.map((r) => mapFriendship(r, userId, usersMap));
+  },
+
+  async listSentRequests(userId: string): Promise<Friendship[]> {
+    const { data, error } = await supabase
+      .from('friendships')
+      .select('*')
+      .eq('status', 'pending')
+      .eq('requester_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const rows = (data || []) as FriendshipRow[];
+    const usersMap = await fetchUsersLite(rows.map((r) => r.addressee_id));
     return rows.map((r) => mapFriendship(r, userId, usersMap));
   },
 

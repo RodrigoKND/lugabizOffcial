@@ -17,3 +17,4 @@ export { useUserSearch } from './social/useUserSearch';
 export { useFriendRequests } from './social/useFriendRequests';
 export { useCreatePlan } from './social/useCreatePlan';
 export { usePlans } from './social/usePlans';
+export { useFriendSearch } from './social/useFriendSearch';

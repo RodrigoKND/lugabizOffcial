@@ -19,3 +19,13 @@ export interface UserSearchResult {
   username: string;
   avatar?: string;
 }
+
+// Resultado de search_my_friends: ya viene filtrado+acotado desde SQL, pensado
+// para funcionar igual de rápido con 5 o con 500 amigos.
+export interface FriendOption {
+  friendshipId: string;
+  userId: string;
+  name: string;
+  username?: string;
+  avatar?: string;
+}

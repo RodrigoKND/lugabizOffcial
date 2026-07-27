@@ -61,7 +61,7 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ isOpen, onClose }) => {
                   className="w-full pl-10 pr-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all"
                 />
               </div>
-              <p className="text-[11px] text-text-secondary mt-1.5">Escribí al menos 3 letras del @apodo exacto.</p>
+              <p className="text-[11px] text-text-secondary mt-1.5">Escribí al menos 3 letras del @usuario exacto.</p>
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 pb-5 space-y-2">

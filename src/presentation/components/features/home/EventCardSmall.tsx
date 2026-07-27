@@ -1,6 +1,7 @@
 import { Calendar } from 'lucide-react';
 import { Event } from '@domain/entities';
 import { getCategoryColor } from './categoryColors';
+import { PlanButton } from '@presentation/components/features/social';
 
 interface EventCardSmallProps {
   event: Event;
@@ -11,14 +12,17 @@ interface EventCardSmallProps {
 const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewed }) => {
   const gradient = getCategoryColor(event.category?.name || '');
   return (
-    <button onClick={onClick}
-      className={`shrink-0 w-48 snap-start group relative rounded-xl overflow-hidden bg-white border shadow-xs hover:shadow-md transition-all active:scale-[0.97] ${isViewed ? 'border-stone-200/60 opacity-60 grayscale-[30%]' : 'border-primary-100/40'}`}>
+    <div role="button" tabIndex={0} onClick={onClick} onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
+      className={`shrink-0 w-48 snap-start group relative rounded-xl overflow-hidden bg-white border shadow-xs hover:shadow-md transition-all active:scale-[0.97] cursor-pointer ${isViewed ? 'border-stone-200/60 opacity-60 grayscale-[30%]' : 'border-primary-100/40'}`}>
       <div className="aspect-16/10 relative overflow-hidden">
         <div className={`absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300`}
           style={{ backgroundImage: `url(${event.image || ''})` }} />
         <div className="absolute inset-0 bg-lienar-to-t from-black/70 via-black/10 to-transparent" />
         <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white bg-linear-to-r ${gradient} shadow-xs z-10`}>
           {event.category?.name || 'Evento'}
+        </div>
+        <div className="absolute top-2 right-2 z-10">
+          <PlanButton targetName={event.name} eventId={event.id} className="w-6 h-6" />
         </div>
         <div className="absolute bottom-2 left-2 right-2 z-10">
           <p className="text-white font-bold text-xs leading-tight truncate">{event.name}</p>
@@ -28,7 +32,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewe
           </p>
         </div>
       </div>
-    </button>
+    </div>
   );
 };
 
