@@ -8,6 +8,7 @@ import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { SocialLinksSection } from '@presentation/components/reusables';
 import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
+import { convertHeicIfNeeded } from '@infrastructure/utils/heic';
 import type { SocialLinks } from '@domain/entities';
 
 const EditPlacePage: React.FC = () => {
@@ -54,7 +55,10 @@ const EditPlacePage: React.FC = () => {
     });
   }, [id, user, navigate]);
 
-  const uploadFile = async (file: File): Promise<string> => {
+  const uploadFile = async (rawFile: File): Promise<string> => {
+    // Fotos HEIC/HEIF (cámara de iPhone) no se pueden mostrar en un <img> una
+    // vez subidas — se convierten a JPEG acá antes de mandarlas a Storage.
+    const file = await convertHeicIfNeeded(rawFile);
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
     const filePath = `places/${fileName}`;

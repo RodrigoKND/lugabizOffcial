@@ -63,7 +63,7 @@ const AddPlace: React.FC = () => {
     <section className="min-h-screen bg-stone-50 text-stone-800 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         <motion.header initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-stone-800 mb-2">Publicar un lugar</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-stone-800 mt-8 mb-2">Publicar un lugar</h1>
           <p className="text-stone-500 text-sm">Comparte tu descubrimiento con la comunidad</p>
           <StepIndicator step={formUtils.step} totalSteps={formUtils.totalSteps} />
         </motion.header>

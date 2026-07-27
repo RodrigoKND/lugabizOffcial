@@ -29,6 +29,9 @@ importers:
       h3-js:
         specifier: ^4.4.0
         version: 4.4.0
+      heic2any:
+        specifier: ^0.0.4
+        version: 0.0.4
       lucide-react:
         specifier: 0.344.0
         version: 0.344.0(react@18.3.1)
@@ -1368,6 +1371,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  heic2any@0.0.4:
+    resolution: {integrity: sha512-3lLnZiDELfabVH87htnRolZ2iehX9zwpRyGNz22GKXIu0fznlblf0/ftppXKNqS26dqFSeqfIBhAmAj/uSp0cA==}
 
   http-parser-js@0.5.10:
     resolution: {integrity: sha512-Pysuw9XpUq5dVc/2SMHpuTY01RFl8fttgcyunjL7eEMhGM3cI4eOmiCycJDVCo/7O7ClfQD3SaI6ftDzqOXYMA==}
@@ -3313,6 +3319,8 @@ snapshots:
   h3-js@4.4.0: {}
 
   has-flag@4.0.0: {}
+
+  heic2any@0.0.4: {}
 
   http-parser-js@0.5.10: {}
 

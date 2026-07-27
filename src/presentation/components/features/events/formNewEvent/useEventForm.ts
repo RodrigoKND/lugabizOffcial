@@ -4,6 +4,7 @@ import { usePlaces, useAuth } from '@presentation/context';
 import { storageService } from '@lib/supabase';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
 import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
+import { convertHeicFiles } from '@infrastructure/utils/heic';
 import { FormData, ValidationErrors, ScheduleEntry } from './EventFormTypes';
 
 const initialState: FormData = {
@@ -48,9 +49,14 @@ export function useEventForm(onClose: () => void) {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFiles = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!rawFiles.length) return;
+
+    // Fotos HEIC/HEIF (cámara de iPhone) no se pueden mostrar en un <img>,
+    // ni en la vista previa ni ya subidas — se convierten a JPEG acá.
+    const files = await convertHeicFiles(rawFiles);
 
     const validation = storageService.validateMultipleFiles(files, 5, 10);
     if (!validation.valid) {

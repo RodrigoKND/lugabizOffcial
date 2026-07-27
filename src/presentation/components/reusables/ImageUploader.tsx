@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, X, AlertCircle } from 'lucide-react';
 import { storageService } from '@lib/supabase';
+import { convertHeicFiles } from '@infrastructure/utils/heic';
 
 interface ImageUploaderProps {
   images: string[];
@@ -18,10 +19,21 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   isSubmitting, maxFiles = 5, maxTotalMB = 10
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
 
-  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files || []);
+  const handleSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawSelected = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!rawSelected.length) return;
+
+    setConverting(true);
+    // Fotos HEIC/HEIF (típico de cámara de iPhone) no se pueden mostrar en un
+    // <img> — ni en la vista previa ni ya subidas — así que se convierten a
+    // JPEG acá antes de todo lo demás.
+    const selected = await convertHeicFiles(rawSelected);
+    setConverting(false);
+
     const allFiles = [...files, ...selected];
 
     const validation = storageService.validateMultipleFiles(allFiles, maxFiles, maxTotalMB);
@@ -56,7 +68,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           {images.length < maxFiles && (
             <label className="cursor-pointer">
               <div className="aspect-square bg-stone-50 border-2 border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center group hover:border-primary-400 hover:bg-primary-50/30 transition-all">
-                {isSubmitting ? (
+                {isSubmitting || converting ? (
                   <div className="w-6 h-6 border-3 border-primary-400 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>

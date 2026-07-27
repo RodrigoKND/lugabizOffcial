@@ -5,6 +5,7 @@ import { eventsService } from '@lib/supabase';
 import { useAuth } from '@presentation/context';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { validateSocialLinks } from '@infrastructure/utils/socialLinks';
+import { convertHeicIfNeeded, convertHeicFiles } from '@infrastructure/utils/heic';
 import type { Event } from '@domain/entities';
 import type { EventFormFields } from '@domain/entities/props/EditEventProps';
 import type { PriceOption, CouponEntry, SocialLinks } from '@domain/entities';
@@ -90,9 +91,11 @@ export function useEditEventForm() {
     }).finally(() => setLoading(false));
   }, [id, user, navigate]);
 
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFile = e.target.files?.[0];
+    e.target.value = '';
+    if (!rawFile) return;
+    const file = await convertHeicIfNeeded(rawFile);
     setCoverFile(file);
     setCoverPreview(URL.createObjectURL(file));
   };
@@ -103,19 +106,19 @@ export function useEditEventForm() {
     if (coverRef.current) coverRef.current.value = '';
   };
 
-  const handleGalleryAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  const handleGalleryAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFiles = Array.from(e.target.files || []);
+    if (galleryRef.current) galleryRef.current.value = '';
+    if (!rawFiles.length) return;
+    const files = await convertHeicFiles(rawFiles);
     const existingNewSize = galleryFiles.reduce((s, f) => s + f.size, 0);
     const newSize = files.reduce((s, f) => s + f.size, 0);
     if (existingNewSize + newSize > MAX_GALLERY_BYTES) {
       toast.error(`El total supera los 10 MB. Tamaño actual de nuevas imágenes: ${formatMB(existingNewSize)} MB + ${formatMB(newSize)} MB nuevos.`);
-      if (galleryRef.current) galleryRef.current.value = '';
       return;
     }
     setGalleryFiles(prev => [...prev, ...files]);
     setGalleryPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-    if (galleryRef.current) galleryRef.current.value = '';
   };
 
   const removeExistingGallery = (url: string) => {
