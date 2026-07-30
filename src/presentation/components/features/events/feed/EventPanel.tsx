@@ -93,7 +93,10 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
           </button>
         )}
 
-        <div className="absolute top-0 inset-x-0 flex items-center justify-between p-3 pb-10 z-20 md:hidden bg-gradient-to-b from-black/75 via-black/30 to-transparent">
+        {/* pointer-events-none en modo video: deja pasar el toque hacia el reproductor de
+            TikTok (para activar el sonido) por el espacio "vacío" del degradado; cada
+            control interactivo recupera pointer-events-auto individualmente */}
+        <div className={`absolute top-0 inset-x-0 flex items-center justify-between p-3 pb-10 z-20 md:hidden bg-gradient-to-b from-black/75 via-black/30 to-transparent ${state.showVideo && state.tiktokId ? 'pointer-events-none' : ''}`}>
           <div className="flex items-center gap-2.5">
             <div className="ring-2 ring-amber-400/60 rounded-full p-[1.5px]">
               <div className="w-7 h-7 rounded-full bg-stone-700 overflow-hidden ring-1 ring-black flex items-center justify-center">
@@ -108,12 +111,12 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
             </div>
           </div>
           <button onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:bg-black/60 hover:text-white transition-all backdrop-blur-sm">
+            className="pointer-events-auto w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:bg-black/60 hover:text-white transition-all backdrop-blur-sm">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="md:hidden absolute bottom-0 inset-x-0 z-20 p-4 pt-14 bg-gradient-to-t from-black/90 via-black/55 to-transparent">
+        <div className={`md:hidden absolute bottom-0 inset-x-0 z-20 p-4 pt-14 bg-gradient-to-t from-black/90 via-black/55 to-transparent ${state.showVideo && state.tiktokId ? 'pointer-events-none' : ''}`}>
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">{event.category?.name}</span>
           </div>
@@ -122,7 +125,7 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
             {event.description}
           </p>
           {event.description.length > 100 && (
-            <button onClick={handlers.toggleExpanded} className="text-amber-400 text-[10px] font-bold mt-0.5">
+            <button onClick={handlers.toggleExpanded} className="pointer-events-auto text-amber-400 text-[10px] font-bold mt-0.5">
               {state.expanded ? 'ver menos' : 'ver más'}
             </button>
           )}
@@ -139,25 +142,25 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
 
           <div className="flex items-center justify-between mt-2 mb-1">
             <div className="flex items-center gap-4">
-              <button onClick={handlers.toggleLike} className="flex items-center gap-1">
+              <button onClick={handlers.toggleLike} className="pointer-events-auto flex items-center gap-1">
                 <Heart className={`w-5 h-5 transition-all ${state.liked ? 'fill-pink-400 text-pink-400' : 'text-white/70'}`} />
                 <span className="text-[11px] text-white/60">{state.likesCount}</span>
               </button>
-              <button onClick={() => handlers.setShowComments(true)} className="flex items-center gap-1">
+              <button onClick={() => handlers.setShowComments(true)} className="pointer-events-auto flex items-center gap-1">
                 <MessageCircle className="w-5 h-5 text-white/70" />
                 <span className="text-[11px] text-white/60">{state.comments.length}</span>
               </button>
-              <button onClick={handlers.handleShare} className="flex items-center gap-1">
+              <button onClick={handlers.handleShare} className="pointer-events-auto flex items-center gap-1">
                 <Share2 className="w-5 h-5 text-white/70" />
               </button>
             </div>
-            <button onClick={handlers.toggleSave}>
+            <button onClick={handlers.toggleSave} className="pointer-events-auto">
               <Bookmark className={`w-5 h-5 transition-all ${state.saved ? 'fill-amber-400 text-amber-400' : 'text-white/70'}`} />
             </button>
           </div>
 
           <Link to={`/event/${event?.id}`}
-            className="mt-1 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
+            className="pointer-events-auto mt-1 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
             Asistiré
           </Link>
         </div>
