@@ -9,7 +9,6 @@ import { FriendsTab, PlansTab } from '@presentation/components/features/social';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { MarketSurvey, ProfileTab, TabId } from '@domain/entities';
 import { eventsService, ownerBusinessesService } from '@lib/supabase';
-import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { useSEO } from '@presentation/hooks/seo/useSEO';
 import { useProfileData, useProfileEdit } from '@presentation/hooks';
 import toast from 'react-hot-toast';
@@ -58,8 +57,6 @@ const Profile: React.FC = () => {
       setSearchParams(searchParams, { replace: true });
     }
   }, [searchParams, setSearchParams]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => { if (isAdmin) edgeService.createOwnerAnnouncement('', '').catch(() => {}); }, [isAdmin]);
 
   // Al entrar al perfil, re-leemos las banderas de verificación desde la DB: así la
   // insignia dorada aparece apenas el admin aprueba los documentos, sin re-login.

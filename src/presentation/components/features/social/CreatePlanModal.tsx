@@ -34,7 +34,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [sendingId, setSendingId] = useState<string | null>(null);
 
-  const { options: friendOptions, isLoading: isLoadingFriends } = useFriendSearch(friendFilter, 20);
+  const { options: friendOptions, isLoading: isLoadingFriends } = useFriendSearch(friendFilter, 20, isOpen);
   const { results: peopleResults, isSearching: isSearchingPeople } = useUserSearch(peopleQuery);
 
   const {
