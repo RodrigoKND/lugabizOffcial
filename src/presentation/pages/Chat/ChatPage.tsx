@@ -375,7 +375,7 @@ function VideoModal({ video, onClose }: { video: VideoEmbed; onClose: () => void
             className="w-full max-w-lg rounded-2xl"
             style={{ height: '70dvh', maxHeight: 640 }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
             loading="eager" title="TikTok" />
         )}
       </div>
