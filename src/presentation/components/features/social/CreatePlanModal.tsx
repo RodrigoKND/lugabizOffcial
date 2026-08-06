@@ -40,7 +40,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const {
     planDate, setPlanDate, planTime, setPlanTime, visibility, setVisibility,
     note, setNote, invitees, toggleInvitee, isSubmitting, submit,
-  } = useCreatePlan({ placeId, eventId }, onClose);
+  } = useCreatePlan({ placeId, eventId }, isOpen, onClose);
 
   const handleSendRequest = async (targetId: string) => {
     if (!user) return;
