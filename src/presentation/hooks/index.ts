@@ -11,6 +11,7 @@ export { useHomeEvents } from './home/useHomeEvents';
 export { useTrendingPlaces } from './home/useTrendingPlaces';
 export { usePlaceDetail } from './places/usePlaceDetail';
 export { usePlaceGallery } from './places/usePlaceGallery';
+export { useEditPlaceImages } from './places/useEditPlaceImages';
 export { useSmartBack } from './useSmartBack';
 export { useLockBodyScroll } from './useLockBodyScroll';
 export { useInfiniteScroll } from './useInfiniteScroll';

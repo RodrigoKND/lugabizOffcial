@@ -116,6 +116,21 @@ export async function updatePlace(id: string, updates: Partial<CreatePlaceData>)
     .single();
 
   if (error) throw error;
+
+  // place_social_groups es una tabla puente (no una columna de places), así que
+  // se reemplaza aparte: se borran los vínculos actuales y se insertan los nuevos.
+  if (updates.socialGroupIds !== undefined) {
+    const { error: deleteError } = await supabase.from('place_social_groups').delete().eq('place_id', id);
+    if (deleteError) throw deleteError;
+
+    if (updates.socialGroupIds.length > 0) {
+      const { error: insertError } = await supabase
+        .from('place_social_groups')
+        .insert(updates.socialGroupIds.map((socialGroupId) => ({ place_id: id, social_group_id: socialGroupId })));
+      if (insertError) throw insertError;
+    }
+  }
+
   return data;
 }
 
