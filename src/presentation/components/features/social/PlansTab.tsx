@@ -6,6 +6,7 @@ import { Plan } from '@domain/entities';
 import PlanListItem from './PlanListItem';
 import PlanCard from './PlanCard';
 import CancelPlanModal from './CancelPlanModal';
+import PlanDetailModal from './PlanDetailModal';
 import PushEnableBanner from './PushEnableBanner';
 
 const PlansTab: React.FC = () => {
@@ -13,6 +14,7 @@ const PlansTab: React.FC = () => {
   const { plans, isLoading, isLoadingMore, hasMore, loadMore, respondToInvite, cancelPlan } = usePlans();
   const [planToCancel, setPlanToCancel] = useState<Plan | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const sentinelRef = useInfiniteScroll(loadMore, hasMore && !isLoading);
 
   if (!user) return null;
@@ -76,6 +78,7 @@ const PlansTab: React.FC = () => {
                 key={plan.id}
                 plan={plan}
                 currentUserId={user.id}
+                onClick={() => setSelectedPlan(plan)}
                 onCancel={plan.createdBy === user.id ? () => setPlanToCancel(plan) : undefined}
               />
             ))}
@@ -97,6 +100,11 @@ const PlansTab: React.FC = () => {
         onClose={() => setPlanToCancel(null)}
         onConfirm={handleConfirmCancel}
         isSubmitting={isCancelling}
+      />
+      <PlanDetailModal
+        plan={selectedPlan}
+        currentUserId={user.id}
+        onClose={() => setSelectedPlan(null)}
       />
     </div>
   );

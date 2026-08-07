@@ -31,7 +31,7 @@
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(168, 128, 250, 0.15) !important;
 }
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-primary-50"],
+.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class~="bg-primary-50"],
 .fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-primary-100"] {
   background: rgba(168, 128, 250, 0.08) !important;
   border-color: rgba(168, 128, 250, 0.15) !important;

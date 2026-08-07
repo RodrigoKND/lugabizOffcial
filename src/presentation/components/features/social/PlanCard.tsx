@@ -5,23 +5,26 @@ interface PlanCardProps {
   plan: Plan;
   currentUserId: string;
   onCancel?: () => void;
+  onClick?: () => void;
 }
 
 const VISIBILITY_ICON = { private: Lock, friends: Users, public: Globe };
 
 // Tarjeta compacta pensada para una grilla (a diferencia de PlanListItem, que
 // es la versión detallada con aceptar/rechazar para invitaciones pendientes).
-const PlanCard: React.FC<PlanCardProps> = ({ plan, currentUserId, onCancel }) => {
+const PlanCard: React.FC<PlanCardProps> = ({ plan, currentUserId, onCancel, onClick }) => {
   const isOwner = plan.createdBy === currentUserId;
   const acceptedCount = plan.participants.filter((p) => p.rsvpStatus === 'accepted').length;
   const VisibilityIcon = VISIBILITY_ICON[plan.visibility];
 
   return (
-    <div className="relative group bg-white rounded-2xl border border-primary-100/50 overflow-hidden hover:shadow-sm transition-shadow">
+    <div onClick={onClick} role="button" tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
+      className="relative group bg-white rounded-2xl border border-primary-100/50 overflow-hidden hover:shadow-sm transition-shadow cursor-pointer">
       {isOwner && onCancel && (
-        <button onClick={onCancel} aria-label="Cancelar plan"
-          className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 transition-all">
-          <X className="w-3.5 h-3.5" />
+        <button onClick={(e) => { e.stopPropagation(); onCancel(); }} aria-label="Cancelar plan"
+          className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-500 transition-colors">
+          <X className="w-4 h-4" />
         </button>
       )}
       <div className="aspect-video bg-primary-50 relative overflow-hidden">

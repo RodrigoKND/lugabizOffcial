@@ -10,10 +10,12 @@ interface PlanListItemProps {
 
 const VISIBILITY_ICON = { private: Lock, friends: Users, public: Globe };
 
+// Quién confirmó no se muestra acá a propósito: esta tarjeta es para invitaciones
+// TODAVÍA no aceptadas, y esa lista solo es visible para el creador o quien ya
+// aceptó (ver migración restrict_plan_participants_visibility_to_accepted).
 const PlanListItem: React.FC<PlanListItemProps> = ({ plan, currentUserId, onAccept, onDecline }) => {
   const myParticipant = plan.participants.find((p) => p.userId === currentUserId);
   const isPendingInvite = myParticipant?.role === 'invitee' && myParticipant.rsvpStatus === 'pending';
-  const accepted = plan.participants.filter((p) => p.rsvpStatus === 'accepted');
   const VisibilityIcon = VISIBILITY_ICON[plan.visibility];
 
   return (
@@ -29,19 +31,6 @@ const PlanListItem: React.FC<PlanListItemProps> = ({ plan, currentUserId, onAcce
         <span className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary-50 text-primary-600 text-[10px] font-semibold">
           <VisibilityIcon className="w-3 h-3" /> {plan.visibility === 'private' ? 'Privado' : plan.visibility === 'friends' ? 'Amigos' : 'Público'}
         </span>
-      </div>
-
-      <div className="flex items-center gap-1.5 mb-1">
-        {accepted.slice(0, 6).map((p) => (
-          p.userAvatar ? (
-            <img key={p.id} src={p.userAvatar} alt="" className="w-6 h-6 rounded-full object-cover border border-white -ml-1.5 first:ml-0" />
-          ) : (
-            <div key={p.id} className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-[9px] font-bold flex items-center justify-center border border-white -ml-1.5 first:ml-0">
-              {(p.userName || '?').charAt(0).toUpperCase()}
-            </div>
-          )
-        ))}
-        <span className="text-[11px] text-text-secondary ml-1.5">{accepted.length} confirmados</span>
       </div>
 
       {isPendingInvite && myParticipant && (
