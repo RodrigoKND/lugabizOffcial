@@ -46,8 +46,8 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children }
           <div className="flex items-center gap-2.5">
             {icon}
             <div>
-              <h2 className="font-semibold text-[15px] text-white leading-none">{title}</h2>
-              {subtitle && <p className="text-xs text-white/35 mt-1">{subtitle}</p>}
+              <h2 className="font-bold text-xl sm:text-2xl text-white leading-none">{title}</h2>
+              {subtitle && <p className="text-sm text-white/35 mt-1.5">{subtitle}</p>}
             </div>
           </div>
           <div className="flex items-center gap-1.5">

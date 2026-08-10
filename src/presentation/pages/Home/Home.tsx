@@ -110,7 +110,7 @@ const Home: React.FC = () => {
 
         {sortedActiveEvents.length > 0 && (
           <ScrollRow title="Próximos Eventos" subtitle={`${sortedActiveEvents.length} disponibles`}
-            icon={<Calendar className="w-4 h-4 text-pink-500" />}>
+            icon={<Calendar className="w-5 h-5 text-pink-500" />}>
             {sortedActiveEvents.map((event) => (
               <EventCardSmall
                 key={event.id}
@@ -125,8 +125,8 @@ const Home: React.FC = () => {
         {trendingPlaces.length > 0 && (
           <>
             <div className="flex items-center gap-2.5 mb-3 px-1">
-              <TrendingUp className="w-4 h-4 text-primary-400" />
-              <h2 className="font-semibold text-[15px] text-white">En Tendencia</h2>
+              <TrendingUp className="w-5 h-5 text-primary-400" />
+              <h2 className="font-bold text-xl sm:text-2xl text-white">En Tendencia</h2>
             </div>
             <TrendBanner places={trendingPlaces} />
             <ScrollRow title="" subtitle="Más lugares populares">

@@ -46,7 +46,7 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
             key={section.id}
             title={section.title}
             subtitle={section.subtitle}
-            icon={<Sparkles className="w-4 h-4 text-primary-400" />}
+            icon={<Sparkles className="w-5 h-5 text-primary-400" />}
           >
             {isEvent
               ? section.events.map(event => (

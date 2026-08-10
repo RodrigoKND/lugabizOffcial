@@ -22,7 +22,7 @@ const FeaturedHeroSection: React.FC<FeaturedHeroSectionProps> = ({
         </div>
       )}
       <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-      <h2 className="font-semibold text-[15px] text-white">Destacado</h2>
+      <h2 className="font-bold text-xl sm:text-2xl text-white">Destacado</h2>
     </div>
     <HeroBanner
       image={heroEvent.image}
