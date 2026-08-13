@@ -1,48 +1,41 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getMessaging, isSupported, getToken } from 'firebase/messaging';
 import { pushSubscriptionsService } from '@lib/supabase/services/push';
 import { useAuth } from '@presentation/context';
-import { firebaseConfig, firebaseVapidKey } from '@infrastructure/config/firebase';
 
-// Guarda en localStorage el token ya confirmado en la DB para no hacer el
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
+
+// Guarda en localStorage el endpoint ya confirmado en la DB para no hacer el
 // upsert en cada recarga (dedup operativo, no es dato de negocio del
-// usuario). Se invalida si el token cambia.
-const LS_KEY = '_lgz_fcm_token';
+// usuario). Se invalida si el navegador rota la suscripción.
+const LS_KEY = '_lgz_push_endpoint';
 
-// NOTA: se probó cargar firebase/app y firebase/messaging con import()
-// dinámico para que no viajaran en el bundle inicial, pero en este proyecto
-// Rollup no generaba el chunk (el import dinámico desaparecía del build sin
-// error — bug puntual de esta config, no de Firebase). Import estático:
-// funciona de forma confiable y el paquete queda aislado en su propio chunk
-// cacheable vía manualChunks (ver vite.config.ts), así al menos no se vuelve
-// a descargar en cada deploy que no toque estas libs.
-async function getFcmToken(): Promise<string | null> {
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+}
+
+async function subscribeToPush(): Promise<PushSubscription | null> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     console.warn('[push] El navegador no soporta push notifications');
     return null;
   }
-  
-  if (!firebaseVapidKey) {
+  if (!VAPID_PUBLIC_KEY) {
+    console.warn('[push] Falta VITE_VAPID_PUBLIC_KEY');
     return null;
   }
 
-  if (!(await isSupported())) {
-    console.warn('[push] Firebase Messaging no soportado en este navegador');
-    return null;
-  }
-
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const messaging = getMessaging(app);
-
-  // Reutiliza el mismo service worker que ya maneja notificaciones/click
-  // (sw.js) en vez de registrar uno nuevo — evita dos SW compitiendo por el
-  // scope '/'. FCM entrega el push como un evento 'push' normal, que sw.js
-  // ya sabe interpretar.
   const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
   await navigator.serviceWorker.ready;
 
-  return getToken(messaging, { vapidKey: firebaseVapidKey, serviceWorkerRegistration: registration });
+  const existing = await registration.pushManager.getSubscription();
+  if (existing) return existing;
+
+  return registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+  });
 }
 
 async function registerAndSave(userId: string): Promise<'saved' | 'denied' | 'error'> {
@@ -59,20 +52,20 @@ async function registerAndSave(userId: string): Promise<'saved' | 'denied' | 'er
   }
 
   try {
-    const token = await getFcmToken();
-    if (!token) return 'error';
+    const subscription = await subscribeToPush();
+    if (!subscription) return 'error';
 
-    if (localStorage.getItem(LS_KEY) === token) {
-      console.log('[push] Token ya guardado en DB');
+    if (localStorage.getItem(LS_KEY) === subscription.endpoint) {
+      console.log('[push] Suscripción ya guardada en DB');
       return 'saved';
     }
 
-    await pushSubscriptionsService.saveFcmToken(userId, token);
-    localStorage.setItem(LS_KEY, token);
-    console.log('[push] ✓ Token FCM guardado en la DB');
+    await pushSubscriptionsService.save(userId, subscription);
+    localStorage.setItem(LS_KEY, subscription.endpoint);
+    console.log('[push] ✓ Suscripción VAPID guardada en la DB');
     return 'saved';
   } catch (err) {
-    console.error('[push] Error registrando el token FCM:', err);
+    console.error('[push] Error registrando la suscripción:', err);
     return 'error';
   }
 }

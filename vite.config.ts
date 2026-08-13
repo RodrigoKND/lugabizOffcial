@@ -38,13 +38,6 @@ export default defineConfig({
           // lo agrupe por límite de import dinámico, así los íconos
           // exclusivos de páginas lazy (admin, chat, asesor, etc.) no
           // inflan el bundle inicial.
-          //
-          // firebase/app + firebase/messaging: el import() dinámico no
-          // generaba chunk en este proyecto (ver comentario en
-          // usePushNotifications.ts), así que quedó como import estático.
-          // Lo aislamos igual en su propio chunk para que no infle el
-          // bundle de código propio y quede cacheado por separado.
-          'firebase': ['firebase/app', 'firebase/messaging'],
         },
       },
     },

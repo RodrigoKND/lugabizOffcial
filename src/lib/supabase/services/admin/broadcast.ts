@@ -1,6 +1,4 @@
-import { supabase } from '@lib/supabase/client';
-
-const FUNCTION_NAME = 'admin-broadcast';
+import { pushServerFetch } from '@lib/pushServer';
 
 /** Audiencia de una campaña de marketing. */
 export type BroadcastAudience =
@@ -45,28 +43,23 @@ export interface BroadcastResult {
 export const broadcastService = {
   /** Cuántos destinatarios alcanzaría la audiencia. */
   async previewAudience(audience: BroadcastAudience, userIds?: string[]): Promise<{ total: number }> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'preview', audience, userIds },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo calcular la audiencia.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
-    return { total: ((data as Record<string, unknown>).total as number) ?? 0 };
+    const data = await pushServerFetch<{ total: number }>('/api/v1/notify/admin-broadcast/preview', { audience, userIds });
+    return { total: data.total ?? 0 };
   },
 
-  /** Envía la campaña por campana + push del navegador. Devuelve el resumen. */
+  /** Envía la campaña por campana + push (navegador vía VAPID + móvil vía FCM). */
   async send(campaign: BroadcastCampaign): Promise<BroadcastResult> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'send', ...campaign },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo enviar la campaña.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    const data = await pushServerFetch<{
+      recipients: number; inApp: number; pushSent: number; push?: BroadcastPush;
+      fcmSent: number; fcm?: BroadcastFcm;
+    }>('/api/v1/notify/admin-broadcast/send', campaign);
     return {
-      recipients: ((data as Record<string, unknown>).recipients as number) ?? 0,
-      inApp: ((data as Record<string, unknown>).inApp as number) ?? 0,
-      pushSent: ((data as Record<string, unknown>).pushSent as number) ?? 0,
-      push: (data as Record<string, unknown>).push as BroadcastPush | undefined,
-      fcmSent: ((data as Record<string, unknown>).fcmSent as number) ?? 0,
-      fcm: (data as Record<string, unknown>).fcm as BroadcastFcm | undefined,
+      recipients: data.recipients ?? 0,
+      inApp: data.inApp ?? 0,
+      pushSent: data.pushSent ?? 0,
+      push: data.push,
+      fcmSent: data.fcmSent ?? 0,
+      fcm: data.fcm,
     };
   },
 };

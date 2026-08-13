@@ -1,89 +1,55 @@
-import { supabase } from '@lib/supabase/client'
+import { pushServerFetch, pushServerGet } from '@lib/pushServer'
 
 export const edgeService = {
+  // Migrado al servidor propio de notificaciones (lugabizPushServer) — ya
+  // no pasa por la Edge Function `owner-announcement`.
   async createOwnerAnnouncement(title: string, body: string, data?: Record<string, unknown>, targetUsers?: string[]) {
-    const { data: result, error } = await supabase.functions.invoke('owner-announcement', {
-      body: { title, body, data, targetUsers },
-    })
-    if (error) throw error
-    return result
+    return pushServerFetch<{ success: boolean; sentTo: number; pushSent: number }>(
+      '/api/v1/notify/owner-announcement',
+      { title, body, data, targetUsers },
+    )
   },
 
   async toggleNotificationLike(notificationId: string, action: 'like' | 'unlike') {
-    const { data: result, error } = await supabase.functions.invoke('notification-like', {
-      body: { notificationId, action },
-    })
-    if (error) throw error
-    return result as { success: boolean; liked: boolean; likesCount: number }
+    return pushServerFetch<{ success: boolean; liked: boolean; likesCount: number }>(
+      '/api/v1/notifications/like',
+      { notificationId, action },
+    )
   },
 
   async getTrendingPlaces() {
-    const { data, error } = await supabase.functions.invoke('trending-places')
-    if (error) throw error
-    return data as Record<string, unknown>[]
+    return pushServerGet<Record<string, unknown>[]>('/api/v1/places/trending')
   },
 
   async sendSurveyPush(surveyId: string, title: string, body: string, categoryIds: string[]) {
-    const { data: result, error } = await supabase.functions.invoke('send-survey-push', {
-      body: { surveyId, title, body, categoryIds },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/survey', { surveyId, title, body, categoryIds })
   },
 
   async sendEventStartPush(eventId: string) {
-    const { data: result, error } = await supabase.functions.invoke('send-event-start-push', {
-      body: { eventId },
-    })
-    if (error) throw error
-    return result as { sent: number; already_sent?: boolean }
+    return pushServerFetch<{ sent: number; already_sent?: boolean }>('/api/v1/notify/event/start', { eventId })
   },
 
   async banUserWithPush(userId: string, reason: string) {
-    const { data: result, error } = await supabase.functions.invoke('ban-user-push', {
-      body: { userId, reason },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/ban-user', { userId, reason })
   },
 
   async sendAttendancePush(eventId: string, attendeeCount: number) {
-    const { data: result, error } = await supabase.functions.invoke('send-event-attendance-push', {
-      body: { eventId, attendeeCount },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/event/attendance', { eventId, attendeeCount })
   },
 
   async sendFriendRequestPush(friendshipId: string) {
-    const { data: result, error } = await supabase.functions.invoke('send-friend-request-push', {
-      body: { friendshipId },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/friendship/request', { friendshipId })
   },
 
   async sendFriendAcceptPush(friendshipId: string) {
-    const { data: result, error } = await supabase.functions.invoke('send-friend-accept-push', {
-      body: { friendshipId },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/friendship/accept', { friendshipId })
   },
 
   async sendPlanInvitePush(participantId: string) {
-    const { data: result, error } = await supabase.functions.invoke('send-plan-invite-push', {
-      body: { participantId },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/plan/invite', { participantId })
   },
 
   async sendPlanResponsePush(participantId: string) {
-    const { data: result, error } = await supabase.functions.invoke('send-plan-response-push', {
-      body: { participantId },
-    })
-    if (error) throw error
-    return result as { sent: number }
+    return pushServerFetch<{ sent: number }>('/api/v1/notify/plan/response', { participantId })
   },
 }

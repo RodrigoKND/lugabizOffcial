@@ -9,6 +9,7 @@ interface PushSubscriptionRow {
 }
 
 export const pushSubscriptionsService = {
+  /** Guarda una suscripción Web Push nativa (VAPID). */
   async save(userId: string, subscription: PushSubscription): Promise<void> {
     // Upsert por endpoint: permite múltiples dispositivos por usuario.
     const { error } = await supabase
@@ -17,20 +18,21 @@ export const pushSubscriptionsService = {
         user_id: userId,
         endpoint: subscription.endpoint,
         subscription: JSON.parse(JSON.stringify(subscription)),
+        provider: 'webpush',
+        fcm_token: null,
       }, { onConflict: 'endpoint' });
     if (error) throw error;
-  },
 
-  /** Guarda un token de Firebase Cloud Messaging (reemplaza gradualmente a `save`). */
-  async saveFcmToken(userId: string, token: string): Promise<void> {
-    const { error } = await supabase
+    // Limpia el token FCM viejo de ESTE navegador (de cuando este proyecto
+    // enviaba push web por Firebase) para no intentarle enviar por dos
+    // canales. Solo borra filas con provider='fcm', que `saveFcmToken` seteaba
+    // explícitamente — la app móvil no usa esa función ni ese valor, así que
+    // sus filas no se tocan.
+    await supabase
       .from('push_subscriptions')
-      .upsert({
-        user_id: userId,
-        fcm_token: token,
-        provider: 'fcm',
-      }, { onConflict: 'fcm_token' });
-    if (error) throw error;
+      .delete()
+      .eq('user_id', userId)
+      .eq('provider', 'fcm');
   },
 
   async getByUserIds(userIds: string[]): Promise<PushSubscriptionRow[]> {

@@ -3,6 +3,7 @@ import { useGeolocation } from './useGeolocation';
 import { userActivityService } from '@lib/supabase/services/places/userActivity';
 import { useAuth } from '@presentation/context/AuthContext';
 import { supabase } from '@lib/supabase/client';
+import { pushServerFetch } from '@lib/pushServer';
 import { latLngToCell, getNearbyCells } from '@infrastructure/utils/h3';
 
 const TRACKING_INTERVAL = 5 * 60 * 1000;
@@ -62,12 +63,10 @@ export function useUserTracking() {
           nearbyCells.includes(latLngToCell(p.latitude, p.longitude))
         );
 
-        // Push real vía edge function (máx 3 por ciclo de tracking)
-        // La deduplicación de 24h la maneja el edge function en BD
+        // Push real vía el servidor de notificaciones (máx 3 por ciclo de tracking)
+        // La deduplicación de 24h la maneja el servidor en BD
         for (const place of nearbyPlaces.slice(0, 3)) {
-          supabase.functions.invoke('send-proximity-push', {
-            body: { placeId: place.id, placeName: place.name },
-          }).catch(() => {});
+          pushServerFetch('/api/v1/notify/proximity', { placeId: place.id, placeName: place.name }).catch(() => {});
         }
       } catch (err) { console.error('[useUserTracking:track]', err); }
     };
