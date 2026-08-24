@@ -59,7 +59,7 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Store className="w-4 h-4 text-primary-500" />
-          <h2 className="font-bold text-sm uppercase tracking-wide text-text-primary">Posts de Negocios</h2>
+          <h2 className="font-bold text-sm uppercase tracking-wide text-[#241b3e]">Posts de Negocios</h2>
         </div>
         {isOwner && (
           <button
@@ -117,8 +117,8 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
           <div className="w-16 h-16 rounded-full bg-primary-50 flex items-center justify-center mx-auto mb-3">
             <Store className="w-7 h-7 text-primary-300" />
           </div>
-          <p className="font-bold text-text-primary mb-1">Publica tu primer post</p>
-          <p className="text-sm text-text-secondary mb-4">Comparte novedades, fotos y ofertas flash con la comunidad.</p>
+          <p className="font-bold text-[#241b3e] mb-1">Publica tu primer post</p>
+          <p className="text-sm text-stone-500 mb-4">Comparte novedades, fotos y ofertas flash con la comunidad.</p>
           <button onClick={() => setCreateOpen(true)}
             className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors shadow-sm">
             Crear post

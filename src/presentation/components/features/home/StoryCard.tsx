@@ -49,7 +49,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ image, name, onClick, isViewed, e
         </div>
       </div>
     )}
-    <span className={`text-[11px] font-medium max-w-16 truncate text-center leading-tight ${isViewed ? 'text-stone-400' : 'text-text-secondary'}`}>
+    <span className={`text-[11px] font-medium max-w-16 truncate text-center leading-tight ${isViewed ? 'text-stone-400' : 'text-stone-500'}`}>
       {name}
     </span>
   </button>

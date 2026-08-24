@@ -45,11 +45,11 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
   if (isEmpty) {
     return (
       <div className="space-y-2">
-        <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">0 confirmaciones</p>
+        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">0 confirmaciones</p>
         <div className="bg-white rounded-2xl p-12 text-center border border-primary-100/40">
           <CheckCircle2 className="w-10 h-10 text-primary-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-text-primary mb-1">No asistes a nada todavía</h3>
-          <p className="text-xs text-text-secondary mb-4">Confirma tu asistencia a eventos o comparte un lugar para que tus amigos confirmen ir contigo.</p>
+          <h3 className="text-base font-bold text-[#241b3e] mb-1">No asistes a nada todavía</h3>
+          <p className="text-xs text-stone-500 mb-4">Confirma tu asistencia a eventos o comparte un lugar para que tus amigos confirmen ir contigo.</p>
           <Link to="/" className="inline-flex items-center gap-2 bg-primary-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-primary-600 transition-all">
             Explorar
           </Link>
@@ -63,7 +63,7 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
       {/* Eventos a los que asistirá */}
       {events.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">{events.length} {events.length === 1 ? 'evento' : 'eventos'}</p>
+          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">{events.length} {events.length === 1 ? 'evento' : 'eventos'}</p>
           <div className="space-y-2">
             {events.slice(0, 30).map(event => (
               <Link key={event.id} to={`/event/${event.id}`}
@@ -73,8 +73,8 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
                     <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${event.image || ''})` }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-text-primary truncate">{event.name}</h4>
-                    <p className="text-xs text-text-secondary flex items-center gap-2 mt-0.5">
+                    <h4 className="font-semibold text-sm text-[#241b3e] truncate">{event.name}</h4>
+                    <p className="text-xs text-stone-500 flex items-center gap-2 mt-0.5">
                       <Calendar className="w-3 h-3" /> {event.dateStart.toLocaleDateString()} | {event.timeStart}
                     </p>
                   </div>
@@ -89,7 +89,7 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
       {/* Lugares que compartió y quién confirmó ir con él */}
       {sharedConfirmations.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1 flex items-center gap-1.5">
+          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1 flex items-center gap-1.5">
             <Share2 className="w-3.5 h-3.5 text-purple-500" />
             Lugares que compartiste
           </p>
@@ -97,7 +97,7 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
             {sharedConfirmations.map((sc) => (
               <div key={sc.shareId} className="bg-white rounded-xl p-4 border border-purple-100/40">
                 <div className="flex items-center justify-between mb-2.5">
-                  <h4 className="text-sm font-semibold text-text-primary truncate">
+                  <h4 className="text-sm font-semibold text-[#241b3e] truncate">
                     {sc.placeName || 'Lugar'}
                   </h4>
                   <button onClick={() => navigate(`/place/${sc.placeId}`)}
@@ -105,7 +105,7 @@ const AttendingEventsTab: React.FC<AttendingEventsTabProps> = ({ events }) => {
                     <ExternalLink className="w-3 h-3" /> Ver
                   </button>
                 </div>
-                <p className="text-[11px] text-text-secondary mb-2">
+                <p className="text-[11px] text-stone-500 mb-2">
                   {sc.confirmations.length} {sc.confirmations.length === 1 ? 'persona confirmó' : 'personas confirmaron'} ir contigo
                 </p>
                 <div className="flex flex-wrap items-center gap-1.5">

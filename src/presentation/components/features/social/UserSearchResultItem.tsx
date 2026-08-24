@@ -18,8 +18,8 @@ const UserSearchResultItem: React.FC<UserSearchResultItemProps> = ({ result, onA
       </div>
     )}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-text-primary truncate">{result.name}</p>
-      <p className="text-[11px] text-text-secondary truncate">@{result.username}</p>
+      <p className="text-sm font-semibold text-[#241b3e] truncate">{result.name}</p>
+      <p className="text-[11px] text-stone-500 truncate">@{result.username}</p>
     </div>
     <button
       type="button"

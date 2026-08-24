@@ -44,7 +44,7 @@ const FriendsTab: React.FC = () => {
 
       {pending.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">
+          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">
             {pending.length} {pending.length === 1 ? 'solicitud recibida' : 'solicitudes recibidas'}
           </p>
           <div className="space-y-2">
@@ -62,7 +62,7 @@ const FriendsTab: React.FC = () => {
 
       {sent.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-text-secondary font-semibold uppercase tracking-wide px-1">
+          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">
             {sent.length} {sent.length === 1 ? 'solicitud enviada' : 'solicitudes enviadas'}
           </p>
           <div className="space-y-2">
@@ -75,13 +75,13 @@ const FriendsTab: React.FC = () => {
 
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
           <input
             type="text"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setPageSize(PAGE_SIZE); }}
             placeholder="Buscar amigos..."
-            className="w-full pl-10 pr-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm text-[#241b3e] placeholder:text-stone-400 outline-none focus:border-primary-300 focus:bg-white transition-all"
           />
         </div>
         <button onClick={() => setShowAddFriend(true)} aria-label="Agregar amigos"
@@ -97,10 +97,10 @@ const FriendsTab: React.FC = () => {
       {friends.length === 0 && !isLoading ? (
         <div className="bg-white rounded-2xl p-10 text-center border border-primary-100/40">
           <Users className="w-9 h-9 text-primary-300 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-text-primary mb-1">
+          <h3 className="text-sm font-bold text-[#241b3e] mb-1">
             {query.trim() ? 'Sin resultados' : 'Todavía no tenés amigos'}
           </h3>
-          <p className="text-xs text-text-secondary">
+          <p className="text-xs text-stone-500">
             {query.trim() ? 'Probá con otro nombre.' : 'Agregalos por su @usuario para poder invitarlos a tus planes.'}
           </p>
         </div>

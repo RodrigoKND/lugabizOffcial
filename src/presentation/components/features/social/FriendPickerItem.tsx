@@ -23,8 +23,8 @@ const FriendPickerItem: React.FC<FriendPickerItemProps> = ({ friend, selected, o
       </div>
     )}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-text-primary truncate">{friend.name}</p>
-      {friend.username && <p className="text-[11px] text-text-secondary truncate">@{friend.username}</p>}
+      <p className="text-sm font-semibold text-[#241b3e] truncate">{friend.name}</p>
+      {friend.username && <p className="text-[11px] text-stone-500 truncate">@{friend.username}</p>}
     </div>
     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
       selected ? 'bg-primary-500 border-primary-500' : 'border-primary-200'

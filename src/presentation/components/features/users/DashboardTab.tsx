@@ -57,7 +57,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ myPlaces, myEvents, mySurve
       )}
       {myPlaces.length > 0 && (
         <div className="bg-white rounded-xl p-4 border border-primary-100/40">
-          <h3 className="font-semibold text-sm text-text-primary mb-3">Tus lugares ({myPlaces.length})</h3>
+          <h3 className="font-semibold text-sm text-[#241b3e] mb-3">Tus lugares ({myPlaces.length})</h3>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
             {myPlaces.slice(0, 20).map(place => (
               <button key={place.id} onClick={() => navigate(`/place/${place.id}`)}

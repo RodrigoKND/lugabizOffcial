@@ -106,7 +106,7 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
             {nearby}/{total} ({nearbyPct}%)
           </span>
         </div>
-        <p className="text-[10px] text-stone-300 mt-1">Usuarios que respondieron estando en el lugar</p>
+        <p className="text-[10px] text-stone-400 mt-1">Usuarios que respondieron estando en el lugar</p>
       </div>
 
       {/* Comentarios recientes */}

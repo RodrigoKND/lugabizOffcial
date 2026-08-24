@@ -15,14 +15,14 @@ const FeaturedHeroSection: React.FC<FeaturedHeroSectionProps> = ({
         <div className="flex gap-1">
           {activeEvents.slice(0, Math.min(activeEvents.length, 5)).map((_, i) => (
             <button key={i} onClick={() => onSetHeroIndex(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === heroIndex ? 'w-6 bg-pink-500' : 'w-1.5 bg-stone-300 hover:bg-stone-400'
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === heroIndex ? 'w-6 bg-pink-500' : 'w-1.5 bg-primary-200 hover:bg-primary-300'
               }`}
             />
           ))}
         </div>
       )}
       <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-      <h2 className="font-bold text-xl sm:text-2xl text-white">Destacado</h2>
+      <h2 className="font-bold text-xl sm:text-2xl text-[#241b3e]">Destacado</h2>
     </div>
     <HeroBanner
       image={heroEvent.image}

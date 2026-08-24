@@ -20,7 +20,7 @@ interface ServingSection {
   eventIds: string[];
 }
 
-const MIN_PLACES = 3;
+const MIN_PLACES = 4;
 
 function localFallback(places: Place[], events: Event[]): HomeSection[] {
   const out: HomeSection[] = [];

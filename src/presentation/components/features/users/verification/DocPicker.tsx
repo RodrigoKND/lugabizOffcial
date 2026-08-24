@@ -11,8 +11,8 @@ const DocPicker: React.FC<{ label: string; hint: string; file: File | null; onSe
         {preview ? <img src={preview} alt="" className="w-full h-full object-cover" /> : <FileCheck2 className="w-5 h-5 text-primary-400" />}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-text-primary truncate">{file ? file.name : label}</p>
-        <p className="text-[11px] text-text-secondary">{file ? 'Toca para cambiar' : hint}</p>
+        <p className="text-sm font-semibold text-[#241b3e] truncate">{file ? file.name : label}</p>
+        <p className="text-[11px] text-stone-500">{file ? 'Toca para cambiar' : hint}</p>
       </div>
       <input ref={ref} type="file" accept="image/*,application/pdf" className="hidden"
         onChange={(e) => onSelect(e.target.files?.[0] ?? null)} />

@@ -15,11 +15,11 @@ const EmptyCommunityState: React.FC<EmptyCommunityStateProps> = ({ query, active
         <Search className="w-9 h-9 text-primary-300" />
       </div>
 
-      <h3 className="font-bold text-lg text-text-primary mb-2">
+      <h3 className="font-bold text-lg text-[#241b3e] mb-2">
         {query ? `Sin resultados para "${query}"` : 'Nada por aquí aún'}
       </h3>
 
-      <p className="text-text-secondary text-sm max-w-xs mb-6 leading-relaxed">
+      <p className="text-stone-500 text-sm max-w-xs mb-6 leading-relaxed">
         {query
           ? '¡Sé el primero en publicar información sobre este lugar o evento!'
           : activeTab === 'events'

@@ -44,15 +44,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <div className="flex-1 text-center sm:text-left min-w-0">
         <div className="flex items-center justify-center sm:justify-between gap-2">
           <div>
-            <h1 className="text-xl font-bold text-text-primary">{user.name}</h1>
-            <p className="text-sm text-text-secondary">{user.email}</p>
+            <h1 className="text-xl font-bold text-[#241b3e]">{user.name}</h1>
+            <p className="text-sm text-stone-500">{user.email}</p>
           </div>
           <button onClick={onEditClick}
             className="hidden sm:flex p-2 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors text-primary-500 shrink-0">
             <Pencil className="w-4 h-4" />
           </button>
         </div>
-        {user.bio && <p className="text-sm text-text-secondary mt-1">{user.bio}</p>}
+        {user.bio && <p className="text-sm text-stone-500 mt-1">{user.bio}</p>}
         {user.isOwner && user.ownerBusinessName && (
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mt-2">
             {businessDocsApproved ? (
@@ -77,16 +77,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
     <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-primary-100/30">
       <div className="text-center">
-        <p className="text-lg font-bold text-text-primary">{myPlacesCount}</p>
-        <p className="text-[10px] font-semibold text-text-secondary uppercase">Lugares</p>
+        <p className="text-lg font-bold text-[#241b3e]">{myPlacesCount}</p>
+        <p className="text-[10px] font-semibold text-stone-500 uppercase">Lugares</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold text-text-primary">{reviewsCount}</p>
-        <p className="text-[10px] font-semibold text-text-secondary uppercase">Reseñas</p>
+        <p className="text-lg font-bold text-[#241b3e]">{reviewsCount}</p>
+        <p className="text-[10px] font-semibold text-stone-500 uppercase">Reseñas</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold text-text-primary">{myEventsCount}</p>
-        <p className="text-[10px] font-semibold text-text-secondary uppercase">Eventos</p>
+        <p className="text-lg font-bold text-[#241b3e]">{myEventsCount}</p>
+        <p className="text-[10px] font-semibold text-stone-500 uppercase">Eventos</p>
       </div>
     </div>
 
@@ -109,7 +109,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <div className="mt-2 space-y-1 sm:hidden">
         {isAdmin && (
           <Link to="/admin" onClick={onToggleMobileMenu}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-primary-50 transition-colors">
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-stone-500 hover:bg-primary-50 transition-colors">
             <BarChart3 className="w-4 h-4" /> Panel Admin
           </Link>
         )}

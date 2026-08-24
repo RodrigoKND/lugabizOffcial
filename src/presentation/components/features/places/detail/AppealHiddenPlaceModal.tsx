@@ -41,13 +41,13 @@ const AppealHiddenPlaceModal: React.FC<AppealHiddenPlaceModalProps> = ({ isOpen,
             className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-primary-100">
-              <h3 className="text-base font-bold text-text-primary">Apelar</h3>
+              <h3 className="text-base font-bold text-[#241b3e]">Apelar</h3>
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-primary-50 transition-colors">
-                <X className="w-4 h-4 text-text-secondary" />
+                <X className="w-4 h-4 text-stone-500" />
               </button>
             </div>
             <div className="p-5 space-y-3">
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-stone-500">
                 Contale al admin por qué creés que tu lugar fue ocultado por error. Un admin lo va a revisar.
               </p>
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} autoFocus
@@ -61,7 +61,7 @@ const AppealHiddenPlaceModal: React.FC<AppealHiddenPlaceModalProps> = ({ isOpen,
                 Enviar apelación
               </button>
               <button onClick={onClose}
-                className="flex-1 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm hover:bg-primary-100 transition-all">
+                className="flex-1 py-2.5 bg-primary-50 text-stone-500 rounded-xl font-semibold text-sm hover:bg-primary-100 transition-all">
                 Cancelar
               </button>
             </div>

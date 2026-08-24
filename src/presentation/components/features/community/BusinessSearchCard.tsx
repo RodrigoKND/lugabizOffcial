@@ -48,13 +48,13 @@ const BusinessSearchCard: React.FC<BusinessSearchCardProps> = ({ place, reportCo
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="font-bold text-text-primary text-sm leading-tight truncate">{place.name}</p>
+          <p className="font-bold text-[#241b3e] text-sm leading-tight truncate">{place.name}</p>
           <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${rep.bg} ${rep.color}`}>
             {rep.label}
           </span>
         </div>
 
-        <p className="text-[11px] text-text-secondary mb-2 line-clamp-1">{place.address}</p>
+        <p className="text-[11px] text-stone-500 mb-2 line-clamp-1">{place.address}</p>
 
         <div className="flex items-center gap-3 flex-wrap">
           <span className={`flex items-center gap-1 text-[11px] font-medium ${status.color}`}>
@@ -63,13 +63,13 @@ const BusinessSearchCard: React.FC<BusinessSearchCardProps> = ({ place, reportCo
           </span>
 
           {(place.viewsCount ?? 0) > 0 && (
-            <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+            <span className="flex items-center gap-1 text-[11px] text-stone-500">
               <Eye className="w-3 h-3" />
               {place.viewsCount?.toLocaleString()}
             </span>
           )}
 
-          <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+          <span className="flex items-center gap-1 text-[11px] text-stone-500">
             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
             {place.rating.toFixed(1)}
             {place.reviewCount > 0 && <span className="text-stone-400">({place.reviewCount})</span>}

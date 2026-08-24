@@ -20,9 +20,9 @@ const UsernameField: React.FC<UsernameFieldProps> = ({ value, onChange, initialU
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Nombre de usuario</label>
+      <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Nombre de usuario</label>
       <div className="relative">
-        <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+        <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
         <input
           type="text"
           value={value}

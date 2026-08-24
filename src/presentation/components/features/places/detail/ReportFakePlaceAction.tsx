@@ -45,7 +45,7 @@ const ReportFakePlaceAction: React.FC<ReportFakePlaceActionProps> = ({ placeId, 
       <button
         onClick={() => setShowConfirm(true)}
         disabled={hasReported}
-        className="flex items-center gap-1.5 text-[11px] text-white/25 hover:text-white/50 transition-colors disabled:hover:text-white/25 mt-2"
+        className="flex items-center gap-1.5 text-[11px] text-stone-400 hover:text-stone-600 transition-colors disabled:hover:text-stone-400 mt-2"
       >
         <Flag className="w-3 h-3" />
         {hasReported ? 'Reportado' : '¿Este lugar no es un negocio real?'}

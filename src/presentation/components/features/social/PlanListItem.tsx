@@ -22,8 +22,8 @@ const PlanListItem: React.FC<PlanListItemProps> = ({ plan, currentUserId, onAcce
     <div className="bg-white rounded-xl p-4 border border-primary-100/40">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="min-w-0">
-          <h4 className="text-sm font-semibold text-text-primary truncate">{plan.targetName || 'Plan'}</h4>
-          <p className="text-xs text-text-secondary flex items-center gap-2 mt-0.5">
+          <h4 className="text-sm font-semibold text-[#241b3e] truncate">{plan.targetName || 'Plan'}</h4>
+          <p className="text-xs text-stone-500 flex items-center gap-2 mt-0.5">
             <Calendar className="w-3 h-3" /> {plan.planDate}
             <Clock className="w-3 h-3 ml-1.5" /> {plan.planTime}
           </p>

@@ -58,6 +58,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
 
   const [reportId, setReportId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState('');
+  const [reportOtherText, setReportOtherText] = useState('');
   const [reporting, setReporting] = useState(false);
   const [reportMode, setReportMode] = useState<'review' | 'user'>('review');
   const [reportReviewId, setReportReviewId] = useState('');
@@ -163,18 +164,20 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
   const openReportModal = (review: Review) => {
     setReportReviewId(review.id); setReportUserId(review.userId);
     setReportUserName(review.userName); setReportMode('review');
-    setReportReason(''); setReportId(review.id);
+    setReportReason(''); setReportOtherText(''); setReportId(review.id);
   };
-  const closeReportModal = () => { setReportId(null); setReportReason(''); };
+  const closeReportModal = () => { setReportId(null); setReportReason(''); setReportOtherText(''); };
 
   const handleReport = async () => {
-    if (!user || !reportReason) return;
+    const isOther = reportReason === 'Otro';
+    if (!user || !reportReason || (isOther && !reportOtherText.trim())) return;
     const targetType = reportMode === 'user' ? 'user' : 'review';
     const targetId = reportMode === 'user' ? reportUserId : reportReviewId;
     if (!targetId) return;
+    const finalReason = isOther ? `Otro: ${reportOtherText.trim()}` : reportReason;
     setReporting(true);
     try {
-      await reportsService.createReport({ targetType, targetId, reporterId: user.id, reason: reportReason });
+      await reportsService.createReport({ targetType, targetId, reporterId: user.id, reason: finalReason });
       toast.success('Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.');
       closeReportModal();
     } catch { toast.error('Error al enviar reporte'); }
@@ -189,7 +192,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
           onMouseEnter={() => onHover?.(star)}
           onMouseLeave={() => onHover?.(0)}
           className="transition-colors">
-          <Star className={`${size} ${star <= (hover || current) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'}`} />
+          <Star className={`${size} ${star <= (hover || current) ? 'fill-yellow-400 text-yellow-400' : 'text-stone-300'}`} />
         </button>
       ))}
     </div>
@@ -206,7 +209,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
         {count > 0 && (
           <button
             onClick={() => toggleReplies(review.id)}
-            className="flex items-center gap-1.5 text-[12px] font-medium text-primary-400 hover:text-primary-300 transition-colors ml-13"
+            className="flex items-center gap-1.5 text-[12px] font-medium text-primary-600 hover:text-primary-700 transition-colors ml-13"
           >
             {isLoading ? (
               <Loader2 className="w-3 h-3 animate-spin" />
@@ -234,7 +237,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                   key={reply.id}
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="bg-white/4 rounded-xl p-3 border-l-2 border-primary-400/30"
+                  className="bg-stone-50 rounded-xl p-3 border-l-2 border-primary-300"
                 >
                   <div className="flex items-start gap-2">
                     <img
@@ -245,10 +248,10 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-xs font-semibold text-white/80">{reply.userName}</span>
-                        <span className="text-[10px] text-white/30">{reply.createdAt.toLocaleDateString()}</span>
+                        <span className="text-xs font-semibold text-[#241b3e]">{reply.userName}</span>
+                        <span className="text-[10px] text-stone-400">{reply.createdAt.toLocaleDateString()}</span>
                       </div>
-                      <p className="text-white/60 text-sm leading-relaxed">{reply.comment}</p>
+                      <p className="text-stone-500 text-sm leading-relaxed">{reply.comment}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -258,7 +261,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                 <button
                   onClick={() => loadReplies(review.id, rs.page + 1, true)}
                   disabled={rs.loading}
-                  className="text-[11px] text-primary-400 hover:underline font-medium flex items-center gap-1 disabled:opacity-50"
+                  className="text-[11px] text-primary-600 hover:underline font-medium flex items-center gap-1 disabled:opacity-50"
                 >
                   {rs.loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowDown className="w-3 h-3" />}
                   Cargar más respuestas
@@ -274,15 +277,15 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
   const renderReviewCard = (review: Review) => (
     <div key={review.id}>
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 rounded-xl p-4 relative group border border-white/6">
+        className="bg-white rounded-xl p-4 relative group border border-primary-100/40 shadow-xs">
         {user?.id === review.userId && !editingId && (
           <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={() => startEditing(review)}
-              className="p-1.5 rounded-lg hover:bg-primary-500/15 text-white/30 hover:text-primary-400 transition-colors">
+              className="p-1.5 rounded-lg hover:bg-primary-500/15 text-stone-400 hover:text-primary-400 transition-colors">
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <button onClick={() => setConfirmDeleteId(review.id)} disabled={deletingId === review.id}
-              className="p-1.5 rounded-lg hover:bg-red-500/15 text-white/30 hover:text-red-400 transition-colors">
+              className="p-1.5 rounded-lg hover:bg-red-500/15 text-stone-400 hover:text-red-400 transition-colors">
               {deletingId === review.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
             </button>
           </div>
@@ -296,12 +299,12 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                   className="w-10 h-10 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <h5 className="font-medium text-white/80">{review.userName}</h5>
-                    <span className="text-xs text-white/35">(editando)</span>
+                    <h5 className="font-medium text-[#241b3e]">{review.userName}</h5>
+                    <span className="text-xs text-stone-400">(editando)</span>
                   </div>
                   {renderStars(editRating, setEditRating, editHover, setEditHover, 'w-5 h-5')}
                   <textarea value={editComment} onChange={(e) => setEditComment(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/25 text-sm focus:border-primary-400/60 focus:ring-0 transition-all resize-none mt-2 outline-none"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-[#241b3e] placeholder:text-stone-400 text-sm focus:border-primary-400/60 focus:ring-0 transition-all resize-none mt-2 outline-none"
                     rows={2} />
                   <div className="flex items-center gap-2 mt-2">
                     <button onClick={handleUpdate} disabled={savingEdit || editRating === 0}
@@ -310,7 +313,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                       Guardar
                     </button>
                     <button onClick={cancelEditing}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-white/8 text-white/50 rounded-lg text-xs font-medium hover:bg-white/12 transition-colors">
+                      className="flex items-center gap-1 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-lg text-xs font-medium hover:bg-stone-200 transition-colors">
                       <X className="w-3 h-3" /> Cancelar
                     </button>
                   </div>
@@ -324,24 +327,24 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                   className="w-10 h-10 rounded-full object-cover" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <h5 className="font-medium text-white/85 text-sm">{review.userName}</h5>
-                    <span className="text-xs text-white/30">{review.createdAt.toLocaleDateString()}</span>
+                    <h5 className="font-medium text-[#241b3e] text-sm">{review.userName}</h5>
+                    <span className="text-xs text-stone-400">{review.createdAt.toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center space-x-1 mb-1">
                     {renderStars(review.rating)}
                   </div>
-                  <p className="text-white/60 text-sm">{review.comment}</p>
+                  <p className="text-stone-500 text-sm">{review.comment}</p>
                   {user && (
                     <div className="flex items-center gap-3 mt-1.5">
                       <button
                         onClick={() => setReplyingTo(replyingTo === review.id ? null : review.id)}
-                        className="text-[11px] text-white/40 hover:text-primary-400 font-medium transition-colors"
+                        className="text-[11px] text-stone-400 hover:text-primary-400 font-medium transition-colors"
                       >
                         Responder
                       </button>
                       {user.id !== review.userId && (
                         <button onClick={() => openReportModal(review)}
-                          className="text-[11px] text-white/30 hover:text-red-400 font-medium transition-colors flex items-center gap-0.5">
+                          className="text-[11px] text-stone-400 hover:text-red-400 font-medium transition-colors flex items-center gap-0.5">
                           <Flag className="w-2.5 h-2.5" /> Reportar
                         </button>
                       )}
@@ -358,17 +361,17 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
         {replyingTo === review.id && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             className="ml-8 mt-2 mb-2">
-            <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2 border border-white/10">
+            <div className="flex items-center gap-2 bg-stone-50 rounded-xl p-2 border border-stone-200">
               <input type="text" value={replyText} onChange={(e) => setReplyText(e.target.value)}
                 placeholder="Escribe una respuesta..."
-                className="flex-1 px-3 py-1.5 text-sm bg-transparent outline-none text-white placeholder:text-white/25"
+                className="flex-1 px-3 py-1.5 text-sm bg-transparent outline-none text-[#241b3e] placeholder:text-stone-400"
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleReply(review.id); } }} />
               <button onClick={() => handleReply(review.id)} disabled={!replyText.trim() || sendingReply}
                 className="p-1.5 rounded-lg bg-primary-500 text-white disabled:opacity-40 transition-opacity">
                 {sendingReply ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               </button>
               <button onClick={() => { setReplyingTo(null); setReplyText(''); }}
-                className="p-1.5 rounded-lg text-white/30 hover:text-white/60">
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-500">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -381,8 +384,8 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
   );
 
   return (
-    <div className="bg-white/5 border border-white/8 rounded-2xl p-6">
-      <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+    <div className="bg-white border border-primary-100/40 rounded-2xl p-6 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
+      <h3 className="text-xl font-bold text-[#241b3e] mb-6 flex items-center space-x-2">
         <MessageCircle className="w-5 h-5 text-primary-400" />
         <span>Reseñas ({reviews.length})</span>
       </h3>
@@ -390,23 +393,23 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
       {user ? (
         <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmitReview}
-          className="rounded-xl p-5 mb-6 bg-white/4 border border-white/6">
-          <h4 className="font-semibold text-white/60 mb-4 text-sm">Escribe una reseña</h4>
+          className="rounded-xl p-5 mb-6 bg-stone-50 border border-stone-200">
+          <h4 className="font-semibold text-stone-500 mb-4 text-sm">Escribe una reseña</h4>
           <div className="mb-4">
-            <label className="block text-white/35 text-xs font-medium mb-2">Calificación</label>
+            <label className="block text-stone-400 text-xs font-medium mb-2">Calificación</label>
             {renderStars(rating, setRating, hoveredRating, setHoveredRating)}
           </div>
           <div className="mb-4">
-            <label className="block text-white/35 text-xs font-medium mb-2">Comentario</label>
+            <label className="block text-stone-400 text-xs font-medium mb-2">Comentario</label>
             <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/25 focus:border-primary-400/60 focus:ring-0 transition-all resize-none outline-none text-sm"
+              className="w-full px-4 py-3 bg-white border border-stone-200 rounded-xl text-[#241b3e] placeholder:text-stone-400 focus:border-primary-400/60 focus:ring-0 transition-all resize-none outline-none text-sm"
               placeholder="Comparte tu experiencia en este lugar..." required />
           </div>
           <button type="submit" disabled={rating === 0 || !comment.trim() || isSubmitting}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all text-sm ${
               rating > 0 && comment.trim() && !isSubmitting
                 ? 'bg-primary-500 text-white hover:bg-primary-600'
-                : 'bg-white/8 text-white/25 cursor-not-allowed'
+                : 'bg-stone-100 text-stone-400 cursor-not-allowed'
             }`}>
             {isSubmitting
               ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Enviando...</span></>
@@ -414,18 +417,18 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
           </button>
         </motion.form>
       ) : (
-        <div className="bg-white/4 border border-white/6 rounded-xl p-6 mb-6 text-center">
-          <User className="w-10 h-10 text-white/20 mx-auto mb-3" />
-          <p className="text-white/40 text-sm">Inicia sesión para escribir una reseña</p>
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-6 mb-6 text-center">
+          <User className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+          <p className="text-stone-400 text-sm">Inicia sesión para escribir una reseña</p>
         </div>
       )}
 
       <div className="space-y-4">
         {reviews.length === 0 ? (
           <div className="text-center py-10">
-            <MessageCircle className="w-14 h-14 text-white/12 mx-auto mb-4" />
-            <h4 className="text-base font-medium text-white/40 mb-1">No hay reseñas aún</h4>
-            <p className="text-white/25 text-sm">Sé el primero en compartir tu experiencia</p>
+            <MessageCircle className="w-14 h-14 text-stone-200 mx-auto mb-4" />
+            <h4 className="text-base font-medium text-stone-400 mb-1">No hay reseñas aún</h4>
+            <p className="text-stone-300 text-sm">Sé el primero en compartir tu experiencia</p>
           </div>
         ) : (
           <>
@@ -433,7 +436,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
             {hasMore && (
               <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 onClick={onLoadMore}
-                className="w-full py-3 flex items-center justify-center gap-2 text-sm font-medium text-primary-400 hover:text-primary-300 bg-primary-500/8 hover:bg-primary-500/12 rounded-xl transition-colors border border-primary-500/15">
+                className="w-full py-3 flex items-center justify-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-xl transition-colors border border-primary-200">
                 <ArrowDown className="w-4 h-4" />
                 Cargar más reseñas
               </motion.button>
@@ -457,28 +460,38 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                 </div>
                 <div>
                   <h3 className="font-bold text-white text-sm">{reportMode === 'user' ? 'Reportar usuario' : 'Reportar reseña'}</h3>
-                  <p className="text-xs text-white/35">Ayúdanos a mantener la comunidad segura</p>
+                  <p className="text-xs text-stone-400">Ayúdanos a mantener la comunidad segura</p>
                 </div>
               </div>
               <div className="flex rounded-xl bg-white/6 p-1 mb-4 gap-1">
                 <button onClick={() => { setReportMode('review'); setReportReason(''); }}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${reportMode === 'review' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/60'}`}>
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${reportMode === 'review' ? 'bg-white/10 text-white shadow-sm' : 'text-stone-400 hover:text-stone-500'}`}>
                   <Flag className="w-3 h-3" /> Reseña
                 </button>
                 <button onClick={() => { setReportMode('user'); setReportReason(''); }}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${reportMode === 'user' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/60'}`}>
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${reportMode === 'user' ? 'bg-white/10 text-white shadow-sm' : 'text-stone-400 hover:text-stone-500'}`}>
                   <UserX className="w-3 h-3" />
                   <span className="truncate max-w-[90px]">@{reportUserName}</span>
                 </button>
               </div>
-              <label className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 block">
+              <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2 block">
                 {reportMode === 'user' ? 'Motivo del reporte al usuario' : 'Motivo del reporte'}
               </label>
               <select value={reportReason} onChange={e => setReportReason(e.target.value)}
+                style={{ colorScheme: 'dark' }}
                 className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-primary-400/60 mb-4">
                 <option value="" className="bg-[#150d2e]">Seleccionar motivo...</option>
                 {REPORT_REASONS.map(r => <option key={r} value={r} className="bg-[#150d2e]">{r}</option>)}
               </select>
+              {reportReason === 'Otro' && (
+                <textarea
+                  value={reportOtherText}
+                  onChange={e => setReportOtherText(e.target.value)}
+                  placeholder="Contanos brevemente el motivo..."
+                  rows={2}
+                  className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-primary-400/60 mb-4 resize-none"
+                />
+              )}
               <div className={`border rounded-xl p-3 mb-4 ${reportMode === 'user' ? 'bg-orange-500/10 border-orange-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
                 <p className={`text-xs ${reportMode === 'user' ? 'text-orange-300' : 'text-amber-300'}`}>
                   {reportMode === 'user'
@@ -491,7 +504,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId, reviews, hasMore
                   className="flex-1 py-2.5 bg-white/8 text-white/55 rounded-xl text-sm font-semibold hover:bg-white/12 transition-colors">
                   Cancelar
                 </button>
-                <button onClick={handleReport} disabled={!reportReason || reporting}
+                <button onClick={handleReport} disabled={!reportReason || (reportReason === 'Otro' && !reportOtherText.trim()) || reporting}
                   className={`flex-1 py-2.5 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${reportMode === 'user' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-red-500 hover:bg-red-600'}`}>
                   {reporting ? <Loader2 className="w-4 h-4 animate-spin" /> : reportMode === 'user' ? <UserX className="w-4 h-4" /> : <Flag className="w-4 h-4" />}
                   {reportMode === 'user' ? 'Reportar usuario' : 'Reportar reseña'}

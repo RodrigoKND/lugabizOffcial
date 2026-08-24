@@ -14,7 +14,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ tabs, activeTab, onTabChange 
       return (
         <button key={tab.id} onClick={() => onTabChange(tab.id)}
           className={`pb-3 text-xs sm:text-sm font-semibold transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
-            activeTab === tab.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-text-secondary hover:text-text-primary'
+            activeTab === tab.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-stone-500 hover:text-[#241b3e]'
           }`}>
           <Icon className="w-4 h-4" /> {tab.label}
         </button>

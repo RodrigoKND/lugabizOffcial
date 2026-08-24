@@ -68,6 +68,7 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
                         to={`/place/${place.id}`}
                         tiktokUrl={place.socialLinks?.tiktok}
                         placeId={place.id}
+                        socialGroup={place.socialGroups?.[0]}
                       />
                     )),
                     ...section.events.map(event => (

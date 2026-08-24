@@ -17,8 +17,8 @@ const FilePicker: React.FC<{
         {preview ? <img src={preview} alt="" className="w-full h-full object-cover" /> : icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-text-primary truncate">{file ? file.name : label}</p>
-        <p className="text-[11px] text-text-secondary">{file ? 'Toca para cambiar' : hint}</p>
+        <p className="text-sm font-semibold text-[#241b3e] truncate">{file ? file.name : label}</p>
+        <p className="text-[11px] text-stone-500">{file ? 'Toca para cambiar' : hint}</p>
       </div>
       {file && <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />}
       <input ref={ref} type="file" accept="image/*" className="hidden"

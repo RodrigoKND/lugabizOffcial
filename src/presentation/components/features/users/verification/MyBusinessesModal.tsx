@@ -124,11 +124,11 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between p-5 border-b border-primary-100 shrink-0">
               <div className="flex items-center gap-2">
                 <Store className="w-5 h-5 text-primary-500" />
-                <h3 className="text-base font-bold text-text-primary">Mis negocios</h3>
-                <span className="text-xs text-text-secondary">({list.length}/{MAX_BUSINESSES})</span>
+                <h3 className="text-base font-bold text-[#241b3e]">Mis negocios</h3>
+                <span className="text-xs text-stone-500">({list.length}/{MAX_BUSINESSES})</span>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-primary-50 transition-colors">
-                <X className="w-4 h-4 text-text-secondary" />
+                <X className="w-4 h-4 text-stone-500" />
               </button>
             </div>
 
@@ -140,7 +140,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   {/* Aviso legal — aceptación obligatoria */}
                   <div className="flex items-start gap-2 p-3 bg-primary-50/60 rounded-xl">
                     <ScrollText className="w-5 h-5 text-primary-500 shrink-0 mt-0.5" />
-                    <p className="text-[11.5px] text-text-secondary leading-relaxed">
+                    <p className="text-[11.5px] text-stone-500 leading-relaxed">
                       Lugabiz solo brinda <strong>visibilidad</strong> a tu negocio y no promueve ni avala actividades
                       ilegales. Sos responsable de cumplir con las <strong>obligaciones legales y tributarias</strong> que
                       correspondan a tu actividad. Lugabiz no clasifica ni reporta tu situación a ninguna entidad.
@@ -149,17 +149,17 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   <label className="flex items-center gap-2.5 cursor-pointer">
                     <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}
                       className="w-4 h-4 rounded border-primary-300 text-primary-500 focus:ring-primary-400" />
-                    <span className="text-sm text-text-primary">Entiendo y acepto</span>
+                    <span className="text-sm text-[#241b3e]">Entiendo y acepto</span>
                   </label>
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Nombre del negocio</label>
+                    <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Nombre del negocio</label>
                     <input type="text" value={name} onChange={e => setName(e.target.value)}
                       placeholder="Ej: Cafetería La Esquina"
                       className="w-full px-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all" />
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => { setView('list'); setName(''); setAccepted(false); }}
-                      className="px-4 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm flex items-center gap-1"><ChevronLeft className="w-4 h-4" /></button>
+                      className="px-4 py-2.5 bg-primary-50 text-stone-500 rounded-xl font-semibold text-sm flex items-center gap-1"><ChevronLeft className="w-4 h-4" /></button>
                     <button onClick={handleAdd} disabled={!name.trim() || !accepted || busy}
                       className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5">
                       {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Registrar negocio
@@ -186,7 +186,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   )}
                   <div className="flex gap-2 pt-1">
                     <button onClick={() => { setView('list'); setVerifyTarget(null); setDocFiles([]); }}
-                      className="px-4 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm">Después</button>
+                      className="px-4 py-2.5 bg-primary-50 text-stone-500 rounded-xl font-semibold text-sm">Después</button>
                     <button onClick={submitDocs} disabled={docFiles.length === 0 || busy}
                       className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5">
                       {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileCheck2 className="w-4 h-4" />} Enviar a revisión
@@ -196,7 +196,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
               ) : (
                 <>
                   {list.length === 0 ? (
-                    <p className="text-sm text-text-secondary text-center py-6">Todavía no tenés negocios registrados.</p>
+                    <p className="text-sm text-stone-500 text-center py-6">Todavía no tenés negocios registrados.</p>
                   ) : (
                     <div className="space-y-2">
                       {list.map(biz => (
@@ -205,7 +205,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
                             <Store className="w-4 h-4 text-primary-400" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-text-primary truncate">{biz.name}</p>
+                            <p className="text-sm font-semibold text-[#241b3e] truncate">{biz.name}</p>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <StatusBadge status={biz.docsStatus} />
                               {(biz.docsStatus === 'none' || biz.docsStatus === 'rejected') && (
@@ -217,7 +217,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
                             </div>
                           </div>
                           <button onClick={() => setDeleteTarget(biz)} disabled={busy}
-                            className="p-2 rounded-lg text-text-secondary hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50 shrink-0">
+                            className="p-2 rounded-lg text-stone-500 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50 shrink-0">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

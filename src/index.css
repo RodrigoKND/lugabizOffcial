@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
-/* ── CSS Custom Properties (shadcn/ui base - dark purple mode) ── */
+/* ── CSS Custom Properties (shadcn/ui base) ── */
 :root {
   --background: 260 40% 6%;
   --foreground: 260 15% 90%;
@@ -62,7 +62,7 @@
   --color-secondary-50: #fef2f2;
   --color-secondary-500: #ef4444;
 
-  /* --- Social Feed Colors (dark purple background) --- */
+  /* --- Social Feed Colors --- */
   --color-feed-bg: #0d0620;
   --color-card-bg: #ffffff;
   --color-card-border: #e4d8f0;
@@ -140,6 +140,30 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* La mayoría de los inputs de la app viven sobre fondos claros (bg-white/bg-stone-50)
+   tras el rediseño, pero heredan `color` de <body> (--color-text-primary, pensado para
+   fondos OSCUROS) porque casi ningún <input>/<textarea> pone su propio color de texto.
+   Esto los dejaba escribiendo "invisible" (texto casi blanco sobre fondo casi blanco)
+   en toda la app. Los pocos formularios que SÍ siguen siendo oscuros a propósito
+   (Auth/SearchModal, EventDetail, Add/Edit Place, Admin, Asesor, y algunos selects/
+   textareas sueltos con `text-white` explícito) ya fuerzan su propio color con clases
+   Tailwind o con !important en pages-dark.css/modals-dark.css.
+   IMPORTANTE: esta regla va DENTRO de @layer base a propósito — Tailwind v4 pone sus
+   utilities (incl. `text-white`) en su propia @layer, y CUALQUIER regla SIN layer le
+   gana a TODAS las reglas con layer sin importar especificidad. Puesto sin @layer acá
+   (como estaba antes) esta regla le ganaba a `text-white` en selects/inputs que sí
+   querían quedarse oscuros, dejándolos con el mismo bug de texto invisible que se
+   supone que arregla. Dentro de @layer base, las utilities de Tailwind (capa más
+   específica) vuelven a ganar cuando el componente pone su propia clase de color. */
+@layer base {
+  input, textarea, select {
+    color: #241b3e;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #a8a0b5;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -267,316 +291,6 @@ nav.sticky a[href="/"] span {
 }
 
 /* ═══════════════════════════════════════════════════════
-   DARK THEME OVERRIDES — ADVISOR PAGE (Asesor)
-   ═══════════════════════════════════════════════════════ */
-/* Outer wrapper: override off-white bg to dark */
-div.min-h-screen:has(> header.sticky > div > h1) {
-  background: var(--color-feed-bg) !important;
-}
-
-/* Header bar override */
-div.min-h-screen:has(> header.sticky) header.sticky {
-  background: rgba(13, 6, 32, 0.92) !important;
-  border-bottom-color: rgba(168, 128, 250, 0.08) !important;
-}
-div.min-h-screen:has(> header.sticky) header.sticky h1 {
-  color: #ede8f5 !important;
-}
-div.min-h-screen:has(> header.sticky) header.sticky p {
-  color: #9b8db5 !important;
-}
-div.min-h-screen:has(> header.sticky) header.sticky svg {
-  color: #9b8db5 !important;
-}
-
-/* All white cards inside advisor → translucent glass */
-div.min-h-screen:has(> header.sticky) .bg-white {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(8px) !important;
-}
-div.min-h-screen:has(> header.sticky) .bg-slate-50 {
-  background: rgba(168, 128, 250, 0.06) !important;
-}
-div.min-h-screen:has(> header.sticky) .bg-slate-100 {
-  background: rgba(168, 128, 250, 0.08) !important;
-}
-div.min-h-screen:has(> header.sticky) .bg-slate-50\/70 {
-  background: rgba(13, 6, 32, 0.6) !important;
-}
-
-/* Text colors → light for dark bg */
-div.min-h-screen:has(> header.sticky) .text-slate-900 { color: #ede8f5 !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-800 { color: #e0d8f0 !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-700 { color: #d0c5e8 !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-600 { color: #b8acd0 !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-500 { color: #9b8db5 !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-400 { color: #7d6d9a !important; }
-div.min-h-screen:has(> header.sticky) .text-slate-300 { color: #6b5a8a !important; }
-
-/* Border colors → subtle purple */
-div.min-h-screen:has(> header.sticky) .border-slate-200,
-div.min-h-screen:has(> header.sticky) .border-slate-100 {
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-div.min-h-screen:has(> header.sticky) .divide-slate-100 > * {
-  border-color: rgba(168, 128, 250, 0.08) !important;
-}
-
-/* Horizontal rule / separators */
-div.min-h-screen:has(> header.sticky) [class*="border-t"],
-div.min-h-screen:has(> header.sticky) [class*="border-b"] {
-  border-color: rgba(168, 128, 250, 0.08) !important;
-}
-div.min-h-screen:has(> header.sticky) .h-px.bg-slate-200 {
-  background: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Input fields */
-div.min-h-screen:has(> header.sticky) input,
-div.min-h-screen:has(> header.sticky) textarea {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-  color: #ede8f5 !important;
-}
-div.min-h-screen:has(> header.sticky) input::placeholder,
-div.min-h-screen:has(> header.sticky) textarea::placeholder {
-  color: #6b5a8a !important;
-}
-
-/* KPI chips */
-div.min-h-screen:has(> header.sticky) [class*="rounded-lg"][class*="border"][class*="px-3"] {
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-
-/* Alternative cards inside advisor tabs */
-div.min-h-screen:has(> header.sticky) .space-y-2\.5 > .rounded-lg.border {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(168, 128, 250, 0.08) !important;
-}
-
-/* Product cards */
-div.min-h-screen:has(> header.sticky) .rounded-lg.border-slate-200.p-3 {
-  background: rgba(255, 255, 255, 0.03) !important;
-}
-
-/* Embed / survey recommendation box */
-div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 {
-  background: rgba(147, 51, 234, 0.1) !important;
-  border-color: rgba(147, 51, 234, 0.2) !important;
-}
-div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 h4 {
-  color: #c4adff !important;
-}
-div.min-h-screen:has(> header.sticky) .rounded-xl.border-primary-200.bg-primary-50 p {
-  color: #b8acd0 !important;
-}
-
-/* Score dial circle stroke */
-div.min-h-screen:has(> header.sticky) svg circle[fill="none"][stroke="#eef2f5"] {
-  stroke: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Section icon colors */
-div.min-h-screen:has(> header.sticky) .text-slate-400 > svg {
-  color: #7d6d9a !important;
-}
-
-/* ═══════════════════════════════════════════════════════
-   DARK THEME OVERRIDES — PROFILE PAGE
-   ═══════════════════════════════════════════════════════ */
-/* Profile header card */
-.max-w-5xl .bg-white.rounded-2xl {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(8px) !important;
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* White cards in profile tabs (lugares guardados, eventos, asistentes) */
-.max-w-5xl .bg-white.rounded-2xl,
-.max-w-5xl .bg-white.rounded-xl {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(8px) !important;
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* Dashboard stats cards */
-.max-w-5xl .bg-white.rounded-xl.shadow-xs {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(6px) !important;
-}
-
-/* Dashboard survey items */
-.max-w-5xl .bg-stone-50,
-.max-w-5xl .bg-stone-50\/50 {
-  background: rgba(168, 128, 250, 0.06) !important;
-}
-.max-w-5xl .text-stone-800 { color: #e0d8f0 !important; }
-.max-w-5xl .text-stone-700 { color: #d0c5e8 !important; }
-.max-w-5xl .text-stone-600 { color: #b8acd0 !important; }
-.max-w-5xl .text-stone-500 { color: #9b8db5 !important; }
-.max-w-5xl .text-stone-400 { color: #7d6d9a !important; }
-.max-w-5xl .border-stone-200,
-.max-w-5xl .border-stone-100,
-.max-w-5xl .border-stone-50 {
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* Edit profile modal */
-.fixed.inset-0.z-50 > .bg-white.rounded-2xl {
-  background: #150d2e !important;
-  border: 1px solid rgba(168, 128, 250, 0.12) !important;
-}
-.fixed.inset-0.z-50 .border-b.border-primary-100,
-.fixed.inset-0.z-50 .border-t.border-primary-100 {
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-.fixed.inset-0.z-50 .bg-primary-50\/50,
-.fixed.inset-0.z-50 .hover\:bg-primary-100\/60 {
-  background: rgba(147, 51, 234, 0.08) !important;
-}
-
-/* Profile tab divider */
-.max-w-5xl .border-b.border-primary-100\/30 {
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* Profile header top border */
-.max-w-5xl [class*="border-t"].border-primary-100\/30 {
-  border-color: rgba(168, 128, 250, 0.08) !important;
-}
-
-/* Profile verification badges */
-.max-w-5xl .bg-amber-50 {
-  background: rgba(217, 119, 6, 0.15) !important;
-}
-
-/* Admin tab stat cards */
-.max-w-5xl .grid-cols-2 .bg-white.rounded-xl {
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-
-/* Shared confirmations section */
-.max-w-5xl .bg-purple-50\/50 {
-  background: rgba(147, 51, 234, 0.06) !important;
-}
-.max-w-5xl .border-purple-100\/40,
-.max-w-5xl .border-purple-100 {
-  border-color: rgba(147, 51, 234, 0.15) !important;
-}
-.max-w-5xl .bg-purple-50\/50 .bg-white.rounded-full {
-  background: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* ═══════════════════════════════════════════════════════
-   DARK THEME OVERRIDES — COMMUNITY PAGE
-   ═══════════════════════════════════════════════════════ */
-/* Sidebar filter panel */
-.max-w-7xl aside .bg-white.rounded-2xl {
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(8px) !important;
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* Category filter buttons */
-.max-w-7xl aside .bg-stone-50 {
-  background: rgba(168, 128, 250, 0.06) !important;
-}
-@media (hover: hover) {
-  .max-w-7xl aside .hover\:bg-stone-50:hover {
-    background: rgba(168, 128, 250, 0.1) !important;
-  }
-}
-
-/* Social group pills in sidebar */
-.max-w-7xl aside .bg-white.border-stone-200 {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-@media (hover: hover) {
-  .max-w-7xl aside .hover\:border-primary-300:hover {
-    border-color: rgba(168, 128, 250, 0.3) !important;
-  }
-}
-
-/* Star rating buttons */
-.max-w-7xl aside .bg-stone-50.text-stone-400 {
-  background: rgba(168, 128, 250, 0.06) !important;
-  color: #7d6d9a !important;
-}
-
-/* Search input in community */
-.max-w-7xl .rounded-xl.bg-white.shadow-lg {
-  background: rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(8px) !important;
-}
-.max-w-7xl .rounded-xl.bg-white.shadow-lg input {
-  color: #ede8f5 !important;
-}
-.max-w-7xl .rounded-xl.bg-white.shadow-lg input::placeholder {
-  color: #6b5a8a !important;
-}
-
-/* Filter chips */
-.max-w-7xl .bg-primary-50.text-primary-600 {
-  background: rgba(147, 51, 234, 0.12) !important;
-}
-
-/* Empty community state circle */
-.max-w-7xl .w-20.h-20.rounded-full.bg-primary-50 {
-  background: rgba(147, 51, 234, 0.1) !important;
-}
-
-/* Find more button */
-.max-w-7xl .rounded-xl.border-primary-100 {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Tab buttons (not active) */
-.max-w-7xl .bg-white.border-primary-100\/40 {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* Mobile filter button */
-.max-w-7xl .bg-white.border-stone-200 {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Filter bottom sheet */
-.z-\[201\].bg-white.rounded-t-3xl {
-  background: #150d2e !important;
-}
-.z-\[201\] .bg-stone-100 {
-  background: rgba(168, 128, 250, 0.08) !important;
-}
-.z-\[201\] .bg-stone-50 {
-  background: rgba(168, 128, 250, 0.06) !important;
-}
-.z-\[201\] .border-stone-200 {
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-.z-\[201\] .border-stone-100 {
-  border-color: rgba(168, 128, 250, 0.08) !important;
-}
-.z-\[201\] .text-stone-800 { color: #e0d8f0 !important; }
-.z-\[201\] .text-stone-600 { color: #b8acd0 !important; }
-.z-\[201\] .text-stone-500 { color: #9b8db5 !important; }
-.z-\[201\] .text-stone-400 { color: #7d6d9a !important; }
-.z-\[201\] .bg-white.border.stone-200 {
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-.z-\[201\] input {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-  color: #ede8f5 !important;
-}
-.z-\[201\] input::placeholder {
-  color: #6b5a8a !important;
-}
-
-/* ═══════════════════════════════════════════════════════
    COMMUNITY CARDS — LUGABIZ DISTINCTIVE STYLE
    ═══════════════════════════════════════════════════════ */
 /* Community search cards: purple glow + lift on hover (solo con puntero real) */
@@ -653,14 +367,6 @@ button:disabled, a[aria-disabled="true"] {
 }
 
 /* ═══════════════════════════════════════════════════════
-   HERO HEADER — COMMUNITY PAGE (dark harmony)
-   ═══════════════════════════════════════════════════════ */
-/* The community hero gradient stays as is - just ensure seamless transition */
-.bg-gradient-to-br.from-primary-700.via-primary-800.to-primary-950 {
-  border-bottom: 1px solid rgba(168, 128, 250, 0.08);
-}
-
-/* ═══════════════════════════════════════════════════════
    RESPONSIVE TOUCHES
    ═══════════════════════════════════════════════════════ */
 @media (hover: hover) {
@@ -669,5 +375,3 @@ button:disabled, a[aria-disabled="true"] {
     transform: translateY(-3px) !important;
   }
 }
-
-

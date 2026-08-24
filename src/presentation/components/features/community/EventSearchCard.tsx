@@ -33,20 +33,20 @@ const EventSearchCard: React.FC<EventSearchCardProps> = ({ event }) => {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="font-bold text-text-primary text-sm leading-tight line-clamp-2">{event.name}</p>
+          <p className="font-bold text-[#241b3e] text-sm leading-tight line-clamp-2">{event.name}</p>
           <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r ${gradient} text-white`}>
             {event.category?.name || 'Evento'}
           </span>
         </div>
 
         <div className="flex flex-col gap-1">
-          <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+          <span className="flex items-center gap-1 text-[11px] text-stone-500">
             <Calendar className="w-3 h-3 shrink-0" />
             {new Date(event.dateStart).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' })}
             {event.timeStart && ` · ${event.timeStart}`}
           </span>
 
-          <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+          <span className="flex items-center gap-1 text-[11px] text-stone-500">
             <MapPin className="w-3 h-3 shrink-0" />
             <span className="truncate">{event.address}</span>
           </span>
@@ -54,7 +54,7 @@ const EventSearchCard: React.FC<EventSearchCardProps> = ({ event }) => {
 
         <div className="flex items-center gap-3 mt-2">
           {event.attendeesCount > 0 && (
-            <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+            <span className="flex items-center gap-1 text-[11px] text-stone-500">
               <Users className="w-3 h-3" />
               {event.attendeesCount} asistentes
             </span>

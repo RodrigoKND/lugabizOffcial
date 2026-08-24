@@ -5,7 +5,8 @@ import type { SocialLoginProps } from '@domain/entities/props/AuthProps';
 export default function SocialLogin({ onGoogleLogin }: SocialLoginProps) {
   return (
     <>
-      <Button type="button" variant="secondary" size="xl" fullWidth onClick={onGoogleLogin} className="mb-5">
+      <Button type="button" variant="secondary" size="xl" fullWidth onClick={onGoogleLogin}
+        className="mb-5 !bg-white/5 !border-white/10 hover:!bg-white/8 hover:!border-white/20">
         <GoogleIcon size={20} />
         <span className="text-white/75 font-medium">Continuar con Google</span>
       </Button>

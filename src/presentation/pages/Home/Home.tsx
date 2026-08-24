@@ -1,25 +1,24 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, Calendar, Zap } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import {
   CompactCard,
-  EventCardSmall, ScrollRow, TrendBanner, AuthModal,
+  ScrollRow, AuthModal,
   SurveyDeck,
 } from '@presentation/components/features';
 import { OnboardingAlert } from '@presentation/components/reusables';
 import LoadingSkeleton from '@presentation/components/features/home/LoadingSkeleton';
 import EmptyHomeState from '@presentation/components/features/home/EmptyHomeState';
-import HomeWelcome from '@presentation/components/features/home/HomeWelcome';
+import HomeHero from '@presentation/components/features/home/HomeHero';
 import StoriesRow from '@presentation/components/features/home/StoriesRow';
-import FeaturedHeroSection from '@presentation/components/features/home/FeaturedHeroSection';
 import PersonalizedSections from '@presentation/components/features/home/PersonalizedSections';
 import { useHomeEvents } from '@presentation/hooks/home/useHomeEvents';
 import { useTrendingPlaces } from '@presentation/hooks/home/useTrendingPlaces';
 import { useOnboardingAlerts } from '@presentation/hooks/onboarding/useOnboardingAlerts';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
-import { usePersonalizedSections } from '@presentation/hooks/home/usePersonalizedSections';
+import { usePersonalizedSections, type HomeSection } from '@presentation/hooks/home/usePersonalizedSections';
 import PostsFeed from '@presentation/components/features/posts/PostsFeed';
 
 const Home: React.FC = () => {
@@ -29,8 +28,7 @@ const Home: React.FC = () => {
   const { currentStep, showAuthModal, setShowAuthModal, handleAction, handleDismiss } = useOnboardingAlerts();
 
   const {
-    activeEvents, sortedActiveEvents, heroEvent, heroIndex,
-    setHeroIndex, viewedEvents, markEventViewed, likedEvents,
+    sortedActiveEvents, viewedEvents, markEventViewed, likedEvents,
   } = useHomeEvents(events, user?.id);
 
   const { trendingPlaces, trendingLoading } = useTrendingPlaces();
@@ -57,36 +55,45 @@ const Home: React.FC = () => {
     navigate(`/events/feed?start=${eventId}`);
   };
 
-  const handleEventClick = (eventId: string) => {
-    markEventViewed(eventId);
-    navigate(`/event/${eventId}`);
-  };
+  // El servidor de trending a veces devuelve muy pocos resultados (ej. 1 solo
+  // lugar) y dejaba la fila viéndose vacía; se completa con recientes sin repetir.
+  const recommendedPlaces = useMemo(() => {
+    const seen = new Set(trendingPlaces.map(p => p.id));
+    const filler = recentPlaces.filter(p => !seen.has(p.id));
+    return [...trendingPlaces, ...(filler as unknown as Record<string, unknown>[])].slice(0, 10);
+  }, [trendingPlaces, recentPlaces]);
 
-  const handleHeroClick = (eventId: string) => {
-    markEventViewed(eventId);
-    navigate(`/event/${eventId}`);
-  };
+  // Sin login no hay personalización, pero la home nunca queda vacía:
+  // sección genérica con lugares del catálogo.
+  const genericSections = useMemo<HomeSection[]>(() => {
+    if (user || places.length < 4) return [];
+    return [{
+      id: 'descubre',
+      title: 'Descubre Lugabiz',
+      subtitle: 'Lugares que te pueden gustar',
+      type: 'places',
+      places: places.slice(0, 12),
+      events: [],
+    }];
+  }, [user, places]);
+  const homeSections = personalizedSections.length > 0 ? personalizedSections : genericSections;
 
   return (
-    <section className="relative min-h-screen pb-24 md:pb-0 bg-feed-bg">
+    <section className="relative min-h-screen pb-24 md:pb-0 bg-[#f7f5fb]">
       <OnboardingAlert type={currentStep || 'login'} isOpen={!!currentStep} onAction={handleAction} onDismiss={handleDismiss} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode="register" />
-
-      <div className="purple-blob w-80 h-80 bg-primary-200/25 -top-20 -left-20" />
-      <div className="purple-blob w-96 h-96 bg-pink-200/15 top-1/3 -right-32" />
-      <div className="purple-blob w-64 h-64 bg-primary-300/10 bottom-0 left-1/4" />
 
       {user && pendingSurveys.length > 0 && (
         <SurveyDeck surveys={pendingSurveys} onRefresh={refreshSurveys} />
       )}
 
+      <HomeHero />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-5">
-
-        <HomeWelcome userName={user?.name} />
+        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-2 pb-8">
 
         {isLoading && trendingLoading && <LoadingSkeleton />}
 
@@ -94,62 +101,10 @@ const Home: React.FC = () => {
           <EmptyHomeState onPublish={() => navigate('/add-place')} />
         )}
 
-        {sortedActiveEvents.length > 0 && (
-          <StoriesRow events={sortedActiveEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} likedEvents={likedEvents} />
-        )}
-
-        {heroEvent && (
-          <FeaturedHeroSection
-            heroEvent={heroEvent}
-            activeEvents={activeEvents}
-            heroIndex={heroIndex}
-            onSetHeroIndex={setHeroIndex}
-            onEventClick={handleHeroClick}
-          />
-        )}
-
-        {sortedActiveEvents.length > 0 && (
-          <ScrollRow title="Próximos Eventos" subtitle={`${sortedActiveEvents.length} disponibles`}
-            icon={<Calendar className="w-5 h-5 text-pink-500" />}>
-            {sortedActiveEvents.map((event) => (
-              <EventCardSmall
-                key={event.id}
-                event={event}
-                onClick={() => handleEventClick(event.id)}
-                isViewed={viewedEvents.has(event.id)}
-              />
-            ))}
-          </ScrollRow>
-        )}
-
-        {trendingPlaces.length > 0 && (
-          <>
-            <div className="flex items-center gap-2.5 mb-3 px-1">
-              <TrendingUp className="w-5 h-5 text-primary-400" />
-              <h2 className="font-bold text-xl sm:text-2xl text-white">En Tendencia</h2>
-            </div>
-            <TrendBanner places={trendingPlaces} />
-            <ScrollRow title="" subtitle="Más lugares populares">
-              {trendingPlaces.slice(1, 8).map((place: Record<string, unknown>) => (
-                <CompactCard
-                  key={place.id}
-                  image={place.image}
-                  name={place.name}
-                  rating={place.rating}
-                  category={place.category?.name}
-                  to={`/place/${place.id}`}
-                  tiktokUrl={place.socialLinks?.tiktok}
-                  placeId={String(place.id)}
-                />
-              ))}
-            </ScrollRow>
-          </>
-        )}
-
-        {recentPlaces.length > 1 && (
-          <ScrollRow title="Recién Agregados" subtitle="Lo más nuevo"
-            icon={<Zap className="w-4 h-4 text-amber-500" />}>
-            {recentPlaces.map((place) => (
+        {recommendedPlaces.length > 0 && (
+          <ScrollRow title="Recomendado para ti" icon={<Star className="w-5 h-5 fill-primary-500 text-primary-500" />}
+            seeAllTo="/comunidad">
+            {recommendedPlaces.slice(0, 10).map((place: Record<string, unknown>) => (
               <CompactCard
                 key={place.id}
                 image={place.image}
@@ -158,13 +113,33 @@ const Home: React.FC = () => {
                 category={place.category?.name}
                 to={`/place/${place.id}`}
                 tiktokUrl={place.socialLinks?.tiktok}
-                placeId={place.id}
+                placeId={String(place.id)}
+                socialGroup={(place.socialGroups as { name: string; icon: string }[] | undefined)?.[0]}
               />
             ))}
           </ScrollRow>
         )}
 
-        <PersonalizedSections sections={personalizedSections} loading={sectionsLoading} />
+        {sortedActiveEvents.length > 0 && (
+          <>
+            <div className="flex items-center justify-between mb-1 px-1">
+              <div className="flex items-center gap-2.5">
+                <Star className="w-5 h-5 fill-primary-500 text-primary-500" />
+                <h2 className="font-bold text-xl sm:text-2xl text-[#241b3e] leading-none">Explora eventos</h2>
+              </div>
+              <button
+                onClick={() => navigate('/events/feed')}
+                className="flex items-center gap-0.5 text-sm font-semibold text-primary-600 hover:text-primary-700"
+              >
+                Ver todas
+                <span aria-hidden="true">›</span>
+              </button>
+            </div>
+            <StoriesRow events={sortedActiveEvents} onEventClick={handleStoryClick} viewedEvents={viewedEvents} likedEvents={likedEvents} />
+          </>
+        )}
+
+        <PersonalizedSections sections={homeSections} loading={sectionsLoading} />
 
         <PostsFeed compact />
       </motion.div>

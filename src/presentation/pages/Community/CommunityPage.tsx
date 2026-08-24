@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Store, Calendar, X, Star, SlidersHorizontal, Filter, Loader2, Check, ChevronDown } from 'lucide-react';
+import { Search, Store, Calendar, X, Star, SlidersHorizontal, Filter, Loader2, Check } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { usePlaces } from '@presentation/context';
 import { Place, Event } from '@domain/entities';
@@ -32,7 +32,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selected, o
 
   return (
     <div>
-      <p className="text-xs font-semibold text-text-secondary mb-2">Categoría</p>
+      <p className="text-xs font-semibold text-stone-500 mb-2">Categoría</p>
       {categories.length > 6 && (
         <div className="relative mb-2">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400 pointer-events-none" />
@@ -48,7 +48,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selected, o
         <button
           onClick={() => onChange('all')}
           className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all ${
-            selected === 'all' ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-text-secondary hover:bg-stone-50'
+            selected === 'all' ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
           }`}>
           <span>Todas las categorías</span>
           {selected === 'all' && <Check className="w-3.5 h-3.5 text-primary-500" />}
@@ -58,14 +58,14 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selected, o
             key={cat.id}
             onClick={() => onChange(selected === cat.id ? 'all' : cat.id)}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all ${
-              selected === cat.id ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-text-secondary hover:bg-stone-50'
+              selected === cat.id ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
             }`}>
             <span className="truncate">{cat.name}</span>
             {selected === cat.id && <Check className="w-3.5 h-3.5 text-primary-500 shrink-0" />}
           </button>
         ))}
         {visible.length === 0 && (
-          <p className="text-xs text-text-secondary text-center py-3">Sin resultados</p>
+          <p className="text-xs text-stone-500 text-center py-3">Sin resultados</p>
         )}
       </div>
     </div>
@@ -344,7 +344,7 @@ const CommunityPage: React.FC = () => {
     } catch (err) {
       console.error('Error fetching places:', err);
       if (!append) setPlaces([]);
-      setError(err?.message || 'Error al cargar lugares');
+      setError((err as Error)?.message || 'Error al cargar lugares');
     }
   }
 
@@ -363,7 +363,7 @@ const CommunityPage: React.FC = () => {
     } catch (err) {
       console.error('Error fetching events:', err);
       if (!append) setEvents([]);
-      setError(err?.message || 'Error al cargar eventos');
+      setError((err as Error)?.message || 'Error al cargar eventos');
     }
   }
 
@@ -429,9 +429,9 @@ const CommunityPage: React.FC = () => {
   const currentTotal = tab === 'places' ? totalPlaces : totalEvents;
 
   return (
-    <div className="min-h-screen bg-feed-bg pb-24 md:pb-8">
+    <div className="min-h-screen bg-[#f7f5fb] pb-24 md:pb-8">
       {/* Hero header */}
-      <div className="bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 pt-8 pb-7 px-4 md:px-6">
+      <div className="bg-primary-800 pt-8 pb-7 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-black text-white mb-1">Comunidad</h1>
           <p className="text-primary-200 text-sm mb-5">Explora y descubre negocios y eventos de tu ciudad</p>
@@ -443,7 +443,7 @@ const CommunityPage: React.FC = () => {
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && commitSearch()}
                 placeholder="Buscar por nombre, dirección, categoría…"
-                className="w-full pl-11 pr-10 py-3 rounded-xl bg-white text-sm text-text-primary placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-300 shadow-lg"
+                className="w-full pl-11 pr-10 py-3 rounded-xl bg-white text-sm text-[#241b3e] placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-300 shadow-lg"
               />
               {inputValue && (
                 <button onClick={clearSearch}
@@ -471,7 +471,7 @@ const CommunityPage: React.FC = () => {
               className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                 tab === key
                   ? 'bg-primary-500 text-white shadow-sm'
-                  : 'bg-white/6 text-white/50 border border-white/10 hover:text-white/75 hover:bg-white/10'
+                  : 'bg-white text-stone-500 border border-stone-200 hover:text-primary-600 hover:border-primary-200'
               }`}>
               <Icon className="w-4 h-4" />
               {label}
@@ -486,8 +486,8 @@ const CommunityPage: React.FC = () => {
           <button onClick={() => setShowFilters(v => !v)}
             className={`md:hidden shrink-0 ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border transition-all ${
               showFilters || activeFiltersCount > 0
-                ? 'bg-primary-500/20 border-primary-400/30 text-primary-300'
-                : 'bg-white/6 border-white/10 text-white/50'
+                ? 'bg-primary-50 border-primary-200 text-primary-600'
+                : 'bg-white border-stone-200 text-stone-500'
             }`}>
             <SlidersHorizontal className="w-4 h-4" />
             Filtros
@@ -526,7 +526,7 @@ const CommunityPage: React.FC = () => {
               <div className="bg-white rounded-2xl border border-primary-100/40 shadow-xs p-4 space-y-5">
 
                 {/* Header */}
-                <div className="flex items-center gap-2 text-xs font-semibold text-white/50">
+                <div className="flex items-center gap-2 text-xs font-semibold text-stone-500">
                   <Filter className="w-3.5 h-3.5 text-primary-500" />
                   Filtros
                   {activeFiltersCount > 0 && (
@@ -539,12 +539,12 @@ const CommunityPage: React.FC = () => {
 
                 {/* Ordenar */}
                 <div>
-                  <p className="text-xs font-semibold text-text-secondary mb-2">Ordenar por</p>
+                  <p className="text-xs font-semibold text-stone-500 mb-2">Ordenar por</p>
                   <div className="space-y-1">
                     {sortOptions.map(opt => (
                       <button key={opt.key} onClick={() => setSort(opt.key)}
                         className={`w-full text-left text-sm px-3 py-2 rounded-xl transition-all ${
-                          currentSort === opt.key ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-text-secondary hover:bg-stone-50'
+                          currentSort === opt.key ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
                         }`}>
                         {opt.label}
                       </button>
@@ -564,14 +564,14 @@ const CommunityPage: React.FC = () => {
                 {/* Grupo social — badges con íconos Lucide */}
                 {socialGroups.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-text-secondary mb-2">Grupo social</p>
+                    <p className="text-xs font-semibold text-stone-500 mb-2">Grupo social</p>
                     <div className="flex flex-wrap gap-1.5">
                       <button
                         onClick={() => setSelectedSocialGroup('all')}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                           selectedSocialGroup === 'all'
                             ? 'bg-primary-500 text-white border-primary-500'
-                            : 'bg-white text-text-secondary border-stone-200 hover:border-primary-300 hover:text-primary-500'
+                            : 'bg-white text-stone-500 border-stone-200 hover:border-primary-300 hover:text-primary-500'
                         }`}>
                         Todos
                       </button>
@@ -585,7 +585,7 @@ const CommunityPage: React.FC = () => {
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                               isSelected
                                 ? 'bg-primary-500 text-white border-primary-500'
-                                : 'bg-white text-text-secondary border-stone-200 hover:border-primary-300 hover:text-primary-500'
+                                : 'bg-white text-stone-500 border-stone-200 hover:border-primary-300 hover:text-primary-500'
                             }`}>
                             {IconComp && <IconComp className="w-3 h-3" />}
                             {sg.name}
@@ -599,7 +599,7 @@ const CommunityPage: React.FC = () => {
                 {/* Calificación mínima (solo negocios) */}
                 {tab === 'places' && (
                   <div>
-                    <p className="text-xs font-semibold text-text-secondary mb-2">Calificación mínima</p>
+                    <p className="text-xs font-semibold text-stone-500 mb-2">Calificación mínima</p>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map(star => (
                         <button key={star} onClick={() => setMinRating(minRating === star ? 0 : star)}
@@ -614,7 +614,7 @@ const CommunityPage: React.FC = () => {
                       ))}
                     </div>
                     {minRating > 0 && (
-                      <p className="text-[11px] text-text-secondary mt-1">{minRating}+ estrellas</p>
+                      <p className="text-[11px] text-stone-500 mt-1">{minRating}+ estrellas</p>
                     )}
                   </div>
                 )}
@@ -628,25 +628,25 @@ const CommunityPage: React.FC = () => {
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {selectedCategory !== 'all' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-500/15 text-primary-300 text-xs font-semibold border border-primary-500/25">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold border border-primary-200">
                     {selectedCat?.icon} {selectedCat?.name}
                     <button onClick={() => setSelectedCategory('all')}><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {selectedSocialGroup !== 'all' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-500/15 text-primary-300 text-xs font-semibold border border-primary-500/25">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold border border-primary-200">
                     {selectedSG?.icon} {selectedSG?.name}
                     <button onClick={() => setSelectedSocialGroup('all')}><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {minRating > 0 && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-semibold border border-amber-500/25">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200">
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{minRating}+
                     <button onClick={() => setMinRating(0)}><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {currentSort !== 'relevance' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/8 text-white/60 text-xs font-semibold border border-white/10">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 text-stone-600 text-xs font-semibold border border-stone-200">
                     {sortOptions.find(o => o.key === currentSort)?.label}
                     <button onClick={() => setSort('relevance')}><X className="w-3 h-3" /></button>
                   </span>
@@ -667,8 +667,8 @@ const CommunityPage: React.FC = () => {
                 <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
                   <X className="w-6 h-6 text-red-400" />
                 </div>
-                <p className="font-semibold text-text-primary mb-1">Error al cargar</p>
-                <p className="text-sm text-text-secondary mb-4 max-w-xs">{error}</p>
+                <p className="font-semibold text-[#241b3e] mb-1">Error al cargar</p>
+                <p className="text-sm text-stone-500 mb-4 max-w-xs">{error}</p>
                 <button onClick={() => { setError(null); setTab(tab); }}
                   className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors">
                   Reintentar
@@ -678,7 +678,7 @@ const CommunityPage: React.FC = () => {
 
             {/* Results count */}
             {!loading && !error && !isEmpty && (
-              <p className="text-xs text-text-secondary mb-4 px-1">
+              <p className="text-xs text-stone-500 mb-4 px-1">
                 {tab === 'places'
                   ? `${currentTotal} negocio${currentTotal !== 1 ? 's' : ''} encontrado${currentTotal !== 1 ? 's' : ''}`
                   : `${currentTotal} evento${currentTotal !== 1 ? 's' : ''} encontrado${currentTotal !== 1 ? 's' : ''}`}
@@ -700,7 +700,7 @@ const CommunityPage: React.FC = () => {
                       </div>
                       {hasMorePlaces && (
                         <button onClick={loadMorePlaces} disabled={loadingMore}
-                          className="w-full mt-4 py-3 rounded-xl border border-white/10 text-white/55 text-sm font-semibold hover:bg-white/6 transition-colors bg-white/4 flex items-center justify-center gap-2 disabled:opacity-60">
+                          className="w-full mt-4 py-3 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 hover:text-primary-600 transition-colors bg-white flex items-center justify-center gap-2 disabled:opacity-60">
                           {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                           {loadingMore ? 'Cargando…' : 'Ver más negocios'}
                         </button>
@@ -713,7 +713,7 @@ const CommunityPage: React.FC = () => {
                       </div>
                       {hasMoreEvents && (
                         <button onClick={loadMoreEvents} disabled={loadingMore}
-                          className="w-full mt-4 py-3 rounded-xl border border-white/10 text-white/55 text-sm font-semibold hover:bg-white/6 transition-colors bg-white/4 flex items-center justify-center gap-2 disabled:opacity-60">
+                          className="w-full mt-4 py-3 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 hover:text-primary-600 transition-colors bg-white flex items-center justify-center gap-2 disabled:opacity-60">
                           {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                           {loadingMore ? 'Cargando…' : 'Ver más eventos'}
                         </button>

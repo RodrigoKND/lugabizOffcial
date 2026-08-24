@@ -40,9 +40,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentUserId, onCancel, onCl
         </span>
       </div>
       <div className="p-2.5">
-        <p className="text-xs font-semibold text-text-primary truncate">{plan.targetName || 'Plan'}</p>
-        <p className="text-[10px] text-text-secondary mt-0.5">{plan.planDate} · {plan.planTime}</p>
-        <p className="text-[10px] text-text-secondary mt-0.5">{acceptedCount} confirmados</p>
+        <p className="text-xs font-semibold text-[#241b3e] truncate">{plan.targetName || 'Plan'}</p>
+        <p className="text-[10px] text-stone-500 mt-0.5">{plan.planDate} · {plan.planTime}</p>
+        <p className="text-[10px] text-stone-500 mt-0.5">{acceptedCount} confirmados</p>
       </div>
     </div>
   );

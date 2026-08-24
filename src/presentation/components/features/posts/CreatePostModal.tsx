@@ -147,8 +147,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
               <div>
-                <h2 className="font-bold text-text-primary">Nuevo post del negocio</h2>
-                <p className="text-[11px] text-text-secondary">Solo visible para dueños de negocios</p>
+                <h2 className="font-bold text-[#241b3e]">Nuevo post del negocio</h2>
+                <p className="text-[11px] text-stone-500">Solo visible para dueños de negocios</p>
               </div>
               <button onClick={handleClose} className="p-2 rounded-xl hover:bg-stone-100 transition-colors">
                 <X className="w-4 h-4" />
@@ -163,10 +163,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   onChange={e => setDescription(e.target.value.slice(0, MAX_DESC))}
                   placeholder="¿Qué quieres compartir con la comunidad? Novedades, ofertas, fotos del día…"
                   rows={4}
-                  className="w-full text-sm text-text-primary placeholder:text-stone-400 resize-none border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+                  className="w-full text-sm text-[#241b3e] placeholder:text-stone-400 resize-none border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
                 />
                 <div className="flex justify-end mt-1">
-                  <span className={`text-[11px] ${description.length > MAX_DESC * 0.9 ? 'text-amber-500' : 'text-text-secondary'}`}>
+                  <span className={`text-[11px] ${description.length > MAX_DESC * 0.9 ? 'text-amber-500' : 'text-stone-500'}`}>
                     {description.length}/{MAX_DESC}
                   </span>
                 </div>
@@ -175,11 +175,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
               {/* Images */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                  <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide">
                     Imágenes ({images.length}/{MAX_IMAGES})
                   </label>
                   {images.length > 0 && (
-                    <span className="text-[11px] text-text-secondary">{totalMB} MB / {MAX_TOTAL_MB} MB</span>
+                    <span className="text-[11px] text-stone-500">{totalMB} MB / {MAX_TOTAL_MB} MB</span>
                   )}
                 </div>
 
@@ -211,8 +211,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                 {!user?.identityVerified ? (
                   <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-stone-200 bg-stone-50">
                     <Lock className="w-4 h-4 text-stone-400 mt-0.5 shrink-0" />
-                    <div className="text-xs text-text-secondary">
-                      <p className="font-semibold text-text-primary">Ofertas con código bloqueadas</p>
+                    <div className="text-xs text-stone-500">
+                      <p className="font-semibold text-[#241b3e]">Ofertas con código bloqueadas</p>
                       <p>Verifica tu identidad en tu perfil para crear ofertas. Así protegemos a la comunidad de estafas. Mientras tanto, podés publicar fotos y novedades sin límite.</p>
                     </div>
                   </div>
@@ -223,7 +223,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   className={`flex items-center gap-2 w-full px-4 py-3 rounded-xl border-2 transition-all text-sm font-semibold ${
                     withOffer
                       ? 'border-amber-400 bg-amber-50 text-amber-800'
-                      : 'border-dashed border-stone-200 text-text-secondary hover:border-amber-300 hover:text-amber-600'
+                      : 'border-dashed border-stone-200 text-stone-500 hover:border-amber-300 hover:text-amber-600'
                   }`}
                 >
                   <Zap className={`w-4 h-4 ${withOffer ? 'text-amber-500' : ''}`} />
@@ -306,7 +306,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
             {/* Footer */}
             <div className="px-5 py-4 border-t border-stone-100 flex items-center gap-3">
               <button onClick={handleClose}
-                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-text-secondary text-sm font-semibold hover:bg-stone-50 transition-colors">
+                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 transition-colors">
                 Cancelar
               </button>
               <button onClick={handleSubmit} disabled={!canSubmit}

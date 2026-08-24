@@ -1,207 +1,29 @@
 /* ═══ MODAL DARK OVERRIDES — glass cards inside overlays ═══ */
 
-/* Catch-all: any fixed modal with bg-black/ overlay → darken inner bg-white card */
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"]:not(body) {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
+/* Los catch-alls genéricos que vivían acá (cualquier `fixed inset-0 bg-black/N` con un
+   hijo `bg-white rounded-*`, más los overrides de texto/inputs por z-index/aria-modal)
+   se ELIMINARON: el rediseño movió casi todos los modales (Amigos, Planes, Privacidad,
+   Editar perfil, Encuesta de lugar, Crear post, Apelar oculto, Verificación, etc.) a
+   tema CLARO (bg-white de verdad), pero esas reglas los seguían oscureciendo por
+   coincidir con el mismo patrón de clases → texto invisible en TODOS los modales
+   (reportado 2026-08-24). Los pocos modales que siguen siendo oscuros a propósito
+   (AuthModal, SearchModal) ya traen su propio `bg-[#150d2e]` en el JSX — no necesitan
+   ayuda de CSS. Si se agrega un modal nuevo que deba ser oscuro, dale su color directo
+   en el componente en vez de depender de un selector genérico acá (ver
+   [[project-lugabiz-home-redesign]] en memoria: estos selectores "bg-white"/"z-50"
+   genéricos quedan huérfanos y secuestran componentes no relacionados).
 
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-800"],
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-700"] {
-  color: #f0e6ff !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-600"] {
-  color: #c7b5db !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-400"] {
-  color: #8b7d9e !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="text-stone-300"] {
-  color: #6b5d7e !important;
-}
+   Lo que SIGUE siendo válido: el <select> nativo (necesita color-scheme:dark en
+   cualquier superficie oscura, es un problema de renderizado del navegador, no del
+   tema) y el dropdown de notificaciones (sigue siendo oscuro por diseño). */
 
-/* Catch-all inner element backgrounds */
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-stone-50"],
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-stone-100"] {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-white"]:not([class*="rounded-3xl"]):not([class*="rounded-2xl"]):not(.address-suggest-panel) {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class~="bg-primary-50"],
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="bg-primary-100"] {
-  background: rgba(168, 128, 250, 0.08) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-}
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="border-primary-"],
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] [class*="border-stone-"] {
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-/* Select elements — dark theme dropdown */
-.fixed.inset-0[class*="bg-black"] > [class*="bg-white"][class*="rounded-"] select,
-section.min-h-screen select {
-  color-scheme: dark !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-  color: #e4d4f5 !important;
-}
-
-/* Autocompletado de dirección dentro de modales — panel sólido y legible */
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel {
-  background: #1a0f2e !important;
-  backdrop-filter: none !important;
-  border-color: rgba(168, 128, 250, 0.25) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
-}
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel li {
-  background: transparent !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel li:hover,
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel li[class*="bg-amber-50"] {
-  background: rgba(168, 128, 250, 0.18) !important;
-}
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel [class*="text-stone-800"] { color: #f0e6ff !important; }
-.fixed.inset-0[class*="bg-black"] ul.address-suggest-panel [class*="text-stone-500"] { color: #aba0bc !important; }
-
-/* Search Modal */
-[aria-modal="true"] {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Auth Modal (z-[70]) */
+/* Auth Modal (z-[70]) — ya es oscuro por su propio bg-[#150d2e], esto es redundante
+   pero inofensivo; se deja por si algún hijo interno todavía usa clases claras. */
 .z-\[70\] > .rounded-3xl.shadow-2xl {
   background: rgba(13, 6, 32, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(168, 128, 250, 0.12) !important;
 }
-
-/* Place Survey Modal (z-[100]) */
-.z-\[100\] > .rounded-3xl.shadow-2xl,
-.z-\[100\] > .max-w-sm.w-full {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Edit Profile Modal (z-50) */
-.z-50 > .rounded-2xl.shadow-xl {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(168, 128, 250, 0.12) !important;
-  max-height: 90vh !important;
-  overflow-y: auto !important;
-}
-
-/* Create Post Modal (z-[200] + sibling of backdrop) */
-[class*="sm:rounded-2xl"][class*="rounded-t-2xl"]:not(body) {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* Chat Modal (z-[200] + rounded-t-3xl) */
-[class*="rounded-t-3xl"][class*="sm:rounded-2xl"]:not(body) {
-  background: rgba(13, 6, 32, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-/* ── Modal shared text/input overrides ── */
-[aria-modal="true"] [class*="text-stone-"],
-.z-\[70\] [class*="text-stone-"],
-.z-\[100\] [class*="text-stone-"],
-.z-50 [class*="text-text-primary"],
-.z-50 [class*="text-text-secondary"],
-[class*="sm:rounded-2xl"] [class*="text-stone-"],
-[class*="sm:rounded-2xl"] [class*="text-text-primary"],
-[class*="sm:rounded-2xl"] [class*="text-text-secondary"],
-[class*="rounded-t-3xl"] [class*="text-slate-"] {
-  color: #e4d4f5 !important;
-}
-[aria-modal="true"] [class*="text-stone-400"],
-.z-\[70\] [class*="text-stone-400"],
-.z-\[100\] [class*="text-stone-400"],
-[class*="sm:rounded-2xl"] [class*="text-stone-400"],
-[class*="rounded-t-3xl"] [class*="text-slate-400"] {
-  color: #8b7d9e !important;
-}
-
-[aria-modal="true"] input,
-[aria-modal="true"] textarea,
-.z-\[70\] input,
-.z-\[100\] input,
-.z-\[100\] textarea,
-.z-50 input,
-.z-50 textarea,
-[class*="sm:rounded-2xl"] input,
-[class*="sm:rounded-2xl"] textarea,
-[class*="sm:rounded-2xl"] select,
-[class*="rounded-t-3xl"] textarea {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-  color: #e4d4f5 !important;
-}
-[aria-modal="true"] input::placeholder,
-[aria-modal="true"] textarea::placeholder,
-.z-\[70\] input::placeholder,
-.z-\[100\] textarea::placeholder,
-.z-50 input::placeholder,
-.z-50 textarea::placeholder,
-[class*="sm:rounded-2xl"] input::placeholder,
-[class*="sm:rounded-2xl"] textarea::placeholder,
-[class*="rounded-t-3xl"] textarea::placeholder {
-  color: rgba(196, 132, 252, 0.35) !important;
-}
-
-[aria-modal="true"] [class*="bg-stone-"],
-.z-\[70\] [class*="bg-stone-"],
-.z-\[100\] [class*="bg-stone-"],
-[class*="sm:rounded-2xl"] [class*="bg-stone-"],
-[class*="sm:rounded-2xl"] [class*="bg-amber-"],
-[class*="sm:rounded-2xl"] [class*="bg-white"],
-[class*="rounded-t-3xl"] [class*="bg-slate-"] {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-[aria-modal="true"] [class*="border-stone-"],
-.z-\[70\] [class*="border-stone-"],
-.z-\[100\] [class*="border-stone-"],
-[class*="sm:rounded-2xl"] [class*="border-stone-"],
-[class*="sm:rounded-2xl"] [class*="border-amber-"],
-[class*="sm:rounded-2xl"] [class*="border-primary-"],
-[class*="rounded-t-3xl"] [class*="border-slate-"] {
-  border-color: rgba(168, 128, 250, 0.12) !important;
-}
-
-[class*="rounded-t-3xl"] [class*="hover:bg-slate-"]:hover {
-  background: rgba(168, 128, 250, 0.1) !important;
-}
-
-/* CreatePostModal — Flash Offer section text */
-[class*="sm:rounded-2xl"] [class*="text-amber-"] { color: #c084fc !important; }
-[class*="sm:rounded-2xl"] [class*="hover:bg-amber-50"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
-[class*="sm:rounded-2xl"] [class*="hover:border-amber-"]:hover { border-color: rgba(168, 128, 250, 0.3) !important; }
-[class*="sm:rounded-2xl"] [class*="hover:bg-stone-"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
-[class*="sm:rounded-2xl"] [class*="hover:bg-primary-50"]:hover { background: rgba(168, 128, 250, 0.1) !important; }
-[class*="sm:rounded-2xl"] [class*="border-dashed"] { border-style: dashed !important; }
-
-/* PlaceSurveyModal (z-[100]) inner content overrides */
-.z-\[100\] [class*="bg-amber-100"] { background: rgba(168, 128, 250, 0.12) !important; }
-.z-\[100\] [class*="text-amber-500"],
-.z-\[100\] [class*="text-amber-600"] { color: #c084fc !important; }
-.z-\[100\] [class*="bg-emerald-100"] { background: rgba(34, 197, 94, 0.12) !important; }
-.z-\[100\] [class*="text-emerald-600"] { color: #86efac !important; }
-.z-\[100\] [class*="bg-amber-500"] { background: linear-gradient(135deg, #7c22ce, #a855f7) !important; }
-.z-\[100\] [class*="hover:bg-amber-600"]:hover { background: linear-gradient(135deg, #6d1fc0, #9333ea) !important; }
-.z-\[100\] [class*="bg-emerald-500"] { background: rgba(34, 197, 94, 0.8) !important; }
-.z-\[100\] [class*="hover:bg-emerald-600"]:hover { background: rgba(34, 197, 94, 0.9) !important; }
 
 /* ═══ NOTIFICATION DROPDOWN DARK OVERRIDES ═══ */
 
@@ -238,40 +60,10 @@ section.min-h-screen select {
   background: rgba(251, 191, 36, 0.1) !important;
 }
 
-/* ═══ FIX: selects de categoría y autocompletado de dirección en modales ═══ */
-
-/* El <select> de categoría del modal de evento está anidado (no es hijo directo),
-   por eso la regla con ">" no lo alcanzaba y la letra quedaba negra sobre fondo
-   oscuro. Cubrimos cualquier <select> dentro de modales. */
-[aria-modal="true"] select,
-.z-50 select,
-.z-\[70\] select,
-.z-\[100\] select,
-.z-\[200\] select,
-.fixed.inset-0[class*="bg-black"] [class*="bg-white"][class*="rounded-"] select {
-  color-scheme: dark !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(168, 128, 250, 0.15) !important;
-  color: #e4d4f5 !important;
-}
-
-/* Las <option> del desplegable se pintan con fondo blanco del sistema → texto
-   invisible. Forzamos fondo oscuro + texto claro en TODA la app (todos los
-   selects viven en superficies oscuras tras el rediseño). */
+/* ═══ <select> nativo: el navegador pinta el fondo de las <option> en blanco pase lo
+   que pase con color-scheme, así que se fuerza en TODA la app, sea claro u oscuro el
+   resto del componente. ═══ */
 select option {
   background-color: #1a0f2e !important;
   color: #e4d4f5 !important;
-}
-
-/* Sugerencias del autocompletado de dirección (text-stone-*) dentro del modal de
-   evento (z-50): el scope z-50 solo remapeaba text-text-*, no text-stone-*, así
-   que el texto de las sugerencias quedaba oscuro sobre el desplegable oscuro. */
-.z-50 [class*="text-stone-800"],
-.z-50 [class*="text-stone-700"],
-.z-50 [class*="text-stone-600"] {
-  color: #e4d4f5 !important;
-}
-.z-50 [class*="text-stone-500"],
-.z-50 [class*="text-stone-400"] {
-  color: #aba0bc !important;
 }

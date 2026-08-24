@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ScrollRowProps {
@@ -6,9 +7,10 @@ interface ScrollRowProps {
   subtitle?: string;
   icon?: React.ReactNode;
   children: React.ReactNode;
+  seeAllTo?: string;
 }
 
-const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children }) => {
+const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children, seeAllTo }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
@@ -46,36 +48,46 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children }
           <div className="flex items-center gap-2.5">
             {icon}
             <div>
-              <h2 className="font-bold text-xl sm:text-2xl text-white leading-none">{title}</h2>
-              {subtitle && <p className="text-sm text-white/35 mt-1.5">{subtitle}</p>}
+              <h2 className="font-bold text-xl sm:text-2xl text-[#241b3e] leading-none">{title}</h2>
+              {subtitle && <p className="text-sm text-stone-400 mt-1.5">{subtitle}</p>}
             </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => scroll('left')}
-              disabled={!canLeft}
-              aria-label="Desplazar izquierda"
-              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
-                canLeft
-                  ? 'border-white/15 text-white/45 hover:border-white/30 hover:text-white hover:bg-white/5 active:scale-95 cursor-pointer'
-                  : 'border-white/5 text-white/15 cursor-default'
-              }`}
+          {seeAllTo ? (
+            <Link
+              to={seeAllTo}
+              className="flex items-center gap-0.5 text-sm font-semibold text-primary-600 hover:text-primary-700"
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => scroll('right')}
-              disabled={!canRight}
-              aria-label="Desplazar derecha"
-              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
-                canRight
-                  ? 'border-white/15 text-white/45 hover:border-white/30 hover:text-white hover:bg-white/5 active:scale-95 cursor-pointer'
-                  : 'border-white/5 text-white/15 cursor-default'
-              }`}
-            >
+              Ver todas
               <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+            </Link>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => scroll('left')}
+                disabled={!canLeft}
+                aria-label="Desplazar izquierda"
+                className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                  canLeft
+                    ? 'border-stone-200 text-stone-400 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 active:scale-95 cursor-pointer'
+                    : 'border-stone-100 text-stone-200 cursor-default'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                disabled={!canRight}
+                aria-label="Desplazar derecha"
+                className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                  canRight
+                    ? 'border-stone-200 text-stone-400 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 active:scale-95 cursor-pointer'
+                    : 'border-stone-100 text-stone-200 cursor-default'
+                }`}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
       <div

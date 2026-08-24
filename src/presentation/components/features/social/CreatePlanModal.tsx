@@ -70,11 +70,11 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-primary-100">
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-text-primary">Crear plan</h3>
-                <p className="text-xs text-text-secondary truncate">{targetName}</p>
+                <h3 className="text-base font-bold text-[#241b3e]">Crear plan</h3>
+                <p className="text-xs text-stone-500 truncate">{targetName}</p>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-primary-50 transition-colors shrink-0">
-                <X className="w-4 h-4 text-text-secondary" />
+                <X className="w-4 h-4 text-stone-500" />
               </button>
             </div>
 
@@ -82,19 +82,19 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
               <PushEnableBanner />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Fecha</label>
+                  <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Fecha</label>
                   <input type="date" min={today} value={planDate} onChange={(e) => setPlanDate(e.target.value)}
                     className="w-full px-3 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Hora</label>
+                  <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Hora</label>
                   <input type="time" value={planTime} onChange={(e) => setPlanTime(e.target.value)}
                     className="w-full px-3 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Visibilidad</label>
+                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Visibilidad</label>
                 <div className="grid grid-cols-3 gap-2">
                   {VISIBILITY_OPTIONS.map((opt) => (
                     <button key={opt.value} type="button" onClick={() => setVisibility(opt.value)}
@@ -103,30 +103,30 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                           ? 'bg-primary-500 border-primary-500 shadow-sm'
                           : 'bg-white border-primary-100 hover:border-primary-200 hover:bg-primary-50/40'
                       }`}>
-                      <p className={`text-xs font-semibold ${visibility === opt.value ? 'text-white' : 'text-text-primary'}`}>
+                      <p className={`text-xs font-semibold ${visibility === opt.value ? 'text-white' : 'text-[#241b3e]'}`}>
                         {opt.label}
                       </p>
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-text-secondary mt-1.5">
+                <p className="text-[11px] text-stone-500 mt-1.5">
                   {VISIBILITY_OPTIONS.find((o) => o.value === visibility)?.hint}
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Nota (opcional)</label>
+                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Nota (opcional)</label>
                 <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2}
                   className="w-full px-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all resize-none" />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">
+                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">
                   Invitar amigos {invitees.length > 0 && `(${invitees.length})`}
                 </label>
 
                 <div className="relative mb-2">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-500" />
                   <input type="text" value={friendFilter} onChange={(e) => setFriendFilter(e.target.value)}
                     placeholder="Buscar entre tus amigos..."
                     className="w-full pl-8 pr-3 py-2 bg-primary-50/50 border border-primary-100 rounded-lg text-xs outline-none focus:border-primary-300 focus:bg-white transition-all" />
@@ -135,7 +135,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                 {noFriendsAtAll ? (
                   <div className="text-center py-6 bg-primary-50/40 rounded-xl">
                     <Users className="w-6 h-6 text-primary-300 mx-auto mb-2" />
-                    <p className="text-xs text-text-secondary">Todavía no tenés amigos. Buscalos abajo por @usuario.</p>
+                    <p className="text-xs text-stone-500">Todavía no tenés amigos. Buscalos abajo por @usuario.</p>
                   </div>
                 ) : (
                   <div className="space-y-1.5 max-h-40 overflow-y-auto">
@@ -148,7 +148,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                       />
                     ))}
                     {!isLoadingFriends && friendFilter.trim() && friendOptions.length === 0 && (
-                      <p className="text-xs text-text-secondary text-center py-3">Sin resultados entre tus amigos.</p>
+                      <p className="text-xs text-stone-500 text-center py-3">Sin resultados entre tus amigos.</p>
                     )}
                   </div>
                 )}
@@ -163,9 +163,9 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                     <input type="text" value={peopleQuery} onChange={(e) => setPeopleQuery(e.target.value)}
                       placeholder="Buscar por @usuario..." autoFocus
                       className="w-full px-3 py-2 bg-primary-50/50 border border-primary-100 rounded-lg text-xs outline-none focus:border-primary-300 focus:bg-white transition-all" />
-                    {isSearchingPeople && <p className="text-[11px] text-text-secondary text-center py-2">Buscando...</p>}
+                    {isSearchingPeople && <p className="text-[11px] text-stone-500 text-center py-2">Buscando...</p>}
                     {!isSearchingPeople && peopleQuery.trim().length >= 3 && peopleResults.length === 0 && (
-                      <p className="text-[11px] text-text-secondary text-center py-2">No encontramos a nadie con ese apodo.</p>
+                      <p className="text-[11px] text-stone-500 text-center py-2">No encontramos a nadie con ese apodo.</p>
                     )}
                     <div className="space-y-1.5 max-h-32 overflow-y-auto">
                       {peopleResults.map((result) => (
@@ -190,7 +190,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                 Crear plan
               </button>
               <button onClick={onClose}
-                className="flex-1 py-2.5 bg-primary-50 text-text-secondary rounded-xl font-semibold text-sm hover:bg-primary-100 transition-all">
+                className="flex-1 py-2.5 bg-primary-50 text-stone-500 rounded-xl font-semibold text-sm hover:bg-primary-100 transition-all">
                 Cancelar
               </button>
             </div>

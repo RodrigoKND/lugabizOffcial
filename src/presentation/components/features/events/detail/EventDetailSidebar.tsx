@@ -38,7 +38,7 @@ export default function EventDetailSidebar({
       </header>
 
       {event.priceNote && (
-        <div className="mb-6 -mt-3 p-3 bg-amber-50/60 border border-amber-100 rounded-xl text-xs text-stone-600">
+        <div className="mb-6 -mt-3 p-3 bg-amber-500/10 border border-amber-400/20 rounded-xl text-xs text-amber-100">
           {event.priceNote}
         </div>
       )}

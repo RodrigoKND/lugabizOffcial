@@ -6,8 +6,8 @@ const EmptyHomeState: React.FC<EmptyHomeStateProps> = ({ onPublish }) => (
       <div className="w-20 h-20 rounded-2xl bg-primary-100 flex items-center justify-center mx-auto mb-4">
         <span className="text-primary-500 text-3xl">🦕</span>
       </div>
-      <h3 className="text-lg font-bold text-text-primary mb-2">Aún no hay contenido</h3>
-      <p className="text-sm text-text-secondary mb-6 max-w-xs mx-auto">
+      <h3 className="text-lg font-bold text-[#241b3e] mb-2">Aún no hay contenido</h3>
+      <p className="text-sm text-stone-500 mb-6 max-w-xs mx-auto">
         No hay lugares ni eventos disponibles. ¡Sé el primero en compartir!
       </p>
       <button onClick={onPublish}

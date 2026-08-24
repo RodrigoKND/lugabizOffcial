@@ -46,27 +46,27 @@ function PlanDetailContent({ plan, currentUserId, onClose }: { plan: Plan; curre
 
         <div className="p-5 space-y-3 overflow-y-auto">
           <div>
-            <h3 className="text-base font-bold text-text-primary">{plan.targetName || 'Plan'}</h3>
-            <p className="text-xs text-text-secondary flex items-center gap-2 mt-1">
+            <h3 className="text-base font-bold text-[#241b3e]">{plan.targetName || 'Plan'}</h3>
+            <p className="text-xs text-stone-500 flex items-center gap-2 mt-1">
               <Calendar className="w-3.5 h-3.5" /> {plan.planDate}
               <Clock className="w-3.5 h-3.5 ml-1.5" /> {plan.planTime}
             </p>
           </div>
 
           {plan.note && (
-            <p className="text-xs text-text-secondary bg-primary-50/50 rounded-xl p-3">{plan.note}</p>
+            <p className="text-xs text-stone-500 bg-primary-50/50 rounded-xl p-3">{plan.note}</p>
           )}
 
           <div>
-            <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wide mb-2">
+            <p className="text-[11px] font-semibold text-stone-500 uppercase tracking-wide mb-2">
               {canSeeAttendees ? `${accepted.length} confirmados` : 'Confirmados'}
             </p>
             {!canSeeAttendees ? (
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-stone-500">
                 Vas a poder ver quién confirmó cuando aceptes la invitación.
               </p>
             ) : accepted.length === 0 ? (
-              <p className="text-xs text-text-secondary">Todavía nadie confirmó asistencia.</p>
+              <p className="text-xs text-stone-500">Todavía nadie confirmó asistencia.</p>
             ) : (
               <div className="space-y-2">
                 {accepted.map((p) => (
@@ -78,7 +78,7 @@ function PlanDetailContent({ plan, currentUserId, onClose }: { plan: Plan; curre
                         {(p.userName || '?').charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-xs font-medium text-text-primary">
+                    <span className="text-xs font-medium text-[#241b3e]">
                       {p.userName || 'Usuario'}{p.role === 'owner' ? ' (organiza)' : ''}
                     </span>
                   </div>

@@ -91,16 +91,16 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
               <Megaphone className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-bold text-text-primary">Nuevo Anuncio</h3>
+            <h3 className="font-bold text-[#241b3e]">Nuevo Anuncio</h3>
           </div>
           <button onClick={onClose} className="p-1.5 hover:bg-primary-50 rounded-lg transition-colors">
-            <X className="w-4 h-4 text-text-secondary" />
+            <X className="w-4 h-4 text-stone-500" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Título</label>
+            <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Título</label>
             <input
               type="text"
               value={title}
@@ -111,7 +111,7 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-text-secondary uppercase mb-1.5">Mensaje</label>
+            <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Mensaje</label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -120,7 +120,7 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
               placeholder="Escribe tu anuncio..."
               maxLength={500}
             />
-            <p className="text-xs text-text-secondary mt-1 text-right">{body.length}/500</p>
+            <p className="text-xs text-stone-500 mt-1 text-right">{body.length}/500</p>
           </div>
           <button
             type="submit"

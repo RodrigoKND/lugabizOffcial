@@ -14,7 +14,7 @@ interface Props {
 }
 
 const inputCls = (hasError?: boolean) =>
-  `w-full px-4 py-3 bg-stone-50 border-2 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0 ${
+  `w-full px-4 py-3 bg-stone-50 border-2 rounded-xl text-sm text-[#241b3e] placeholder:text-stone-400 outline-none transition-all duration-200 focus:ring-0 ${
     hasError ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-stone-200'
   }`;
 

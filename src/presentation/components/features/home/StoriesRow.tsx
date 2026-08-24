@@ -102,7 +102,7 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
               </motion.div>
 
               {/* Nombre — fuera del anillo para no deformar el círculo */}
-              <span className={`text-[11px] font-medium w-16 truncate text-center leading-tight ${isViewed ? 'text-stone-400' : 'text-text-secondary'}`}>
+              <span className={`text-[11px] font-medium w-16 truncate text-center leading-tight ${isViewed ? 'text-stone-400' : 'text-stone-500'}`}>
                 {event.name}
               </span>
             </button>

@@ -11,14 +11,35 @@ export function useSearchModal(open: boolean, onClose: () => void) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSocialGroup, setSelectedSocialGroup] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const pendingQueryRef = useRef('');
+  const pendingGroupRef = useRef('');
+
+  // Permite pre-cargar un query/filtro desde fuera (p. ej. el buscador del hero):
+  // document.dispatchEvent(new CustomEvent('lugabiz:prefill-search', { detail: { query: 'café', socialGroupId: '...' } }))
+  useEffect(() => {
+    const handlePrefill = (e: Event) => {
+      const { query, socialGroupId } = (e as CustomEvent<{ query?: string; socialGroupId?: string }>).detail ?? {};
+      pendingQueryRef.current = query ?? '';
+      pendingGroupRef.current = socialGroupId ?? '';
+      if (query || socialGroupId) {
+        setSelectedCategory(null);
+        setSelectedSocialGroup(socialGroupId ?? null);
+        setQuery(query ?? '');
+      }
+    };
+    document.addEventListener('lugabiz:prefill-search', handlePrefill);
+    return () => document.removeEventListener('lugabiz:prefill-search', handlePrefill);
+  }, []);
 
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 100);
-      setQuery('');
+      setQuery(pendingQueryRef.current);
       setActiveFilter('all');
       setSelectedCategory(null);
-      setSelectedSocialGroup(null);
+      setSelectedSocialGroup(pendingGroupRef.current || null);
+      pendingQueryRef.current = '';
+      pendingGroupRef.current = '';
     }
   }, [open]);
 

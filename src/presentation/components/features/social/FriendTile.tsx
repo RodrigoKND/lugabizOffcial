@@ -22,8 +22,8 @@ const FriendTile: React.FC<FriendTileProps> = ({ friend, onRemove }) => (
       </div>
     )}
     <div className="min-w-0 w-full">
-      <p className="text-xs font-semibold text-text-primary truncate">{friend.name}</p>
-      {friend.username && <p className="text-[10px] text-text-secondary truncate">@{friend.username}</p>}
+      <p className="text-xs font-semibold text-[#241b3e] truncate">{friend.name}</p>
+      {friend.username && <p className="text-[10px] text-stone-500 truncate">@{friend.username}</p>}
     </div>
   </div>
 );

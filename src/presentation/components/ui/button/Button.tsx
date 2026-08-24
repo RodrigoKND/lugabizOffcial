@@ -7,11 +7,11 @@ const variantStyles: Record<string, string> = {
   primary:
     'bg-primary-500 text-white hover:bg-primary-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm',
   secondary:
-    'bg-white/5 border border-white/10 text-white/45 hover:text-white/75 hover:bg-white/8 hover:border-white/20',
+    'bg-stone-100 border border-stone-200 text-stone-600 hover:text-stone-800 hover:bg-stone-200 hover:border-stone-300',
   ghost:
-    'text-white/50 hover:text-white/80 hover:bg-white/8',
+    'text-stone-500 hover:text-stone-800 hover:bg-stone-100',
   outline:
-    'border border-white/20 text-white/75 hover:bg-white/8 hover:border-white/30 hover:text-white',
+    'border border-stone-200 text-stone-600 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-800',
   danger:
     'bg-red-500 text-white hover:bg-red-600 active:scale-[0.98] disabled:opacity-50',
 };

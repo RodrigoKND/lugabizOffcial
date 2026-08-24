@@ -208,11 +208,11 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               </div>
             )}
           </div>
-          <p className="text-[12px] font-semibold text-text-primary truncate">{localPost.businessName}</p>
+          <p className="text-[12px] font-semibold text-[#241b3e] truncate">{localPost.businessName}</p>
         </button>
 
         {/* Descripción */}
-        <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 flex-1">
+        <p className="text-[12px] text-stone-500 leading-relaxed line-clamp-2 flex-1">
           {localPost.description}
         </p>
 
@@ -258,7 +258,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
                 {offer.totalSlots && (
                   <div>
                     <div className="flex justify-between text-[10px] mb-1">
-                      <span className="text-text-secondary">{offer.claimedSlots} de {offer.totalSlots} usados</span>
+                      <span className="text-stone-500">{offer.claimedSlots} de {offer.totalSlots} usados</span>
                       <span className="text-amber-600 font-semibold">{offer.totalSlots - offer.claimedSlots} disponibles</span>
                     </div>
                     <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
@@ -287,7 +287,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               >
                 <span className="text-[14px]">{emoji}</span>
                 {localPost.reactionsCount[key] > 0 && (
-                  <span className="text-[10px] text-text-secondary font-medium">{localPost.reactionsCount[key]}</span>
+                  <span className="text-[10px] text-stone-500 font-medium">{localPost.reactionsCount[key]}</span>
                 )}
               </button>
             ))}

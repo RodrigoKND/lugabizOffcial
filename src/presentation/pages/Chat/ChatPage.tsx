@@ -54,8 +54,9 @@ function AssistantMessage({ text }: { text: string }) {
   return (
     <div className="space-y-1.5">
       {lines.map((line, i) => {
-        const isBullet = /^[•\-*›]/.test(line.trimStart())
-        const clean = isBullet ? line.replace(/^[•\-*›]\s*/, '') : line
+        // Un '*' solo (no seguido de otro '*') es viñeta; '**' es negrita, no viñeta.
+        const isBullet = /^(?:[•\-›]|\*(?!\*))/.test(line.trimStart())
+        const clean = isBullet ? line.replace(/^(?:[•\-›]|\*(?!\*))\s*/, '') : line
         const rendered = renderInline(clean)
         if (isBullet) return (
           <div key={i} className="flex gap-2 items-start">
@@ -70,11 +71,14 @@ function AssistantMessage({ text }: { text: string }) {
 }
 
 function renderInline(text: string): React.ReactNode[] {
-  // Detecta **bold**, [text](url) y https:// links sueltos
-  const parts = text.split(/(\*\*.*?\*\*|\[.*?\]\(.*?\)|https?:\/\/\S+)/g)
+  // Detecta **bold**, *italic*, [text](url) y https:// links sueltos
+  const parts = text.split(/(\*\*.*?\*\*|\*[^*\n]+?\*|\[.*?\]\(.*?\)|https?:\/\/\S+)/g)
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={i} className="italic text-text-secondary">{part.slice(1, -1)}</em>
     }
     const mdLink = part.match(/^\[(.*?)\]\((https?:\/\/.*?)\)$/)
     if (mdLink) {

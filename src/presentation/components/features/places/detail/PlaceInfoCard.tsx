@@ -8,9 +8,9 @@ import ReportFakePlaceAction from './ReportFakePlaceAction';
 
 export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onToggleSave }: PlaceInfoCardProps) {
   return (
-    <div className="bg-white/5 rounded-3xl p-6 border border-white/8 backdrop-blur-sm">
+    <div className="bg-white rounded-3xl p-6 ring-1 ring-primary-100/70 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
       <div className="flex items-start justify-between gap-4 mb-4">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
+        <h1 className="text-2xl lg:text-3xl font-bold text-[#241b3e] leading-tight">
           {place.name}
         </h1>
       </div>
@@ -18,23 +18,23 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
       <div className="flex items-center gap-4 mb-5 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-          <span className="font-semibold text-white/80">{place.rating}</span>
-          <span className="text-white/35 text-sm">({place.reviewCount})</span>
+          <span className="font-semibold text-[#241b3e]">{place.rating}</span>
+          <span className="text-stone-400 text-sm">({place.reviewCount})</span>
         </div>
-        <div className="flex items-center gap-1.5 text-white/35 text-sm">
+        <div className="flex items-center gap-1.5 text-stone-400 text-sm">
           <Calendar className="w-4 h-4" />
           <span>{place.createdAt.toLocaleDateString()}</span>
         </div>
         {place.viewsCount !== undefined && (
-          <div className="flex items-center gap-1.5 text-white/35 text-sm">
+          <div className="flex items-center gap-1.5 text-stone-400 text-sm">
             <Eye className="w-4 h-4" />
             <span>{place.viewsCount}</span>
           </div>
         )}
-        <PlansCountBadge count={place.plansCount} variant="dark" />
+        <PlansCountBadge count={place.plansCount} variant="light" />
       </div>
 
-      <p className="text-white/55 leading-relaxed mb-6">
+      <p className="text-stone-500 leading-relaxed mb-6">
         {place.description}
       </p>
 
@@ -53,12 +53,12 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
         </div>
       )}
 
-      <SocialLinksRow links={place.socialLinks} variant="dark" className="mb-6" />
+      <SocialLinksRow links={place.socialLinks} variant="light" className="mb-6" />
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <PlanButton targetName={place.name} placeId={place.id} variant="detail" className="flex-1" />
+        <PlanButton targetName={place.name} placeId={place.id} variant="detail" theme="light" className="flex-1" />
         <button onClick={onShare}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-white/6 border border-white/10 rounded-2xl text-white/55 hover:bg-white/10 hover:text-white/80 font-medium transition-all text-sm flex-1">
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl text-stone-600 hover:bg-stone-100 hover:text-[#241b3e] font-medium transition-all text-sm flex-1">
           <Share2 className="w-4 h-4" /> Compartir
         </button>
         <button onClick={() => {
@@ -67,8 +67,8 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
         }}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border font-medium transition-all text-sm flex-1 ${
             isPlaceSaved
-              ? 'bg-red-500/15 border-red-500/25 text-red-400 hover:bg-red-500/20'
-              : 'bg-white/6 border-white/10 text-white/55 hover:bg-white/10 hover:text-white/80'
+              ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
+              : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100 hover:text-[#241b3e]'
           }`}>
           {isPlaceSaved ? <HeartOff className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
           {isPlaceSaved ? 'Guardado' : 'Guardar'}

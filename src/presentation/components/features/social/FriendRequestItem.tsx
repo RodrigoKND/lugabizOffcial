@@ -17,8 +17,8 @@ const FriendRequestItem: React.FC<FriendRequestItemProps> = ({ request, onAccept
       </div>
     )}
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-text-primary truncate">{request.otherUserName}</p>
-      {request.otherUserUsername && <p className="text-[11px] text-text-secondary truncate">@{request.otherUserUsername}</p>}
+      <p className="text-sm font-semibold text-[#241b3e] truncate">{request.otherUserName}</p>
+      {request.otherUserUsername && <p className="text-[11px] text-stone-500 truncate">@{request.otherUserUsername}</p>}
     </div>
     <div className="flex items-center gap-1.5 shrink-0">
       <button onClick={onAccept} className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors">

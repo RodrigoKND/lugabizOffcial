@@ -6,7 +6,7 @@ import { UseTrendingPlacesReturn } from '@domain/entities/HomeTypes';
 async function fetchTrendingFallback(): Promise<Record<string, unknown>[]> {
   const { data, error } = await supabase
     .from('places')
-    .select('id, name, image, rating, category:categories(id, name, color)')
+    .select('id, name, image, rating, category:categories(id, name, color), place_social_groups(social_group:social_groups(id, name, icon, color))')
     .order('views_count', { ascending: false, nullsFirst: false })
     .limit(10);
 
@@ -17,6 +17,9 @@ async function fetchTrendingFallback(): Promise<Record<string, unknown>[]> {
     image: p.image,
     rating: p.rating ?? 0,
     category: p.category,
+    socialGroups: ((p.place_social_groups as Record<string, unknown>[] | null) || [])
+      .map((r) => r.social_group)
+      .filter(Boolean),
   }));
 }
 
