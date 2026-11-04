@@ -97,7 +97,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ isVisible, onClick }) => {
         }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       >
-        <div className="bg-white border border-pink-100 rounded-2xl px-3 py-2 shadow-md w-44 text-center">
+        <div className="bg-lg-surface border border-pink-100 rounded-2xl px-3 py-2 shadow-md w-44 text-center">
           <AnimatePresence mode="wait">
             <motion.span
               key={msgIndex}

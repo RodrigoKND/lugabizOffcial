@@ -8,13 +8,13 @@ interface ProfileTabsProps {
 }
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({ tabs, activeTab, onTabChange }) => (
-  <div className="flex gap-4 sm:gap-6 border-b border-primary-100/30 overflow-x-auto scrollbar-hide mb-5">
+  <div className="flex gap-4 sm:gap-6 border-b border-lg-surface-2 overflow-x-auto scrollbar-hide mb-5">
     {tabs.map(tab => {
       const Icon = tab.icon;
       return (
         <button key={tab.id} onClick={() => onTabChange(tab.id)}
           className={`pb-3 text-xs sm:text-sm font-semibold transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
-            activeTab === tab.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-stone-500 hover:text-[#241b3e]'
+            activeTab === tab.id ? 'border-primary-500 text-lg-accent' : 'border-transparent text-lg-dim hover:text-lg-text'
           }`}>
           <Icon className="w-4 h-4" /> {tab.label}
         </button>

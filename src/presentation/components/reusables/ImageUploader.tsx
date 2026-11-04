@@ -58,22 +58,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+      className="bg-lg-surface rounded-3xl p-6 border border-lg-surface-2 shadow-sm">
       <div className="space-y-3">
-        <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider">
+        <label className="block text-xs font-semibold text-lg-dim uppercase tracking-wider">
           Imágenes ({images.length}/{maxFiles})
         </label>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
           {images.length < maxFiles && (
             <label className="cursor-pointer">
-              <div className="aspect-square bg-stone-50 border-2 border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center group hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+              <div className="aspect-square bg-lg-surface-2 border-2 border-dashed border-lg-surface-2 rounded-2xl flex flex-col items-center justify-center group hover:border-primary-400 hover:bg-lg-surface-2 transition-all">
                 {isSubmitting || converting ? (
                   <div className="w-6 h-6 border-3 border-primary-400 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Camera className="w-7 h-7 text-stone-400 group-hover:text-primary-500 group-hover:scale-110 transition-all" />
-                    <span className="text-[10px] font-semibold text-stone-400 group-hover:text-primary-500 mt-1">Agregar</span>
+                    <Camera className="w-7 h-7 text-lg-dim group-hover:text-lg-accent group-hover:scale-110 transition-all" />
+                    <span className="text-[10px] font-semibold text-lg-dim group-hover:text-lg-accent mt-1">Agregar</span>
                   </>
                 )}
                 <input ref={inputRef} type="file" accept="image/*"
@@ -101,7 +101,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           </div>
         )}
 
-        <p className="text-[11px] text-stone-400 font-medium">
+        <p className="text-[11px] text-lg-dim font-medium">
           JPG, PNG, WEBP. Máx {maxFiles} imágenes, {maxTotalMB}MB total.
         </p>
       </div>

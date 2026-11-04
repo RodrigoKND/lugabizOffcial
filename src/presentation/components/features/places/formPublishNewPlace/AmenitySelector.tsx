@@ -78,7 +78,7 @@ const AmenitySelector: React.FC<TagSelectorProps> = ({ tags = AMENITIES, selecte
               flex items-center gap-2 px-4 py-2.5 rounded-full border-2 transition-all duration-200 font-medium text-sm
               ${isSelected 
                 ? 'border-transparent text-white shadow-lg'
-                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                : 'border-gray-200 bg-lg-surface text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }
             `}
             style={{ 

@@ -29,7 +29,7 @@ const CreateSurveyModal: React.FC<CreateSurveyModalProps> = ({ open, onClose, on
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-lienar-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/20">
+                  <div className="w-11 h-11 rounded-2xl bg-lg-accent flex items-center justify-center shadow-lg shadow-primary-500/20">
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -46,7 +46,7 @@ const CreateSurveyModal: React.FC<CreateSurveyModalProps> = ({ open, onClose, on
               <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 <div className="bg-white/2 rounded-2xl p-5 border border-white/5">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-5 bg-linear-to-b from-primary-400 to-primary-600 rounded-full" />
+                    <div className="w-1 h-5 bg-lg-accent rounded-full" />
                     <span className="text-sm font-bold text-white/80">Información del proyecto</span>
                   </div>
                   <SurveyFormFields form={form} onChange={setFormField} />
@@ -54,7 +54,7 @@ const CreateSurveyModal: React.FC<CreateSurveyModalProps> = ({ open, onClose, on
 
                 <div className="bg-white/2 rounded-2xl p-5 border border-white/5">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-5 bg-linear-to-b from-primary-400 to-primary-600 rounded-full" />
+                    <div className="w-1 h-5 bg-lg-accent rounded-full" />
                     <span className="text-sm font-bold text-white/80">Preguntas</span>
                   </div>
                   <QuestionBuilder
@@ -70,14 +70,14 @@ const CreateSurveyModal: React.FC<CreateSurveyModalProps> = ({ open, onClose, on
 
                 <div className="bg-white/2 rounded-2xl p-5 border border-white/5">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-5 bg-linear-to-b from-primary-400 to-primary-600 rounded-full" />
+                    <div className="w-1 h-5 bg-lg-accent rounded-full" />
                     <span className="text-sm font-bold text-white/80">Audiencia objetivo</span>
                   </div>
                   <CategorySelector categories={categories} selectedIds={selectedCats} onToggle={toggleCategory} />
                 </div>
 
                 <button type="submit" disabled={loading || !form.title}
-                  className="w-full py-3.5 bg-linear-to-r from-primary-500 to-primary-600 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                  className="w-full py-3.5 bg-lg-accent text-lg-ink rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                   {loading ? (
                     <><Loader2 className="w-5 h-5 animate-spin" /> Creando y notificando...</>
                   ) : (

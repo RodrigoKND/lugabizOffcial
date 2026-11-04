@@ -14,7 +14,7 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ step, totalSteps,
     <button
       type="button" onClick={onPrev}
       className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
-        step === 0 ? 'invisible' : 'text-stone-600 hover:bg-stone-100'
+        step === 0 ? 'invisible' : 'text-lg-dim hover:bg-lg-surface-2'
       }`}
     >
       Anterior
@@ -22,7 +22,7 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ step, totalSteps,
     {showNext && (
       <button
         type="button" onClick={onNext}
-        className="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm hover:bg-primary-600 transition-all"
+        className="px-6 py-2.5 bg-lg-accent text-lg-ink rounded-xl font-medium text-sm hover:bg-lg-accent transition-all"
       >
         Siguiente
       </button>

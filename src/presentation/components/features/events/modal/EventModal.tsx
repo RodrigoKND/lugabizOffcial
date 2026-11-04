@@ -339,7 +339,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, onClose, onNext, onPrev,
             {/* CTA */}
             <div className="border-t border-white/5 px-4 py-3 shrink-0">
               <Link to={`/event/${event.id}`} onClick={onClose}
-                className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
+                className="block w-full text-center bg-lg-accent text-lg-ink py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
                 Asistiré
               </Link>
             </div>

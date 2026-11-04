@@ -40,11 +40,11 @@ export default function PlaceImageSection({ place, user, onEdit, onDeleteClick }
         {user?.id === place.authorId && (
           <div className="flex gap-1.5 ml-auto">
             <button onClick={onEdit}
-              className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all shadow-md">
-              <Pencil className="w-4 h-4 text-stone-700" />
+              className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-lg-surface transition-all shadow-md">
+              <Pencil className="w-4 h-4 text-lg-text" />
             </button>
             <button onClick={onDeleteClick}
-              className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all shadow-md">
+              className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-lg-surface transition-all shadow-md">
               <Trash2 className="w-4 h-4 text-red-500" />
             </button>
           </div>

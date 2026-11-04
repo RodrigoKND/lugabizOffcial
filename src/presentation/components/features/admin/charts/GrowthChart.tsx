@@ -5,7 +5,7 @@ import type { AdminGrowthDataPoint } from '@domain/entities';
 
 export function GrowthChart({ data }: { data: AdminGrowthDataPoint[] }) {
   if (!data.length) return (
-    <div className="h-48 flex flex-col items-center justify-center text-stone-300 gap-2">
+    <div className="h-48 flex flex-col items-center justify-center text-lg-dim gap-2">
       <BarChart2 className="w-8 h-8" />
       <p className="text-xs">Sin datos de crecimiento aún</p>
     </div>

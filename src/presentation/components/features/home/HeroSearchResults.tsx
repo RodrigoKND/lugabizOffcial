@@ -18,34 +18,34 @@ const HeroSearchResults: React.FC<HeroSearchResultsProps> = ({ visible, query, r
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.15 }}
-        className="absolute z-30 mt-2 w-full max-h-80 overflow-y-auto bg-white rounded-2xl shadow-[0_12px_40px_rgba(80,50,140,0.18)] ring-1 ring-primary-100"
+        className="absolute z-30 mt-2 w-full max-h-80 overflow-y-auto bg-lg-surface rounded-2xl shadow-2xl shadow-black/50"
       >
         {results.length > 0 ? (
           results.map(place => (
             <button
               key={place.id}
               onMouseDown={(e) => { e.preventDefault(); onSelect(place.id); }}
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 hover:bg-primary-50/70 text-left transition-colors"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 hover:bg-lg-surface-2 text-left transition-colors"
             >
               {place.image ? (
                 <img src={place.image} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
               ) : (
-                <span className="w-10 h-10 rounded-lg bg-primary-100 text-primary-500 flex items-center justify-center font-bold shrink-0">
+                <span className="w-10 h-10 rounded-lg bg-lg-surface-2 text-lg-accent flex items-center justify-center font-bold shrink-0">
                   {place.name.charAt(0)}
                 </span>
               )}
               <span className="flex-1 min-w-0">
-                <span className="block text-sm font-semibold text-[#241b3e] truncate">{place.name}</span>
-                <span className="block text-[11px] text-stone-400 truncate">{place.category?.name}</span>
+                <span className="block text-sm font-semibold text-lg-text truncate">{place.name}</span>
+                <span className="block text-[11px] text-lg-dim truncate">{place.category?.name}</span>
               </span>
-              <span className="flex items-center gap-0.5 text-xs font-semibold text-stone-500 shrink-0">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span className="flex items-center gap-0.5 text-xs font-semibold text-lg-dim shrink-0">
+                <Star className="w-3 h-3 fill-lg-accent text-lg-accent" />
                 {place.rating}
               </span>
             </button>
           ))
         ) : (
-          <p className="px-4 py-3 text-sm text-stone-400">Sin resultados para “{query.trim()}”</p>
+          <p className="px-4 py-3 text-sm text-lg-dim">Sin resultados para “{query.trim()}”</p>
         )}
       </motion.div>
     )}

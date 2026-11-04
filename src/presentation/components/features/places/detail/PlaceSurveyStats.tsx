@@ -23,7 +23,7 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
     return (
       <div className="space-y-2">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-6 bg-stone-100 rounded-lg animate-pulse" />
+          <div key={i} className="h-6 bg-lg-surface-2 rounded-lg animate-pulse" />
         ))}
       </div>
     );
@@ -57,18 +57,18 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-amber-50 rounded-xl p-3 text-center">
           <Users className="w-4 h-4 text-amber-500 mx-auto mb-1" />
-          <p className="text-[20px] font-bold text-stone-800 leading-none">{total}</p>
-          <p className="text-[10px] text-stone-500 mt-0.5 font-medium">Respuestas</p>
+          <p className="text-[20px] font-bold text-lg-text leading-none">{total}</p>
+          <p className="text-[10px] text-lg-dim mt-0.5 font-medium">Respuestas</p>
         </div>
         <div className="bg-orange-50 rounded-xl p-3 text-center">
           <Star className="w-4 h-4 text-orange-400 mx-auto mb-1" />
-          <p className="text-[20px] font-bold text-stone-800 leading-none">{avgRating.toFixed(1)}</p>
-          <p className="text-[10px] text-stone-500 mt-0.5 font-medium">Promedio</p>
+          <p className="text-[20px] font-bold text-lg-text leading-none">{avgRating.toFixed(1)}</p>
+          <p className="text-[10px] text-lg-dim mt-0.5 font-medium">Promedio</p>
         </div>
         <div className="bg-green-50 rounded-xl p-3 text-center">
           <ThumbsUp className="w-4 h-4 text-green-500 mx-auto mb-1" />
-          <p className="text-[20px] font-bold text-stone-800 leading-none">{recommendPct}%</p>
-          <p className="text-[10px] text-stone-500 mt-0.5 font-medium">Recomiendan</p>
+          <p className="text-[20px] font-bold text-lg-text leading-none">{recommendPct}%</p>
+          <p className="text-[10px] text-lg-dim mt-0.5 font-medium">Recomiendan</p>
         </div>
       </div>
 
@@ -76,8 +76,8 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
       {rated.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <BarChart3 className="w-3.5 h-3.5 text-stone-400" />
-            <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Distribución de estrellas</p>
+            <BarChart3 className="w-3.5 h-3.5 text-lg-dim" />
+            <p className="text-[11px] font-bold text-lg-dim uppercase tracking-wider">Distribución de estrellas</p>
           </div>
           <div className="space-y-1.5">
             {ratingDist.map(({ star, count }) => (
@@ -90,37 +90,37 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
       {/* Visitantes cercanos */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <MapPin className="w-3.5 h-3.5 text-stone-400" />
-          <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Visitantes cercanos</p>
+          <MapPin className="w-3.5 h-3.5 text-lg-dim" />
+          <p className="text-[11px] font-bold text-lg-dim uppercase tracking-wider">Visitantes cercanos</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-3 bg-stone-100 rounded-full overflow-hidden">
+          <div className="flex-1 h-3 bg-lg-surface-2 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${nearbyPct}%` }}
               transition={{ duration: 0.6 }}
-              className="h-full bg-gradient-to-r from-violet-400 to-violet-500 rounded-full"
+              className="h-full bg-lg-accent rounded-full"
             />
           </div>
-          <span className="text-[12px] text-stone-500 font-medium shrink-0">
+          <span className="text-[12px] text-lg-dim font-medium shrink-0">
             {nearby}/{total} ({nearbyPct}%)
           </span>
         </div>
-        <p className="text-[10px] text-stone-400 mt-1">Usuarios que respondieron estando en el lugar</p>
+        <p className="text-[10px] text-lg-dim mt-1">Usuarios que respondieron estando en el lugar</p>
       </div>
 
       {/* Comentarios recientes */}
       {comments.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <MessageSquare className="w-3.5 h-3.5 text-stone-400" />
-            <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+            <MessageSquare className="w-3.5 h-3.5 text-lg-dim" />
+            <p className="text-[11px] font-bold text-lg-dim uppercase tracking-wider">
               Comentarios ({comments.length})
             </p>
           </div>
           <div className="space-y-2">
             {comments.slice(0, 5).map((s, i) => (
-              <div key={s.id} className="bg-stone-50 rounded-xl px-3 py-2.5">
+              <div key={s.id} className="bg-lg-surface-2 rounded-xl px-3 py-2.5">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   {s.rating != null && (
                     <div className="flex items-center gap-0.5">
@@ -132,15 +132,15 @@ const PlaceSurveyStats: React.FC<PlaceSurveyStatsProps> = ({ placeId }) => {
                       ))}
                     </div>
                   )}
-                  <span className="text-[10px] text-stone-400 ml-auto">
+                  <span className="text-[10px] text-lg-dim ml-auto">
                     {s.createdAt.toLocaleDateString('es', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>
-                <p className="text-[12px] text-stone-600 leading-relaxed line-clamp-3">"{s.comment}"</p>
+                <p className="text-[12px] text-lg-dim leading-relaxed line-clamp-3">"{s.comment}"</p>
               </div>
             ))}
             {comments.length > 5 && (
-              <p className="text-center text-[11px] text-stone-400">+{comments.length - 5} comentarios más</p>
+              <p className="text-center text-[11px] text-lg-dim">+{comments.length - 5} comentarios más</p>
             )}
           </div>
         </div>

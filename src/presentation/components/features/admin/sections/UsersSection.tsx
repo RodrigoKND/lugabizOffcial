@@ -52,7 +52,7 @@ export function UsersSection() {
   const filtered = users.filter(u => !search || (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
   const banned = users.filter(u => u.banned).length;
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>;
 
   return (
     <>
@@ -62,43 +62,43 @@ export function UsersSection() {
           { label: 'Baneados', value: banned, color: 'text-red-600', bg: 'bg-red-50' },
         ].map(s => (
           <div key={s.label} className={`${s.bg} rounded-2xl p-4 text-center`}>
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p><p className="text-xs text-stone-500 mt-0.5">{s.label}</p>
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p><p className="text-xs text-lg-dim mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
-        <div className="p-5 border-b border-stone-100">
+      <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
+        <div className="p-5 border-b border-lg-surface-2">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre o email..."
-              className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10" />
+              className="w-full pl-9 pr-4 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10" />
           </div>
         </div>
         {filtered.length === 0 ? (
-          <div className="text-center py-16 text-stone-400"><Users className="w-10 h-10 mx-auto mb-3 text-stone-200" /><p className="text-sm font-medium">No hay usuarios para mostrar</p></div>
+          <div className="text-center py-16 text-lg-dim"><Users className="w-10 h-10 mx-auto mb-3 text-stone-200" /><p className="text-sm font-medium">No hay usuarios para mostrar</p></div>
         ) : (
-          <div className="divide-y divide-stone-50 max-h-[60vh] overflow-y-auto">
+          <div className="divide-y divide-lg-surface-2 max-h-[60vh] overflow-y-auto">
             {filtered.map((u) => (
-              <div key={u.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 transition-colors">
-                <div className="w-9 h-9 rounded-full bg-stone-100 overflow-hidden shrink-0 ring-2 ring-stone-200">
+              <div key={u.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-lg-surface-2 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-lg-surface-2 overflow-hidden shrink-0 ring-2 ring-lg-surface-2">
                   {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover" />
-                    : <div className="w-full h-full flex items-center justify-center"><Users className="w-4 h-4 text-stone-400" /></div>}
+                    : <div className="w-full h-full flex items-center justify-center"><Users className="w-4 h-4 text-lg-dim" /></div>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-sm font-medium text-stone-700 truncate">{u.name}</p>
+                    <p className="text-sm font-medium text-lg-text truncate">{u.name}</p>
                     {u.banned && <span className="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">BANEADO</span>}
-                    {u.role === 'admin' && <span className="text-[9px] font-bold bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full">Admin</span>}
-                    {u.role === 'owner' && <span className="text-[9px] font-bold bg-primary-100 text-primary-600 px-1.5 py-0.5 rounded-full">Dueño</span>}
+                    {u.role === 'admin' && <span className="text-[9px] font-bold bg-lg-surface-2 text-lg-accent px-1.5 py-0.5 rounded-full">Admin</span>}
+                    {u.role === 'owner' && <span className="text-[9px] font-bold bg-lg-surface-2 text-lg-accent px-1.5 py-0.5 rounded-full">Dueño</span>}
                   </div>
-                  <p className="text-[11px] text-stone-400 truncate">{u.email}</p>
+                  <p className="text-[11px] text-lg-dim truncate">{u.email}</p>
                   {u.banned && u.ban_reason && <p className="text-[10px] text-red-400 mt-0.5">Motivo: {u.ban_reason}</p>}
                 </div>
                 <div className="flex items-center">
                   {u.banned ? (
-                    <button onClick={() => setConfirmUnbanId(u.id)} className="p-2 rounded-xl text-stone-400 hover:text-green-500 hover:bg-green-50 transition-all" title="Restaurar usuario"><UserCheck className="w-4 h-4" /></button>
+                    <button onClick={() => setConfirmUnbanId(u.id)} className="p-2 rounded-xl text-lg-dim hover:text-green-500 hover:bg-green-50 transition-all" title="Restaurar usuario"><UserCheck className="w-4 h-4" /></button>
                   ) : (
-                    <button onClick={() => setBanModal({ id: u.id, name: u.name })} className="p-2 rounded-xl text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Banear usuario"><Ban className="w-4 h-4" /></button>
+                    <button onClick={() => setBanModal({ id: u.id, name: u.name })} className="p-2 rounded-xl text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all" title="Banear usuario"><Ban className="w-4 h-4" /></button>
                   )}
                 </div>
               </div>

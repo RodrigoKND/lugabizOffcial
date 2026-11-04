@@ -105,11 +105,11 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl border border-primary-100/40 shadow-sm overflow-hidden flex flex-col h-full"
+      className="bg-lg-surface rounded-2xl overflow-hidden flex flex-col h-full"
     >
       {/* ── Imagen ── */}
       <div
-        className="relative bg-stone-100 overflow-hidden"
+        className="relative bg-lg-surface-2 overflow-hidden"
         style={{ aspectRatio: '4/3' }}
       >
         {localPost.images.length > 0 ? (
@@ -152,7 +152,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
             </button>
             <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1">
               {localPost.images.map((_, i) => (
-                <div key={i} className={`h-1 rounded-full bg-white transition-all ${i === imgIndex ? 'w-3' : 'w-1 opacity-50'}`} />
+                <div key={i} className={`h-1 rounded-full bg-lg-surface transition-all ${i === imgIndex ? 'w-3' : 'w-1 opacity-50'}`} />
               ))}
             </div>
           </>
@@ -160,9 +160,9 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
 
         {/* Oferta badge */}
         {offerActive && (
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 rounded-md shadow-sm">
-            <Zap className="w-2.5 h-2.5 text-white" />
-            <span className="text-[10px] font-bold text-white">{countdown}</span>
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-lg-accent rounded-md">
+            <Zap className="w-2.5 h-2.5 text-lg-ink" />
+            <span className="text-[10px] font-bold text-lg-ink">{countdown}</span>
           </div>
         )}
 
@@ -176,11 +176,11 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
               <MoreVertical className="w-3.5 h-3.5" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-7 bg-white rounded-xl shadow-lg border border-stone-100 overflow-hidden z-10 min-w-[110px]">
+              <div className="absolute right-0 top-7 bg-lg-surface-2 rounded-xl shadow-lg overflow-hidden z-10 min-w-[110px]">
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-red-500 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-red-400 hover:bg-lg-surface transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   {deleting ? 'Eliminando…' : 'Eliminar'}
@@ -199,34 +199,34 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
           onClick={() => localPost.placeId && navigate(`/place/${localPost.placeId}`)}
           className="flex items-center gap-1.5 min-w-0 text-left"
         >
-          <div className="w-5 h-5 rounded-full overflow-hidden bg-primary-100 ring-1 ring-primary-200 shrink-0">
+          <div className="w-5 h-5 rounded-full overflow-hidden bg-lg-surface-2 ring-1 ring-lg-accent/40 shrink-0">
             {localPost.userAvatar ? (
               <CdnImage src={localPost.userAvatar} width={40} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-400 to-primary-600">
-                <Store className="w-2.5 h-2.5 text-white" />
+              <div className="w-full h-full flex items-center justify-center bg-lg-accent">
+                <Store className="w-2.5 h-2.5 text-lg-ink" />
               </div>
             )}
           </div>
-          <p className="text-[12px] font-semibold text-[#241b3e] truncate">{localPost.businessName}</p>
+          <p className="text-[12px] font-semibold text-lg-text truncate">{localPost.businessName}</p>
         </button>
 
         {/* Descripción */}
-        <p className="text-[12px] text-stone-500 leading-relaxed line-clamp-2 flex-1">
+        <p className="text-[12px] text-lg-dim leading-relaxed line-clamp-2 flex-1">
           {localPost.description}
         </p>
 
         {/* Oferta expandible — sin animación de height para evitar layout jump */}
         {offerActive && (
-          <div className="rounded-lg border border-amber-200 overflow-hidden">
+          <div className="rounded-lg border border-lg-accent/30 overflow-hidden">
             <button
               onClick={() => setShowOffer(v => !v)}
-              className="w-full flex items-center gap-2 px-2.5 py-1.5 bg-amber-50 text-left"
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 bg-lg-surface-2 text-left"
             >
-              <Zap className="w-3 h-3 text-amber-500 shrink-0" />
-              <span className="text-[11px] font-semibold text-amber-800 flex-1 truncate">{offer.title}</span>
+              <Zap className="w-3 h-3 text-lg-accent shrink-0" />
+              <span className="text-[11px] font-semibold text-lg-text flex-1 truncate">{offer.title}</span>
               {offer.totalSlots && (
-                <span className="text-[10px] text-amber-600 shrink-0">
+                <span className="text-[10px] text-lg-accent shrink-0">
                   {offer.totalSlots - offer.claimedSlots} restantes
                 </span>
               )}
@@ -239,17 +239,17 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
                 transition: 'max-height 0.22s ease',
                 overflow: 'hidden',
               }}
-              className="bg-white border-t border-amber-100"
+              className="bg-lg-surface border-t border-lg-surface-2"
             >
               <div className="px-2.5 py-2 space-y-2">
                 {offer.description && (
-                  <p className="text-[11px] text-amber-800">{offer.description}</p>
+                  <p className="text-[11px] text-lg-text">{offer.description}</p>
                 )}
                 {offer.code && (
-                  <div className="flex items-center gap-2 p-1.5 bg-amber-50 rounded-lg border border-amber-200">
-                    <Tag className="w-3 h-3 text-amber-600 shrink-0" />
-                    <span className="font-mono font-bold text-amber-800 flex-1 text-[12px] tracking-wider">{offer.code}</span>
-                    <button onClick={copyCode} className="text-[10px] text-amber-600 font-semibold flex items-center gap-0.5">
+                  <div className="flex items-center gap-2 p-1.5 bg-lg-surface-2 rounded-lg border border-lg-accent/30">
+                    <Tag className="w-3 h-3 text-lg-accent shrink-0" />
+                    <span className="font-mono font-bold text-lg-text flex-1 text-[12px] tracking-wider">{offer.code}</span>
+                    <button onClick={copyCode} className="text-[10px] text-lg-accent font-semibold flex items-center gap-0.5">
                       {codeCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                       {codeCopied ? 'Copiado' : 'Copiar'}
                     </button>
@@ -258,12 +258,12 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
                 {offer.totalSlots && (
                   <div>
                     <div className="flex justify-between text-[10px] mb-1">
-                      <span className="text-stone-500">{offer.claimedSlots} de {offer.totalSlots} usados</span>
-                      <span className="text-amber-600 font-semibold">{offer.totalSlots - offer.claimedSlots} disponibles</span>
+                      <span className="text-lg-dim">{offer.claimedSlots} de {offer.totalSlots} usados</span>
+                      <span className="text-lg-accent font-semibold">{offer.totalSlots - offer.claimedSlots} disponibles</span>
                     </div>
-                    <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-1 bg-lg-surface-2 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                        className="h-full bg-lg-accent rounded-full"
                         style={{ width: `${Math.min(100, (offer.claimedSlots / offer.totalSlots) * 100)}%` }}
                       />
                     </div>
@@ -282,12 +282,12 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
                 key={key}
                 onClick={() => handleReact(key)}
                 className={`flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-sm transition-all active:scale-90 ${
-                  localPost.userReaction === key ? 'bg-primary-100 scale-110' : 'hover:bg-stone-50'
+                  localPost.userReaction === key ? 'bg-lg-surface-2 scale-110' : 'hover:bg-lg-surface-2'
                 }`}
               >
                 <span className="text-[14px]">{emoji}</span>
                 {localPost.reactionsCount[key] > 0 && (
-                  <span className="text-[10px] text-stone-500 font-medium">{localPost.reactionsCount[key]}</span>
+                  <span className="text-[10px] text-lg-dim font-medium">{localPost.reactionsCount[key]}</span>
                 )}
               </button>
             ))}
@@ -347,7 +347,7 @@ const BusinessPostCard: React.FC<BusinessPostCardProps> = ({ post, onReactionUpd
                     <button
                       key={i}
                       onClick={() => setGalleryIndex(i)}
-                      className={`h-1.5 rounded-full transition-all ${i === galleryIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}`}
+                      className={`h-1.5 rounded-full transition-all ${i === galleryIndex ? 'w-5 bg-lg-surface' : 'w-1.5 bg-white/40'}`}
                     />
                   ))}
                 </div>

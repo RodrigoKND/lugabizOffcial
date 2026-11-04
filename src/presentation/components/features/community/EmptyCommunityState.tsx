@@ -11,15 +11,15 @@ const EmptyCommunityState: React.FC<EmptyCommunityStateProps> = ({ query, active
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center mb-4">
+      <div className="w-20 h-20 rounded-full bg-lg-surface-2 flex items-center justify-center mb-4">
         <Search className="w-9 h-9 text-primary-300" />
       </div>
 
-      <h3 className="font-bold text-lg text-[#241b3e] mb-2">
+      <h3 className="font-bold text-lg text-lg-text mb-2">
         {query ? `Sin resultados para "${query}"` : 'Nada por aquí aún'}
       </h3>
 
-      <p className="text-stone-500 text-sm max-w-xs mb-6 leading-relaxed">
+      <p className="text-lg-dim text-sm max-w-xs mb-6 leading-relaxed">
         {query
           ? '¡Sé el primero en publicar información sobre este lugar o evento!'
           : activeTab === 'events'
@@ -29,7 +29,7 @@ const EmptyCommunityState: React.FC<EmptyCommunityStateProps> = ({ query, active
 
       <button
         onClick={() => navigate('/add-place')}
-        className="flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors shadow-sm"
+        className="flex items-center gap-2 px-5 py-2.5 bg-lg-accent text-lg-ink rounded-xl font-semibold text-sm hover:bg-lg-accent transition-colors shadow-sm"
       >
         <Plus className="w-4 h-4" />
         Publicar un negocio

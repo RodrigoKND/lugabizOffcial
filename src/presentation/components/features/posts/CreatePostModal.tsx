@@ -142,15 +142,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full sm:max-w-lg bg-white sm:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
+            className="relative w-full sm:max-w-lg bg-lg-surface sm:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-lg-surface-2">
               <div>
-                <h2 className="font-bold text-[#241b3e]">Nuevo post del negocio</h2>
-                <p className="text-[11px] text-stone-500">Solo visible para dueños de negocios</p>
+                <h2 className="font-bold text-lg-text">Nuevo post del negocio</h2>
+                <p className="text-[11px] text-lg-dim">Solo visible para dueños de negocios</p>
               </div>
-              <button onClick={handleClose} className="p-2 rounded-xl hover:bg-stone-100 transition-colors">
+              <button onClick={handleClose} className="p-2 rounded-xl hover:bg-lg-surface-2 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -163,10 +163,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   onChange={e => setDescription(e.target.value.slice(0, MAX_DESC))}
                   placeholder="¿Qué quieres compartir con la comunidad? Novedades, ofertas, fotos del día…"
                   rows={4}
-                  className="w-full text-sm text-[#241b3e] placeholder:text-stone-400 resize-none border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+                  className="w-full text-sm text-lg-text placeholder:text-lg-dim resize-none border border-lg-surface-2 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
                 />
                 <div className="flex justify-end mt-1">
-                  <span className={`text-[11px] ${description.length > MAX_DESC * 0.9 ? 'text-amber-500' : 'text-stone-500'}`}>
+                  <span className={`text-[11px] ${description.length > MAX_DESC * 0.9 ? 'text-amber-500' : 'text-lg-dim'}`}>
                     {description.length}/{MAX_DESC}
                   </span>
                 </div>
@@ -175,11 +175,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
               {/* Images */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide">
+                  <label className="text-xs font-semibold text-lg-dim uppercase tracking-wide">
                     Imágenes ({images.length}/{MAX_IMAGES})
                   </label>
                   {images.length > 0 && (
-                    <span className="text-[11px] text-stone-500">{totalMB} MB / {MAX_TOTAL_MB} MB</span>
+                    <span className="text-[11px] text-lg-dim">{totalMB} MB / {MAX_TOTAL_MB} MB</span>
                   )}
                 </div>
 
@@ -195,7 +195,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   ))}
                   {images.length < MAX_IMAGES && (
                     <button onClick={() => fileRef.current?.click()}
-                      className="w-20 h-20 rounded-xl border-2 border-dashed border-primary-200 flex flex-col items-center justify-center gap-1 text-primary-400 hover:bg-primary-50 hover:border-primary-300 transition-all">
+                      className="w-20 h-20 rounded-xl border-2 border-dashed border-lg-surface-2 flex flex-col items-center justify-center gap-1 text-lg-accent hover:bg-lg-surface-2 hover:border-primary-300 transition-all">
                       <Image className="w-5 h-5" />
                       <span className="text-[10px] font-medium">Agregar</span>
                     </button>
@@ -209,10 +209,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
               {/* Flash Offer toggle — requiere identidad verificada (anti-estafa) */}
               <div>
                 {!user?.identityVerified ? (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-stone-200 bg-stone-50">
-                    <Lock className="w-4 h-4 text-stone-400 mt-0.5 shrink-0" />
-                    <div className="text-xs text-stone-500">
-                      <p className="font-semibold text-[#241b3e]">Ofertas con código bloqueadas</p>
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-lg-surface-2 bg-lg-surface-2">
+                    <Lock className="w-4 h-4 text-lg-dim mt-0.5 shrink-0" />
+                    <div className="text-xs text-lg-dim">
+                      <p className="font-semibold text-lg-text">Ofertas con código bloqueadas</p>
                       <p>Verifica tu identidad en tu perfil para crear ofertas. Así protegemos a la comunidad de estafas. Mientras tanto, podés publicar fotos y novedades sin límite.</p>
                     </div>
                   </div>
@@ -223,7 +223,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                   className={`flex items-center gap-2 w-full px-4 py-3 rounded-xl border-2 transition-all text-sm font-semibold ${
                     withOffer
                       ? 'border-amber-400 bg-amber-50 text-amber-800'
-                      : 'border-dashed border-stone-200 text-stone-500 hover:border-amber-300 hover:text-amber-600'
+                      : 'border-dashed border-lg-surface-2 text-lg-dim hover:border-amber-300 hover:text-amber-600'
                   }`}
                 >
                   <Zap className={`w-4 h-4 ${withOffer ? 'text-amber-500' : ''}`} />
@@ -250,14 +250,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                           value={offer.title || ''}
                           onChange={e => setOffer(o => ({ ...o, title: e.target.value }))}
                           placeholder="Título de la oferta (ej: 20% de descuento hoy)"
-                          className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
+                          className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-lg-surface focus:outline-none focus:ring-2 focus:ring-amber-300"
                         />
 
                         <input
                           value={offer.description || ''}
                           onChange={e => setOffer(o => ({ ...o, description: e.target.value }))}
                           placeholder="Descripción breve (opcional)"
-                          className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
+                          className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-lg-surface focus:outline-none focus:ring-2 focus:ring-amber-300"
                         />
 
                         <div className="grid grid-cols-2 gap-2">
@@ -270,7 +270,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                               value={offer.expiresAt ? toLocalDatetimeInput(offer.expiresAt) : ''}
                               onChange={e => setOffer(o => ({ ...o, expiresAt: e.target.value ? new Date(e.target.value).toISOString() : '' }))}
                               min={toLocalDatetimeInput(new Date().toISOString())}
-                              className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
+                              className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-lg-surface focus:outline-none focus:ring-2 focus:ring-amber-300"
                             />
                           </div>
                           <div>
@@ -283,7 +283,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                               value={offer.totalSlots || ''}
                               onChange={e => setOffer(o => ({ ...o, totalSlots: parseInt(e.target.value) || undefined }))}
                               placeholder="Ej: 50"
-                              className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
+                              className="w-full text-sm border border-amber-200 rounded-lg px-3 py-2 bg-lg-surface focus:outline-none focus:ring-2 focus:ring-amber-300"
                             />
                           </div>
                         </div>
@@ -292,7 +292,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
                           value={offer.code || ''}
                           onChange={e => setOffer(o => ({ ...o, code: e.target.value.toUpperCase() }))}
                           placeholder="Código de descuento (ej: LUGABIZ20)"
-                          className="w-full text-sm font-mono border border-amber-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 uppercase"
+                          className="w-full text-sm font-mono border border-amber-200 rounded-lg px-3 py-2 bg-lg-surface focus:outline-none focus:ring-2 focus:ring-amber-300 uppercase"
                         />
                       </div>
                     </motion.div>
@@ -304,13 +304,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCr
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-4 border-t border-stone-100 flex items-center gap-3">
+            <div className="px-5 py-4 border-t border-lg-surface-2 flex items-center gap-3">
               <button onClick={handleClose}
-                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 transition-colors">
+                className="flex-1 py-2.5 rounded-xl border border-lg-surface-2 text-lg-dim text-sm font-semibold hover:bg-lg-surface-2 transition-colors">
                 Cancelar
               </button>
               <button onClick={handleSubmit} disabled={!canSubmit}
-                className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                className="flex-1 py-2.5 rounded-xl bg-lg-accent text-lg-ink text-sm font-bold hover:bg-lg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />

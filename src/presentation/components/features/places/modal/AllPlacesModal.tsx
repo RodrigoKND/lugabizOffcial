@@ -29,8 +29,8 @@ const AllPlacesModal: React.FC<AllPlacesModalProps> = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-          <header className="bg-linear-to-r from-primary-500 to-tomato p-6 relative">
+          className="bg-lg-surface rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+          <header className="bg-lg-accent p-6 relative">
             <button onClick={onClose} className="absolute cursor-pointer top-4 right-4 text-white/80 hover:text-white transition-colors">
               <X className="w-6 h-6" />
             </button>
@@ -44,7 +44,7 @@ const AllPlacesModal: React.FC<AllPlacesModalProps> = ({ isOpen, onClose }) => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="text" placeholder="Buscar por lugares, categorías o grupo social..."
                   value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-3 w-full rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all" />
+                  className="pl-10 pr-4 py-3 w-full rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-lg-surface-2 transition-all" />
               </div>
             </div>
             

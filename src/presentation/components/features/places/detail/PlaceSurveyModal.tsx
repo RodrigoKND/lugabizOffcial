@@ -101,7 +101,7 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
             exit={{ scale: 0.92, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-stone-100"
+            className="bg-lg-surface rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-lg-surface-2"
             role="dialog"
             aria-modal="true"
             aria-label="Encuesta del lugar"
@@ -113,7 +113,7 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                     key={s}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       SURVEY_STEP_ORDER.indexOf(s) <= SURVEY_STEP_ORDER.indexOf(wizard.currentStep)
-                        ? 'w-6 bg-amber-500' : 'w-1.5 bg-stone-200'
+                        ? 'w-6 bg-amber-500' : 'w-1.5 bg-lg-surface-2'
                     }`}
                     role="progressbar"
                     aria-valuenow={SURVEY_STEP_ORDER.indexOf(wizard.currentStep) + 1}
@@ -124,8 +124,8 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
               </nav>
             )}
 
-            <button onClick={handleClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors" aria-label="Cerrar">
-              <X className="w-4 h-4 text-stone-500" />
+            <button onClick={handleClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-lg-surface-2 flex items-center justify-center hover:bg-lg-surface-2 transition-colors" aria-label="Cerrar">
+              <X className="w-4 h-4 text-lg-dim" />
             </button>
 
             {survey.error && (
@@ -137,8 +137,8 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <LocationIcon size={32} className="text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">{placeName}</h3>
-                <p className="text-sm text-stone-500 mb-6">¿Estuviste en este lugar?</p>
+                <h3 className="text-lg font-bold text-lg-text mb-1">{placeName}</h3>
+                <p className="text-sm text-lg-dim mb-6">¿Estuviste en este lugar?</p>
                 <div className="flex gap-3">
                   <Button onClick={() => { updateSurvey({ isNearby: true }); wizard.goNext(); }} size="lg" fullWidth>
                     Sí, entré
@@ -155,8 +155,8 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <Star className="w-8 h-8 text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.RATE].title}</h3>
-                <p className="text-sm text-stone-500 mb-5">{STEP_CONFIG[SURVEY_STEPS.RATE].subtitle}</p>
+                <h3 className="text-lg font-bold text-lg-text mb-1">{STEP_CONFIG[SURVEY_STEPS.RATE].title}</h3>
+                <p className="text-sm text-lg-dim mb-5">{STEP_CONFIG[SURVEY_STEPS.RATE].subtitle}</p>
                 <div className="flex justify-center gap-2 mb-6">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <button key={s} onClick={() => { updateSurvey({ rating: s }); wizard.goNext(); }}
@@ -169,7 +169,7 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                     </button>
                   ))}
                 </div>
-                <button onClick={() => wizard.goNext()} className="text-xs text-stone-400 hover:text-stone-600 underline transition-colors">
+                <button onClick={() => wizard.goNext()} className="text-xs text-lg-dim hover:text-lg-dim underline transition-colors">
                   Saltar
                 </button>
               </article>
@@ -180,8 +180,8 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <ThumbsUp className="w-8 h-8 text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].title}</h3>
-                <p className="text-sm text-stone-500 mb-6">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].subtitle}</p>
+                <h3 className="text-lg font-bold text-lg-text mb-1">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].title}</h3>
+                <p className="text-sm text-lg-dim mb-6">{STEP_CONFIG[SURVEY_STEPS.RECOMMEND].subtitle}</p>
                 <div className="flex gap-3">
                   <Button onClick={() => { updateSurvey({ wouldRecommend: true }); wizard.goNext(); }} size="lg" fullWidth className="!bg-emerald-500 hover:!bg-emerald-600">
                     <ThumbsUp className="w-4 h-4" /> Sí
@@ -198,10 +198,10 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                 <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <ChatIcon size={32} className="text-amber-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">{STEP_CONFIG[SURVEY_STEPS.COMMENT].title}</h3>
-                <p className="text-sm text-stone-500 mb-5">{STEP_CONFIG[SURVEY_STEPS.COMMENT].subtitle}</p>
+                <h3 className="text-lg font-bold text-lg-text mb-1">{STEP_CONFIG[SURVEY_STEPS.COMMENT].title}</h3>
+                <p className="text-sm text-lg-dim mb-5">{STEP_CONFIG[SURVEY_STEPS.COMMENT].subtitle}</p>
                 <textarea value={survey.comment} onChange={(e) => updateSurvey({ comment: e.target.value })}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-2xl text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all resize-none"
+                  className="w-full px-4 py-3 border border-lg-surface-2 rounded-2xl text-sm text-lg-text placeholder-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all resize-none"
                   rows={3} placeholder="Ej. La atención fue excelente..." />
                 <footer className="flex gap-3 mt-4">
                   <Button onClick={handleSubmit} disabled={submitting} loading={submitting} size="lg" fullWidth>
@@ -220,8 +220,8 @@ const PlaceSurveyModal: React.FC<PlaceSurveyModalProps> = ({ open, onClose, plac
                 <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
                   <CheckCircleIcon size={32} className="text-emerald-600" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-1">¡Gracias por tu opinión!</h3>
-                <p className="text-sm text-stone-500 mb-6">Tu feedback ayuda a mejorar la comunidad</p>
+                <h3 className="text-lg font-bold text-lg-text mb-1">¡Gracias por tu opinión!</h3>
+                <p className="text-sm text-lg-dim mb-6">Tu feedback ayuda a mejorar la comunidad</p>
                 <Button onClick={handleClose} size="lg" fullWidth>
                   Cerrar
                 </Button>

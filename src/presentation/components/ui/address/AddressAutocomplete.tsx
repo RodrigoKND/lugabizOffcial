@@ -102,30 +102,30 @@ export default function AddressAutocomplete({
           onBlur={() => { onBlur?.() }}
           placeholder={placeholder}
           autoComplete="off"
-          className={`w-full pl-11 pr-10 py-3.5 bg-stone-50 border rounded-xl focus:ring-0 text-sm outline-none transition-all ${
-            hasError ? 'border-red-300' : 'border-stone-200 focus:border-amber-400'
+          className={`w-full pl-11 pr-10 py-3.5 bg-lg-surface-2 border rounded-xl focus:ring-0 text-sm outline-none transition-all ${
+            hasError ? 'border-red-300' : 'border-lg-surface-2 focus:border-amber-400'
           } ${className}`}
         />
         {loading && (
-          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-stone-400" />
+          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-lg-dim" />
         )}
       </div>
       {open && results.length > 0 && (
-        <ul className="address-suggest-panel absolute z-50 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+        <ul className="address-suggest-panel absolute z-50 left-0 right-0 mt-1 bg-lg-surface border border-lg-surface-2 rounded-xl shadow-lg max-h-64 overflow-y-auto">
           {results.map((r, i) => (
             <li
               key={i}
               onMouseDown={() => handlePick(r)}
               onMouseEnter={() => setHighlight(i)}
-              className={`flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-stone-100 last:border-0 transition-colors ${
+              className={`flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-lg-surface-2 last:border-0 transition-colors ${
                 highlight === i ? 'bg-amber-50' : 'hover:bg-amber-50'
               }`}
             >
               <MapPin className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
               <span className="min-w-0">
-                <span className="block text-sm font-medium text-stone-800 truncate">{r.mainText}</span>
+                <span className="block text-sm font-medium text-lg-text truncate">{r.mainText}</span>
                 {r.secondaryText && (
-                  <span className="block text-xs text-stone-500 truncate">{r.secondaryText}</span>
+                  <span className="block text-xs text-lg-dim truncate">{r.secondaryText}</span>
                 )}
               </span>
             </li>

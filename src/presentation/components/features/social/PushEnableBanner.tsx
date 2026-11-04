@@ -29,16 +29,16 @@ const PushEnableBanner: React.FC<PushEnableBannerProps> = ({ className = '' }) =
   };
 
   return (
-    <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-primary-50 border border-primary-100/60 ${className}`}>
-      <BellRing className="w-4 h-4 text-primary-500 shrink-0" />
-      <p className="text-[11px] text-primary-700 flex-1 leading-snug font-medium">
+    <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-lg-surface-2 border border-lg-surface-2 ${className}`}>
+      <BellRing className="w-4 h-4 text-lg-accent shrink-0" />
+      <p className="text-[11px] text-lg-accent flex-1 leading-snug font-medium">
         {permission === 'denied'
           ? 'Las notificaciones están bloqueadas: activalas desde el candado del navegador para no perderte respuestas.'
           : 'Activá las notificaciones para enterarte al instante de solicitudes e invitaciones.'}
       </p>
       {permission !== 'denied' && (
         <button onClick={handleEnable} disabled={isLoading}
-          className="shrink-0 flex items-center gap-1 px-2.5 py-1 bg-primary-600 text-white rounded-lg text-[10px] font-bold hover:bg-primary-700 transition-colors disabled:opacity-60">
+          className="shrink-0 flex items-center gap-1 px-2.5 py-1 bg-lg-accent text-lg-ink rounded-lg text-[10px] font-bold hover:brightness-110 transition-colors disabled:opacity-60">
           {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
           Activar
         </button>

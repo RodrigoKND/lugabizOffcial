@@ -20,21 +20,21 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { e.stopPropagation(); onClose(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+            className="bg-lg-surface rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-5 border-b border-primary-100">
+            <div className="flex items-center justify-between p-5 border-b border-lg-surface-2">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary-500" />
-                <h3 className="text-base font-bold text-[#241b3e]">Privacidad</h3>
+                <ShieldCheck className="w-4 h-4 text-lg-accent" />
+                <h3 className="text-base font-bold text-lg-text">Privacidad</h3>
               </div>
-              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-primary-50 transition-colors">
-                <X className="w-4 h-4 text-stone-500" />
+              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-lg-surface-2 transition-colors">
+                <X className="w-4 h-4 text-lg-dim" />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
               <label className="flex items-center justify-between gap-3 cursor-pointer">
-                <span className="text-sm text-[#241b3e]">Aparecer en la búsqueda por @usuario</span>
+                <span className="text-sm text-lg-text">Aparecer en la búsqueda por @usuario</span>
                 <input
                   type="checkbox"
                   checked={user?.searchable ?? true}
@@ -43,7 +43,7 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
                 />
               </label>
               <label className="flex items-center justify-between gap-3 cursor-pointer">
-                <span className="text-sm text-[#241b3e]">Permitir solicitudes de cualquiera</span>
+                <span className="text-sm text-lg-text">Permitir solicitudes de cualquiera</span>
                 <input
                   type="checkbox"
                   checked={(user?.whoCanRequest ?? 'everyone') === 'everyone'}
@@ -51,7 +51,7 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
                   className="w-4 h-4 accent-primary-500 shrink-0"
                 />
               </label>
-              <p className="text-[11px] text-stone-500">
+              <p className="text-[11px] text-lg-dim">
                 Aunque desactives esto, ya nadie puede invitarte a un plan sin que primero aceptes su solicitud de amistad.
               </p>
             </div>

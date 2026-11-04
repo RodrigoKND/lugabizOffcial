@@ -14,8 +14,8 @@ interface Props {
 }
 
 const inputCls = (hasError?: boolean) =>
-  `w-full px-4 py-3 bg-stone-50 border-2 rounded-xl text-sm text-[#241b3e] placeholder:text-stone-400 outline-none transition-all duration-200 focus:ring-0 ${
-    hasError ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-stone-200'
+  `w-full px-4 py-3 bg-lg-surface-2 border-2 rounded-xl text-sm text-lg-text placeholder:text-lg-dim outline-none transition-all duration-200 focus:ring-0 ${
+    hasError ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-lg-surface-2'
   }`;
 
 const renderError = (field: string, errors: ValidationErrors, touched: Record<string, boolean>) => {
@@ -53,7 +53,7 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
   return (
   <div className="space-y-5">
     <div className="space-y-1">
-      <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Nombre del evento</label>
+      <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Nombre del evento</label>
       <input type="text" value={formData.name}
         onChange={e => onChange('name', e.target.value)}
         onBlur={() => onBlur('name')}
@@ -63,7 +63,7 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
     </div>
 
     <div className="space-y-1">
-      <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Descripción</label>
+      <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Descripción</label>
       <textarea value={formData.description}
         onChange={e => onChange('description', e.target.value)}
         onBlur={() => onBlur('description')}
@@ -74,7 +74,7 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
       <div className="flex items-center gap-2 mt-1">
         <button type="button" disabled={genLoading || cooldown > 0}
           onClick={handleGenerate}
-          className="text-[11px] font-medium text-primary-600 hover:text-primary-700 disabled:text-stone-300 disabled:cursor-not-allowed transition-colors"
+          className="text-[11px] font-medium text-lg-accent hover:text-lg-accent disabled:text-lg-dim disabled:cursor-not-allowed transition-colors"
         >
           {genLoading ? (
             <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />Generando...</span>
@@ -85,14 +85,14 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
           )}
         </button>
         {formData.description.length > 0 && (
-          <span className="text-[10px] text-stone-400">{formData.description.length} caracteres</span>
+          <span className="text-[10px] text-lg-dim">{formData.description.length} caracteres</span>
         )}
       </div>
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="space-y-1">
-        <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Categoría</label>
+        <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Categoría</label>
         <div className="relative">
           <select value={formData.categoryId}
             onChange={e => onChange('categoryId', e.target.value)}
@@ -101,18 +101,18 @@ const BasicInfoSection: React.FC<Props> = ({ formData, errors, touched, categori
             <option value="">Selecciona una</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim pointer-events-none" />
         </div>
         {renderError('categoryId', errors, touched)}
       </div>
 
       <div className="space-y-1">
-        <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Tags</label>
+        <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Tags</label>
         <div className="relative">
-          <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+          <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim pointer-events-none" />
           <input type="text" value={formData.tags}
             onChange={e => onChange('tags', e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-stone-50 border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
+            className="w-full pl-10 pr-4 py-3 bg-lg-surface-2 border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
             placeholder="música, arte, cultura" />
         </div>
       </div>

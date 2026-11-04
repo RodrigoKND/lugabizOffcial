@@ -54,7 +54,7 @@ export default function PlaceGallery({ place, galleryIdx, onThumbnailClick, onCl
             )}
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5">
               {place.gallery.map((_, i) => (
-                <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === galleryIdx ? 'bg-white w-4' : 'bg-white/40'}`} />
+                <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === galleryIdx ? 'bg-lg-surface w-4' : 'bg-white/40'}`} />
               ))}
             </div>
           </div>

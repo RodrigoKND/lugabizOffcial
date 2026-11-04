@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="col-span-5">
             <div className="mb-4">
-              <span className="text-white font-bold text-xl tracking-tight">Lugabiz</span>
+              <span className="font-flyer text-2xl text-lg-text">Luga<span className="text-lg-accent">biz</span></span>
             </div>
             <p className="text-white/30 text-sm leading-relaxed max-w-xs">
               Descubre los mejores lugares y negocios locales. Lo local nunca debería ser invisible.

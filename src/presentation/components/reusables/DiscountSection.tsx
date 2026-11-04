@@ -38,7 +38,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({ discountInfo, onChang
             className="sr-only peer"
           />
           <div className="w-12 h-7 bg-gray-200 rounded-full peer-checked:bg-[#9C3FE4] transition-colors duration-300" />
-          <div className="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 peer-checked:translate-x-5" />
+          <div className="absolute left-1 top-1 w-5 h-5 bg-lg-surface rounded-full shadow transition-transform duration-300 peer-checked:translate-x-5" />
         </div>
         <span className="font-semibold text-gray-700 group-hover:text-[#9C3FE4] transition-colors">
           Este lugar ofrece descuentos o beneficios
@@ -62,7 +62,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({ discountInfo, onChang
                   max={100}
                   value={discountInfo.percentage || ''}
                   onChange={(e) => onChange({ ...discountInfo, percentage: Number(e.target.value) })}
-                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium"
+                  className="w-full pl-12 pr-4 py-3 bg-lg-surface border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium"
                   placeholder="% de descuento"
                 />
               </div>
@@ -72,7 +72,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({ discountInfo, onChang
                   type="text"
                   value={discountInfo.code || ''}
                   onChange={(e) => onChange({ ...discountInfo, code: e.target.value.toUpperCase() })}
-                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium uppercase"
+                  className="w-full pl-12 pr-4 py-3 bg-lg-surface border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium uppercase"
                   placeholder="Código promocional"
                   maxLength={15}
                 />
@@ -84,7 +84,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({ discountInfo, onChang
                 value={discountInfo.description || ''}
                 onChange={(e) => onChange({ ...discountInfo, description: e.target.value })}
                 rows={3}
-                className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium resize-none"
+                className="w-full pl-12 pr-4 py-3 bg-lg-surface border-2 border-gray-200 rounded-xl focus:border-[#9C3FE4] focus:ring-0 transition-all text-gray-900 placeholder:text-gray-400 font-medium resize-none"
                 placeholder="Describe el beneficio: '2x1 en cervezas', '20% en menú completo', etc."
               />
             </div>

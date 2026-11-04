@@ -20,25 +20,25 @@ export function RecentActivity() {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
-      <div className="p-5 border-b border-stone-50 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center"><Activity className="w-4 h-4 text-stone-500" /></div>
-        <div><h3 className="text-sm font-bold text-stone-800">Actividad Reciente</h3><p className="text-[10px] text-stone-400">Últimas acciones del sistema</p></div>
+    <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
+      <div className="p-5 border-b border-lg-surface-2 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-lg-surface-2 flex items-center justify-center"><Activity className="w-4 h-4 text-lg-dim" /></div>
+        <div><h3 className="text-sm font-bold text-lg-text">Actividad Reciente</h3><p className="text-[10px] text-lg-dim">Últimas acciones del sistema</p></div>
       </div>
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-stone-400" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-lg-dim" /></div>
       ) : activities.length === 0 ? (
-        <p className="text-sm text-stone-400 text-center py-10">Sin actividad reciente</p>
+        <p className="text-sm text-lg-dim text-center py-10">Sin actividad reciente</p>
       ) : (
-        <div className="divide-y divide-stone-50 max-h-72 overflow-y-auto">
+        <div className="divide-y divide-lg-surface-2 max-h-72 overflow-y-auto">
           {activities.map((a, i) => (
-            <div key={a.id || i} className="flex items-start gap-3 px-5 py-3 hover:bg-stone-50 transition-colors">
-              <div className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center shrink-0 mt-0.5"><Activity className="w-3.5 h-3.5 text-stone-400" /></div>
+            <div key={a.id || i} className="flex items-start gap-3 px-5 py-3 hover:bg-lg-surface-2 transition-colors">
+              <div className="w-7 h-7 rounded-full bg-lg-surface-2 flex items-center justify-center shrink-0 mt-0.5"><Activity className="w-3.5 h-3.5 text-lg-dim" /></div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-stone-700 truncate">{a.action || a.title || 'Actividad'}</p>
-                {a.body && <p className="text-[10px] text-stone-400 truncate">{a.body}</p>}
+                <p className="text-xs font-medium text-lg-text truncate">{a.action || a.title || 'Actividad'}</p>
+                {a.body && <p className="text-[10px] text-lg-dim truncate">{a.body}</p>}
               </div>
-              <div className="flex items-center gap-1 shrink-0"><Clock className="w-2.5 h-2.5 text-stone-300" /><span className="text-[10px] text-stone-400">{timeAgo(a.created_at)}</span></div>
+              <div className="flex items-center gap-1 shrink-0"><Clock className="w-2.5 h-2.5 text-lg-dim" /><span className="text-[10px] text-lg-dim">{timeAgo(a.created_at)}</span></div>
             </div>
           ))}
         </div>

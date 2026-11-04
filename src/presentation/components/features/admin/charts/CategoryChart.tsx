@@ -4,7 +4,7 @@ import { PIE_COLORS } from '../constants';
 export function CategoryChart({ data }: { data: Array<{ name: string; value: number }> }) {
   const total = data.reduce((s, d) => s + d.value, 0);
   if (!total) return (
-    <div className="w-32 h-32 flex items-center justify-center text-stone-300">
+    <div className="w-32 h-32 flex items-center justify-center text-lg-dim">
       <Hash className="w-8 h-8" />
     </div>
   );

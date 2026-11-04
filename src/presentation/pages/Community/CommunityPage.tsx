@@ -32,15 +32,15 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selected, o
 
   return (
     <div>
-      <p className="text-xs font-semibold text-stone-500 mb-2">Categoría</p>
+      <p className="text-xs font-semibold text-lg-dim mb-2">Categoría</p>
       {categories.length > 6 && (
         <div className="relative mb-2">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-lg-dim pointer-events-none" />
           <input
             value={catQuery}
             onChange={e => setCatQuery(e.target.value)}
             placeholder="Buscar categoría…"
-            className="w-full pl-7 pr-3 py-1.5 text-xs rounded-lg border border-stone-200 focus:outline-none focus:ring-1 focus:ring-primary-300 bg-stone-50"
+            className="w-full pl-7 pr-3 py-1.5 text-xs rounded-lg border border-lg-surface-2 focus:outline-none focus:ring-1 focus:ring-primary-300 bg-lg-surface-2"
           />
         </div>
       )}
@@ -48,24 +48,24 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selected, o
         <button
           onClick={() => onChange('all')}
           className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all ${
-            selected === 'all' ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
+            selected === 'all' ? 'bg-lg-surface-2 text-lg-accent font-semibold' : 'text-lg-dim hover:bg-lg-surface-2'
           }`}>
           <span>Todas las categorías</span>
-          {selected === 'all' && <Check className="w-3.5 h-3.5 text-primary-500" />}
+          {selected === 'all' && <Check className="w-3.5 h-3.5 text-lg-accent" />}
         </button>
         {visible.map(cat => (
           <button
             key={cat.id}
             onClick={() => onChange(selected === cat.id ? 'all' : cat.id)}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all ${
-              selected === cat.id ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
+              selected === cat.id ? 'bg-lg-surface-2 text-lg-accent font-semibold' : 'text-lg-dim hover:bg-lg-surface-2'
             }`}>
             <span className="truncate">{cat.name}</span>
-            {selected === cat.id && <Check className="w-3.5 h-3.5 text-primary-500 shrink-0" />}
+            {selected === cat.id && <Check className="w-3.5 h-3.5 text-lg-accent shrink-0" />}
           </button>
         ))}
         {visible.length === 0 && (
-          <p className="text-xs text-stone-500 text-center py-3">Sin resultados</p>
+          <p className="text-xs text-lg-dim text-center py-3">Sin resultados</p>
         )}
       </div>
     </div>
@@ -126,32 +126,32 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
       )}
       {open && (
         <div
-          className="fixed inset-x-0 bottom-0 z-[201] bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl"
+          className="fixed inset-x-0 bottom-0 z-[201] bg-lg-surface rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl"
           onClick={e => e.stopPropagation()}
         >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="w-10 h-1 rounded-full bg-stone-200" />
+              <div className="w-10 h-1 rounded-full bg-lg-surface-2" />
             </div>
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100 shrink-0">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-lg-surface-2 shrink-0">
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-primary-500" />
-                <span className="font-bold text-stone-800 text-sm">Filtros</span>
+                <Filter className="w-4 h-4 text-lg-accent" />
+                <span className="font-bold text-lg-text text-sm">Filtros</span>
                 {activeCount > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-primary-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="w-5 h-5 rounded-full bg-lg-accent text-lg-ink text-[10px] font-bold flex items-center justify-center">
                     {activeCount}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-3">
                 {activeCount > 0 && (
-                  <button onClick={onReset} className="text-xs text-primary-500 font-semibold">
+                  <button onClick={onReset} className="text-xs text-lg-accent font-semibold">
                     Limpiar
                   </button>
                 )}
-                <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
-                  <X className="w-3.5 h-3.5 text-stone-500" />
+                <button onClick={onClose} className="w-7 h-7 rounded-full bg-lg-surface-2 flex items-center justify-center">
+                  <X className="w-3.5 h-3.5 text-lg-dim" />
                 </button>
               </div>
             </div>
@@ -160,7 +160,7 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 pb-safe">
               {/* Sort */}
               <div>
-                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Ordenar por</p>
+                <p className="text-xs font-bold text-lg-dim uppercase tracking-wider mb-3">Ordenar por</p>
                 <div className="grid grid-cols-2 gap-2">
                   {sortOptions.map(opt => (
                     <button
@@ -168,8 +168,8 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                       onClick={() => onSort(opt.key)}
                       className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left ${
                         currentSort === opt.key
-                          ? 'bg-primary-50 border-primary-300 text-primary-600'
-                          : 'bg-stone-50 border-stone-200 text-stone-600'
+                          ? 'bg-lg-surface-2 border-primary-300 text-lg-accent'
+                          : 'bg-lg-surface-2 border-lg-surface-2 text-lg-dim'
                       }`}
                     >
                       {currentSort === opt.key && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
@@ -182,15 +182,15 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
               {/* Category */}
               {categories.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Categoría</p>
+                  <p className="text-xs font-bold text-lg-dim uppercase tracking-wider mb-3">Categoría</p>
                   {categories.length > 6 && (
                     <div className="relative mb-2">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-lg-dim pointer-events-none" />
                       <input
                         value={catQuery}
                         onChange={e => setCatQuery(e.target.value)}
                         placeholder="Buscar categoría…"
-                        className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-stone-200 focus:outline-none focus:ring-1 focus:ring-primary-300 bg-stone-50"
+                        className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-lg-surface-2 focus:outline-none focus:ring-1 focus:ring-primary-300 bg-lg-surface-2"
                       />
                     </div>
                   )}
@@ -199,8 +199,8 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                       onClick={() => onCategory('all')}
                       className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left ${
                         selectedCategory === 'all'
-                          ? 'bg-primary-50 border-primary-300 text-primary-600'
-                          : 'bg-stone-50 border-stone-200 text-stone-600'
+                          ? 'bg-lg-surface-2 border-primary-300 text-lg-accent'
+                          : 'bg-lg-surface-2 border-lg-surface-2 text-lg-dim'
                       }`}
                     >
                       {selectedCategory === 'all' && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
@@ -212,8 +212,8 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                         onClick={() => onCategory(selectedCategory === cat.id ? 'all' : cat.id)}
                         className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left truncate ${
                           selectedCategory === cat.id
-                            ? 'bg-primary-50 border-primary-300 text-primary-600'
-                            : 'bg-stone-50 border-stone-200 text-stone-600'
+                            ? 'bg-lg-surface-2 border-primary-300 text-lg-accent'
+                            : 'bg-lg-surface-2 border-lg-surface-2 text-lg-dim'
                         }`}
                       >
                         {selectedCategory === cat.id && <Check className="w-3 h-3 inline mr-1 mb-0.5" />}
@@ -227,14 +227,14 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
               {/* Social group */}
               {socialGroups.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Grupo social</p>
+                  <p className="text-xs font-bold text-lg-dim uppercase tracking-wider mb-3">Grupo social</p>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => onSocialGroup('all')}
                       className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
                         selectedSocialGroup === 'all'
-                          ? 'bg-primary-500 text-white border-primary-500'
-                          : 'bg-white text-stone-600 border-stone-200'
+                          ? 'bg-lg-accent text-lg-ink border-primary-500'
+                          : 'bg-lg-surface text-lg-dim border-lg-surface-2'
                       }`}
                     >
                       Todos
@@ -248,8 +248,8 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                           onClick={() => onSocialGroup(isSelected ? 'all' : sg.id)}
                           className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
                             isSelected
-                              ? 'bg-primary-500 text-white border-primary-500'
-                              : 'bg-white text-stone-600 border-stone-200'
+                              ? 'bg-lg-accent text-lg-ink border-primary-500'
+                              : 'bg-lg-surface text-lg-dim border-lg-surface-2'
                           }`}
                         >
                           {IconComp && <IconComp className="w-3.5 h-3.5" />}
@@ -264,7 +264,7 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
               {/* Rating */}
               {tab === 'places' && (
                 <div>
-                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Calificación mínima</p>
+                  <p className="text-xs font-bold text-lg-dim uppercase tracking-wider mb-3">Calificación mínima</p>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map(star => (
                       <button
@@ -273,7 +273,7 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
                         className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-sm font-bold border transition-all ${
                           minRating === star
                             ? 'bg-amber-50 text-amber-600 border-amber-300'
-                            : 'bg-stone-50 text-stone-400 border-stone-200'
+                            : 'bg-lg-surface-2 text-lg-dim border-lg-surface-2'
                         }`}
                       >
                         <Star className={`w-3.5 h-3.5 ${minRating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
@@ -286,10 +286,10 @@ const FilterBottomSheet: React.FC<FilterSheetProps> = ({
             </div>
 
             {/* Apply button */}
-            <div className="px-5 py-4 border-t border-stone-100 shrink-0">
+            <div className="px-5 py-4 border-t border-lg-surface-2 shrink-0">
               <button
                 onClick={onClose}
-                className="w-full py-3.5 bg-primary-500 text-white rounded-2xl font-bold text-sm hover:bg-primary-600 transition-colors"
+                className="w-full py-3.5 bg-lg-accent text-lg-ink rounded-2xl font-bold text-sm hover:bg-lg-accent transition-colors"
               >
                 Aplicar filtros{activeCount > 0 ? ` (${activeCount})` : ''}
               </button>
@@ -429,7 +429,7 @@ const CommunityPage: React.FC = () => {
   const currentTotal = tab === 'places' ? totalPlaces : totalEvents;
 
   return (
-    <div className="min-h-screen bg-[#f7f5fb] pb-24 md:pb-8">
+    <div className="min-h-screen bg-lg-ground pb-24 md:pb-8">
       {/* Hero header */}
       <div className="bg-primary-800 pt-8 pb-7 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
@@ -437,23 +437,23 @@ const CommunityPage: React.FC = () => {
           <p className="text-primary-200 text-sm mb-5">Explora y descubre negocios y eventos de tu ciudad</p>
           <div className="flex gap-2 max-w-2xl">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim pointer-events-none" />
               <input
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && commitSearch()}
                 placeholder="Buscar por nombre, dirección, categoría…"
-                className="w-full pl-11 pr-10 py-3 rounded-xl bg-white text-sm text-[#241b3e] placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-300 shadow-lg"
+                className="w-full pl-11 pr-10 py-3 rounded-xl bg-lg-surface text-sm text-lg-text placeholder:text-lg-dim focus:outline-none focus:ring-2 focus:ring-primary-300 shadow-lg"
               />
               {inputValue && (
                 <button onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-stone-100 transition-colors">
-                  <X className="w-3.5 h-3.5 text-stone-400" />
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-lg-surface-2 transition-colors">
+                  <X className="w-3.5 h-3.5 text-lg-dim" />
                 </button>
               )}
             </div>
             <button onClick={commitSearch}
-              className="px-5 py-3 bg-white text-primary-600 font-semibold text-sm rounded-xl shadow-lg hover:bg-primary-50 transition-colors shrink-0">
+              className="px-5 py-3 bg-lg-surface text-lg-accent font-semibold text-sm rounded-xl shadow-lg hover:bg-lg-surface-2 transition-colors shrink-0">
               Buscar
             </button>
           </div>
@@ -470,13 +470,13 @@ const CommunityPage: React.FC = () => {
             <button key={key} onClick={() => setTab(key)}
               className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                 tab === key
-                  ? 'bg-primary-500 text-white shadow-sm'
-                  : 'bg-white text-stone-500 border border-stone-200 hover:text-primary-600 hover:border-primary-200'
+                  ? 'bg-lg-accent text-lg-ink shadow-sm'
+                  : 'bg-lg-surface text-lg-dim border border-lg-surface-2 hover:text-lg-accent hover:border-lg-surface-2'
               }`}>
               <Icon className="w-4 h-4" />
               {label}
               {count > 0 && (
-                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === key ? 'bg-white/20' : 'bg-stone-100 text-stone-500'}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === key ? 'bg-white/20' : 'bg-lg-surface-2 text-lg-dim'}`}>
                   {count}
                 </span>
               )}
@@ -486,13 +486,13 @@ const CommunityPage: React.FC = () => {
           <button onClick={() => setShowFilters(v => !v)}
             className={`md:hidden shrink-0 ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border transition-all ${
               showFilters || activeFiltersCount > 0
-                ? 'bg-primary-50 border-primary-200 text-primary-600'
-                : 'bg-white border-stone-200 text-stone-500'
+                ? 'bg-lg-surface-2 border-lg-surface-2 text-lg-accent'
+                : 'bg-lg-surface border-lg-surface-2 text-lg-dim'
             }`}>
             <SlidersHorizontal className="w-4 h-4" />
             Filtros
             {activeFiltersCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-primary-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-lg-accent text-lg-ink text-[10px] font-bold flex items-center justify-center">
                 {activeFiltersCount}
               </span>
             )}
@@ -523,15 +523,15 @@ const CommunityPage: React.FC = () => {
           {/* ── LEFT SIDEBAR (desktop only) ───────────── */}
           <aside className="hidden md:block w-64 shrink-0">
             <div className="sticky top-20 space-y-4">
-              <div className="bg-white rounded-2xl border border-primary-100/40 shadow-xs p-4 space-y-5">
+              <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-xs p-4 space-y-5">
 
                 {/* Header */}
-                <div className="flex items-center gap-2 text-xs font-semibold text-stone-500">
-                  <Filter className="w-3.5 h-3.5 text-primary-500" />
+                <div className="flex items-center gap-2 text-xs font-semibold text-lg-dim">
+                  <Filter className="w-3.5 h-3.5 text-lg-accent" />
                   Filtros
                   {activeFiltersCount > 0 && (
                     <button onClick={resetFilters}
-                      className="ml-auto text-xs text-primary-500 font-semibold hover:text-primary-700 normal-case tracking-normal">
+                      className="ml-auto text-xs text-lg-accent font-semibold hover:text-lg-accent normal-case tracking-normal">
                       Limpiar todo
                     </button>
                   )}
@@ -539,12 +539,12 @@ const CommunityPage: React.FC = () => {
 
                 {/* Ordenar */}
                 <div>
-                  <p className="text-xs font-semibold text-stone-500 mb-2">Ordenar por</p>
+                  <p className="text-xs font-semibold text-lg-dim mb-2">Ordenar por</p>
                   <div className="space-y-1">
                     {sortOptions.map(opt => (
                       <button key={opt.key} onClick={() => setSort(opt.key)}
                         className={`w-full text-left text-sm px-3 py-2 rounded-xl transition-all ${
-                          currentSort === opt.key ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-stone-500 hover:bg-stone-50'
+                          currentSort === opt.key ? 'bg-lg-surface-2 text-lg-accent font-semibold' : 'text-lg-dim hover:bg-lg-surface-2'
                         }`}>
                         {opt.label}
                       </button>
@@ -564,14 +564,14 @@ const CommunityPage: React.FC = () => {
                 {/* Grupo social — badges con íconos Lucide */}
                 {socialGroups.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-stone-500 mb-2">Grupo social</p>
+                    <p className="text-xs font-semibold text-lg-dim mb-2">Grupo social</p>
                     <div className="flex flex-wrap gap-1.5">
                       <button
                         onClick={() => setSelectedSocialGroup('all')}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                           selectedSocialGroup === 'all'
-                            ? 'bg-primary-500 text-white border-primary-500'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-primary-300 hover:text-primary-500'
+                            ? 'bg-lg-accent text-lg-ink border-primary-500'
+                            : 'bg-lg-surface text-lg-dim border-lg-surface-2 hover:border-primary-300 hover:text-lg-accent'
                         }`}>
                         Todos
                       </button>
@@ -584,8 +584,8 @@ const CommunityPage: React.FC = () => {
                             onClick={() => setSelectedSocialGroup(isSelected ? 'all' : sg.id)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                               isSelected
-                                ? 'bg-primary-500 text-white border-primary-500'
-                                : 'bg-white text-stone-500 border-stone-200 hover:border-primary-300 hover:text-primary-500'
+                                ? 'bg-lg-accent text-lg-ink border-primary-500'
+                                : 'bg-lg-surface text-lg-dim border-lg-surface-2 hover:border-primary-300 hover:text-lg-accent'
                             }`}>
                             {IconComp && <IconComp className="w-3 h-3" />}
                             {sg.name}
@@ -599,14 +599,14 @@ const CommunityPage: React.FC = () => {
                 {/* Calificación mínima (solo negocios) */}
                 {tab === 'places' && (
                   <div>
-                    <p className="text-xs font-semibold text-stone-500 mb-2">Calificación mínima</p>
+                    <p className="text-xs font-semibold text-lg-dim mb-2">Calificación mínima</p>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map(star => (
                         <button key={star} onClick={() => setMinRating(minRating === star ? 0 : star)}
                           className={`flex-1 flex items-center justify-center py-2 rounded-lg text-xs font-semibold border transition-all ${
                             minRating === star
                               ? 'bg-amber-50 text-amber-600 border-amber-300'
-                              : 'bg-stone-50 text-stone-400 border-transparent hover:border-amber-200'
+                              : 'bg-lg-surface-2 text-lg-dim border-transparent hover:border-amber-200'
                           }`}>
                           <Star className={`w-3 h-3 ${minRating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
                           <span className="ml-0.5">{star}</span>
@@ -614,7 +614,7 @@ const CommunityPage: React.FC = () => {
                       ))}
                     </div>
                     {minRating > 0 && (
-                      <p className="text-[11px] text-stone-500 mt-1">{minRating}+ estrellas</p>
+                      <p className="text-[11px] text-lg-dim mt-1">{minRating}+ estrellas</p>
                     )}
                   </div>
                 )}
@@ -628,13 +628,13 @@ const CommunityPage: React.FC = () => {
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {selectedCategory !== 'all' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold border border-primary-200">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-lg-surface-2 text-lg-accent text-xs font-semibold border border-lg-surface-2">
                     {selectedCat?.icon} {selectedCat?.name}
                     <button onClick={() => setSelectedCategory('all')}><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {selectedSocialGroup !== 'all' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold border border-primary-200">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-lg-surface-2 text-lg-accent text-xs font-semibold border border-lg-surface-2">
                     {selectedSG?.icon} {selectedSG?.name}
                     <button onClick={() => setSelectedSocialGroup('all')}><X className="w-3 h-3" /></button>
                   </span>
@@ -646,7 +646,7 @@ const CommunityPage: React.FC = () => {
                   </span>
                 )}
                 {currentSort !== 'relevance' && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 text-stone-600 text-xs font-semibold border border-stone-200">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-lg-surface-2 text-lg-dim text-xs font-semibold border border-lg-surface-2">
                     {sortOptions.find(o => o.key === currentSort)?.label}
                     <button onClick={() => setSort('relevance')}><X className="w-3 h-3" /></button>
                   </span>
@@ -657,7 +657,7 @@ const CommunityPage: React.FC = () => {
             {/* Loading */}
             {loading && (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 animate-spin text-primary-400" />
+                <Loader2 className="w-6 h-6 animate-spin text-lg-accent" />
               </div>
             )}
 
@@ -667,10 +667,10 @@ const CommunityPage: React.FC = () => {
                 <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
                   <X className="w-6 h-6 text-red-400" />
                 </div>
-                <p className="font-semibold text-[#241b3e] mb-1">Error al cargar</p>
-                <p className="text-sm text-stone-500 mb-4 max-w-xs">{error}</p>
+                <p className="font-semibold text-lg-text mb-1">Error al cargar</p>
+                <p className="text-sm text-lg-dim mb-4 max-w-xs">{error}</p>
                 <button onClick={() => { setError(null); setTab(tab); }}
-                  className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors">
+                  className="px-5 py-2.5 bg-lg-accent text-lg-ink rounded-xl font-semibold text-sm hover:bg-lg-accent transition-colors">
                   Reintentar
                 </button>
               </div>
@@ -678,7 +678,7 @@ const CommunityPage: React.FC = () => {
 
             {/* Results count */}
             {!loading && !error && !isEmpty && (
-              <p className="text-xs text-stone-500 mb-4 px-1">
+              <p className="text-xs text-lg-dim mb-4 px-1">
                 {tab === 'places'
                   ? `${currentTotal} negocio${currentTotal !== 1 ? 's' : ''} encontrado${currentTotal !== 1 ? 's' : ''}`
                   : `${currentTotal} evento${currentTotal !== 1 ? 's' : ''} encontrado${currentTotal !== 1 ? 's' : ''}`}
@@ -700,7 +700,7 @@ const CommunityPage: React.FC = () => {
                       </div>
                       {hasMorePlaces && (
                         <button onClick={loadMorePlaces} disabled={loadingMore}
-                          className="w-full mt-4 py-3 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 hover:text-primary-600 transition-colors bg-white flex items-center justify-center gap-2 disabled:opacity-60">
+                          className="w-full mt-4 py-3 rounded-xl border border-lg-surface-2 text-lg-dim text-sm font-semibold hover:bg-lg-surface-2 hover:text-lg-accent transition-colors bg-lg-surface flex items-center justify-center gap-2 disabled:opacity-60">
                           {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                           {loadingMore ? 'Cargando…' : 'Ver más negocios'}
                         </button>
@@ -713,7 +713,7 @@ const CommunityPage: React.FC = () => {
                       </div>
                       {hasMoreEvents && (
                         <button onClick={loadMoreEvents} disabled={loadingMore}
-                          className="w-full mt-4 py-3 rounded-xl border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 hover:text-primary-600 transition-colors bg-white flex items-center justify-center gap-2 disabled:opacity-60">
+                          className="w-full mt-4 py-3 rounded-xl border border-lg-surface-2 text-lg-dim text-sm font-semibold hover:bg-lg-surface-2 hover:text-lg-accent transition-colors bg-lg-surface flex items-center justify-center gap-2 disabled:opacity-60">
                           {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                           {loadingMore ? 'Cargando…' : 'Ver más eventos'}
                         </button>

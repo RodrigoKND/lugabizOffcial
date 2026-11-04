@@ -32,19 +32,19 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-stone-100"
+            className="bg-lg-surface rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-lg-surface-2"
           >
             <div className="flex items-start justify-between mb-4">
               <div className={`w-10 h-10 rounded-xl ${v.bg} flex items-center justify-center`}>
                 <AlertTriangle className={`w-5 h-5 ${v.icon}`} />
               </div>
-              <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors">
-                <X className="w-4 h-4 text-stone-500" />
+              <button onClick={onClose} className="w-8 h-8 rounded-full bg-lg-surface-2 flex items-center justify-center hover:bg-lg-surface-2 transition-colors">
+                <X className="w-4 h-4 text-lg-dim" />
               </button>
             </div>
 
-            <h3 className="text-lg font-bold text-stone-800 mb-1">{title}</h3>
-            <p className="text-sm text-stone-500 mb-6 leading-relaxed">{message}</p>
+            <h3 className="text-lg font-bold text-lg-text mb-1">{title}</h3>
+            <p className="text-sm text-lg-dim mb-6 leading-relaxed">{message}</p>
 
             <div className="flex gap-3">
               <Button variant="secondary" size="lg" fullWidth onClick={onClose}>

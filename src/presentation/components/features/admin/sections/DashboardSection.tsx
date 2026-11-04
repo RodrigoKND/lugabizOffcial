@@ -61,10 +61,10 @@ export function DashboardSection() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-28 gap-4">
       <div className="relative">
-        <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>
-        <div className="absolute -inset-1 rounded-2xl border-2 border-primary-200 animate-ping opacity-30" />
+        <div className="w-16 h-16 rounded-2xl bg-lg-surface-2 flex items-center justify-center"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>
+        <div className="absolute -inset-1 rounded-2xl border-2 border-lg-surface-2 animate-ping opacity-30" />
       </div>
-      <p className="text-sm text-stone-400 font-medium">Cargando métricas del sistema...</p>
+      <p className="text-sm text-lg-dim font-medium">Cargando métricas del sistema...</p>
     </div>
   );
 
@@ -82,10 +82,10 @@ export function DashboardSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-stone-800">Vista General</h2>
-          {lastUpdated && <p className="text-[11px] text-stone-400 mt-0.5">Actualizado a las {lastUpdated.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</p>}
+          <h2 className="text-xl font-bold text-lg-text">Vista General</h2>
+          {lastUpdated && <p className="text-[11px] text-lg-dim mt-0.5">Actualizado a las {lastUpdated.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</p>}
         </div>
-        <button onClick={load} className="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-50 transition-all shadow-sm">
+        <button onClick={load} className="flex items-center gap-2 px-4 py-2 bg-lg-surface border border-lg-surface-2 rounded-xl text-xs font-semibold text-lg-dim hover:bg-lg-surface-2 transition-all shadow-sm">
           <RefreshCw className="w-3.5 h-3.5" /> Actualizar
         </button>
       </div>

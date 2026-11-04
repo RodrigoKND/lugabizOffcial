@@ -38,19 +38,19 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="bg-white rounded-3xl w-full max-w-2xl my-4 sm:my-0 shadow-2xl border border-white/10 overflow-hidden"
+            className="bg-lg-surface rounded-3xl w-full max-w-2xl my-4 sm:my-0 shadow-2xl border border-white/10 overflow-hidden"
             onClick={e => e.stopPropagation()}>
 
             {/* Header */}
-            <div className="px-5 sm:px-6 pt-4 sm:pt-5 pb-3 border-b border-stone-100">
+            <div className="px-5 sm:px-6 pt-4 sm:pt-5 pb-3 border-b border-lg-surface-2">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h2 className="text-lg font-bold text-stone-800 tracking-tight">Crear Evento</h2>
-                  <p className="text-[11px] text-stone-400 mt-0.5">Comparte tu evento con la comunidad</p>
+                  <h2 className="text-lg font-bold text-lg-text tracking-tight">Crear Evento</h2>
+                  <p className="text-[11px] text-lg-dim mt-0.5">Comparte tu evento con la comunidad</p>
                 </div>
                 <button onClick={onClose}
-                  className="p-2 hover:bg-stone-100 rounded-xl transition-colors">
-                  <X className="w-4 h-4 text-stone-400" />
+                  className="p-2 hover:bg-lg-surface-2 rounded-xl transition-colors">
+                  <X className="w-4 h-4 text-lg-dim" />
                 </button>
               </div>
               <StepIndicator step={step} />
@@ -82,7 +82,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose }) => {
                       />
                     </div>
                     <div className="mt-5">
-                      <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block mb-2">Redes sociales (opcional)</label>
+                      <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider block mb-2">Redes sociales (opcional)</label>
                       <SocialLinksSection
                         value={formData.socialLinks}
                         onChange={links => handleChange('socialLinks', links)}

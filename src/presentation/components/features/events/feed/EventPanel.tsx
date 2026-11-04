@@ -87,7 +87,7 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
         {state.tiktokId && (
           <button
             onClick={e => { e.stopPropagation(); handlers.toggleShowVideo(); }}
-            className="absolute top-16 md:top-4 right-3 md:right-4 z-30 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-stone-700 shadow-md hover:bg-white transition-colors"
+            className="absolute top-16 md:top-4 right-3 md:right-4 z-30 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-lg-text shadow-md hover:bg-lg-surface transition-colors"
           >
             {state.showVideo ? <><ImageIcon className="w-3.5 h-3.5" /> Ver fotos</> : <><Play className="w-3.5 h-3.5" /> Ver video</>}
           </button>
@@ -160,7 +160,7 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
           </div>
 
           <Link to={`/event/${event?.id}`}
-            className="pointer-events-auto mt-1 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
+            className="pointer-events-auto mt-1 block w-full text-center bg-lg-accent text-lg-ink py-2 rounded-xl font-bold text-xs hover:shadow-lg active:scale-[0.98] transition-all">
             Asistiré
           </Link>
         </div>
@@ -316,7 +316,7 @@ export function EventPanel({ event, userId, onClose, onPrev, onNext, hasPrev, ha
 
         <div className="border-t border-white/5 px-4 py-3">
           <Link to={`/event/${event.id}`}
-            className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
+            className="block w-full text-center bg-lg-accent text-lg-ink py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-[0.98] transition-all">
             Asistiré
           </Link>
         </div>

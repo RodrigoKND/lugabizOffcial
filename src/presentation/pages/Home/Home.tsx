@@ -12,6 +12,7 @@ import { OnboardingAlert } from '@presentation/components/reusables';
 import LoadingSkeleton from '@presentation/components/features/home/LoadingSkeleton';
 import EmptyHomeState from '@presentation/components/features/home/EmptyHomeState';
 import HomeHero from '@presentation/components/features/home/HomeHero';
+import HomeBento from '@presentation/components/features/home/HomeBento';
 import StoriesRow from '@presentation/components/features/home/StoriesRow';
 import PersonalizedSections from '@presentation/components/features/home/PersonalizedSections';
 import { useHomeEvents } from '@presentation/hooks/home/useHomeEvents';
@@ -79,7 +80,7 @@ const Home: React.FC = () => {
   const homeSections = personalizedSections.length > 0 ? personalizedSections : genericSections;
 
   return (
-    <section className="relative min-h-screen pb-24 md:pb-0 bg-[#f7f5fb]">
+    <section className="relative min-h-screen pb-24 md:pb-0 bg-lg-ground">
       <OnboardingAlert type={currentStep || 'login'} isOpen={!!currentStep} onAction={handleAction} onDismiss={handleDismiss} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode="register" />
 
@@ -88,6 +89,7 @@ const Home: React.FC = () => {
       )}
 
       <HomeHero />
+      <HomeBento />
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -102,7 +104,7 @@ const Home: React.FC = () => {
         )}
 
         {recommendedPlaces.length > 0 && (
-          <ScrollRow title="Recomendado para ti" icon={<Star className="w-5 h-5 fill-primary-500 text-primary-500" />}
+          <ScrollRow title="Recomendado para ti" icon={<Star className="w-5 h-5 fill-lg-accent text-lg-accent" />}
             seeAllTo="/comunidad">
             {recommendedPlaces.slice(0, 10).map((place: Record<string, unknown>) => (
               <CompactCard
@@ -124,12 +126,12 @@ const Home: React.FC = () => {
           <>
             <div className="flex items-center justify-between mb-1 px-1">
               <div className="flex items-center gap-2.5">
-                <Star className="w-5 h-5 fill-primary-500 text-primary-500" />
-                <h2 className="font-bold text-xl sm:text-2xl text-[#241b3e] leading-none">Explora eventos</h2>
+                <Star className="w-5 h-5 fill-lg-accent text-lg-accent" />
+                <h2 className="font-flyer-sm text-2xl sm:text-3xl text-lg-text">Explora eventos</h2>
               </div>
               <button
                 onClick={() => navigate('/events/feed')}
-                className="flex items-center gap-0.5 text-sm font-semibold text-primary-600 hover:text-primary-700"
+                className="flex items-center gap-0.5 text-sm font-semibold text-lg-dim hover:text-lg-text"
               >
                 Ver todas
                 <span aria-hidden="true">›</span>

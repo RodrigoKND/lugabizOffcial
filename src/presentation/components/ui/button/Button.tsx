@@ -5,13 +5,13 @@ import type { ButtonProps } from '@domain/entities/ui';
 
 const variantStyles: Record<string, string> = {
   primary:
-    'bg-primary-500 text-white hover:bg-primary-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm',
+    'bg-lg-accent text-lg-ink hover:bg-lg-accent active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm',
   secondary:
-    'bg-stone-100 border border-stone-200 text-stone-600 hover:text-stone-800 hover:bg-stone-200 hover:border-stone-300',
+    'bg-lg-surface-2 border border-lg-surface-2 text-lg-dim hover:text-lg-text hover:bg-lg-surface-2 hover:border-lg-surface-2',
   ghost:
-    'text-stone-500 hover:text-stone-800 hover:bg-stone-100',
+    'text-lg-dim hover:text-lg-text hover:bg-lg-surface-2',
   outline:
-    'border border-stone-200 text-stone-600 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-800',
+    'border border-lg-surface-2 text-lg-dim hover:bg-lg-surface-2 hover:border-lg-surface-2 hover:text-lg-text',
   danger:
     'bg-red-500 text-white hover:bg-red-600 active:scale-[0.98] disabled:opacity-50',
 };

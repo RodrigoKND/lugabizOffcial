@@ -54,7 +54,7 @@ const PlacesCarousel: React.FC<PlacesCarouselProps> = ({ places, onPlaceClick, s
           </button>
           <button
             onClick={() => setShowAllPlacesModal(true)}
-            className="p-2 rounded-full cursor-pointer bg-linear-to-r from-primary-500 to-tomato text-white shadow-lg transition-all hover:scale-105">
+            className="p-2 rounded-full cursor-pointer bg-lg-accent text-lg-ink shadow-lg transition-all hover:scale-105">
             <Plus className="w-5 h-5" />
           </button>
         </div>
@@ -127,7 +127,7 @@ const PlacesCarousel: React.FC<PlacesCarouselProps> = ({ places, onPlaceClick, s
             <button
               key={idx}
               onClick={() => setStartIndex(idx * 4)}
-              className={`h-2 cursor-pointer rounded-full transition-all ${currentPage === idx ? 'bg-primary-500 w-6' : 'bg-gray-300 w-2'
+              className={`h-2 cursor-pointer rounded-full transition-all ${currentPage === idx ? 'bg-lg-accent w-6' : 'bg-gray-300 w-2'
                 }`}
             />
           ))}

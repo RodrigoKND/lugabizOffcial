@@ -37,10 +37,10 @@ const PlansTab: React.FC = () => {
     return (
       <div className="space-y-3">
         <PushEnableBanner />
-        <div className="bg-white rounded-2xl p-12 text-center border border-primary-100/40">
+        <div className="bg-lg-surface rounded-2xl p-12 text-center border border-lg-surface-2">
           <CalendarCheck2 className="w-10 h-10 text-primary-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-[#241b3e] mb-1">Sin planes todavía</h3>
-          <p className="text-xs text-stone-500">Tocá el botón "Planes" en un lugar o evento para invitar a tus amigos.</p>
+          <h3 className="text-base font-bold text-lg-text mb-1">Sin planes todavía</h3>
+          <p className="text-xs text-lg-dim">Tocá el botón "Planes" en un lugar o evento para invitar a tus amigos.</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ const PlansTab: React.FC = () => {
 
       {pendingInvites.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">
+          <p className="text-xs text-lg-dim font-semibold uppercase tracking-wide px-1">
             {pendingInvites.length} {pendingInvites.length === 1 ? 'invitación pendiente' : 'invitaciones pendientes'}
           </p>
           <div className="space-y-2">
@@ -71,7 +71,7 @@ const PlansTab: React.FC = () => {
 
       {confirmedPlans.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide px-1">Mis planes</p>
+          <p className="text-xs text-lg-dim font-semibold uppercase tracking-wide px-1">Mis planes</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {confirmedPlans.map((plan) => (
               <PlanCard
@@ -91,7 +91,7 @@ const PlansTab: React.FC = () => {
       <div ref={sentinelRef} className="h-1" />
       {isLoadingMore && (
         <div className="flex justify-center py-3">
-          <Loader2 className="w-5 h-5 animate-spin text-primary-400" />
+          <Loader2 className="w-5 h-5 animate-spin text-lg-accent" />
         </div>
       )}
 

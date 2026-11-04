@@ -16,13 +16,9 @@ export { default as PlaceSearchFilter } from '@presentation/components/features/
 export { default as ChatButton } from '@presentation/components/features/chatbot/ChatButton';
 export { default as AmenitySelector } from '@presentation/components/features/places/formPublishNewPlace/AmenitySelector';
 export { default as OwnerAnnouncement } from '@presentation/components/features/notifications/OwnerAnnouncement';
-export { default as StoryCard } from '@presentation/components/features/home/StoryCard';
 export { default as CompactCard } from '@presentation/components/features/home/CompactCard';
 export { default as EventCardSmall } from '@presentation/components/features/home/EventCardSmall';
-export { default as HeroBanner } from '@presentation/components/features/home/HeroBanner';
 export { default as ScrollRow } from '@presentation/components/features/home/ScrollRow';
-export { default as TrendBanner } from '@presentation/components/features/home/TrendBanner';
-export { getCategoryColor } from '@presentation/components/features/home/categoryColors';
 export { default as CreateSurveyModal } from '@presentation/components/features/surveys/CreateSurveyModal';
 export { default as SurveyCard } from '@presentation/components/features/surveys/SurveyCard';
 export { default as SurveyStats } from '@presentation/components/features/surveys/SurveyStats';
@@ -30,4 +26,3 @@ export { default as SurveyDeck } from '@presentation/components/features/surveys
 export { default as LoadingSkeleton } from '@presentation/components/features/home/LoadingSkeleton';
 export { default as EmptyHomeState } from '@presentation/components/features/home/EmptyHomeState';
 export { default as StoriesRow } from '@presentation/components/features/home/StoriesRow';
-export { default as FeaturedHeroSection } from '@presentation/components/features/home/FeaturedHeroSection';

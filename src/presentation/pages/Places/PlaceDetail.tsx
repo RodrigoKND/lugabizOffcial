@@ -85,26 +85,26 @@ const PlaceDetail: React.FC = () => {
   });
 
   if (isLoadingPlace || isAuthLoading) return (
-    <div className="min-h-screen bg-[#f7f5fb] flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-primary-400" />
+    <div className="min-h-screen bg-lg-ground flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-lg-accent" />
     </div>
   );
   if (!place && !user) return (
-    <div className="min-h-screen bg-[#f7f5fb] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-lg-ground flex items-center justify-center px-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-white ring-1 ring-primary-100/70 rounded-3xl shadow-[0_2px_12px_rgba(80,50,140,0.08)] p-8 max-w-sm w-full text-center">
-        <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
-          <LogIn className="w-7 h-7 text-primary-600" />
+        className="bg-lg-surface ring-1 ring-lg-surface-2 rounded-3xl shadow-[0_2px_12px_rgba(80,50,140,0.08)] p-8 max-w-sm w-full text-center">
+        <div className="w-14 h-14 rounded-2xl bg-lg-surface-2 flex items-center justify-center mx-auto mb-4">
+          <LogIn className="w-7 h-7 text-lg-accent" />
         </div>
-        <h2 className="text-lg font-bold text-[#241b3e] mb-2">Inicia sesión</h2>
-        <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+        <h2 className="text-lg font-bold text-lg-text mb-2">Inicia sesión</h2>
+        <p className="text-sm text-lg-dim mb-6 leading-relaxed">
           Necesitas iniciar sesión para ver los detalles de este lugar.
         </p>
         <Link to="/?auth=login"
-          className="w-full py-3 bg-primary-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary-600 transition-colors">
+          className="w-full py-3 bg-lg-accent text-lg-ink rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-lg-accent transition-colors">
           <LogIn className="w-4 h-4" /> Iniciar sesión
         </Link>
-        <button onClick={() => navigate('/')} className="mt-3 w-full py-2.5 text-stone-400 text-sm hover:text-stone-500 transition-colors">
+        <button onClick={() => navigate('/')} className="mt-3 w-full py-2.5 text-lg-dim text-sm hover:text-lg-dim transition-colors">
           Volver al inicio
         </button>
       </motion.div>
@@ -113,16 +113,16 @@ const PlaceDetail: React.FC = () => {
   if (!place) return <PlaceNotFound />;
 
   return (
-    <div className="min-h-screen bg-[#f7f5fb]">
+    <div className="min-h-screen bg-lg-ground">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
           {isModal ? (
             <button onClick={goBack}
-              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white ring-1 ring-primary-100/70 hover:bg-stone-50 transition-colors text-stone-500">
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-lg-surface ring-1 ring-lg-surface-2 hover:bg-lg-surface-2 transition-colors text-lg-dim">
               <X className="w-5 h-5" />
             </button>
           ) : (
-            <button onClick={goBack} className="inline-flex items-center gap-2 text-stone-500 hover:text-[#241b3e] transition-colors font-medium">
+            <button onClick={goBack} className="inline-flex items-center gap-2 text-lg-dim hover:text-lg-text transition-colors font-medium">
               <ArrowLeft className="w-5 h-5" />
               Volver
             </button>
@@ -156,13 +156,13 @@ const PlaceDetail: React.FC = () => {
             {reviews.length > 0 && (
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {reviews.slice(0, 5).map((review) => (
-                  <div key={review.id} className="flex items-center gap-2 bg-white ring-1 ring-primary-100/70 rounded-2xl px-4 py-2 shrink-0 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
+                  <div key={review.id} className="flex items-center gap-2 bg-lg-surface ring-1 ring-lg-surface-2 rounded-2xl px-4 py-2 shrink-0 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
                     <img src={review.userAvatar || '/avatar.png'} alt="" className="w-8 h-8 rounded-full object-cover" />
                     <div>
-                      <p className="text-xs font-semibold text-[#241b3e]">{review.userName}</p>
+                      <p className="text-xs font-semibold text-lg-text">{review.userName}</p>
                       <div className="flex items-center gap-1">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span className="text-xs text-stone-400">{review.rating}</span>
+                        <span className="text-xs text-lg-dim">{review.rating}</span>
                       </div>
                     </div>
                   </div>
@@ -190,10 +190,10 @@ const PlaceDetail: React.FC = () => {
 
             {/* Stats de encuestas — visible solo para el dueño del lugar */}
             {user?.id === place.userId && (
-              <div className="bg-white ring-1 ring-primary-100/70 rounded-2xl p-4 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
+              <div className="bg-lg-surface ring-1 ring-lg-surface-2 rounded-2xl p-4 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
                 <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="w-4 h-4 text-primary-500" />
-                  <h3 className="font-semibold text-sm text-[#241b3e]">Estadísticas de encuestas</h3>
+                  <BarChart3 className="w-4 h-4 text-lg-accent" />
+                  <h3 className="font-semibold text-sm text-lg-text">Estadísticas de encuestas</h3>
                 </div>
                 <PlaceSurveyStats placeId={place.id} />
               </div>
@@ -203,10 +203,10 @@ const PlaceDetail: React.FC = () => {
 
         {relatedPlaces.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="mt-10 pt-6 border-t border-primary-100/70">
+            className="mt-10 pt-6 border-t border-lg-surface-2">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-primary-500" />
-              <h3 className="font-semibold text-[15px] text-[#241b3e]">
+              <TrendingUp className="w-4 h-4 text-lg-accent" />
+              <h3 className="font-semibold text-[15px] text-lg-text">
                 Más de {place.category?.name}
               </h3>
             </div>
@@ -216,9 +216,9 @@ const PlaceDetail: React.FC = () => {
                   key={p.id}
                   to={`/place/${p.id}`}
                   state={{ background: isModal ? routerLocation.state.background : routerLocation }}
-                  className="group shrink-0 w-32 rounded-xl overflow-hidden bg-white border border-primary-100/40 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
+                  className="group shrink-0 w-32 rounded-xl overflow-hidden bg-lg-surface border border-lg-surface-2 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
                 >
-                  <div className="aspect-square relative overflow-hidden bg-primary-50">
+                  <div className="aspect-square relative overflow-hidden bg-lg-surface-2">
                     {p.image ? (
                       <img src={p.image} alt={p.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

@@ -43,7 +43,7 @@ export function EventModalInfo({ event, isExpanded, onToggleExpand, onClose }: I
       </div>
 
       <Link to={`/event/${event.id}`} onClick={onClose}
-        className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg active:scale-[0.97] transition-all">
+        className="block w-full text-center bg-lg-accent text-lg-ink py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg active:scale-[0.97] transition-all">
         Asistiré
       </Link>
     </div>

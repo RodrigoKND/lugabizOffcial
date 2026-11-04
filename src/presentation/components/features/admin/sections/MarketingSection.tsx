@@ -55,12 +55,12 @@ export function MarketingSection() {
 
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
-        <div className="p-5 border-b border-stone-100 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center"><Megaphone className="w-4 h-4 text-primary-500" /></div>
-          <div className="flex-1"><h3 className="font-bold text-stone-800">Marketing</h3><p className="text-[11px] text-stone-400">Enviá avisos por la campana y push.</p></div>
+      <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
+        <div className="p-5 border-b border-lg-surface-2 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-lg-surface-2 flex items-center justify-center"><Megaphone className="w-4 h-4 text-lg-accent" /></div>
+          <div className="flex-1"><h3 className="font-bold text-lg-text">Marketing</h3><p className="text-[11px] text-lg-dim">Enviá avisos por la campana y push.</p></div>
         </div>
-        <div className="m-5 mb-0 flex items-start gap-2 text-[11px] bg-primary-50 border border-primary-100 rounded-xl px-3 py-2.5 text-primary-700">
+        <div className="m-5 mb-0 flex items-start gap-2 text-[11px] bg-lg-surface-2 border border-lg-surface-2 rounded-xl px-3 py-2.5 text-lg-accent">
           <BellRing className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           <p>El aviso llega a la <b>campana</b> y como <b>notificación push</b> a quienes activaron notificaciones.</p>
         </div>
@@ -68,32 +68,32 @@ export function MarketingSection() {
           <AudienceSelector value={audience} onChange={setAudience} />
           {audience === 'specific' && <UserSelector users={users} usersLoaded={usersLoaded} selectedIds={selectedIds} onToggle={toggleUser} />}
           <div className="space-y-3">
-            <div><label className="text-xs font-semibold text-stone-600 mb-1 block">Título</label>
+            <div><label className="text-xs font-semibold text-lg-dim mb-1 block">Título</label>
               <input value={heading} onChange={e => setHeading(e.target.value)} placeholder="Ej. Descubrí lo mejor de tu ciudad"
-                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-200" /></div>
-            <div><label className="text-xs font-semibold text-stone-600 mb-1 block">Mensaje</label>
+                className="w-full text-sm border border-lg-surface-2 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lg-surface-2" /></div>
+            <div><label className="text-xs font-semibold text-lg-dim mb-1 block">Mensaje</label>
               <textarea value={message} onChange={e => setMessage(e.target.value)} rows={4} placeholder="Escribí tu mensaje."
-                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-primary-200" /></div>
-            <div><label className="text-xs font-semibold text-stone-600 mb-1 block flex items-center gap-1"><Link2 className="w-3 h-3" /> Al tocar, llevar a (opcional)</label>
+                className="w-full text-sm border border-lg-surface-2 rounded-lg px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-lg-surface-2" /></div>
+            <div><label className="text-xs font-semibold text-lg-dim mb-1 block flex items-center gap-1"><Link2 className="w-3 h-3" /> Al tocar, llevar a (opcional)</label>
               <input value={ctaUrl} onChange={e => setCtaUrl(e.target.value)} placeholder="Ej. /comunidad · /event/123"
-                className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-200" /></div>
+                className="w-full text-sm border border-lg-surface-2 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lg-surface-2" /></div>
           </div>
-          {(heading || message) && <div><label className="text-xs font-semibold text-stone-600 mb-2 block">Vista previa</label>
-              <div className="rounded-xl border border-stone-200 bg-white shadow-sm p-3 flex items-start gap-3 max-w-md">
-                <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center shrink-0"><span className="text-white font-extrabold text-sm">L</span></div>
-                <div className="min-w-0"><p className="text-sm font-semibold text-stone-800 leading-snug">📢 {heading || 'Tu título aquí'}</p>
-                  <p className="text-xs text-stone-500 mt-0.5 whitespace-pre-wrap leading-snug">{message || 'Tu mensaje aquí…'}</p>
-                  <p className="text-[10px] text-stone-400 mt-1">Lugabiz · ahora</p>
+          {(heading || message) && <div><label className="text-xs font-semibold text-lg-dim mb-2 block">Vista previa</label>
+              <div className="rounded-xl border border-lg-surface-2 bg-lg-surface shadow-sm p-3 flex items-start gap-3 max-w-md">
+                <div className="w-9 h-9 rounded-lg bg-lg-accent flex items-center justify-center shrink-0"><span className="text-white font-extrabold text-sm">L</span></div>
+                <div className="min-w-0"><p className="text-sm font-semibold text-lg-text leading-snug">📢 {heading || 'Tu título aquí'}</p>
+                  <p className="text-xs text-lg-dim mt-0.5 whitespace-pre-wrap leading-snug">{message || 'Tu mensaje aquí…'}</p>
+                  <p className="text-[10px] text-lg-dim mt-1">Lugabiz · ahora</p>
                 </div>
               </div>
             </div>}
           <div className="flex items-center justify-between gap-3 pt-1">
-            <div className="text-xs text-stone-500">
+            <div className="text-xs text-lg-dim">
               {count == null ? <span className="inline-flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> calculando alcance…</span>
-                : <span><b className="text-stone-700">{count.total}</b> destinatario(s)</span>}
+                : <span><b className="text-lg-text">{count.total}</b> destinatario(s)</span>}
             </div>
             <button onClick={onSendClick} disabled={sending}
-              className="px-5 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center gap-2">
+              className="px-5 py-2.5 rounded-xl bg-lg-accent text-lg-ink text-sm font-bold hover:bg-lg-accent transition-colors disabled:opacity-50 flex items-center gap-2">
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} Enviar campaña
             </button>
           </div>

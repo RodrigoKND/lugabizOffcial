@@ -14,13 +14,13 @@ export const AdminStatCard: React.FC<AdminStatCardProps> = ({ card, index }) => 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="bg-white rounded-2xl p-5 border border-stone-100 shadow-sm"
+      className="bg-lg-surface rounded-2xl p-5 border border-lg-surface-2 shadow-sm"
     >
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${card.color}`}>
         <Icon className="w-5 h-5" />
       </div>
-      <p className="text-2xl font-bold text-stone-800">{card.value}</p>
-      <p className="text-xs text-stone-400 font-semibold uppercase mt-1">{card.label}</p>
+      <p className="text-2xl font-bold text-lg-text">{card.value}</p>
+      <p className="text-xs text-lg-dim font-semibold uppercase mt-1">{card.label}</p>
     </motion.div>
   );
 };

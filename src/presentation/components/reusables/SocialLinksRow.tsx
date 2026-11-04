@@ -16,7 +16,7 @@ const ICON_MAP: Record<keyof SocialLinks, React.ReactNode> = {
 };
 
 const linkCls = {
-  light: 'bg-white border border-stone-100 shadow-xs text-stone-500 hover:text-primary-600 hover:border-primary-200',
+  light: 'bg-lg-surface border border-lg-surface-2 shadow-xs text-lg-dim hover:text-lg-accent hover:border-lg-surface-2',
   dark: 'bg-white/6 border border-white/10 text-white/55 hover:bg-white/10 hover:text-white/80',
 };
 

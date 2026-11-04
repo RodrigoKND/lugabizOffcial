@@ -33,8 +33,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       
       <div className="absolute top-3 left-3 z-10">
-        <div className={`p-0.5 rounded-full ${event.organizer.isNew ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500' : 'bg-gray-400'}`}>
-          <div className="p-0.5 bg-white rounded-full">
+        <div className={`p-0.5 rounded-full ${event.organizer.isNew ? 'bg-lg-accent ' : 'bg-gray-400'}`}>
+          <div className="p-0.5 bg-lg-surface rounded-full">
             <CdnImage src={event.organizer.avatar} width={80} alt={event.organizer.name} className="w-10 h-10 rounded-full object-cover" />
           </div>
         </div>
@@ -42,7 +42,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
 
       <div className="absolute top-3 right-3 flex items-center gap-2">
         <PlanButton targetName={event.title} eventId={event.id} />
-        <div className="bg-gradient-to-r from-primary-500 to-tomato px-3 py-1 rounded-full shadow-lg">
+        <div className="bg-lg-accent px-3 py-1 rounded-full shadow-lg">
           <span className="text-white text-xs font-semibold">{event.category}</span>
         </div>
       </div>
@@ -50,7 +50,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
         {daysUntil > 0 && (
           <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full">
-            <Calendar className="w-3.5 h-3.5 text-primary-500" />
+            <Calendar className="w-3.5 h-3.5 text-lg-accent" />
             <span className="text-xs font-bold text-gray-900">
               {daysUntil === 1 ? 'Mañana' : `En ${daysUntil} días`}
             </span>

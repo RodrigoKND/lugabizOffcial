@@ -11,7 +11,7 @@ export function FeedProgressBar({ total, currentIndex }: FeedProgressBarProps) {
       {Array.from({ length: visible }).map((_, idx) => (
         <div
           key={idx}
-          className={`h-1 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-white' : 'w-1.5 bg-white/30'}`}
+          className={`h-1 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-lg-surface' : 'w-1.5 bg-white/30'}`}
         />
       ))}
       {total > 8 && (

@@ -48,14 +48,14 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children, 
           <div className="flex items-center gap-2.5">
             {icon}
             <div>
-              <h2 className="font-bold text-xl sm:text-2xl text-[#241b3e] leading-none">{title}</h2>
-              {subtitle && <p className="text-sm text-stone-400 mt-1.5">{subtitle}</p>}
+              <h2 className="font-flyer-sm text-2xl sm:text-3xl text-lg-text">{title}</h2>
+              {subtitle && <p className="text-sm text-lg-dim mt-1.5">{subtitle}</p>}
             </div>
           </div>
           {seeAllTo ? (
             <Link
               to={seeAllTo}
-              className="flex items-center gap-0.5 text-sm font-semibold text-primary-600 hover:text-primary-700"
+              className="flex items-center gap-0.5 text-sm font-semibold text-lg-dim hover:text-lg-text"
             >
               Ver todas
               <ChevronRight className="w-4 h-4" />
@@ -68,8 +68,8 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children, 
                 aria-label="Desplazar izquierda"
                 className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
                   canLeft
-                    ? 'border-stone-200 text-stone-400 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 active:scale-95 cursor-pointer'
-                    : 'border-stone-100 text-stone-200 cursor-default'
+                    ? 'border-lg-surface-2 text-lg-dim hover:border-lg-accent hover:text-lg-accent active:scale-95 cursor-pointer'
+                    : 'border-lg-surface text-lg-surface-2 cursor-default'
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -80,8 +80,8 @@ const ScrollRow: React.FC<ScrollRowProps> = ({ title, subtitle, icon, children, 
                 aria-label="Desplazar derecha"
                 className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
                   canRight
-                    ? 'border-stone-200 text-stone-400 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 active:scale-95 cursor-pointer'
-                    : 'border-stone-100 text-stone-200 cursor-default'
+                    ? 'border-lg-surface-2 text-lg-dim hover:border-lg-accent hover:text-lg-accent active:scale-95 cursor-pointer'
+                    : 'border-lg-surface text-lg-surface-2 cursor-default'
                 }`}
               >
                 <ChevronRight className="w-4 h-4" />

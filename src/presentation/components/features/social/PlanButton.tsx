@@ -15,7 +15,7 @@ interface PlanButtonProps {
 
 const DETAIL_THEME_CLASSES = {
   dark: 'bg-white/6 border-white/10 text-white/55 hover:bg-white/10 hover:text-white/80',
-  light: 'bg-primary-50 border-primary-100 text-primary-600 hover:bg-primary-100',
+  light: 'bg-lg-surface-2 border-lg-surface-2 text-lg-accent hover:bg-lg-surface-2',
 };
 
 const PlanButton: React.FC<PlanButtonProps> = ({ targetName, placeId, eventId, variant = 'card', theme = 'dark', className = '' }) => {

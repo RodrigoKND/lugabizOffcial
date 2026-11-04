@@ -11,7 +11,7 @@ const PlansCountBadge: React.FC<PlansCountBadgeProps> = ({ count, variant = 'lig
 
   const variantClasses = variant === 'dark'
     ? 'bg-white/15 backdrop-blur-md text-white'
-    : 'bg-primary-50 text-primary-700 border border-primary-100';
+    : 'bg-lg-surface-2 text-lg-accent border border-lg-surface-2';
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${variantClasses} ${className}`}>

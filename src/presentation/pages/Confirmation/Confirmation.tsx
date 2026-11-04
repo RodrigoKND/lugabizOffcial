@@ -56,11 +56,11 @@ const Confirmation: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-400 via-primary-500 to-tomato flex items-center justify-center p-4">
+    <div className="min-h-screen bg-lg-accent flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-lg-surface rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
       >
         <div className="p-8 text-center">
           {/* Dinosaur Mascot */}
@@ -96,14 +96,14 @@ const Confirmation: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Tu email para reenviar confirmación"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-lg-surface-2 transition-all"
                 />
               </div>
 
               <button
                 onClick={handleResendConfirmation}
                 disabled={!email.trim() || isResending}
-                className="w-full bg-linear-to-r from-primary-500 to-tomato text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full bg-lg-accent text-lg-ink py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {isResending ? (
                   <>

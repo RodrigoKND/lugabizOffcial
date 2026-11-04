@@ -32,16 +32,16 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({ value, onChange
     <div className="space-y-3">
       {FIELDS.map(({ field, label, placeholder, icon }) => (
         <div key={field} className="space-y-1">
-          <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">{label}</label>
+          <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">{label}</label>
           <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">{icon}</span>
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg-dim pointer-events-none">{icon}</span>
             <input
               type="text"
               value={value[field] || ''}
               onChange={e => onChange({ ...value, [field]: e.target.value })}
               onBlur={() => handleBlur(field)}
-              className={`w-full pl-10 pr-4 py-3 bg-stone-50 border-2 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0 ${
-                errors[field] ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-stone-200'
+              className={`w-full pl-10 pr-4 py-3 bg-lg-surface-2 border-2 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0 ${
+                errors[field] ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-lg-surface-2'
               }`}
               placeholder={placeholder}
             />

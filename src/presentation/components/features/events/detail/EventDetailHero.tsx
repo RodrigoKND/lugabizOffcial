@@ -40,7 +40,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
     <>
       {/* Cover image */}
       <div
-        className="relative aspect-video rounded-3xl overflow-hidden bg-stone-100 shadow-sm cursor-pointer group"
+        className="relative aspect-video rounded-3xl overflow-hidden bg-lg-surface-2 shadow-sm cursor-pointer group"
         onClick={() => openLightbox(0)}
       >
         <CdnImage
@@ -55,12 +55,12 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
         <div className="absolute bottom-4 left-4 flex items-center gap-3">
           <button
             onClick={(e) => { e.stopPropagation(); onShare(); }}
-            className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-colors"
+            className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-lg-surface transition-colors"
           >
-            <Share2 className="w-5 h-5 text-stone-600" />
+            <Share2 className="w-5 h-5 text-lg-dim" />
           </button>
           {event.category && (
-            <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-semibold text-stone-700 shadow-sm">
+            <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-semibold text-lg-text shadow-sm">
               {event.category.name}
             </span>
           )}
@@ -175,7 +175,7 @@ export default function EventDetailHero({ event, onShare }: EventDetailHeroProps
                       key={i}
                       onClick={(e) => { e.stopPropagation(); setLightboxIdx(i); }}
                       className={`rounded-full transition-all ${
-                        i === lightboxIdx ? 'bg-white w-5 h-2' : 'bg-white/40 w-2 h-2'
+                        i === lightboxIdx ? 'bg-lg-surface w-5 h-2' : 'bg-white/40 w-2 h-2'
                       }`}
                     />
                   ))}

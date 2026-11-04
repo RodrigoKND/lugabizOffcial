@@ -11,10 +11,10 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({ stats, cards }) =>
   const total = cards.reduce((a, c) => a + (stats?.[c.label.toLowerCase() as keyof AdminStats] || 0), 0);
 
   return (
-    <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm">
+    <div className="bg-lg-surface rounded-3xl p-6 border border-lg-surface-2 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
         <AlertTriangle className="w-5 h-5 text-amber-500" />
-        <h2 className="font-bold text-stone-800">Alertas y Estado</h2>
+        <h2 className="font-bold text-lg-text">Alertas y Estado</h2>
       </div>
       <div className="space-y-3">
         <div className="flex items-center gap-3 p-4 bg-green-50 rounded-2xl">

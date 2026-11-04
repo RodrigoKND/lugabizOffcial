@@ -15,7 +15,7 @@ const PlaceSearchFilter: React.FC<PlaceSearchFilterProps> = ({ onSearchChange, s
           placeholder="Buscar lugar o servicio..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full text-black px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base"
+          className="w-full text-black px-4 py-2 pr-10 bg-lg-surface border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base"
         />
         {searchQuery && (
           <button onClick={() => onSearchChange('')} aria-label="Limpiar búsqueda"

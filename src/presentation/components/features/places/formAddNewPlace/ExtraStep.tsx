@@ -27,7 +27,7 @@ const ExtraStep: React.FC<ExtraStepProps> = ({
   isValid, isSubmitting, handleSubmit,
 }) => (
   <motion.div key="s2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-    <div className="bg-white rounded-2xl p-6 border border-stone-200 space-y-5">
+    <div className="bg-lg-surface rounded-2xl p-6 border border-lg-surface-2 space-y-5">
       <CollapsibleSection title="Características" icon={<AlertCircle className="w-4 h-4" />}>
         <AmenitySelector selectedTags={formData.amenities} onChange={handleAmenitiesChange} />
       </CollapsibleSection>
@@ -43,8 +43,8 @@ const ExtraStep: React.FC<ExtraStepProps> = ({
       type="submit" disabled={!isValid || isSubmitting}
       className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-sm ${
         isValid && !isSubmitting
-          ? 'bg-primary-500 text-white hover:bg-primary-600'
-          : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+          ? 'bg-lg-accent text-lg-ink hover:bg-lg-accent'
+          : 'bg-lg-surface-2 text-lg-dim cursor-not-allowed'
       }`}
     >
       {isSubmitting ? (

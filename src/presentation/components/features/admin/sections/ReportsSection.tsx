@@ -31,35 +31,35 @@ export function ReportsSection() {
     finally { setBanning(null); }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>;
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
-      <div className="p-5 border-b border-stone-100 flex items-center gap-3">
+    <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
+      <div className="p-5 border-b border-lg-surface-2 flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center"><Flag className="w-4 h-4 text-red-500" /></div>
-        <div><h3 className="font-bold text-stone-800">Contenido Reportado</h3><p className="text-[11px] text-stone-400">{flagged.length} elemento{flagged.length !== 1 ? 's' : ''} con {reportsService.REPORT_THRESHOLD}+ reportes</p></div>
+        <div><h3 className="font-bold text-lg-text">Contenido Reportado</h3><p className="text-[11px] text-lg-dim">{flagged.length} elemento{flagged.length !== 1 ? 's' : ''} con {reportsService.REPORT_THRESHOLD}+ reportes</p></div>
       </div>
       {flagged.length === 0 ? (
-        <div className="text-center py-16 text-stone-400"><CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-200" /><p className="text-sm font-medium text-stone-500">No hay contenido reportado</p><p className="text-xs text-stone-400 mt-1">Todo está bajo control</p></div>
+        <div className="text-center py-16 text-lg-dim"><CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-200" /><p className="text-sm font-medium text-lg-dim">No hay contenido reportado</p><p className="text-xs text-lg-dim mt-1">Todo está bajo control</p></div>
       ) : (
-        <div className="divide-y divide-stone-50 max-h-[60vh] overflow-y-auto">
+        <div className="divide-y divide-lg-surface-2 max-h-[60vh] overflow-y-auto">
           {flagged.map((item) => (
-            <div key={item.targetId} className="flex items-start gap-3 px-5 py-4 hover:bg-stone-50 transition-colors">
+            <div key={item.targetId} className="flex items-start gap-3 px-5 py-4 hover:bg-lg-surface-2 transition-colors">
               <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0"><Flag className="w-4 h-4 text-red-500" /></div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-semibold text-stone-700">{item.authorName}</span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.reportCount >= 5 ? 'bg-red-100 text-red-600' : 'bg-primary-100 text-primary-600'}`}>{item.reportCount} reportes</span>
+                  <span className="text-sm font-semibold text-lg-text">{item.authorName}</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.reportCount >= 5 ? 'bg-red-100 text-red-600' : 'bg-lg-surface-2 text-lg-accent'}`}>{item.reportCount} reportes</span>
                 </div>
-                <p className="text-xs text-stone-500 mt-0.5 line-clamp-2">{item.content}</p>
+                <p className="text-xs text-lg-dim mt-0.5 line-clamp-2">{item.content}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[10px] text-red-400 font-medium">Último: {item.latestReason}</span>
-                  <span className="text-[10px] text-stone-300">·</span>
-                  <span className="text-[10px] text-stone-400 capitalize">{item.targetType === 'review' ? 'Reseña' : 'Comentario'}</span>
+                  <span className="text-[10px] text-lg-dim">·</span>
+                  <span className="text-[10px] text-lg-dim capitalize">{item.targetType === 'review' ? 'Reseña' : 'Comentario'}</span>
                 </div>
               </div>
               <button onClick={() => setConfirmBanItem(item)} disabled={banning === item.authorId}
-                className="p-2 rounded-xl text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0 disabled:opacity-50" title="Banear usuario">
+                className="p-2 rounded-xl text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all shrink-0 disabled:opacity-50" title="Banear usuario">
                 {banning === item.authorId ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
               </button>
             </div>

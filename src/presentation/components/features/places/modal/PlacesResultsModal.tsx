@@ -20,7 +20,7 @@ const PlacesResultsModal: React.FC<PlacesResultsModalProps> = ({
   return (
     <Modal isShowingModal={isOpen} setIsShowingModal={onClose}>
       <form className="shadow-lg">
-        <header className="bg-gradient-to-r from-primary-500 to-tomato p-6 flex items-center justify-between">
+        <header className="bg-lg-accent p-6 flex items-center justify-between">
           <h2 className="text-white text-2xl font-bold">Lugares para {query}</h2>
           <div className="flex justify-end items-center">
             <button className="hover:bg-purple-100 rounded-full p-2" aria-label="cerrar preferencias" onClick={onClose} type="button">
@@ -30,7 +30,7 @@ const PlacesResultsModal: React.FC<PlacesResultsModalProps> = ({
         </header>
         <section className="container p-6 relative">
           <header className="absolute top-4 left-6 z-10">
-            <button className="w-14 h-14 bg-gradient-to-b from-primary-500 to-tomato rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
+            <button className="w-14 h-14 bg-lg-accent rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
               title="Chatear con Lubi" aria-label="Chatear con Lubi" onClick={onChatAgain} type="button">
               <span className="text-white text-3xl font-bold">👀</span>
             </button>

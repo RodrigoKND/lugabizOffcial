@@ -32,24 +32,24 @@ const CancelPlanModal: React.FC<CancelPlanModalProps> = ({ isOpen, onClose, onCo
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { e.stopPropagation(); handleClose(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+            className="bg-lg-surface rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-5 border-b border-primary-100">
-              <h3 className="text-base font-bold text-[#241b3e]">Cancelar plan</h3>
-              <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-primary-50 transition-colors">
-                <X className="w-4 h-4 text-stone-500" />
+            <div className="flex items-center justify-between p-5 border-b border-lg-surface-2">
+              <h3 className="text-base font-bold text-lg-text">Cancelar plan</h3>
+              <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-lg-surface-2 transition-colors">
+                <X className="w-4 h-4 text-lg-dim" />
               </button>
             </div>
 
             <div className="p-5 space-y-3">
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-lg-dim">
                 Los que ya habían confirmado van a recibir un aviso con tu motivo. Contales por qué se cancela.
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {REASON_CHIPS.map((chip) => (
                   <button key={chip} type="button" onClick={() => setReason(chip)}
                     className={`px-2.5 py-1.5 rounded-full text-[11px] font-semibold border transition-colors ${
-                      reason === chip ? 'bg-primary-500 border-primary-500 text-white' : 'border-primary-100 text-stone-500 hover:bg-primary-50/60'
+                      reason === chip ? 'bg-lg-accent border-primary-500 text-lg-ink' : 'border-lg-surface-2 text-lg-dim hover:bg-lg-surface-2'
                     }`}>
                     {chip}
                   </button>
@@ -57,17 +57,17 @@ const CancelPlanModal: React.FC<CancelPlanModalProps> = ({ isOpen, onClose, onCo
               </div>
               <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3}
                 placeholder="Escribí el motivo..."
-                className="w-full px-4 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all resize-none" />
+                className="w-full px-4 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-lg-surface transition-all resize-none" />
             </div>
 
-            <div className="flex gap-3 p-5 border-t border-primary-100">
+            <div className="flex gap-3 p-5 border-t border-lg-surface-2">
               <button onClick={() => onConfirm(reason)} disabled={!reason.trim() || isSubmitting}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 text-white rounded-xl font-semibold text-sm hover:bg-red-600 transition-all disabled:opacity-50">
                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 Cancelar plan
               </button>
               <button onClick={handleClose}
-                className="flex-1 py-2.5 bg-primary-50 text-stone-500 rounded-xl font-semibold text-sm hover:bg-primary-100 transition-all">
+                className="flex-1 py-2.5 bg-lg-surface-2 text-lg-dim rounded-xl font-semibold text-sm hover:bg-lg-surface-2 transition-all">
                 Volver
               </button>
             </div>

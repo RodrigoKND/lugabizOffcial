@@ -34,31 +34,18 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                 whileTap={{ scale: 0.95 }}
                 className="relative p-[3px] rounded-full"
               >
-                {/* Anillo: animado con glow si no visto, gris si ya visto */}
+                {/* Anillo: lila con brillo si no visto, apagado si ya visto */}
                 {isViewed ? (
-                  <div className="absolute inset-0 rounded-full bg-stone-300" />
+                  <div className="absolute inset-0 rounded-full bg-lg-surface-2" />
                 ) : (
                   <>
-                    {/* Capa base rotante */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full"
-                      style={{ background: 'conic-gradient(from 0deg, #7C3AED, #06B6D4, #10B981, #EC4899, #7C3AED)' }}
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-                    />
+                    <div className="absolute inset-0 rounded-full bg-lg-accent" />
                     {/* Brillo deslizante */}
                     <motion.div
                       className="absolute inset-0 rounded-full"
-                      style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.6) 30deg, transparent 60deg)' }}
+                      style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.45) 30deg, transparent 60deg)' }}
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                    />
-                    {/* Glow pulsante exterior */}
-                    <motion.div
-                      className="absolute -inset-[3px] rounded-full"
-                      style={{ background: 'conic-gradient(from 0deg, #7C3AED55, #06B6D455, #10B98155, #7C3AED55)' }}
-                      animate={{ rotate: -360, scale: [1, 1.05, 1] }}
-                      transition={{ rotate: { duration: 8, repeat: Infinity, ease: 'linear' }, scale: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
                     />
                   </>
                 )}
@@ -68,7 +55,7 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 480, damping: 16, delay: 0.15 * i }}
-                    className="absolute -top-1 -right-1 z-20 w-6 h-6 rounded-full bg-white shadow-md ring-2 ring-rose-100 flex items-center justify-center"
+                    className="absolute -top-1 -right-1 z-20 w-6 h-6 rounded-full bg-lg-text shadow-md ring-2 ring-lg-ground flex items-center justify-center"
                   >
                     <motion.div
                       animate={{ scale: [1, 1.28, 1, 1.15, 1] }}
@@ -78,12 +65,12 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                         delay: 0.6 + 0.15 * i,
                       }}
                     >
-                      <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
+                      <Heart className="w-3 h-3 fill-lg-ink text-lg-ink" />
                     </motion.div>
                   </motion.div>
                 )}
                 {/* Avatar circular */}
-                <div className="relative rounded-full bg-white p-[2px]">
+                <div className="relative rounded-full bg-lg-ground p-[2px]">
                   {event.image ? (
                     <img
                       src={event.image}
@@ -91,18 +78,18 @@ const StoriesRow: React.FC<StoriesRowProps> = ({ events, onEventClick, viewedEve
                       className={`w-16 h-16 rounded-full object-cover block ${isViewed ? 'grayscale-[40%]' : ''}`}
                     />
                   ) : (
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold ${isViewed ? 'bg-stone-100 text-stone-400' : 'bg-primary-100 text-primary-500'}`}>
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold ${isViewed ? 'bg-lg-surface text-lg-dim' : 'bg-lg-surface-2 text-lg-accent'}`}>
                       {event.name.charAt(0)}
                     </div>
                   )}
                   {extractTikTokVideoId(event.socialLinks?.tiktok) && (
-                    <TikTokBadge className="absolute bottom-0 right-0 w-5 h-5 ring-2 ring-white" />
+                    <TikTokBadge className="absolute bottom-0 right-0 w-5 h-5 ring-2 ring-lg-ground" />
                   )}
                 </div>
               </motion.div>
 
               {/* Nombre — fuera del anillo para no deformar el círculo */}
-              <span className={`text-[11px] font-medium w-16 truncate text-center leading-tight ${isViewed ? 'text-stone-400' : 'text-stone-500'}`}>
+              <span className={`text-[11px] font-medium w-16 truncate text-center leading-tight ${isViewed ? 'text-lg-dim/60' : 'text-lg-dim'}`}>
                 {event.name}
               </span>
             </button>

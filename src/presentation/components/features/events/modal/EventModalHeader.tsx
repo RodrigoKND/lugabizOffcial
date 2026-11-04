@@ -14,7 +14,7 @@ export function EventModalHeader({ event, onClose }: HeaderProps) {
       </button>
 
       <div className="flex items-center gap-2.5">
-        <div className={`p-[1.5px] rounded-full ${event.organizer.isNew ? 'bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-500' : 'bg-stone-500'}`}>
+        <div className={`p-[1.5px] rounded-full ${event.organizer.isNew ? 'bg-lg-accent ' : 'bg-stone-500'}`}>
           <div className="p-[1.5px] bg-black rounded-full">
             <img src={event.organizer.avatar || '/avatar.png'} alt={event.organizer.name} className="w-8 h-8 rounded-full object-cover" />
           </div>

@@ -8,7 +8,7 @@ interface UsernameFieldProps {
 }
 
 const STATUS_COPY: Record<string, { text: string; className: string } | undefined> = {
-  checking: { text: 'Revisando...', className: 'text-stone-400' },
+  checking: { text: 'Revisando...', className: 'text-lg-dim' },
   available: { text: 'Disponible', className: 'text-green-600' },
   taken: { text: 'Ese nombre de usuario ya existe', className: 'text-red-500' },
   invalid: { text: '3-20 caracteres: letras, números, punto o guión bajo', className: 'text-red-500' },
@@ -20,18 +20,18 @@ const UsernameField: React.FC<UsernameFieldProps> = ({ value, onChange, initialU
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Nombre de usuario</label>
+      <label className="block text-xs font-semibold text-lg-dim uppercase mb-1.5">Nombre de usuario</label>
       <div className="relative">
-        <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
+        <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim" />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value.toLowerCase().replace(/\s/g, ''))}
           placeholder="tu_apodo"
           maxLength={20}
-          className="w-full pl-10 pr-9 py-2.5 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all"
+          className="w-full pl-10 pr-9 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-lg-surface transition-all"
         />
-        {status === 'checking' && <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 animate-spin" />}
+        {status === 'checking' && <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim animate-spin" />}
         {status === 'available' && <Check className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-green-600" />}
         {(status === 'taken' || status === 'invalid') && <X className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />}
       </div>

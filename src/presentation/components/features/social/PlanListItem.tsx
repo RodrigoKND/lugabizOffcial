@@ -19,16 +19,16 @@ const PlanListItem: React.FC<PlanListItemProps> = ({ plan, currentUserId, onAcce
   const VisibilityIcon = VISIBILITY_ICON[plan.visibility];
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-primary-100/40">
+    <div className="bg-lg-surface rounded-xl p-4 border border-lg-surface-2">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="min-w-0">
-          <h4 className="text-sm font-semibold text-[#241b3e] truncate">{plan.targetName || 'Plan'}</h4>
-          <p className="text-xs text-stone-500 flex items-center gap-2 mt-0.5">
+          <h4 className="text-sm font-semibold text-lg-text truncate">{plan.targetName || 'Plan'}</h4>
+          <p className="text-xs text-lg-dim flex items-center gap-2 mt-0.5">
             <Calendar className="w-3 h-3" /> {plan.planDate}
             <Clock className="w-3 h-3 ml-1.5" /> {plan.planTime}
           </p>
         </div>
-        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary-50 text-primary-600 text-[10px] font-semibold">
+        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-lg-surface-2 text-lg-accent text-[10px] font-semibold">
           <VisibilityIcon className="w-3 h-3" /> {plan.visibility === 'private' ? 'Privado' : plan.visibility === 'friends' ? 'Amigos' : 'Público'}
         </span>
       </div>
@@ -43,7 +43,7 @@ const PlanListItem: React.FC<PlanListItemProps> = ({ plan, currentUserId, onAcce
           </button>
           <button
             onClick={() => onDecline?.(myParticipant.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-stone-100 text-stone-600 rounded-lg text-xs font-semibold hover:bg-stone-200 transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-lg-surface-2 text-lg-dim rounded-lg text-xs font-semibold hover:bg-lg-surface-2 transition-colors"
           >
             <X className="w-3.5 h-3.5" /> Rechazar
           </button>

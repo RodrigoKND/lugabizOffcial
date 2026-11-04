@@ -14,18 +14,18 @@ const MyEventsTab: React.FC<MyEventsTabProps> = ({ events, onEventCreate, onDele
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
-          <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide">0 eventos</p>
+          <p className="text-xs text-lg-dim font-semibold uppercase tracking-wide">0 eventos</p>
           <button onClick={onEventCreate}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white rounded-lg text-xs font-semibold hover:bg-primary-600 transition-all">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-lg-accent text-lg-ink rounded-lg text-xs font-semibold hover:bg-lg-accent transition-all">
             <Plus className="w-3 h-3" /> Crear
           </button>
         </div>
-        <div className="bg-white rounded-2xl p-12 text-center border border-primary-100/40">
+        <div className="bg-lg-surface rounded-2xl p-12 text-center border border-lg-surface-2">
           <Calendar className="w-10 h-10 text-primary-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-[#241b3e] mb-1">Sin eventos</h3>
-          <p className="text-sm text-stone-500 mb-5">Crea tu primer evento</p>
+          <h3 className="text-base font-bold text-lg-text mb-1">Sin eventos</h3>
+          <p className="text-sm text-lg-dim mb-5">Crea tu primer evento</p>
           <button onClick={onEventCreate}
-            className="inline-flex items-center gap-2 bg-primary-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-primary-600 transition-all">
+            className="inline-flex items-center gap-2 bg-lg-accent text-lg-ink px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-lg-accent transition-all">
             <Plus className="w-4 h-4" /> Crear Evento
           </button>
         </div>
@@ -36,30 +36,30 @@ const MyEventsTab: React.FC<MyEventsTabProps> = ({ events, onEventCreate, onDele
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-1">
-        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wide">{events.length} eventos</p>
+        <p className="text-xs text-lg-dim font-semibold uppercase tracking-wide">{events.length} eventos</p>
         <button onClick={onEventCreate}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white rounded-lg text-xs font-semibold hover:bg-primary-600 transition-all">
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-lg-accent text-lg-ink rounded-lg text-xs font-semibold hover:bg-lg-accent transition-all">
           <Plus className="w-3 h-3" /> Crear
         </button>
       </div>
       <div className="space-y-3">
         {events.slice(0, 20).map(event => (
           <div key={event.id}
-            className="bg-white rounded-xl p-4 border border-primary-100/40 hover:shadow-sm transition-all flex items-center gap-3">
+            className="bg-lg-surface rounded-xl p-4 border border-lg-surface-2 hover:shadow-sm transition-all flex items-center gap-3">
             {event.image && (
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-primary-50 shrink-0">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-lg-surface-2 shrink-0">
                 <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${event.image})` }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                {event.category && <span className="px-1.5 py-0.5 bg-primary-50 text-primary-600 rounded text-[10px] font-semibold">{event.category.name}</span>}
-                <p className="text-xs text-stone-500">{event.dateStart.toLocaleDateString()}</p>
+                {event.category && <span className="px-1.5 py-0.5 bg-lg-surface-2 text-lg-accent rounded text-[10px] font-semibold">{event.category.name}</span>}
+                <p className="text-xs text-lg-dim">{event.dateStart.toLocaleDateString()}</p>
               </div>
-              <Link to={`/event/${event.id}`} className="font-semibold text-sm text-[#241b3e] hover:text-primary-600 transition-colors truncate block">
+              <Link to={`/event/${event.id}`} className="font-semibold text-sm text-lg-text hover:text-lg-accent transition-colors truncate block">
                 {event.name}
               </Link>
-              <div className="flex items-center gap-3 text-[11px] text-stone-500 mt-0.5">
+              <div className="flex items-center gap-3 text-[11px] text-lg-dim mt-0.5">
                 <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.attendeesCount}</span>
                 <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {event.address}</span>
               </div>

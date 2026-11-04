@@ -22,7 +22,7 @@ const EditPlaceImagesSection: React.FC<EditPlaceImagesSectionProps> = ({
   return (
     <>
       <div>
-        <label className="text-xs font-semibold text-stone-500 uppercase mb-2 block">Imagen Principal</label>
+        <label className="text-xs font-semibold text-lg-dim uppercase mb-2 block">Imagen Principal</label>
         {image ? (
           <div className="relative rounded-xl overflow-hidden group">
             <img src={image} alt="Principal" className="w-full h-40 object-cover rounded-xl" />
@@ -32,14 +32,14 @@ const EditPlaceImagesSection: React.FC<EditPlaceImagesSectionProps> = ({
                 <Trash2 className="w-4 h-4" />
               </button>
               <button type="button" onClick={() => fileInputRef.current?.click()}
-                className="p-2 bg-white text-stone-700 rounded-full hover:bg-stone-100 transition-all">
+                className="p-2 bg-lg-surface text-lg-text rounded-full hover:bg-lg-surface-2 transition-all">
                 <ImagePlus className="w-4 h-4" />
               </button>
             </div>
           </div>
         ) : (
           <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImage}
-            className="w-full h-32 border-2 border-dashed border-stone-300 rounded-xl flex items-center justify-center gap-2 text-stone-400 hover:border-primary-400 hover:text-primary-500 transition-all disabled:opacity-50">
+            className="w-full h-32 border-2 border-dashed border-lg-surface-2 rounded-xl flex items-center justify-center gap-2 text-lg-dim hover:border-primary-400 hover:text-lg-accent transition-all disabled:opacity-50">
             {uploadingImage ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
             {uploadingImage ? 'Subiendo...' : 'Agregar imagen principal'}
           </button>
@@ -48,7 +48,7 @@ const EditPlaceImagesSection: React.FC<EditPlaceImagesSectionProps> = ({
       </div>
 
       <div>
-        <label className="text-xs font-semibold text-stone-500 uppercase mb-2 block">Galería de Fotos</label>
+        <label className="text-xs font-semibold text-lg-dim uppercase mb-2 block">Galería de Fotos</label>
         <div className="grid grid-cols-3 gap-2 mb-2">
           {gallery.map((url, idx) => (
             <div key={idx} className="relative rounded-lg overflow-hidden group aspect-square">
@@ -60,13 +60,13 @@ const EditPlaceImagesSection: React.FC<EditPlaceImagesSectionProps> = ({
             </div>
           ))}
           <button type="button" onClick={() => galleryInputRef.current?.click()} disabled={uploadingGallery}
-            className="aspect-square border-2 border-dashed border-stone-300 rounded-lg flex items-center justify-center text-stone-400 hover:border-primary-400 hover:text-primary-500 transition-all disabled:opacity-50">
+            className="aspect-square border-2 border-dashed border-lg-surface-2 rounded-lg flex items-center justify-center text-lg-dim hover:border-primary-400 hover:text-lg-accent transition-all disabled:opacity-50">
             {uploadingGallery ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
           </button>
         </div>
         <input ref={galleryInputRef} type="file" accept="image/*" multiple className="hidden" onChange={onGalleryAdd} />
         {gallery.length > 0 && (
-          <p className="text-[11px] text-stone-400">{gallery.length} foto(s) en galería</p>
+          <p className="text-[11px] text-lg-dim">{gallery.length} foto(s) en galería</p>
         )}
       </div>
     </>

@@ -48,10 +48,10 @@ const LocationStep: React.FC<LocationStepProps> = ({
 
   return (
     <motion.div key="s1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-      <div className="bg-white rounded-2xl p-6 border border-stone-200 space-y-5">
-        <h2 className="text-base font-bold text-stone-800">Ubicación</h2>
+      <div className="bg-lg-surface rounded-2xl p-6 border border-lg-surface-2 space-y-5">
+        <h2 className="text-base font-bold text-lg-text">Ubicación</h2>
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-stone-500 uppercase">Dirección</label>
+          <label className="text-xs font-semibold text-lg-dim uppercase">Dirección</label>
           <AddressAutocomplete
             value={formData.address}
             onChange={(val) => handleInputChange({ target: { name: 'address', value: val } } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>)}
@@ -65,10 +65,10 @@ const LocationStep: React.FC<LocationStepProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-stone-500 uppercase">Selecciona en el mapa</label>
+          <label className="text-xs font-semibold text-lg-dim uppercase">Selecciona en el mapa</label>
           <Suspense fallback={
-            <div className="aspect-video bg-stone-100 rounded-xl flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+            <div className="aspect-video bg-lg-surface-2 rounded-xl flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-lg-accent" />
             </div>
           }>
             <MapPicker
@@ -77,8 +77,8 @@ const LocationStep: React.FC<LocationStepProps> = ({
             />
           </Suspense>
           {formData.latitude && formData.longitude && (
-            <div className="flex items-center gap-2 text-xs text-stone-500 bg-primary-50 px-3 py-2 rounded-xl">
-              <Locate className="w-3.5 h-3.5 text-primary-500" />
+            <div className="flex items-center gap-2 text-xs text-lg-dim bg-lg-surface-2 px-3 py-2 rounded-xl">
+              <Locate className="w-3.5 h-3.5 text-lg-accent" />
               <span>{formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}</span>
             </div>
           )}

@@ -58,13 +58,13 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       {/* Section header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <Store className="w-4 h-4 text-primary-500" />
-          <h2 className="font-bold text-sm uppercase tracking-wide text-[#241b3e]">Posts de Negocios</h2>
+          <Store className="w-4 h-4 text-lg-accent" />
+          <h2 className="font-flyer-sm text-2xl text-lg-text">Posts de Negocios</h2>
         </div>
         {isOwner && (
           <button
             onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white rounded-xl text-xs font-semibold hover:bg-primary-600 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-lg-accent text-lg-ink rounded-full text-xs font-bold hover:brightness-110 transition-colors shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             Publicar
@@ -76,12 +76,12 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       {showSkeleton && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="bg-white rounded-xl border border-primary-100/40 overflow-hidden animate-pulse">
-              <div style={{ aspectRatio: '4/3' }} className="bg-stone-100" />
+            <div key={i} className="bg-lg-surface rounded-2xl overflow-hidden animate-pulse">
+              <div style={{ aspectRatio: '4/3' }} className="bg-lg-surface-2" />
               <div className="px-3 py-2.5 space-y-2">
-                <div className="h-2.5 bg-stone-200 rounded w-1/2" />
-                <div className="h-2 bg-stone-100 rounded w-full" />
-                <div className="h-2 bg-stone-100 rounded w-3/4" />
+                <div className="h-2.5 bg-lg-surface-2 rounded w-1/2" />
+                <div className="h-2 bg-lg-surface-2 rounded w-full" />
+                <div className="h-2 bg-lg-surface-2 rounded w-3/4" />
               </div>
             </div>
           ))}
@@ -105,7 +105,7 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
         <button
           onClick={() => load(false)}
           disabled={loading}
-          className="w-full py-3 rounded-xl border border-primary-100 text-primary-600 text-sm font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50"
+          className="w-full py-3 rounded-xl border border-lg-surface-2 text-lg-text text-sm font-semibold hover:bg-lg-surface transition-colors disabled:opacity-50"
         >
           {loading ? 'Cargando…' : 'Ver más posts'}
         </button>
@@ -114,13 +114,13 @@ const PostsFeed: React.FC<PostsFeedProps> = ({ compact = false }) => {
       {/* Owner empty state */}
       {!loading && posts.length === 0 && isOwner && (
         <div className="text-center py-10 px-6">
-          <div className="w-16 h-16 rounded-full bg-primary-50 flex items-center justify-center mx-auto mb-3">
-            <Store className="w-7 h-7 text-primary-300" />
+          <div className="w-16 h-16 rounded-full bg-lg-surface flex items-center justify-center mx-auto mb-3">
+            <Store className="w-7 h-7 text-lg-accent" />
           </div>
-          <p className="font-bold text-[#241b3e] mb-1">Publica tu primer post</p>
-          <p className="text-sm text-stone-500 mb-4">Comparte novedades, fotos y ofertas flash con la comunidad.</p>
+          <p className="font-bold text-lg-text mb-1">Publica tu primer post</p>
+          <p className="text-sm text-lg-dim mb-4">Comparte novedades, fotos y ofertas flash con la comunidad.</p>
           <button onClick={() => setCreateOpen(true)}
-            className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors shadow-sm">
+            className="px-5 py-2.5 bg-lg-accent text-lg-ink rounded-full font-bold text-sm hover:brightness-110 transition">
             Crear post
           </button>
         </div>

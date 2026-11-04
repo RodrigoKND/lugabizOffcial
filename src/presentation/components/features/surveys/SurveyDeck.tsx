@@ -92,16 +92,16 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
             onClick={() => setMinimized(false)}
             className="w-full bg-white/95 backdrop-blur-sm rounded-2xl border border-purple-100 shadow-[0_8px_32px_-4px_rgba(109,40,217,0.18)] px-4 py-3 flex items-center gap-3"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-lg-accent flex items-center justify-center shadow-sm shrink-0">
               <ClipboardList className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-xs font-bold text-stone-800 truncate">{survey.title}</p>
+              <p className="text-xs font-bold text-lg-text truncate">{survey.title}</p>
               <p className="text-[10px] text-purple-500 font-medium">
                 {remaining} encuesta{remaining > 1 ? 's' : ''} pendiente{remaining > 1 ? 's' : ''}
               </p>
             </div>
-            <ChevronDown className="w-4 h-4 text-stone-400 -rotate-180 shrink-0" />
+            <ChevronDown className="w-4 h-4 text-lg-dim -rotate-180 shrink-0" />
           </motion.button>
         ) : (
           <motion.div
@@ -115,7 +115,7 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
             <div className="flex items-center justify-between mb-2.5 px-1">
               <div className="flex items-center gap-1.5">
                 <ClipboardList className="w-3.5 h-3.5 text-purple-500" />
-                <span className="text-[11px] font-black text-stone-500 uppercase tracking-widest">Encuestas</span>
+                <span className="text-[11px] font-black text-lg-dim uppercase tracking-widest">Encuestas</span>
                 {remaining > 1 && (
                   <span className="text-[10px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-bold leading-none">
                     {remaining}
@@ -125,13 +125,13 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
               <div className="flex gap-0.5">
                 <button
                   onClick={() => setMinimized(true)}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-100/80 transition-all"
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-lg-dim hover:text-lg-dim hover:bg-stone-100/80 transition-all"
                 >
                   <ChevronDown className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={dismissAll}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -153,7 +153,7 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
                     transform: `translateX(${-(i + 1) * 8}px) translateY(${(i + 1) * 4}px) rotate(${-(i + 1) * 2}deg) scale(${1 - (i + 1) * 0.025})`,
                   }}
                 >
-                  <div className="h-1.5 bg-gradient-to-r from-violet-400/50 to-purple-500/50" />
+                  <div className="h-1.5 bg-lg-accent " />
                   <div className="px-4 pt-2.5">
                     <p className="text-[10px] font-semibold text-purple-400/80 truncate">{s.title}</p>
                   </div>
@@ -172,7 +172,7 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
                     className="absolute inset-0 z-10"
                     style={{ willChange: 'transform, opacity' }}
                   >
-                    <div className="h-full bg-white rounded-2xl border border-purple-100/80 shadow-[0_8px_32px_-4px_rgba(109,40,217,0.18)] overflow-hidden flex flex-col">
+                    <div className="h-full bg-lg-surface rounded-2xl border border-purple-100/80 shadow-[0_8px_32px_-4px_rgba(109,40,217,0.18)] overflow-hidden flex flex-col">
                       <AnimatePresence mode="wait">
                         {stepType === 'idle' && (
                           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
@@ -218,18 +218,18 @@ const SurveyDeck: React.FC<SurveyDeckProps> = ({ surveys, onRefresh }) => {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.88, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                    className="absolute inset-0 z-20 bg-white rounded-2xl border border-green-100 shadow-[0_8px_32px_-4px_rgba(34,197,94,0.2)] flex flex-col items-center justify-center p-6"
+                    className="absolute inset-0 z-20 bg-lg-surface rounded-2xl border border-green-100 shadow-[0_8px_32px_-4px_rgba(34,197,94,0.2)] flex flex-col items-center justify-center p-6"
                   >
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mb-4 shadow-lg shadow-green-200">
+                    <div className="w-16 h-16 rounded-full bg-lg-accent flex items-center justify-center mb-4 shadow-lg shadow-green-200">
                       <CheckCircle2 className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-stone-900 font-bold text-base mb-1.5">¡Todas completadas!</h3>
-                    <p className="text-stone-400 text-xs text-center mb-5 leading-relaxed">
+                    <h3 className="text-lg-text font-bold text-base mb-1.5">¡Todas completadas!</h3>
+                    <p className="text-lg-dim text-xs text-center mb-5 leading-relaxed">
                       Gracias por tomarte el tiempo de responder. Tu opinión es muy valiosa.
                     </p>
                     <button
                       onClick={dismissAll}
-                      className="px-8 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-green-200 active:scale-[0.98] transition-all"
+                      className="px-8 py-2.5 bg-lg-accent text-lg-ink text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-green-200 active:scale-[0.98] transition-all"
                     >
                       Finalizar
                     </button>

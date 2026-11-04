@@ -83,49 +83,49 @@ const OwnerAnnouncement: React.FC<OwnerAnnouncementProps> = ({ isOpen, onClose }
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+        className="bg-lg-surface rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-primary-100">
+        <div className="flex items-center justify-between p-5 border-b border-lg-surface-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-lg-accent flex items-center justify-center shadow-sm">
               <Megaphone className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-bold text-[#241b3e]">Nuevo Anuncio</h3>
+            <h3 className="font-bold text-lg-text">Nuevo Anuncio</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-primary-50 rounded-lg transition-colors">
-            <X className="w-4 h-4 text-stone-500" />
+          <button onClick={onClose} className="p-1.5 hover:bg-lg-surface-2 rounded-lg transition-colors">
+            <X className="w-4 h-4 text-lg-dim" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Título</label>
+            <label className="block text-xs font-semibold text-lg-dim uppercase mb-1.5">Título</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all"
+              className="w-full px-4 py-3 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-lg-surface transition-all"
               placeholder="Ej. Nuevo evento este sábado"
               maxLength={100}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-stone-500 uppercase mb-1.5">Mensaje</label>
+            <label className="block text-xs font-semibold text-lg-dim uppercase mb-1.5">Mensaje</label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 bg-primary-50/50 border border-primary-100 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-white transition-all resize-none"
+              className="w-full px-4 py-3 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm outline-none focus:border-primary-300 focus:bg-lg-surface transition-all resize-none"
               placeholder="Escribe tu anuncio..."
               maxLength={500}
             />
-            <p className="text-xs text-stone-500 mt-1 text-right">{body.length}/500</p>
+            <p className="text-xs text-lg-dim mt-1 text-right">{body.length}/500</p>
           </div>
           <button
             type="submit"
             disabled={sending || !title.trim() || !body.trim()}
-            className="w-full py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-lg-accent text-lg-ink rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {sending ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>

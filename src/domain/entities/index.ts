@@ -14,7 +14,6 @@ export { type MarketSurvey, type SurveyResponse, type SurveyNotification, type C
 export { type TabId, type ProfileTab, type EditProfileData, type StatCardProps } from './ProfileTypes';
 export {
   type StoriesRowProps,
-  type FeaturedHeroSectionProps,
   type EmptyHomeStateProps,
   type UseHomeEventsReturn,
   type UseTrendingPlacesReturn,

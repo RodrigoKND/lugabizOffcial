@@ -20,14 +20,14 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentUserId, onCancel, onCl
   return (
     <div onClick={onClick} role="button" tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
-      className="relative group bg-white rounded-2xl border border-primary-100/50 overflow-hidden hover:shadow-sm transition-shadow cursor-pointer">
+      className="relative group bg-lg-surface rounded-2xl border border-lg-surface-2 overflow-hidden hover:shadow-sm transition-shadow cursor-pointer">
       {isOwner && onCancel && (
         <button onClick={(e) => { e.stopPropagation(); onCancel(); }} aria-label="Cancelar plan"
           className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-500 transition-colors">
           <X className="w-4 h-4" />
         </button>
       )}
-      <div className="aspect-video bg-primary-50 relative overflow-hidden">
+      <div className="aspect-video bg-lg-surface-2 relative overflow-hidden">
         {plan.targetImage ? (
           <img src={plan.targetImage} alt="" className="w-full h-full object-cover" />
         ) : (
@@ -40,9 +40,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentUserId, onCancel, onCl
         </span>
       </div>
       <div className="p-2.5">
-        <p className="text-xs font-semibold text-[#241b3e] truncate">{plan.targetName || 'Plan'}</p>
-        <p className="text-[10px] text-stone-500 mt-0.5">{plan.planDate} · {plan.planTime}</p>
-        <p className="text-[10px] text-stone-500 mt-0.5">{acceptedCount} confirmados</p>
+        <p className="text-xs font-semibold text-lg-text truncate">{plan.targetName || 'Plan'}</p>
+        <p className="text-[10px] text-lg-dim mt-0.5">{plan.planDate} · {plan.planTime}</p>
+        <p className="text-[10px] text-lg-dim mt-0.5">{acceptedCount} confirmados</p>
       </div>
     </div>
   );

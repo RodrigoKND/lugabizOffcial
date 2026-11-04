@@ -8,14 +8,6 @@ export interface StoriesRowProps {
   likedEvents?: Set<string>;
 }
 
-export interface FeaturedHeroSectionProps {
-  heroEvent: Event;
-  activeEvents: Event[];
-  heroIndex: number;
-  onSetHeroIndex: (index: number) => void;
-  onEventClick: (eventId: string) => void;
-}
-
 export interface EmptyHomeStateProps {
   onPublish: () => void;
 }

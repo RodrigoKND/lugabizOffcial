@@ -8,7 +8,7 @@ const MAP_HEIGHT = 160;
 export function LocationMapSection({ coords }: { coords: [number, number] }) {
   return (
     <>
-      <div className="rounded-2xl overflow-hidden border border-stone-100" style={{ height: `${MAP_HEIGHT}px` }}>
+      <div className="rounded-2xl overflow-hidden border border-lg-surface-2" style={{ height: `${MAP_HEIGHT}px` }}>
         <Map center={[coords[1], coords[0]]} zoom={SNAP_ZOOM} style={{ width: '100%', height: '100%' }}>
           <MapMarker longitude={coords[1]} latitude={coords[0]}>
             <MarkerContent>

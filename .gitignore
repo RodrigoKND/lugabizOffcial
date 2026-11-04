@@ -46,3 +46,5 @@ supabase/migrations/*
 supabase/config.toml
 supabase/lugabiz_complete_schema.sql
 supabase/.temp/*
+# Crawler de eventos (local, no se sube: incluye scripts, salidas y credenciales)
+scripts/crawler-eventos/

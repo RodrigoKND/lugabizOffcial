@@ -19,8 +19,8 @@ interface Props {
 }
 
 const iCls = (hasError?: boolean) =>
-  `w-full px-4 py-3 bg-stone-50 border-2 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0 ${
-    hasError ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-stone-200'
+  `w-full px-4 py-3 bg-lg-surface-2 border-2 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0 ${
+    hasError ? 'border-red-300 focus:border-red-400' : 'border-transparent focus:border-primary-400 hover:border-lg-surface-2'
   }`;
 
 const renderError = (field: string, errors: ValidationErrors, touched: Record<string, boolean>) => {
@@ -164,11 +164,11 @@ const DateTimeLocationSection: React.FC<Props> = ({
       {/* ── Selector de modo ─────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Calendar className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Fecha del evento</h4>
+          <Calendar className="w-4 h-4 text-lg-accent" />
+          <h4 className="text-sm font-semibold text-lg-text">Fecha del evento</h4>
         </div>
 
-        <div className="flex gap-1 p-1 bg-stone-100 rounded-xl mb-4">
+        <div className="flex gap-1 p-1 bg-lg-surface-2 rounded-xl mb-4">
           {MODES.map(m => (
             <button
               key={m.value}
@@ -176,8 +176,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
               onClick={() => switchMode(m.value)}
               className={`flex-1 px-2 py-2 rounded-lg text-xs font-semibold transition-all ${
                 mode === m.value
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-lg-surface text-lg-accent shadow-sm'
+                  : 'text-lg-dim hover:text-lg-text'
               }`}
             >
               {m.label}
@@ -196,14 +196,14 @@ const DateTimeLocationSection: React.FC<Props> = ({
                   onClick={() => { onChange('dateStart', qd.value); onBlur('dateStart'); }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                     formData.dateStart === qd.value
-                      ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
-                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
+                      ? 'bg-lg-accent text-lg-ink border-primary-500 shadow-sm shadow-primary-200'
+                      : 'bg-lg-surface-2 text-lg-dim border-lg-surface-2 hover:border-primary-300 hover:text-lg-accent'
                   }`}
                 >
                   {qd.label}
                 </button>
               ))}
-              <span className="px-1 py-1.5 text-xs text-stone-400 self-center">o elige:</span>
+              <span className="px-1 py-1.5 text-xs text-lg-dim self-center">o elige:</span>
             </div>
             <div className="space-y-1">
               <input
@@ -223,7 +223,7 @@ const DateTimeLocationSection: React.FC<Props> = ({
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Inicio</label>
+                <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Inicio</label>
                 <input
                   type="date"
                   value={formData.dateStart}
@@ -234,7 +234,7 @@ const DateTimeLocationSection: React.FC<Props> = ({
                 {renderError('dateStart', errors, touched)}
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Fin</label>
+                <label className="text-[11px] font-semibold text-lg-dim uppercase tracking-wider">Fin</label>
                 <input
                   type="date"
                   value={formData.dateEnd}
@@ -245,7 +245,7 @@ const DateTimeLocationSection: React.FC<Props> = ({
                 />
               </div>
             </div>
-            <p className="text-[11px] text-stone-400">El mismo horario aplica a todos los días del evento.</p>
+            <p className="text-[11px] text-lg-dim">El mismo horario aplica a todos los días del evento.</p>
           </div>
         )}
 
@@ -253,9 +253,9 @@ const DateTimeLocationSection: React.FC<Props> = ({
         {mode === 'custom' && (
           <div className="space-y-2">
             {formData.schedules.map((session, i) => (
-              <div key={i} className="bg-stone-50 rounded-xl p-3 space-y-2">
+              <div key={i} className="bg-lg-surface-2 rounded-xl p-3 space-y-2">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-semibold text-stone-500">Sesión {i + 1}</span>
+                  <span className="text-[11px] font-semibold text-lg-dim">Sesión {i + 1}</span>
                   {formData.schedules.length > 1 && (
                     <button type="button" onClick={() => removeSession(i)}
                       className="text-red-400 hover:text-red-600 transition-colors">
@@ -265,30 +265,30 @@ const DateTimeLocationSection: React.FC<Props> = ({
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   <div>
-                    <label className="text-[10px] text-stone-400 font-medium">Fecha</label>
+                    <label className="text-[10px] text-lg-dim font-medium">Fecha</label>
                     <input
                       type="date"
                       value={session.date}
                       onChange={e => updateSession(i, 'date', e.target.value)}
-                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                      className="w-full mt-0.5 px-3 py-2 bg-lg-surface border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-stone-400 font-medium">Hora inicio</label>
+                    <label className="text-[10px] text-lg-dim font-medium">Hora inicio</label>
                     <input
                       type="time"
                       value={session.timeStart}
                       onChange={e => updateSession(i, 'timeStart', e.target.value)}
-                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                      className="w-full mt-0.5 px-3 py-2 bg-lg-surface border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-stone-400 font-medium">Hora fin</label>
+                    <label className="text-[10px] text-lg-dim font-medium">Hora fin</label>
                     <input
                       type="time"
                       value={session.timeEnd}
                       onChange={e => updateSession(i, 'timeEnd', e.target.value)}
-                      className="w-full mt-0.5 px-3 py-2 bg-white border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
+                      className="w-full mt-0.5 px-3 py-2 bg-lg-surface border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-xs outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -303,7 +303,7 @@ const DateTimeLocationSection: React.FC<Props> = ({
             <button
               type="button"
               onClick={addSession}
-              className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border-2 border-dashed border-stone-200 text-sm text-stone-500 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/30 transition-all"
+              className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border-2 border-dashed border-lg-surface-2 text-sm text-lg-dim hover:border-primary-300 hover:text-lg-accent hover:bg-lg-surface-2 transition-all"
             >
               <Plus className="w-4 h-4" />
               Agregar sesión
@@ -317,8 +317,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
         <>
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-primary-500" />
-              <h4 className="text-sm font-semibold text-stone-700">Hora de inicio</h4>
+              <Clock className="w-4 h-4 text-lg-accent" />
+              <h4 className="text-sm font-semibold text-lg-text">Hora de inicio</h4>
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
               {TIME_PRESETS.map(tp => (
@@ -328,8 +328,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
                   onClick={() => { onChange('timeStart', tp); onBlur('timeStart'); }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                     formData.timeStart === tp
-                      ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
-                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-primary-300 hover:text-primary-600'
+                      ? 'bg-lg-accent text-lg-ink border-primary-500 shadow-sm shadow-primary-200'
+                      : 'bg-lg-surface-2 text-lg-dim border-lg-surface-2 hover:border-primary-300 hover:text-lg-accent'
                   }`}
                 >
                   {tp}
@@ -350,9 +350,9 @@ const DateTimeLocationSection: React.FC<Props> = ({
 
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-primary-500" />
-              <h4 className="text-sm font-semibold text-stone-700">
-                Hora de fin <span className="text-stone-400 font-normal text-xs">(opcional)</span>
+              <Zap className="w-4 h-4 text-lg-accent" />
+              <h4 className="text-sm font-semibold text-lg-text">
+                Hora de fin <span className="text-lg-dim font-normal text-xs">(opcional)</span>
               </h4>
             </div>
             {endTimePresets.length > 0 && (
@@ -364,8 +364,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
                     onClick={() => onChange('timeEnd', tp.value)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                       formData.timeEnd === tp.value
-                        ? 'bg-stone-700 text-white border-stone-700'
-                        : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-400'
+                        ? 'bg-stone-700 text-white border-lg-surface-2'
+                        : 'bg-lg-surface-2 text-lg-dim border-lg-surface-2 hover:border-lg-surface-2'
                     }`}
                   >
                     {tp.label}
@@ -374,13 +374,13 @@ const DateTimeLocationSection: React.FC<Props> = ({
               </div>
             )}
             {!formData.timeStart && (
-              <p className="text-[11px] text-stone-400 mb-2">Selecciona la hora de inicio primero.</p>
+              <p className="text-[11px] text-lg-dim mb-2">Selecciona la hora de inicio primero.</p>
             )}
             <input
               type="time"
               value={formData.timeEnd}
               onChange={e => onChange('timeEnd', e.target.value)}
-              className="max-w-xs px-4 py-3 bg-stone-50 border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
+              className="max-w-xs px-4 py-3 bg-lg-surface-2 border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
             />
           </div>
         </>
@@ -389,15 +389,15 @@ const DateTimeLocationSection: React.FC<Props> = ({
       {/* ── Capacidad ────────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Users className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Capacidad <span className="text-stone-400 font-normal text-xs">(opcional)</span></h4>
+          <Users className="w-4 h-4 text-lg-accent" />
+          <h4 className="text-sm font-semibold text-lg-text">Capacidad <span className="text-lg-dim font-normal text-xs">(opcional)</span></h4>
         </div>
         <input
           type="number"
           min={0}
           value={formData.capacity || ''}
           onChange={e => onChange('capacity', Number(e.target.value))}
-          className="max-w-xs px-4 py-3 bg-stone-50 border-2 border-transparent hover:border-stone-200 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
+          className="max-w-xs px-4 py-3 bg-lg-surface-2 border-2 border-transparent hover:border-lg-surface-2 focus:border-primary-400 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-0"
           placeholder="Máximo de asistentes"
         />
       </div>
@@ -405,8 +405,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
       {/* ── Dirección ────────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <MapPin className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Ubicación</h4>
+          <MapPin className="w-4 h-4 text-lg-accent" />
+          <h4 className="text-sm font-semibold text-lg-text">Ubicación</h4>
         </div>
         <div className="space-y-1">
           <AddressAutocomplete
@@ -426,12 +426,12 @@ const DateTimeLocationSection: React.FC<Props> = ({
         </div>
 
         <div className="space-y-1 mt-3">
-          <p className="text-[11px] text-stone-500 mb-2">
+          <p className="text-[11px] text-lg-dim mb-2">
             Confirma la ubicación en el mapa. Haz clic o arrastra el marcador para ajustarla.
           </p>
           <Suspense fallback={
-            <div className="aspect-video bg-stone-100 rounded-xl flex items-center justify-center">
-              <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+            <div className="aspect-video bg-lg-surface-2 rounded-xl flex items-center justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-lg-accent" />
             </div>
           }>
             <MapPicker initialCoords={formData.coords} onCoordsChange={handleMapCoords} />
@@ -443,8 +443,8 @@ const DateTimeLocationSection: React.FC<Props> = ({
             </p>
           )}
           {formData.coords?.length === 2 && (
-            <div className="flex items-center gap-2 text-xs text-stone-500 bg-primary-50 px-3 py-2 rounded-xl mt-2">
-              <Locate className="w-3.5 h-3.5 text-primary-500" />
+            <div className="flex items-center gap-2 text-xs text-lg-dim bg-lg-surface-2 px-3 py-2 rounded-xl mt-2">
+              <Locate className="w-3.5 h-3.5 text-lg-accent" />
               <span>{formData.coords[0].toFixed(6)}, {formData.coords[1].toFixed(6)}</span>
             </div>
           )}
@@ -454,17 +454,17 @@ const DateTimeLocationSection: React.FC<Props> = ({
       {/* ── Imágenes ─────────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Image className="w-4 h-4 text-primary-500" />
-          <h4 className="text-sm font-semibold text-stone-700">Imágenes</h4>
+          <Image className="w-4 h-4 text-lg-accent" />
+          <h4 className="text-sm font-semibold text-lg-text">Imágenes</h4>
         </div>
         <div className="flex flex-wrap gap-2">
-          <label className="flex flex-col items-center justify-center w-20 h-20 bg-stone-50 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all group">
-            <Image className="w-5 h-5 text-stone-400 group-hover:text-primary-500 transition-colors" />
-            <span className="text-[9px] text-stone-400 mt-1">Agregar</span>
+          <label className="flex flex-col items-center justify-center w-20 h-20 bg-lg-surface-2 border-2 border-dashed border-lg-surface-2 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-lg-surface-2 transition-all group">
+            <Image className="w-5 h-5 text-lg-dim group-hover:text-lg-accent transition-colors" />
+            <span className="text-[9px] text-lg-dim mt-1">Agregar</span>
             <input type="file" accept="image/*" onChange={onImage} className="hidden" multiple />
           </label>
           {imagePreviews.map((src, i) => (
-            <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden group ring-1 ring-stone-100">
+            <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden group ring-1 ring-lg-surface-2">
               <img src={src} alt="" className="w-full h-full object-cover" />
               <button
                 type="button"
@@ -476,7 +476,7 @@ const DateTimeLocationSection: React.FC<Props> = ({
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-stone-400 mt-2">Máx 5 imágenes · 10MB total</p>
+        <p className="text-[10px] text-lg-dim mt-2">Máx 5 imágenes · 10MB total</p>
       </div>
     </div>
   );

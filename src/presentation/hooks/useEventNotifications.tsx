@@ -63,9 +63,9 @@ export function useEventNotifications() {
                     <Calendar className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <p className="font-bold text-sm text-stone-800">Evento próximo!</p>
-                    <p className="text-xs text-stone-500 mt-0.5">{event.name}</p>
-                    <p className="text-[11px] text-stone-400">{timeStr} · {event.address}</p>
+                    <p className="font-bold text-sm text-lg-text">Evento próximo!</p>
+                    <p className="text-xs text-lg-dim mt-0.5">{event.name}</p>
+                    <p className="text-[11px] text-lg-dim">{timeStr} · {event.address}</p>
                     <button
                       onClick={() => toast.dismiss(t.id)}
                       className="mt-2 text-xs font-semibold text-amber-600 hover:text-amber-700"

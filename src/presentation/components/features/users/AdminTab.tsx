@@ -30,7 +30,7 @@ const AdminTab: React.FC<AdminTabProps> = ({ myPlacesCount, myEventsCount, unrea
           <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
             <Shield className="w-3.5 h-3.5 text-amber-600" />
           </div>
-          <h3 className="font-bold text-sm text-[#241b3e]">Monitor del Sistema</h3>
+          <h3 className="font-bold text-sm text-lg-text">Monitor del Sistema</h3>
         </div>
         <Link to="/admin"
           className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors shadow-sm">
@@ -51,22 +51,22 @@ const AdminTab: React.FC<AdminTabProps> = ({ myPlacesCount, myEventsCount, unrea
             { icon: Calendar, label: 'Eventos', value: stats?.events ?? myEventsCount, color: 'text-emerald-500', bg: 'bg-emerald-50' },
             { icon: Bell, label: 'Notif.', value: unreadCount, color: 'text-rose-500', bg: 'bg-rose-50' },
           ].map(({ icon: Icon, label, value, color, bg }) => (
-            <div key={label} className="bg-white rounded-xl p-3.5 border border-primary-100/40 shadow-xs">
+            <div key={label} className="bg-lg-surface rounded-xl p-3.5 border border-lg-surface-2 shadow-xs">
               <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center mb-2`}>
                 <Icon className={`w-3.5 h-3.5 ${color}`} />
               </div>
-              <p className="text-xl font-bold text-[#241b3e]">{typeof value === 'number' ? value.toLocaleString() : value}</p>
-              <p className="text-[10px] text-stone-500 uppercase font-semibold mt-0.5">{label}</p>
+              <p className="text-xl font-bold text-lg-text">{typeof value === 'number' ? value.toLocaleString() : value}</p>
+              <p className="text-[10px] text-lg-dim uppercase font-semibold mt-0.5">{label}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Status indicators */}
-      <div className="bg-white rounded-xl p-4 border border-primary-100/40">
+      <div className="bg-lg-surface rounded-xl p-4 border border-lg-surface-2">
         <div className="flex items-center gap-2 mb-3">
-          <Activity className="w-3.5 h-3.5 text-primary-500" />
-          <h4 className="font-bold text-xs text-[#241b3e] uppercase tracking-wide">Estado de Servicios</h4>
+          <Activity className="w-3.5 h-3.5 text-lg-accent" />
+          <h4 className="font-bold text-xs text-lg-text uppercase tracking-wide">Estado de Servicios</h4>
         </div>
         <div className="space-y-2">
           {[
@@ -75,8 +75,8 @@ const AdminTab: React.FC<AdminTabProps> = ({ myPlacesCount, myEventsCount, unrea
             { icon: TrendingUp, label: 'Sistema', status: 'ok' },
           ].map(({ icon: Icon, label, status }) => (
             <div key={label} className="flex items-center gap-2.5">
-              <Icon className="w-3.5 h-3.5 text-stone-500" />
-              <span className="text-xs text-stone-500 flex-1">{label}</span>
+              <Icon className="w-3.5 h-3.5 text-lg-dim" />
+              <span className="text-xs text-lg-dim flex-1">{label}</span>
               <div className="flex items-center gap-1">
                 <div className={`w-1.5 h-1.5 rounded-full ${status === 'ok' ? 'bg-green-500' : 'bg-red-400'}`} />
                 <span className={`text-[10px] font-semibold ${status === 'ok' ? 'text-green-600' : 'text-red-500'}`}>
@@ -89,24 +89,24 @@ const AdminTab: React.FC<AdminTabProps> = ({ myPlacesCount, myEventsCount, unrea
       </div>
 
       {/* Recent notifications / activity */}
-      <div className="bg-white rounded-xl p-4 border border-primary-100/40">
+      <div className="bg-lg-surface rounded-xl p-4 border border-lg-surface-2">
         <div className="flex items-center gap-2 mb-3">
-          <BarChart2 className="w-3.5 h-3.5 text-primary-500" />
-          <h4 className="font-semibold text-xs text-[#241b3e] uppercase tracking-wide">Actividad Reciente</h4>
+          <BarChart2 className="w-3.5 h-3.5 text-lg-accent" />
+          <h4 className="font-semibold text-xs text-lg-text uppercase tracking-wide">Actividad Reciente</h4>
         </div>
         {notifications.length === 0 ? (
-          <p className="text-xs text-stone-500 text-center py-4">Sin actividad reciente</p>
+          <p className="text-xs text-lg-dim text-center py-4">Sin actividad reciente</p>
         ) : (
           <div className="space-y-1.5 max-h-52 overflow-y-auto">
             {notifications.slice(0, 12).map(n => (
               <div key={n.id}
-                className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-primary-50 transition-colors">
-                <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <Bell className="w-2.5 h-2.5 text-primary-400" />
+                className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-lg-surface-2 transition-colors">
+                <div className="w-5 h-5 rounded-full bg-lg-surface-2 flex items-center justify-center shrink-0 mt-0.5">
+                  <Bell className="w-2.5 h-2.5 text-lg-accent" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-[#241b3e] truncate">{n.title}</p>
-                  <p className="text-[10px] text-stone-500 truncate">{n.body}</p>
+                  <p className="text-xs font-medium text-lg-text truncate">{n.title}</p>
+                  <p className="text-[10px] text-lg-dim truncate">{n.body}</p>
                   <p className="text-[10px] text-stone-500/60 mt-0.5">
                     {n.createdAt.toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </p>

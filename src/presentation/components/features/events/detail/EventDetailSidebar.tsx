@@ -19,19 +19,19 @@ export default function EventDetailSidebar({
 
       <header className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Precio</p>
-          <p className="text-2xl font-bold text-stone-800">
+          <p className="text-xs font-semibold text-lg-dim uppercase tracking-wider">Precio</p>
+          <p className="text-2xl font-bold text-lg-text">
             {event.isFree ? 'Gratis' : formatPrice(event)}
           </p>
         </div>
         <div className="text-right">
-          <div className="flex items-center gap-1 text-sm text-stone-500">
+          <div className="flex items-center gap-1 text-sm text-lg-dim">
             <Users className="w-4 h-4" />
             <span className="font-semibold">{attendeeCount}</span>
             <span>asistentes</span>
           </div>
           {capacity > 0 && (
-            <p className="text-[10px] text-stone-400 mt-0.5">{availableSpots} cupos disponibles</p>
+            <p className="text-[10px] text-lg-dim mt-0.5">{availableSpots} cupos disponibles</p>
           )}
           <PlansCountBadge count={event.plansCount} className="mt-1.5" />
         </div>
@@ -74,7 +74,7 @@ export default function EventDetailSidebar({
             variant={isAttending ? 'secondary' : 'primary'}
             size="lg"
             fullWidth
-            className={isAttending ? '!bg-stone-100 !text-stone-600 !border !border-stone-200 hover:!bg-stone-200' : ''}
+            className={isAttending ? '!bg-lg-surface-2 !text-lg-dim !border !border-lg-surface-2 hover:!bg-lg-surface-2' : ''}
           >
             {isAttending ? <><CheckCircle2 className="w-5 h-5" /> Asistiré</> : <><Ticket className="w-5 h-5" /> Confirmar Asistencia</>}
           </Button>

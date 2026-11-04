@@ -17,7 +17,7 @@ const EditEventPage: React.FC = () => {
   } = useEditEventForm();
 
   if (loading) return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+    <div className="min-h-screen bg-lg-surface-2 flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
     </div>
   );
@@ -25,22 +25,22 @@ const EditEventPage: React.FC = () => {
   if (!event) return null;
 
   return (
-    <Section level="page" className="!bg-stone-50 text-stone-800 p-4 md:p-8">
+    <Section level="page" className="!bg-lg-surface-2 text-lg-text p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
         <Link to={`/event/${id}`}
-          className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-700 transition-colors mb-6">
+          className="inline-flex items-center gap-2 text-lg-dim hover:text-lg-text transition-colors mb-6">
           <ArrowLeft className="w-5 h-5" /> Volver al evento
         </Link>
         <h1 className="text-2xl font-bold mb-6">Editar Evento</h1>
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 border border-stone-200 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-lg-surface rounded-2xl p-6 border border-lg-surface-2 space-y-5">
 
           {/* Imagen de portada */}
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Imagen de portada</label>
+            <label className="text-xs font-semibold text-lg-dim uppercase block mb-2">Imagen de portada</label>
             <input ref={coverRef} type="file" accept="image/*" onChange={handleCoverChange} className="hidden" />
             {coverPreview ? (
               <div className="flex items-start gap-3">
-                <div className="relative w-32 h-20 rounded-xl overflow-hidden ring-1 ring-stone-200 shrink-0">
+                <div className="relative w-32 h-20 rounded-xl overflow-hidden ring-1 ring-lg-surface-2 shrink-0">
                   <img src={coverPreview} alt="" className="w-full h-full object-cover" />
                   <button type="button" onClick={clearCover}
                     className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80">
@@ -63,7 +63,7 @@ const EditEventPage: React.FC = () => {
           {/* Galería de imágenes */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-stone-500 uppercase">Galería</label>
+              <label className="text-xs font-semibold text-lg-dim uppercase">Galería</label>
               {galleryFiles.length > 0 && (
                 <Badge variant={totalNewMB > 8 ? 'danger' : 'default'}>
                   {totalNewMB.toFixed(1)} / 10 MB
@@ -73,7 +73,7 @@ const EditEventPage: React.FC = () => {
             <input ref={galleryRef} type="file" accept="image/*" multiple onChange={handleGalleryAdd} className="hidden" />
             <div className="flex flex-wrap gap-2">
               {galleryUrls.map((url) => (
-                <div key={url} className="relative w-20 h-20 rounded-xl overflow-hidden ring-1 ring-stone-200 group">
+                <div key={url} className="relative w-20 h-20 rounded-xl overflow-hidden ring-1 ring-lg-surface-2 group">
                   <img src={url} alt="" className="w-full h-full object-cover" />
                   <button type="button" onClick={() => removeExistingGallery(url)}
                     className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
@@ -96,15 +96,15 @@ const EditEventPage: React.FC = () => {
                 <span className="text-[9px] mt-1">Agregar</span>
               </Button>
             </div>
-            <p className="text-[10px] text-stone-400 mt-1.5">Máximo 10 MB en total para imágenes nuevas</p>
+            <p className="text-[10px] text-lg-dim mt-1.5">Máximo 10 MB en total para imágenes nuevas</p>
           </div>
 
           <Input label="Nombre" type="text" value={form.name}
             onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-            className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+            className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
 
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase block mb-1">Descripción</label>
+            <label className="text-xs font-semibold text-lg-dim uppercase block mb-1">Descripción</label>
             <textarea value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               className={`${formInputClass} resize-none`} rows={4} />
@@ -112,33 +112,33 @@ const EditEventPage: React.FC = () => {
 
           <Input label="Dirección" type="text" value={form.address}
             onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
-            className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+            className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
 
           <div className="grid grid-cols-2 gap-4">
             <Input label="Fecha inicio" type="date" value={form.dateStart}
               onChange={(e) => setForm(f => ({ ...f, dateStart: e.target.value }))}
-              className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+              className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
             <Input label="Fecha fin (opcional)" type="date" value={form.dateEnd}
               min={form.dateStart || undefined}
               onChange={(e) => setForm(f => ({ ...f, dateEnd: e.target.value }))}
-              className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+              className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input label="Hora inicio" type="time" value={form.timeStart}
               onChange={(e) => setForm(f => ({ ...f, timeStart: e.target.value }))}
-              className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+              className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
             <Input label="Hora fin (opcional)" type="time" value={form.timeEnd}
               onChange={(e) => setForm(f => ({ ...f, timeEnd: e.target.value }))}
-              className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+              className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
           </div>
 
           <Input label="Tags (separados por coma)" type="text" value={form.tags}
             onChange={(e) => setForm(f => ({ ...f, tags: e.target.value }))}
-            className="!bg-stone-50 !text-stone-800 !border-stone-200" />
+            className="!bg-lg-surface-2 !text-lg-text !border-lg-surface-2" />
 
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Precio</label>
+            <label className="text-xs font-semibold text-lg-dim uppercase block mb-2">Precio</label>
             <EventPricingSection
               isFree={form.isFree} price={form.price}
               priceOptions={form.priceOptions} priceNote={form.priceNote}
@@ -148,7 +148,7 @@ const EditEventPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase block mb-2">Redes sociales (opcional)</label>
+            <label className="text-xs font-semibold text-lg-dim uppercase block mb-2">Redes sociales (opcional)</label>
             <SocialLinksSection
               value={form.socialLinks}
               onChange={links => setForm(f => ({ ...f, socialLinks: links }))}

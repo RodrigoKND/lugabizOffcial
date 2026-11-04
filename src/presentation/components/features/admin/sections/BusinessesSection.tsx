@@ -46,29 +46,29 @@ export function BusinessesSection() {
     (acc[b.userId] ??= { name: b.ownerName, email: b.ownerEmail, list: [] }).list.push(b); return acc;
   }, {});
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-primary-500" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>;
 
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm">
-        <div className="p-5 border-b border-stone-100 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center"><Store className="w-4 h-4 text-primary-500" /></div>
-          <div className="flex-1"><h3 className="font-bold text-stone-800">Negocios registrados</h3><p className="text-[11px] text-stone-400">{items.length} negocio(s) · {Object.keys(groups).length} dueño(s)</p></div>
-          <button onClick={load} className="p-2 rounded-xl hover:bg-stone-100 transition-colors text-stone-400 hover:text-stone-600"><RefreshCw className="w-4 h-4" /></button>
+      <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
+        <div className="p-5 border-b border-lg-surface-2 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-lg-surface-2 flex items-center justify-center"><Store className="w-4 h-4 text-lg-accent" /></div>
+          <div className="flex-1"><h3 className="font-bold text-lg-text">Negocios registrados</h3><p className="text-[11px] text-lg-dim">{items.length} negocio(s) · {Object.keys(groups).length} dueño(s)</p></div>
+          <button onClick={load} className="p-2 rounded-xl hover:bg-lg-surface-2 transition-colors text-lg-dim hover:text-lg-dim"><RefreshCw className="w-4 h-4" /></button>
         </div>
         {items.length === 0 ? (
-          <div className="text-center py-16 text-stone-400"><Store className="w-10 h-10 mx-auto mb-3 text-stone-200" /><p className="text-sm font-medium text-stone-500">No hay negocios registrados</p></div>
+          <div className="text-center py-16 text-lg-dim"><Store className="w-10 h-10 mx-auto mb-3 text-stone-200" /><p className="text-sm font-medium text-lg-dim">No hay negocios registrados</p></div>
         ) : (
-          <div className="divide-y divide-stone-50">
+          <div className="divide-y divide-lg-surface-2">
             {Object.entries(groups).map(([uid, g]) => (
               <div key={uid} className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-semibold text-stone-700">{g.name ?? uid}</span>
-                  <span className="text-[11px] text-stone-400">{g.email}</span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700">{g.list.length}/3</span>
+                  <span className="text-sm font-semibold text-lg-text">{g.name ?? uid}</span>
+                  <span className="text-[11px] text-lg-dim">{g.email}</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-lg-surface-2 text-lg-accent">{g.list.length}/3</span>
                   <button onClick={() => { setReason(''); setRevoke({ target: 'identity', ownerId: uid, title: 'Retirar verificación de identidad', message: `Se quitará la verificación de la cuenta de ${g.name ?? 'este dueño'}.` }); }}
                     disabled={acting === `id-${uid}`}
-                    className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50">
+                    className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-lg text-lg-dim hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50">
                     {acting === `id-${uid}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldAlert className="w-3 h-3" />} Retirar identidad
                   </button>
                 </div>
@@ -76,9 +76,9 @@ export function BusinessesSection() {
                   {g.list.map(biz => {
                     const badge = DOCS_BADGE[biz.docsStatus] ?? DOCS_BADGE.none;
                     return (
-                      <div key={biz.id} className="flex items-center gap-2 px-3 py-2 bg-stone-50 rounded-lg">
-                        <Store className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-                        <span className="text-sm text-stone-700 flex-1 min-w-0 truncate">{biz.name}</span>
+                      <div key={biz.id} className="flex items-center gap-2 px-3 py-2 bg-lg-surface-2 rounded-lg">
+                        <Store className="w-3.5 h-3.5 text-lg-dim shrink-0" />
+                        <span className="text-sm text-lg-text flex-1 min-w-0 truncate">{biz.name}</span>
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${badge.cls}`}>{badge.label}</span>
                         {biz.docsStatus === 'approved' && (
                           <button onClick={() => { setReason(''); setRevoke({ target: 'business_docs', businessId: biz.id, title: 'Retirar insignia dorada', message: `La insignia de "${biz.name}" volverá a estado emergente.` }); }}
@@ -88,7 +88,7 @@ export function BusinessesSection() {
                           </button>
                         )}
                         <button onClick={() => setTarget(biz)} disabled={acting === biz.id} title="Eliminar negocio"
-                          className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
+                          className="p-1.5 rounded-lg text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
                           {acting === biz.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         </button>
                       </div>

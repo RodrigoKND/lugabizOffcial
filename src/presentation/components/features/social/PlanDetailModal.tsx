@@ -25,9 +25,9 @@ function PlanDetailContent({ plan, currentUserId, onClose }: { plan: Plan; curre
       className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       onClick={onClose}>
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden max-h-[85vh] flex flex-col"
+        className="bg-lg-surface rounded-2xl shadow-xl w-full max-w-sm overflow-hidden max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}>
-        <div className="relative aspect-video bg-primary-50 shrink-0">
+        <div className="relative aspect-video bg-lg-surface-2 shrink-0">
           {plan.targetImage ? (
             <img src={plan.targetImage} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -46,27 +46,27 @@ function PlanDetailContent({ plan, currentUserId, onClose }: { plan: Plan; curre
 
         <div className="p-5 space-y-3 overflow-y-auto">
           <div>
-            <h3 className="text-base font-bold text-[#241b3e]">{plan.targetName || 'Plan'}</h3>
-            <p className="text-xs text-stone-500 flex items-center gap-2 mt-1">
+            <h3 className="text-base font-bold text-lg-text">{plan.targetName || 'Plan'}</h3>
+            <p className="text-xs text-lg-dim flex items-center gap-2 mt-1">
               <Calendar className="w-3.5 h-3.5" /> {plan.planDate}
               <Clock className="w-3.5 h-3.5 ml-1.5" /> {plan.planTime}
             </p>
           </div>
 
           {plan.note && (
-            <p className="text-xs text-stone-500 bg-primary-50/50 rounded-xl p-3">{plan.note}</p>
+            <p className="text-xs text-lg-dim bg-lg-surface-2 rounded-xl p-3">{plan.note}</p>
           )}
 
           <div>
-            <p className="text-[11px] font-semibold text-stone-500 uppercase tracking-wide mb-2">
+            <p className="text-[11px] font-semibold text-lg-dim uppercase tracking-wide mb-2">
               {canSeeAttendees ? `${accepted.length} confirmados` : 'Confirmados'}
             </p>
             {!canSeeAttendees ? (
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-lg-dim">
                 Vas a poder ver quién confirmó cuando aceptes la invitación.
               </p>
             ) : accepted.length === 0 ? (
-              <p className="text-xs text-stone-500">Todavía nadie confirmó asistencia.</p>
+              <p className="text-xs text-lg-dim">Todavía nadie confirmó asistencia.</p>
             ) : (
               <div className="space-y-2">
                 {accepted.map((p) => (
@@ -74,11 +74,11 @@ function PlanDetailContent({ plan, currentUserId, onClose }: { plan: Plan; curre
                     {p.userAvatar ? (
                       <img src={p.userAvatar} alt="" className="w-8 h-8 rounded-full object-cover" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-lg-surface-2 text-lg-accent text-xs font-bold flex items-center justify-center">
                         {(p.userName || '?').charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-xs font-medium text-[#241b3e]">
+                    <span className="text-xs font-medium text-lg-text">
                       {p.userName || 'Usuario'}{p.role === 'owner' ? ' (organiza)' : ''}
                     </span>
                   </div>

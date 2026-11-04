@@ -32,7 +32,7 @@ export function MobileInfoStrip({ event, isExpanded, onToggleExpand, onClose }: 
         </div>
       </div>
       <Link to={`/event/${event.id}`} onClick={onClose}
-        className="mt-2 block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white py-2 rounded-lg font-semibold text-xs">
+        className="mt-2 block w-full text-center bg-lg-accent text-lg-ink py-2 rounded-lg font-semibold text-xs">
         Asistiré
       </Link>
     </div>

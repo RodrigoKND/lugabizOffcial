@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
 @plugin "tailwindcss-animate";
 
 /* ── CSS Custom Properties (shadcn/ui base) ── */
@@ -63,7 +64,7 @@
   --color-secondary-500: #ef4444;
 
   /* --- Social Feed Colors --- */
-  --color-feed-bg: #0d0620;
+  --color-feed-bg: #1f1033;
   --color-card-bg: #ffffff;
   --color-card-border: #e4d8f0;
   --color-accent-purple: #a855f7;
@@ -77,10 +78,6 @@
   --gradient-brand: linear-gradient(135deg, #9333ea, #7c22ce, #6b1cb0);
   --gradient-brand-soft: linear-gradient(135deg, #2d1655, #1a0e33);
   --gradient-brand-glow: radial-gradient(ellipse at 50% 0%, rgba(147, 51, 234, 0.15), transparent 70%);
-
-  /* --- Fonts --- */
-  --font-sora: 'Sora', sans-serif;
-  --font-dm: 'DM Sans', sans-serif;
 
   /* --- Radius --- */
   --radius-lg: var(--radius);
@@ -129,51 +126,34 @@
 
 body {
   background-color: var(--color-feed-bg);
-  background-image:
-    radial-gradient(ellipse 900px 500px at 8% 10%, rgba(147, 51, 234, 0.12), transparent),
-    radial-gradient(ellipse 700px 600px at 90% 55%, rgba(168, 128, 250, 0.08), transparent),
-    radial-gradient(ellipse 550px 450px at 45% 85%, rgba(219, 39, 119, 0.05), transparent);
-  background-attachment: fixed;
   color: var(--color-text-primary);
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
 }
 
-/* La mayoría de los inputs de la app viven sobre fondos claros (bg-white/bg-stone-50)
-   tras el rediseño, pero heredan `color` de <body> (--color-text-primary, pensado para
-   fondos OSCUROS) porque casi ningún <input>/<textarea> pone su propio color de texto.
-   Esto los dejaba escribiendo "invisible" (texto casi blanco sobre fondo casi blanco)
-   en toda la app. Los pocos formularios que SÍ siguen siendo oscuros a propósito
-   (Auth/SearchModal, EventDetail, Add/Edit Place, Admin, Asesor, y algunos selects/
-   textareas sueltos con `text-white` explícito) ya fuerzan su propio color con clases
-   Tailwind o con !important en pages-dark.css/modals-dark.css.
-   IMPORTANTE: esta regla va DENTRO de @layer base a propósito — Tailwind v4 pone sus
-   utilities (incl. `text-white`) en su propia @layer, y CUALQUIER regla SIN layer le
-   gana a TODAS las reglas con layer sin importar especificidad. Puesto sin @layer acá
-   (como estaba antes) esta regla le ganaba a `text-white` en selects/inputs que sí
-   querían quedarse oscuros, dejándolos con el mismo bug de texto invisible que se
-   supone que arregla. Dentro de @layer base, las utilities de Tailwind (capa más
-   específica) vuelven a ganar cuando el componente pone su propia clase de color. */
+/* Los inputs heredan el color del body; se fija aquí para que escribir se vea
+   sobre las superficies violeta. Va en @layer base para que las utilities de
+   Tailwind (p. ej. text-lg-ink en el buscador claro del hero) sigan ganando. */
 @layer base {
   input, textarea, select {
-    color: #241b3e;
+    color: var(--color-lg-text);
   }
   input::placeholder, textarea::placeholder {
-    color: #a8a0b5;
+    color: var(--color-lg-dim);
   }
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: -0.02em;
 }
 
 ::selection {
-  background-color: rgba(147, 51, 234, 0.3);
-  color: #f0ebf8;
+  background-color: #b794ff;
+  color: #1b0b2e;
 }
 
 :focus-visible {

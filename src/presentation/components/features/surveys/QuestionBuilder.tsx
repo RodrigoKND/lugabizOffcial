@@ -30,7 +30,7 @@ export function QuestionBuilder({
             className="bg-white/5 rounded-xl p-4 border border-white/5 hover:border-primary-500/20 transition-colors">
             <div className="flex items-start gap-3">
               <div className="w-7 h-7 mt-0.5 rounded-lg bg-primary-500/10 flex items-center justify-center shrink-0">
-                <HelpCircle className="w-4 h-4 text-primary-400" />
+                <HelpCircle className="w-4 h-4 text-lg-accent" />
               </div>
               <div className="flex-1 min-w-0">
                 <input type="text" value={q.question}
@@ -57,7 +57,7 @@ export function QuestionBuilder({
                   ))}
                   {q.options.length < 4 && (
                     <button type="button" onClick={() => onAddOption(q.id)}
-                      className="text-xs text-primary-400/70 hover:text-primary-400 font-medium transition-colors ml-7">
+                      className="text-xs text-primary-400/70 hover:text-lg-accent font-medium transition-colors ml-7">
                       + Agregar opción
                     </button>
                   )}

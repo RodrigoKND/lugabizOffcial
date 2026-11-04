@@ -135,25 +135,25 @@ export function CommentItem({ comment, onReply, depth = 0, userId, rootId }: Com
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl"
+              className="bg-lg-surface rounded-3xl w-full max-w-sm p-6 shadow-2xl"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
                   <Flag className="w-5 h-5 text-red-500" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-stone-800">Reportar comentario</h3>
-                  <p className="text-xs text-stone-400">Ayúdanos a mantener la comunidad segura</p>
+                  <h3 className="font-bold text-lg-text">Reportar comentario</h3>
+                  <p className="text-xs text-lg-dim">Ayúdanos a mantener la comunidad segura</p>
                 </div>
               </div>
               <select value={reportReason} onChange={e => setReportReason(e.target.value)}
-                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-red-400 mb-4">
+                className="w-full px-3 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm focus:outline-none focus:border-red-400 mb-4">
                 <option value="">Seleccionar motivo...</option>
                 {REPORT_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
               <div className="flex gap-3">
                 <button onClick={() => { setReportOpen(false); setReportReason(''); }}
-                  className="flex-1 py-2.5 bg-stone-100 text-stone-600 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
+                  className="flex-1 py-2.5 bg-lg-surface-2 text-lg-dim rounded-xl text-sm font-semibold hover:bg-lg-surface-2 transition-colors">
                   Cancelar
                 </button>
                 <button onClick={handleReport} disabled={!reportReason || reporting}

@@ -10,16 +10,16 @@ export default function PlaceLocationCard({ address, latitude, longitude }: Plac
     : '#';
 
   return (
-    <div className="bg-white rounded-3xl p-6 ring-1 ring-primary-100/70 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
-      <h3 className="font-semibold text-[#241b3e] mb-3">Ubicación</h3>
+    <div className="bg-lg-surface rounded-3xl p-6 ring-1 ring-lg-surface-2 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
+      <h3 className="font-semibold text-lg-text mb-3">Ubicación</h3>
       <div className="flex items-start gap-3 mb-4">
         <MapPin className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-        <span className="text-stone-500">{address}</span>
+        <span className="text-lg-dim">{address}</span>
       </div>
 
       {hasCoords && (
         <>
-          <div className="rounded-2xl overflow-hidden border border-primary-100/70" style={{ height: '200px' }}>
+          <div className="rounded-2xl overflow-hidden border border-lg-surface-2" style={{ height: '200px' }}>
             <Map
               center={[longitude!, latitude!]}
               zoom={15}

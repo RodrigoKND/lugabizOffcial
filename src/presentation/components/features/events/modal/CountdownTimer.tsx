@@ -11,9 +11,9 @@ interface CountdownTimerProps {
 
 export function CountdownTimer({ endDate, time, onExpired, variant = 'light' }: CountdownTimerProps) {
   const isDark = variant === 'dark';
-  const labelClass = isDark ? 'text-white/55' : 'text-stone-500';
-  const numberClass = isDark ? 'text-white' : 'text-stone-800';
-  const unitClass = isDark ? 'text-white/40' : 'text-stone-400';
+  const labelClass = isDark ? 'text-white/55' : 'text-lg-dim';
+  const numberClass = isDark ? 'text-white' : 'text-lg-text';
+  const unitClass = isDark ? 'text-white/40' : 'text-lg-dim';
   const targetDate = useMemo(() => {
     if (!time) return endDate;
     const d = new Date(endDate);

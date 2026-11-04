@@ -47,8 +47,8 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClose, onResponded })
   return (
     <div className="relative">
       <button onClick={onClose}
-        className="absolute -top-2 -right-2 z-20 w-7 h-7 rounded-full bg-white border border-stone-200 flex items-center justify-center hover:bg-stone-50 shadow-sm transition-colors">
-        <X className="w-3.5 h-3.5 text-stone-500" />
+        className="absolute -top-2 -right-2 z-20 w-7 h-7 rounded-full bg-lg-surface border border-lg-surface-2 flex items-center justify-center hover:bg-lg-surface-2 shadow-sm transition-colors">
+        <X className="w-3.5 h-3.5 text-lg-dim" />
       </button>
 
       {currentQ !== 'done' && totalCards > 2 && (
@@ -56,15 +56,15 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClose, onResponded })
           {Array.from({ length: totalCards - (currentQ === 'welcome' ? 1 : 0) }).map((_, i) => (
             <div key={i}
               className={`h-1 rounded-full transition-all duration-300 ${
-                i === (currentQ === 'welcome' ? 0 : progressIdx - 1) ? 'w-6 bg-purple-500' : 'w-1.5 bg-stone-200'
+                i === (currentQ === 'welcome' ? 0 : progressIdx - 1) ? 'w-6 bg-purple-500' : 'w-1.5 bg-lg-surface-2'
               }`}
             />
           ))}
         </div>
       )}
 
-      <div className="absolute inset-0 rounded-2xl bg-white/60 backdrop-blur-sm border border-stone-100 -translate-y-1 scale-[0.97] z-0" />
-      <div className="absolute inset-0 rounded-2xl bg-white/80 backdrop-blur-sm border border-stone-100 -translate-y-0.5 scale-[0.985] z-[1]" />
+      <div className="absolute inset-0 rounded-2xl bg-white/60 backdrop-blur-sm border border-lg-surface-2 -translate-y-1 scale-[0.97] z-0" />
+      <div className="absolute inset-0 rounded-2xl bg-white/80 backdrop-blur-sm border border-lg-surface-2 -translate-y-0.5 scale-[0.985] z-[1]" />
 
       <div className="relative h-72 sm:h-80 z-2">
         <AnimatePresence mode="wait">

@@ -88,27 +88,27 @@ const SharedPlacePage: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center">
+    <div className="min-h-screen bg-lg-accent flex items-center justify-center">
       <div className="w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
   if (needsAuth && !place) return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-lg-accent flex items-center justify-center px-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl border border-purple-100/60 shadow-xl shadow-purple-200/20 p-8 max-w-sm w-full text-center">
+        className="bg-lg-surface rounded-3xl border border-purple-100/60 shadow-xl shadow-purple-200/20 p-8 max-w-sm w-full text-center">
         <div className="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center mx-auto mb-4">
           <LogIn className="w-8 h-8 text-purple-500" />
         </div>
-        <h2 className="text-xl font-bold text-stone-800 mb-2">Inicia sesión</h2>
-        <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+        <h2 className="text-xl font-bold text-lg-text mb-2">Inicia sesión</h2>
+        <p className="text-sm text-lg-dim mb-6 leading-relaxed">
           Debes iniciar sesión para ver los detalles de esta invitación y confirmar tu asistencia.
         </p>
         <Link to="/?auth=login"
-          className="w-full py-3 bg-gradient-to-r from-purple-600 to-amber-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-200/40 transition-all">
+          className="w-full py-3 bg-lg-accent text-lg-ink rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-200/40 transition-all">
           <LogIn className="w-4 h-4" /> Iniciar sesión
         </Link>
-        <button onClick={goBack} className="mt-3 w-full py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors">
+        <button onClick={goBack} className="mt-3 w-full py-2.5 text-lg-dim text-sm hover:text-lg-text transition-colors">
           Volver
         </button>
       </motion.div>
@@ -121,19 +121,19 @@ const SharedPlacePage: React.FC = () => {
   const remaining = confirmations.length - 5;
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50">
+    <section className="min-h-screen bg-lg-accent ">
       <div className="purple-blob w-72 h-72 bg-purple-200/30 -top-20 -left-20" />
       <div className="purple-blob w-80 h-80 bg-amber-200/20 top-1/3 -right-32" />
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 py-6">
         <button onClick={goBack}
-          className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-700 transition-colors mb-4">
+          className="inline-flex items-center gap-2 text-lg-dim hover:text-lg-text transition-colors mb-4">
           <ArrowLeft className="w-5 h-5" /> Volver
         </button>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3xl border border-purple-100/60 shadow-xl shadow-purple-200/20 overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-lg-surface rounded-3xl border border-purple-100/60 shadow-xl shadow-purple-200/20 overflow-hidden">
           {/* Hero */}
-          <div className="relative h-48 sm:h-56 bg-gradient-to-br from-purple-600 via-purple-700 to-amber-600 overflow-hidden">
+          <div className="relative h-48 sm:h-56 bg-lg-accent overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
@@ -163,7 +163,7 @@ const SharedPlacePage: React.FC = () => {
               </div>
             )}
 
-            <h1 className="text-xl font-bold text-stone-800 mb-1">{place.name}</h1>
+            <h1 className="text-xl font-bold text-lg-text mb-1">{place.name}</h1>
 
             {place.category && (
               <span className="inline-block text-[11px] font-semibold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full mb-3">
@@ -171,17 +171,17 @@ const SharedPlacePage: React.FC = () => {
               </span>
             )}
 
-            <p className="text-sm text-stone-600 leading-relaxed mb-4">{place.description}</p>
+            <p className="text-sm text-lg-dim leading-relaxed mb-4">{place.description}</p>
 
-            <div className="flex items-center gap-4 text-sm text-stone-500 mb-4">
+            <div className="flex items-center gap-4 text-sm text-lg-dim mb-4">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span className="font-medium text-stone-700">{place.rating}</span>
+                <span className="font-medium text-lg-text">{place.rating}</span>
                 <span>({place.reviewCount})</span>
               </div>
               {place.address && (
                 <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-stone-400" />
+                  <MapPin className="w-4 h-4 text-lg-dim" />
                   <span className="text-xs truncate max-w-[200px]">{place.address}</span>
                 </div>
               )}
@@ -196,7 +196,7 @@ const SharedPlacePage: React.FC = () => {
                 </div>
               ) : (
                 <button onClick={handleConfirm} disabled={confirming}
-                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-amber-500 text-white rounded-2xl font-semibold text-sm hover:shadow-lg hover:shadow-purple-200/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                  className="w-full py-3.5 bg-lg-accent text-lg-ink rounded-2xl font-semibold text-sm hover:shadow-lg hover:shadow-purple-200/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                   {confirming ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     : <CheckCircle className="w-5 h-5" />}
                   {confirming ? 'Confirmando...' : 'Confirmar asistencia'}
@@ -205,10 +205,10 @@ const SharedPlacePage: React.FC = () => {
             ) : (
               <div className="space-y-2">
                 <button disabled
-                  className="w-full py-3.5 bg-stone-100 text-stone-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-stone-200">
+                  className="w-full py-3.5 bg-lg-surface-2 text-lg-dim rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-lg-surface-2">
                   <CheckCircle className="w-5 h-5" /> Confirmar asistencia
                 </button>
-                <p className="text-center text-xs text-stone-500">
+                <p className="text-center text-xs text-lg-dim">
                   <Link to="/?auth=login" className="text-purple-600 font-semibold hover:underline">Inicia sesión</Link> para confirmar tu asistencia
                 </p>
               </div>
@@ -216,16 +216,16 @@ const SharedPlacePage: React.FC = () => {
 
             {/* View place */}
             <Link to={`/place/${place.id}`}
-              className="mt-3 w-full py-2.5 bg-stone-50 border border-stone-200 text-stone-600 rounded-2xl font-medium text-sm hover:bg-stone-100 transition-all flex items-center justify-center gap-2">
+              className="mt-3 w-full py-2.5 bg-lg-surface-2 border border-lg-surface-2 text-lg-dim rounded-2xl font-medium text-sm hover:bg-lg-surface-2 transition-all flex items-center justify-center gap-2">
               <ExternalLink className="w-4 h-4" /> Ver lugar completo
             </Link>
 
             {/* Confirmers */}
             {confirmations.length > 0 && (
-              <div className="mt-6 pt-5 border-t border-stone-100">
+              <div className="mt-6 pt-5 border-t border-lg-surface-2">
                 <div className="flex items-center gap-2 mb-3">
                   <Users className="w-4 h-4 text-purple-500" />
-                  <span className="text-xs font-semibold text-stone-500 uppercase tracking-wide">
+                  <span className="text-xs font-semibold text-lg-dim uppercase tracking-wide">
                     {confirmations.length} confirmaron
                   </span>
                 </div>

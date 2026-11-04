@@ -19,12 +19,12 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
         {[1, 2].map(i => (
           <div key={i}>
             <div className="flex items-center gap-2 mb-3 px-1">
-              <div className="w-4 h-4 rounded bg-stone-200 animate-pulse" />
-              <div className="h-4 w-44 bg-stone-200 rounded animate-pulse" />
+              <div className="w-4 h-4 rounded bg-lg-surface animate-pulse" />
+              <div className="h-4 w-44 bg-lg-surface rounded animate-pulse" />
             </div>
             <div className="flex gap-3 overflow-hidden">
               {[1, 2, 3, 4].map(j => (
-                <div key={j} className="w-36 shrink-0 rounded-xl bg-stone-100 animate-pulse" style={{ height: 148 }} />
+                <div key={j} className="w-36 shrink-0 rounded-xl bg-lg-surface animate-pulse" style={{ height: 148 }} />
               ))}
             </div>
           </div>
@@ -46,7 +46,7 @@ const PersonalizedSections: React.FC<PersonalizedSectionsProps> = ({ sections, l
             key={section.id}
             title={section.title}
             subtitle={section.subtitle}
-            icon={<Sparkles className="w-5 h-5 text-primary-400" />}
+            icon={<Sparkles className="w-5 h-5 text-lg-accent" />}
           >
             {isEvent
               ? section.events.map(event => (

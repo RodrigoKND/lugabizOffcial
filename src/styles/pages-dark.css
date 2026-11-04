@@ -2,7 +2,7 @@
 
 /* ── Event Detail Page ── */
 section.text-stone-800 {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
   color: #e4d4f5 !important;
 }
 
@@ -51,7 +51,7 @@ section.text-stone-800 [class*="text-green-600"] { color: #86efac !important; }
 
 /* ── Place Detail Page ── */
 div.min-h-screen.bg-\[\#FDFCFB\] {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
 }
 div.min-h-screen.bg-\[\#FDFCFB\] [class*="bg-white"] {
   background: rgba(255, 255, 255, 0.04) !important;
@@ -84,7 +84,7 @@ div.min-h-screen.bg-\[\#FDFCFB\] [class*="text-orange-"] { color: #fca5a5 !impor
 
 /* ── Advisor Page ── */
 div.min-h-screen:has(> header.sticky) {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
 }
 div.min-h-screen:has(> header.sticky) header.sticky {
   background: rgba(13, 6, 32, 0.95) !important;
@@ -151,7 +151,7 @@ div.min-h-screen:has(> header.sticky) button[class*="bg-primary-700"]:hover {
 
 /* ── Admin Panel ── */
 .min-h-screen.bg-slate-50 {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
 }
 .min-h-screen.bg-slate-50 header.sticky {
   background: rgba(13, 6, 32, 0.95) !important;
@@ -241,7 +241,7 @@ div.min-h-screen:has(> header.sticky) button[class*="bg-primary-700"]:hover {
   fill: #8b7d9e !important;
 }
 .min-h-screen.bg-slate-50 circle[fill="white"] {
-  fill: #0d0620 !important;
+  fill: #1f1033 !important;
 }
 .min-h-screen.bg-slate-50 circle[fill="none"] {
   stroke: rgba(255, 255, 255, 0.08) !important;
@@ -266,7 +266,7 @@ div.min-h-screen:has(> header.sticky) button[class*="bg-primary-700"]:hover {
 
 /* ── Add Place / Edit Place Pages ── */
 section.min-h-screen.bg-stone-50.text-stone-800 {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
   color: #e4d4f5 !important;
 }
 section.min-h-screen.bg-stone-50.text-stone-800 [class*="bg-white"] {
@@ -383,7 +383,7 @@ section.min-h-screen.bg-stone-50.text-stone-800 ul.address-suggest-panel li[clas
 
 /* Success screen */
 div.min-h-screen.bg-stone-50:has(> div.max-w-sm) {
-  background: #0d0620 !important;
+  background: #1f1033 !important;
 }
 div.min-h-screen.bg-stone-50:has(> div.max-w-sm) [class*="bg-white"] {
   background: rgba(13, 6, 32, 0.96) !important;

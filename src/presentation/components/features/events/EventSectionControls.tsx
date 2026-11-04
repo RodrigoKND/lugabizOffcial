@@ -40,7 +40,7 @@ const EventSectionControls = ({
     </button>
     <button
       onClick={onShowAll}
-      className="p-2 rounded-full bg-linear-to-r from-primary-500 to-tomato text-white shadow-lg transition-all hover:scale-105"
+      className="p-2 rounded-full bg-lg-accent text-lg-ink shadow-lg transition-all hover:scale-105"
     >
       <Plus className="w-5 h-5" />
     </button>

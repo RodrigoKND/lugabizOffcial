@@ -126,7 +126,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f5fb] pb-24 md:pb-0">
+    <div className="min-h-screen bg-lg-ground pb-24 md:pb-0">
       <div className="purple-blob w-72 h-72 bg-primary-200/20 -top-20 -left-20" />
       <div className="purple-blob w-80 h-80 bg-pink-200/10 top-1/3 -right-32" />
 
