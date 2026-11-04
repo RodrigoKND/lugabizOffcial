@@ -1,4 +1,5 @@
 import { supabase } from '@lib/supabase';
+import { safeUuid } from '@infrastructure/utils/uuid';
 import { Report, CreateReportData, FlaggedContent } from '@domain/entities';
 
 const REPORT_THRESHOLD = 3;
@@ -33,7 +34,7 @@ async function autoBanIfNeeded(userId: string, reporterId: string, threshold: nu
     action: 'auto_banned',
     data: { reason: banReason, report_threshold: threshold, banned_at: bannedAt, source: 'community_reports' },
     user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'system',
-    session_id: crypto.randomUUID(),
+    session_id: safeUuid(),
   });
 }
 

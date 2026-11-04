@@ -1,4 +1,5 @@
 import { supabase } from '@lib/supabase';
+import { safeUuid } from '@infrastructure/utils/uuid';
 
 export interface UserActivity {
   id: string;
@@ -18,7 +19,7 @@ export const userActivityService = {
       action,
       data: data || {},
       user_agent: navigator.userAgent,
-      session_id: sessionStorage.getItem('_lugabiz_s') || crypto.randomUUID(),
+      session_id: sessionStorage.getItem('_lugabiz_s') || safeUuid(),
     };
 
     const { error } = await supabase.from('user_activity').insert(payload);

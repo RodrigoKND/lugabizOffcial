@@ -34,6 +34,16 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
     };
   }, []);
 
+  // La campana del header móvil (HomeHeroTopBar) avisa con este evento; sin sesión se pide iniciarla.
+  useEffect(() => {
+    function handleOpenNotifications() {
+      if (user) setShowNotifs(true);
+      else onAuthClick();
+    }
+    document.addEventListener('lugabiz:open-notifications', handleOpenNotifications);
+    return () => document.removeEventListener('lugabiz:open-notifications', handleOpenNotifications);
+  }, [user, onAuthClick]);
+
   const navLinks = [
     { to: '/', label: 'Inicio' },
     { to: '/comunidad', label: 'Comunidad' },
@@ -112,12 +122,7 @@ const Navbar = ({ onAuthClick }: { onAuthClick: () => void }) => {
         </div>
       </nav>
 
-      <MobileBottomNav
-        totalUnread={totalUnread}
-        onSearch={() => setShowSearch(true)}
-        onToggleNotifs={() => setShowNotifs(v => !v)}
-        onAuthClick={onAuthClick}
-      />
+      <MobileBottomNav onAuthClick={onAuthClick} />
 
       <NotificationDropdown open={showNotifs} onClose={() => setShowNotifs(false)} />
       <SearchModal open={showSearch} onClose={() => setShowSearch(false)} />

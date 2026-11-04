@@ -5,6 +5,7 @@ import { TikTokBadge } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 import { PlanButton } from '@presentation/components/features/social';
 import ReactionButton from '@presentation/components/features/reactions/ReactionButton';
+import CardTitleLink from './CardTitleLink';
 
 interface CompactCardSocialGroup {
   id?: string;
@@ -60,7 +61,7 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
 
       <div className="pt-2 pb-1 px-1 flex items-start justify-between gap-1">
         <div className="min-w-0">
-          <p className="text-lg-text font-bold text-[14px] leading-tight truncate">{name}</p>
+          <p className="text-lg-text font-bold text-[14px] leading-tight truncate"><CardTitleLink to={to}>{name}</CardTitleLink></p>
           {group?.name ? (
             <p className="text-lg-dim text-[11px] font-medium flex items-center gap-1 mt-0.5">
               {groupIsEmoji ? (

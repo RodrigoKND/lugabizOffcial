@@ -1,4 +1,5 @@
 import { userActivityService } from '@lib/supabase/services/places/userActivity';
+import { safeUuid } from './uuid';
 
 const STORAGE_PREFIX = '_lugabiz_'
 const SESSION_KEY = `${STORAGE_PREFIX}s`
@@ -57,12 +58,15 @@ export const tracking = {
   },
 
   getSessionId(): string {
-    let sessionId = sessionStorage.getItem(SESSION_KEY)
-    if (!sessionId) {
-      sessionId = crypto.randomUUID()
-      sessionStorage.setItem(SESSION_KEY, sessionId)
-    }
-    return sessionId
+    // sessionStorage puede estar bloqueado (Safari en modo privado, políticas del navegador): nunca debe romper la app.
+    try {
+      let sessionId = sessionStorage.getItem(SESSION_KEY)
+      if (!sessionId) {
+        sessionId = safeUuid()
+        sessionStorage.setItem(SESSION_KEY, sessionId)
+      }
+      return sessionId
+    } catch { return safeUuid() }
   },
 
   async trackAction(action: string, data?: Record<string, unknown>) {
@@ -79,10 +83,12 @@ export const tracking = {
     const path = page || window.location.pathname
     // Throttle: avoid duplicate page_view within 30 s for the same path (session-only, not persisted)
     const key = `_lbpv_${path}`
-    const last = sessionStorage.getItem(key)
-    const now = Date.now()
-    if (last && now - parseInt(last, 10) < 30000) return
-    sessionStorage.setItem(key, String(now))
+    try {
+      const last = sessionStorage.getItem(key)
+      const now = Date.now()
+      if (last && now - parseInt(last, 10) < 30000) return
+      sessionStorage.setItem(key, String(now))
+    } catch { /* sessionStorage bloqueado (Safari privado): se registra igual, sin throttle */ }
     // Save to DB via user_activity (persistent record of user navigation)
     this.trackAction('page_view', { path })
   },

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /chat
+Disallow: /asesor
+Disallow: /add-place
+Disallow: /edit-place/
+Disallow: /edit-event/
+Disallow: /confirmation
+Disallow: /share/
+
+Sitemap: https://lugabiz.vercel.app/sitemap.xml

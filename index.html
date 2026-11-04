@@ -2,8 +2,8 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Lugabiz - Descubre Lugares Cotidianos</title>
-    <meta name="description" content="Explora lugares cotidianos en Lugabiz, donde la comunidad se reúne para compartir sus sitios favoritos." />
+    <title>Lugabiz: qué hacer en Cochabamba | Lugares, eventos y planes</title>
+    <meta name="description" content="Descubre qué hacer hoy en Cochabamba: lugares, eventos y planes con tus panas. Reseñas reales, cómo llegar y lo que pasa cerca de ti." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#7c22ce" />
@@ -11,16 +11,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Lugabiz" />
 
-    <meta property="og:title" content="Lugabiz - Descubre Lugares Cotidianos" />
-    <meta property="og:description" content="Explora lugares cotidianos en Lugabiz, donde la comunidad se reúne para compartir sus sitios favoritos." />
+    <meta property="og:title" content="Lugabiz: qué hacer en Cochabamba | Lugares, eventos y planes" />
+    <meta property="og:description" content="Descubre qué hacer hoy en Cochabamba: lugares, eventos y planes con tus panas. Reseñas reales, cómo llegar y lo que pasa cerca de ti." />
     <meta property="og:url" content="https://lugabiz.vercel.app" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lugabiz.vercel.app/welcome_to_lugabiz.webp" />
     <meta property="og:locale" content="es_BO" />
 
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Lugabiz - Descubre Lugares Cotidianos" />
-    <meta property="twitter:description" content="Explora lugares cotidianos en Lugabiz, donde la comunidad se reúne para compartir sus sitios favoritos." />
+    <meta property="twitter:title" content="Lugabiz: qué hacer en Cochabamba | Lugares, eventos y planes" />
+    <meta property="twitter:description" content="Descubre qué hacer hoy en Cochabamba: lugares, eventos y planes con tus panas. Reseñas reales, cómo llegar y lo que pasa cerca de ti." />
     <meta property="twitter:image" content="https://lugabiz.vercel.app/welcome_to_lugabiz.webp" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,7 +42,7 @@
       "@type": "WebSite",
       "name": "Lugabiz",
       "url": "https://lugabiz.vercel.app",
-      "description": "Red social para descubrir y compartir lugares cotidianos",
+      "description": "Red social para descubrir qué hacer en Cochabamba: lugares, eventos y planes con tus panas",
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://lugabiz.vercel.app/?q={search_term_string}",
@@ -59,6 +59,18 @@
       </div>
     </noscript>
     <div id="root"></div>
+    <script>
+      // El diseño usa CSS moderno (Safari 16.4+). Sin ese soporte la página se ve vacía: mejor avisar.
+      if (!(window.CSS && CSS.registerProperty)) {
+        document.addEventListener('DOMContentLoaded', function () {
+          var b = document.createElement('div');
+          b.setAttribute('role', 'alert');
+          b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;padding:14px 16px;background:#b794ff;color:#1b0b2e;font:700 14px/1.4 sans-serif;text-align:center';
+          b.textContent = 'Tu navegador es antiguo y Lugabiz puede verse incompleto. Actualiza iOS o Safari para verlo bien.';
+          document.body.appendChild(b);
+        });
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

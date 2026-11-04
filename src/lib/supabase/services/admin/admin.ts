@@ -13,20 +13,6 @@ export interface AdminUser {
   created_at: string;
 }
 
-interface ModItem {
-  id: string;
-  name?: string;
-  title?: string;
-  description?: string;
-  image?: string;
-  user_name?: string;
-  user_avatar?: string;
-  author_id?: string;
-  hidden?: boolean;
-  hidden_reason?: string;
-  created_at: string;
-}
-
 export const adminService = {
   async getStats(): Promise<{
     users: number;
@@ -135,73 +121,6 @@ export const adminService = {
       .upsert({ user_id: userId, role }, { onConflict: 'user_id' });
 
     if (error) throw error;
-  },
-
-  async getAllPlaces(): Promise<ModItem[]> {
-    const { data, error } = await supabase
-      .from('places')
-      .select('id, name, description, image, author_id, hidden, hidden_reason, created_at, author:users(name, avatar)')
-      .order('created_at', { ascending: false })
-      .limit(200);
-
-    if (error) throw error;
-    return (data || []).map((p: Record<string, unknown>) => ({
-      id: p.id,
-      name: p.name,
-      description: p.description,
-      image: p.image,
-      author_id: p.author_id,
-      hidden: p.hidden,
-      hidden_reason: p.hidden_reason,
-      created_at: p.created_at,
-      user_name: (p.author as Record<string, unknown> | undefined)?.name as string || 'Usuario',
-      user_avatar: (p.author as Record<string, unknown> | undefined)?.avatar,
-    }));
-  },
-
-  async getAllEvents(): Promise<ModItem[]> {
-    const { data, error } = await supabase
-      .from('events')
-      .select('id, name, user_id, created_at, author:users(name)')
-      .order('created_at', { ascending: false })
-      .limit(200);
-
-    if (error) throw error;
-    return (data || []).map((p: Record<string, unknown>) => ({
-      id: p.id,
-      name: p.name as string,
-      author_id: p.user_id,
-      created_at: p.created_at,
-      user_name: (p.author as Record<string, unknown> | undefined)?.name as string || 'Usuario',
-    }));
-  },
-
-  async getAllReviews(): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('id, comment, rating, user_id, place_id, created_at, user:users(name, banned, ban_reason)')
-      .order('created_at', { ascending: false })
-      .limit(100);
-
-    if (error) throw error;
-
-    const reviews = (data || []).map(r => ({
-      ...r,
-      user_name: r.user?.name || 'Usuario',
-      user_banned: r.user?.banned || false,
-      user_ban_reason: r.user?.ban_reason || null,
-    }));
-
-    const ids = reviews.map(r => r.id);
-    const { data: reportCounts } = await supabase
-      .from('reports')
-      .select('target_id, count:target_id(count)')
-      .in('target_id', ids.length > 0 ? ids : ['none'])
-      .eq('target_type', 'review');
-
-    const reportMap = new Map((reportCounts || []).map((r: Record<string, unknown>) => [r.target_id, Number(r.count) || 0]));
-
-    return reviews.map(r => ({ ...r, report_count: reportMap.get(r.id) || 0 }));
   },
 
   async deletePlace(placeId: string): Promise<void> {

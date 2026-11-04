@@ -1,20 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Plus, User, Bell, Home, Search, Users, Compass } from 'lucide-react';
+import { Plus, User, Home, Users, Compass } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '@presentation/context/AuthContext';
 import { CdnImage } from '@presentation/components/reusables';
 
 interface MobileBottomNavProps {
-  totalUnread: number;
-  onSearch: () => void;
-  onToggleNotifs: () => void;
   onAuthClick: () => void;
 }
 
 const ITEM = 'relative flex flex-col items-center gap-1 py-2 px-2 rounded-xl transition-colors';
 const LABEL = 'text-[10px] font-semibold';
 
-const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ totalUnread, onSearch, onToggleNotifs, onAuthClick }) => {
+// Menú inferior móvil. Búsqueda y notificaciones viven en el header (HomeHeroTopBar), no se repiten aquí.
+const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onAuthClick }) => {
   const { pathname } = useLocation();
   const { user } = useAuth();
   const tone = (path: string) => (pathname === path ? 'text-lg-text' : 'text-lg-dim');
@@ -33,11 +31,6 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ totalUnread, onSearch
         {linkItem('/', 'Inicio', Home)}
         {linkItem('/asesor', 'Asesor', Compass)}
 
-        <button onClick={onSearch} className={`${ITEM} text-lg-dim`}>
-          <Search className="w-5 h-5" />
-          <span className={LABEL}>Buscar</span>
-        </button>
-
         <Link to="/add-place" className={`${ITEM} ${tone('/add-place')}`}>
           <span className="w-9 h-9 -mt-1 rounded-xl bg-lg-accent text-lg-ink flex items-center justify-center -rotate-6 shadow-md shadow-black/30">
             <Plus className="w-5 h-5" strokeWidth={3} />
@@ -46,16 +39,6 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ totalUnread, onSearch
         </Link>
 
         {linkItem('/comunidad', 'Comunidad', Users)}
-
-        <button onClick={onToggleNotifs} className={`${ITEM} text-lg-dim`}>
-          <Bell className="w-5 h-5" />
-          <span className={LABEL}>Notis</span>
-          {totalUnread > 0 && (
-            <span className="absolute top-1 right-0.5 min-w-4 h-4 px-1 bg-lg-accent text-lg-ink text-[9px] font-extrabold rounded-full flex items-center justify-center">
-              {totalUnread > 9 ? '9+' : totalUnread}
-            </span>
-          )}
-        </button>
 
         {user ? (
           <Link to="/profile" className={`${ITEM} ${tone('/profile')}`}>

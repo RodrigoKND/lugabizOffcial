@@ -60,16 +60,16 @@ function AdminDashboard() {
             <button onClick={() => setMobileOpen(false)} className="lg:hidden p-1.5 hover:bg-slate-800 rounded-lg transition-colors"><X className="w-4 h-4 text-slate-400" /></button>
           </div>
         </div>
-        <nav className="flex-1 min-h-0 p-3 space-y-3 overflow-y-auto lg:overflow-visible">
+        <nav className="flex-1 min-h-0 p-3 space-y-3 [@media(max-height:760px)]:space-y-1.5 overflow-y-auto no-scrollbar">
           {SIDEBAR_GROUPS.map(group => (
             <div key={group.label}>
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2">{group.label}</p>
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 [@media(max-height:760px)]:hidden">{group.label}</p>
               <div className="space-y-0.5">
                 {group.items.map(item => {
                   const active = section === item.id;
                   return (
                     <button key={item.id} onClick={() => { setSection(item.id); setMobileOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 [@media(max-height:820px)]:py-1.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+                      className={`w-full flex items-center gap-3 px-3 py-2 [@media(max-height:820px)]:py-1.5 [@media(max-height:700px)]:py-1 [@media(max-height:700px)]:text-[13px] rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
                       <item.icon className={`w-4 h-4 shrink-0 ${active ? 'text-primary-400' : ''}`} />
                       <span className="flex-1 text-left">{item.label}</span>
                       {active && <div className="w-1.5 h-1.5 rounded-full bg-primary-400 shrink-0" />}
@@ -81,7 +81,7 @@ function AdminDashboard() {
           ))}
         </nav>
         <div className="p-3 border-t border-slate-700/50 space-y-1">
-          <div className="flex items-center gap-2 px-3 py-2"><div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /><span className="text-xs text-slate-500">Sistema operativo</span></div>
+          <div className="flex items-center gap-2 px-3 py-2 [@media(max-height:700px)]:hidden"><div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /><span className="text-xs text-slate-500">Sistema operativo</span></div>
           <Link to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-500 hover:bg-slate-800/60 hover:text-slate-300 transition-all text-xs font-medium">
             <ArrowLeft className="w-3.5 h-3.5" /> Volver al perfil</Link>
         </div>

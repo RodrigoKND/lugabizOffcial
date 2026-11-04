@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { safeUuid } from '@infrastructure/utils/uuid';
 import { marketSurveysService } from '@lib/supabase';
 import { edgeService } from '@lib/supabase/services/notifications/edgeFunctions';
 import { moderateContent } from '@lib/supabase/services/moderation/moderationService';
@@ -15,7 +16,7 @@ import {
 } from '@presentation/components/features/surveys/CreateSurveyModal.types';
 
 function createEmptyQuestion(): SurveyQuestion {
-  return { id: crypto.randomUUID(), question: '', options: ['', ''] };
+  return { id: safeUuid(), question: '', options: ['', ''] };
 }
 
 export function useCreateSurvey(onCreated: () => void, onClose: () => void) {

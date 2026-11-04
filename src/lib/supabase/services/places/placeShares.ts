@@ -1,4 +1,5 @@
 import { supabase } from '@lib/supabase';
+import { safeUuid } from '@infrastructure/utils/uuid';
 import { PlaceShareConfirmation } from '@domain/entities';
 
 export interface PlaceShare {
@@ -40,7 +41,7 @@ interface ConfirmationRowWithShare {
 
 export const placeSharesService = {
   async createShare(placeId: string, sharedBy: string): Promise<PlaceShare> {
-    const shareId = crypto.randomUUID();
+    const shareId = safeUuid();
     const sharedUrl = `${window.location.origin}/share/place/${shareId}`;
 
     const { data, error } = await supabase

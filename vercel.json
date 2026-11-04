@@ -1,8 +1,15 @@
 {
+    "functions": {
+        "api/seo.js": { "includeFiles": "dist/index.html" }
+    },
     "rewrites": [
         {
+            "source": "/sitemap.xml",
+            "destination": "/api/sitemap"
+        },
+        {
             "source": "/(.*)",
-            "destination": "/"
+            "destination": "/api/seo?path=/$1"
         }
     ],
     "images": {

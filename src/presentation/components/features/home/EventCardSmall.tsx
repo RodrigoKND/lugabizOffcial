@@ -4,6 +4,7 @@ import { PlanButton } from '@presentation/components/features/social';
 import { useAuth } from '@presentation/context';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
 import GoingButton from './GoingButton';
+import CardTitleLink from './CardTitleLink';
 import ReactionButton from '@presentation/components/features/reactions/ReactionButton';
 
 interface EventCardSmallProps {
@@ -48,7 +49,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewe
           <Calendar className="w-3 h-3" />
           {new Date(event.dateStart).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' })}
         </p>
-        <p className="text-lg-text font-bold text-[14px] leading-tight line-clamp-2">{event.name}</p>
+        <p className="text-lg-text font-bold text-[14px] leading-tight line-clamp-2"><CardTitleLink to={`/event/${event.id}`}>{event.name}</CardTitleLink></p>
         <p className="text-lg-dim text-[11px] flex items-center gap-1 truncate">
           <MapPin className="w-3 h-3 shrink-0" />
           {event.address}

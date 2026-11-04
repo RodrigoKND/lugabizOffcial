@@ -1,5 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -9,50 +9,37 @@ interface ErrorBoundaryProps {
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
 }
 
+// Última red de seguridad: si algo falla al renderizar o una página no carga, se ve esto en vez de una pantalla vacía.
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  state: ErrorBoundaryState = { hasError: false };
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.props.onError?.(error, errorInfo);
   }
 
-  handleRetry = (): void => {
-    this.setState({ hasError: false, error: null });
-  };
-
   render(): ReactNode {
-    if (this.state.hasError) {
-      if (this.props.fallback) return this.props.fallback;
+    if (!this.state.hasError) return this.props.children;
+    if (this.props.fallback) return this.props.fallback;
 
-      return (
-        <div className="flex flex-col items-center justify-center min-h-50 p-8 text-center" role="alert">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-4">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
-          </div>
-          <h2 className="text-lg font-bold text-stone-800 mb-1">Algo salió mal</h2>
-          <p className="text-sm text-stone-500 mb-4 max-w-sm">
-            Ocurrió un error inesperado. Por favor intenta de nuevo.
-          </p>
-          <button
-            onClick={this.handleRetry}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" /> Reintentar
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
+    return (
+      <div className="min-h-screen bg-lg-ground flex flex-col items-center justify-center p-8 text-center" role="alert">
+        <h2 className="font-flyer text-4xl text-lg-text mb-3">Se nos cruzó un cable</h2>
+        <p className="text-sm text-lg-dim mb-6 max-w-sm">
+          La página no pudo cargar. Recárgala y vuelves al plan.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-lg-accent text-lg-ink rounded-full text-sm font-extrabold hover:brightness-110 transition"
+        >
+          <RefreshCw className="w-4 h-4" /> Recargar
+        </button>
+      </div>
+    );
   }
 }

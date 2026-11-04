@@ -1,9 +1,10 @@
 import { supabase } from '@lib/supabase';
+import { safeUuid } from '@infrastructure/utils/uuid';
 import { EventShare } from '@domain/entities';
 
 export const eventSharesService = {
   async createShare(eventId: string, sharedBy: string): Promise<EventShare> {
-    const shareId = crypto.randomUUID();
+    const shareId = safeUuid();
     const sharedUrl = `${window.location.origin}/event/${eventId}?ref=${shareId}`;
 
     const { data, error } = await supabase

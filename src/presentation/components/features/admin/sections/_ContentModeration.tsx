@@ -1,147 +1,43 @@
-import { useState, useEffect, useCallback } from 'react';
-import { adminService } from '@lib/supabase/services/admin/admin';
-import { placeFakeReportsService } from '@lib/supabase';
-import { Search, Shield, Loader2, Trash2, Clock, Users, MapPin, AlertTriangle, RotateCcw } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
+import { Loader2, Search, Shield } from 'lucide-react';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
-import { timeAgo } from '../helpers';
+import { useContentModeration } from '@presentation/hooks/admin/useContentModeration';
+import { PAGE_SIZE, type ContentType } from '@lib/supabase/services/admin/adminContent';
+import { Pager } from './_Pager';
+import { ContentRow } from './_ContentRow';
 
-interface ContentItem {
-  id: string;
-  name?: string;
-  title?: string;
-  comment?: string;
-  description?: string;
-  image?: string;
-  user_name?: string;
-  user_avatar?: string;
-  rating?: number;
-  hidden?: boolean;
-  hidden_reason?: string;
-  created_at: string;
-}
+const LABELS = { places: 'Lugares', events: 'Eventos', reviews: 'Reseñas' } as const;
 
-export function ContentModeration({ type }: { type: 'places' | 'events' | 'reviews' }) {
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [restoring, setRestoring] = useState<string | null>(null);
-
-  const loadItems = useCallback(async () => {
-    setLoading(true);
-    try { setItems(type === 'places' ? await adminService.getAllPlaces() : type === 'events' ? await adminService.getAllEvents() : await adminService.getAllReviews()); }
-    catch { toast.error('Error al cargar datos'); } finally { setLoading(false); }
-  }, [type]);
-
-  useEffect(() => { loadItems(); }, [loadItems]);
-
-  const handleDelete = async (id: string) => {
-    setDeleting(id);
-    try {
-      if (type === 'places') await adminService.deletePlace(id);
-      else if (type === 'events') await adminService.deleteEvent(id);
-      else await adminService.deleteReview(id);
-      setItems(prev => prev.filter(i => i.id !== id));
-      toast.success('Contenido eliminado');
-    } catch { toast.error('Error al eliminar'); } finally { setDeleting(null); }
-  };
-
-  const handleRestore = async (id: string) => {
-    setRestoring(id);
-    try {
-      await placeFakeReportsService.restore(id);
-      setItems(prev => prev.map(i => i.id === id ? { ...i, hidden: false } : i));
-      toast.success('Lugar restaurado');
-    } catch { toast.error('Solo un admin puede restaurar'); } finally { setRestoring(null); }
-  };
-
-  const q = search.toLowerCase();
-  const filtered = items.filter(i => !search || (i.name || i.title || i.comment || '').toLowerCase().includes(q));
-  const labels = { places: 'Lugares', events: 'Eventos', reviews: 'Reseñas' };
-
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>;
+// Moderación de lugares, eventos y reseñas: 20 por página desde el servidor, paginador y buscador arriba.
+export function ContentModeration({ type }: { type: ContentType }) {
+  const { items, total, totalPages, page, setPage, search, setSearch, loading, deleting, restoring, remove, restore } = useContentModeration(type);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   return (
     <div className="bg-lg-surface rounded-2xl border border-lg-surface-2 shadow-sm">
-      <div className="p-5 border-b border-lg-surface-2 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="relative flex-1 max-w-md">
+      <div className="p-5 border-b border-lg-surface-2 space-y-3">
+        <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lg-dim" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={`Buscar en ${labels[type]}...`}
-            className="w-full pl-9 pr-4 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={`Buscar en ${LABELS[type]}...`}
+            className="w-full pl-9 pr-4 py-2.5 bg-lg-surface-2 border border-lg-surface-2 rounded-xl text-sm text-lg-text focus:outline-none focus:border-lg-accent" />
         </div>
-        <span className="px-2.5 py-1 bg-lg-surface-2 rounded-full text-xs text-lg-dim font-medium">{filtered.length} / {items.length}</span>
+        <Pager page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPage={setPage} />
       </div>
-      {filtered.length === 0 ? (
-        <div className="text-center py-16 text-lg-dim"><Shield className="w-10 h-10 mx-auto mb-3 text-stone-200" /><p className="text-sm font-medium">No hay {labels[type].toLowerCase()} para mostrar</p></div>
+
+      {loading ? (
+        <div className="flex justify-center py-20"><Loader2 className="w-7 h-7 animate-spin text-lg-accent" /></div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-16 text-lg-dim"><Shield className="w-10 h-10 mx-auto mb-3" /><p className="text-sm font-medium">No hay {LABELS[type].toLowerCase()} para mostrar</p></div>
       ) : (
-        <div className="divide-y divide-lg-surface-2 max-h-[60vh] overflow-y-auto">
-          {filtered.map((item) => (
-            type === 'places' ? (
-              <div key={item.id} className="flex gap-4 px-5 py-4 hover:bg-lg-surface-2 transition-colors">
-                <div className="w-20 h-14 rounded-xl overflow-hidden shrink-0 bg-lg-surface-2 border border-lg-surface-2">
-                  {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    : <div className="w-full h-full flex items-center justify-center"><MapPin className="w-5 h-5 text-lg-dim" /></div>}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-lg-text truncate">{item.name || 'Sin nombre'}</p>
-                    {item.hidden && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-500 text-[10px] font-semibold shrink-0">
-                        <AlertTriangle className="w-3 h-3" /> Oculto
-                      </span>
-                    )}
-                  </div>
-                  {item.description && <p className="text-xs text-lg-dim mt-0.5 line-clamp-2 leading-relaxed">{item.description}</p>}
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full bg-lg-surface-2 overflow-hidden shrink-0">
-                        {item.user_avatar ? <img src={item.user_avatar} alt="" className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center"><Users className="w-2.5 h-2.5 text-lg-dim" /></div>}
-                      </div>
-                      <span className="text-[11px] font-medium text-lg-dim">{item.user_name || 'Usuario'}</span>
-                    </div>
-                    <span className="text-lg-dim text-[10px]">·</span>
-                    <div className="flex items-center gap-1 text-[11px] text-lg-dim">
-                      <Clock className="w-3 h-3" />
-                      {new Date(item.created_at).toLocaleString('es', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0 self-start mt-1">
-                  {item.hidden && (
-                    <button onClick={() => handleRestore(item.id)} disabled={restoring === item.id}
-                      className="p-2 rounded-xl text-lg-dim hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-50">
-                      {restoring === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-                    </button>
-                  )}
-                  <button onClick={() => setConfirmDeleteId(item.id)} disabled={deleting === item.id}
-                    className="p-2 rounded-xl text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
-                    {deleting === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div key={item.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-lg-surface-2 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-lg-text truncate">{item.name || item.title || (item.comment?.slice(0, 60) + '…') || 'Sin título'}</p>
-                  <p className="text-[11px] text-lg-dim flex items-center gap-2 mt-0.5">
-                    <Clock className="w-3 h-3" />{timeAgo(item.created_at)}
-                    {item.user_name && <><span>·</span>{item.user_name}</>}
-                    {item.rating && <><span>·</span>★ {item.rating}</>}
-                  </p>
-                </div>
-                <button onClick={() => setConfirmDeleteId(item.id)} disabled={deleting === item.id}
-                  className="p-2 rounded-xl text-lg-dim hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50">
-                  {deleting === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                </button>
-              </div>
-            )
+        <ul className="divide-y divide-lg-surface-2">
+          {items.map(item => (
+            <ContentRow key={item.id} item={item} type={type} deleting={deleting === item.id} restoring={restoring === item.id}
+              onDelete={setConfirmId} onRestore={restore} />
           ))}
-        </div>
+        </ul>
       )}
-      <ConfirmDialog open={!!confirmDeleteId} onClose={() => setConfirmDeleteId(null)} onConfirm={() => { if (confirmDeleteId) handleDelete(confirmDeleteId); }}
+
+      <ConfirmDialog open={!!confirmId} onClose={() => setConfirmId(null)} onConfirm={() => { if (confirmId) remove(confirmId); }}
         title="Eliminar contenido" message="¿Eliminar este contenido? Esta acción no se puede deshacer." confirmLabel="Eliminar" variant="danger" />
     </div>
   );

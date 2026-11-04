@@ -49,6 +49,12 @@
   }
 }
 
+/* Scroll sin barra visible (el contenido sigue desplazándose) */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 /* Etiqueta tipo calcomanía (texto, sin ilustraciones) */
 @utility sticker-tag {
   font-family: var(--font-display);
