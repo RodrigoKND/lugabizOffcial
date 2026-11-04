@@ -388,17 +388,6 @@ function VideoModal({ video, onClose }: { video: VideoEmbed; onClose: () => void
   )
 }
 
-// ── Idea skeleton ──────────────────────────────────────────────────────────────
-function IdeaSkeleton() {
-  return (
-    <div className="w-full grid grid-cols-2 gap-2 mt-5">
-      {[1, 2, 3, 4].map(i => (
-        <div key={i} className="h-16 rounded-xl bg-feed-bg/5 animate-pulse" />
-      ))}
-    </div>
-  )
-}
-
 // ── Main ChatPage ──────────────────────────────────────────────────────────────
 const ChatPage: React.FC = () => {
   const { user } = useAuth()
@@ -433,7 +422,8 @@ const ChatPage: React.FC = () => {
     const threshold = 120
     const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold
     if (isBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      // Mientras llegan tokens, scroll instantáneo: un smooth por token se encola y se siente trabado.
+      messagesEndRef.current?.scrollIntoView({ behavior: chatLoading ? 'auto' : 'smooth' })
     }
   }, [messages, chatLoading])
 
@@ -524,7 +514,8 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* ── Mensajes ────────────────────────────────────────────────────────── */}
-      <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto overscroll-contain relative">
+      <div className="flex-1 min-h-0 relative flex flex-col">
+      <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto overscroll-contain">
         <div className="max-w-2xl mx-auto px-4 py-6">
 
           {!hasConversation ? (
@@ -664,8 +655,9 @@ const ChatPage: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* ── Floating scroll-to-bottom button ──────────────────────────────── */}
+        {/* ── Botón de bajar: vive fuera del contenedor con scroll, así queda fijo abajo ── */}
         <AnimatePresence>
           {showScrollDown && hasConversation && (
             <motion.button
