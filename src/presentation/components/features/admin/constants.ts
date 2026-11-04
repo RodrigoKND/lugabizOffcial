@@ -1,5 +1,5 @@
 import type React from 'react';
-import { LayoutDashboard, MapPin, Calendar, MessageSquare, Users, Flag, ShieldAlert, BadgeCheck, Store, Activity, Megaphone } from 'lucide-react';
+import { LayoutDashboard, MapPin, Calendar, MessageSquare, Users, Flag, ShieldAlert, BadgeCheck, Store, Activity, Megaphone, Lightbulb, Vote } from 'lucide-react';
 import type { Section } from './types';
 
 export const C = {
@@ -45,6 +45,8 @@ export const SIDEBAR_GROUPS: { label: string; items: { id: Section; label: strin
     label: 'CRECIMIENTO',
     items: [
       { id: 'marketing' as Section, label: 'Marketing', icon: Megaphone },
+      { id: 'feedback' as Section, label: 'Opiniones', icon: Lightbulb },
+      { id: 'poll' as Section, label: "Ta' pues del día", icon: Vote },
     ],
   },
 ];

@@ -4,7 +4,7 @@ import type {
   AdminEngagementMetrics,
 } from '@domain/entities';
 
-export type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'verifications' | 'businesses' | 'marketing' | 'system';
+export type Section = 'dashboard' | 'places' | 'events' | 'reviews' | 'users' | 'reports' | 'moderation' | 'verifications' | 'businesses' | 'marketing' | 'system' | 'feedback' | 'poll';
 
 export interface DashboardData {
   stats: AdminStats | null;

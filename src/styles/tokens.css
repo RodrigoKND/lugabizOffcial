@@ -32,6 +32,23 @@
   line-height: 1;
 }
 
+/* Frases flotantes de las reacciones: suben, se desvían y se desvanecen. */
+@keyframes lg-float {
+  0%   { opacity: 0; transform: translate(-50%, 0) scale(0.6) rotate(0); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), -150px) scale(1) rotate(var(--rot)); }
+}
+@keyframes lg-fade {
+  0%, 100% { opacity: 0; }
+  30%, 70% { opacity: 1; }
+}
+@utility lg-float-phrase {
+  animation: lg-float 1.7s ease-out both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: lg-fade 1.7s ease-out both;
+  }
+}
+
 /* Etiqueta tipo calcomanía (texto, sin ilustraciones) */
 @utility sticker-tag {
   font-family: var(--font-display);

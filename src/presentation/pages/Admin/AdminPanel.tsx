@@ -16,6 +16,8 @@ import { VerificationsSection } from '@presentation/components/features/admin/se
 import { BusinessesSection } from '@presentation/components/features/admin/sections/BusinessesSection';
 import { MarketingSection } from '@presentation/components/features/admin/sections/MarketingSection';
 import { SystemSection } from '@presentation/components/features/admin/sections/SystemSection';
+import { FeedbackSection } from '@presentation/components/features/admin/sections/FeedbackSection';
+import { PollSection } from '@presentation/components/features/admin/sections/PollSection';
 import type { Section } from '@presentation/components/features/admin/types';
 
 const SECTION_MAP: Record<Section, React.ComponentType> = {
@@ -30,6 +32,8 @@ const SECTION_MAP: Record<Section, React.ComponentType> = {
   businesses: BusinessesSection,
   marketing: MarketingSection,
   system: SystemSection,
+  feedback: FeedbackSection,
+  poll: PollSection,
 };
 
 const AdminPanel: React.FC = () => {
@@ -47,8 +51,8 @@ function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
-        <div className="p-5 border-b border-slate-700/50">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:z-auto ${mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
+        <div className="p-4 border-b border-slate-700/50">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
               <div><p className="text-sm font-bold text-white leading-none">Lugabiz</p><p className="text-[9px] text-primary-400/80 font-semibold uppercase tracking-widest mt-0.5">Admin Panel</p></div>
@@ -56,7 +60,7 @@ function AdminDashboard() {
             <button onClick={() => setMobileOpen(false)} className="lg:hidden p-1.5 hover:bg-slate-800 rounded-lg transition-colors"><X className="w-4 h-4 text-slate-400" /></button>
           </div>
         </div>
-        <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+        <nav className="flex-1 min-h-0 p-3 space-y-3 overflow-y-auto lg:overflow-visible">
           {SIDEBAR_GROUPS.map(group => (
             <div key={group.label}>
               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2">{group.label}</p>
@@ -65,7 +69,7 @@ function AdminDashboard() {
                   const active = section === item.id;
                   return (
                     <button key={item.id} onClick={() => { setSection(item.id); setMobileOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
+                      className={`w-full flex items-center gap-3 px-3 py-2 [@media(max-height:820px)]:py-1.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
                       <item.icon className={`w-4 h-4 shrink-0 ${active ? 'text-primary-400' : ''}`} />
                       <span className="flex-1 text-left">{item.label}</span>
                       {active && <div className="w-1.5 h-1.5 rounded-full bg-primary-400 shrink-0" />}

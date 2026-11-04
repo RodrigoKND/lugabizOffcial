@@ -4,6 +4,7 @@ import { PlanButton } from '@presentation/components/features/social';
 import { useAuth } from '@presentation/context';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
 import GoingButton from './GoingButton';
+import ReactionButton from '@presentation/components/features/reactions/ReactionButton';
 
 interface EventCardSmallProps {
   event: Event;
@@ -33,6 +34,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewe
         </div>
 
         <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
+          <ReactionButton />
           <PlanButton targetName={event.name} eventId={event.id} className="w-7 h-7" />
           <button onClick={handleSaveClick} aria-label={saved ? 'Quitar de guardados' : 'Guardar evento'}
             className={`w-7 h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-colors ${saved ? 'bg-lg-accent' : 'bg-lg-text/90 hover:bg-lg-text'}`}>

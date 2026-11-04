@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TikTokBadge } from '@presentation/components/reusables';
 import { extractTikTokVideoId } from '@infrastructure/utils/socialLinks';
 import { PlanButton } from '@presentation/components/features/social';
+import ReactionButton from '@presentation/components/features/reactions/ReactionButton';
 
 interface CompactCardSocialGroup {
   id?: string;
@@ -76,7 +77,10 @@ const CompactCard: React.FC<CompactCardProps> = ({ image, name, rating, category
             </p>
           )}
         </div>
-        {(placeId || eventId) && <PlanButton targetName={name} placeId={placeId} eventId={eventId} className="w-7 h-7 shrink-0" />}
+        <div className="flex items-center gap-1 shrink-0">
+          <ReactionButton />
+          {(placeId || eventId) && <PlanButton targetName={name} placeId={placeId} eventId={eventId} className="w-7 h-7 shrink-0" />}
+        </div>
       </div>
     </motion.div>
   );
