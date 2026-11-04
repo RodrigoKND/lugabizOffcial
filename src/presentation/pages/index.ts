@@ -12,3 +12,4 @@ export { default as AdminPanel } from '@presentation/pages/Admin/AdminPanel';
 export { default as CommunityPage } from '@presentation/pages/Community/CommunityPage';
 export { default as ChatPage } from '@presentation/pages/Chat/ChatPage';
 export { default as BusinessAdvisorPage } from '@presentation/pages/Advisor/BusinessAdvisorPage';
+export { default as PassportPage } from '@presentation/pages/Passport/PassportPage';

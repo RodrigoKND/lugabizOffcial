@@ -13,13 +13,9 @@ export type PollChoice = 'a' | 'b';
 // Todos devuelven null/0 ante error (p. ej. migración aún no aplicada) para que la Home no se rompa.
 export const dailyPollsService = {
   async getActivePoll(): Promise<DailyPoll | null> {
-    const { data, error } = await supabase
-      .from('daily_polls')
-      .select('id, question, option_a, option_b, closes_at')
-      .gt('closes_at', new Date().toISOString())
-      .order('closes_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    // La función SQL crea la votación del día automáticamente desde poll_bank si aún no existe.
+    const { data: rows, error } = await supabase.rpc('get_or_create_daily_poll');
+    const data = Array.isArray(rows) ? rows[0] : rows;
     if (error || !data) return null;
     return { id: data.id, question: data.question, optionA: data.option_a, optionB: data.option_b, closesAt: data.closes_at };
   },

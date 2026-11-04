@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { eventsService, plansService } from '@lib/supabase';
 import { PlanVisibility, UserSearchResult } from '@domain/entities';
 import { useAuth } from '@presentation/context';
+import type { PlanSummary } from './planShare';
 
 interface PlanTarget {
   placeId?: string;
@@ -23,7 +24,7 @@ function toLocalDateInput(date: Date): string {
 // `isOpen` gatilla la precarga de fecha/hora cada vez que el modal se abre
 // (y no solo la primera vez), para que reabrir tras crear un plan también
 // las traiga precargadas.
-export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: () => void) {
+export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: (summary: PlanSummary) => void) {
   const { user } = useAuth();
   const [planDate, setPlanDate] = useState('');
   const [planTime, setPlanTime] = useState('');
@@ -76,8 +77,9 @@ export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: (
         inviteeIds: invitees.map((i) => i.id),
       });
       toast.success('Plan creado');
+      const summary: PlanSummary = { planDate, planTime, note: note.trim() || undefined };
       reset();
-      onCreated?.();
+      onCreated?.(summary);
     } catch (err) {
       console.error('[useCreatePlan:submit]', err);
       toast.error('No se pudo crear el plan');

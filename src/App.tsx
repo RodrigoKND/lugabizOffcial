@@ -30,6 +30,7 @@ const Confirmation = lazy(() => import('@presentation/pages/Confirmation/Confirm
 const AdminPanel = lazy(() => import('@presentation/pages/Admin/AdminPanel'));
 const CommunityPage = lazy(() => import('@presentation/pages/Community/CommunityPage'));
 const ChatPage = lazy(() => import('@presentation/pages/Chat/ChatPage'));
+const PassportPage = lazy(() => import('@presentation/pages/Passport/PassportPage'));
 const BusinessAdvisorPage = lazy(() => import('@presentation/pages/Advisor/BusinessAdvisorPage'));
 
 // Contexto global para que cualquier componente pueda pedir "activar push"
@@ -279,6 +280,7 @@ function AppRoutes() {
                   <Route path="/comunidad" element={<CommunityPage />} />
                   <Route path="/chat" element={<ChatPage />} />
                   <Route path="/asesor" element={<BusinessAdvisorPage />} />
+                  <Route path="/pasaporte" element={<PassportPage />} />
                   <Route path="*" element={<Home />} />
                 </Routes>
               </Suspense>

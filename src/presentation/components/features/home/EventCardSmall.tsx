@@ -3,6 +3,7 @@ import { Event } from '@domain/entities';
 import { PlanButton } from '@presentation/components/features/social';
 import { useAuth } from '@presentation/context';
 import { useEventSaves } from '@presentation/hooks/useEventSaves';
+import GoingButton from './GoingButton';
 
 interface EventCardSmallProps {
   event: Event;
@@ -50,6 +51,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({ event, onClick, isViewe
           <MapPin className="w-3 h-3 shrink-0" />
           {event.address}
         </p>
+        <GoingButton eventId={event.id} initialCount={event.attendeesCount ?? 0} />
       </div>
     </div>
   );

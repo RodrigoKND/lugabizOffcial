@@ -3,6 +3,7 @@ import { supabase } from '@lib/supabase';
 export interface PassportStamp {
   placeId: string;
   name: string;
+  stampedAt: string;
 }
 
 // Un sello por lugar donde el usuario confirmó "estoy aquí" en una encuesta (place_surveys.is_nearby).
@@ -18,11 +19,11 @@ export const passportService = {
 
     const seen = new Set<string>();
     const stamps: PassportStamp[] = [];
-    for (const row of data as unknown as { place_id: string; places: { name: string } | { name: string }[] | null }[]) {
+    for (const row of data as unknown as { place_id: string; created_at: string; places: { name: string } | { name: string }[] | null }[]) {
       if (seen.has(row.place_id)) continue;
       seen.add(row.place_id);
       const place = Array.isArray(row.places) ? row.places[0] : row.places;
-      stamps.push({ placeId: row.place_id, name: place?.name ?? 'Lugar' });
+      stamps.push({ placeId: row.place_id, name: place?.name ?? 'Lugar', stampedAt: row.created_at });
     }
     return stamps;
   },

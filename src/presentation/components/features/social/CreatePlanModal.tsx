@@ -10,6 +10,8 @@ import { PlanVisibility } from '@domain/entities';
 import FriendPickerItem from './FriendPickerItem';
 import UserSearchResultItem from './UserSearchResultItem';
 import PushEnableBanner from './PushEnableBanner';
+import PlanShareView from './PlanShareView';
+import type { PlanSummary } from '@presentation/hooks/social/planShare';
 
 interface CreatePlanModalProps {
   isOpen: boolean;
@@ -33,6 +35,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const [peopleQuery, setPeopleQuery] = useState('');
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [created, setCreated] = useState<PlanSummary | null>(null);
 
   const { options: friendOptions, isLoading: isLoadingFriends } = useFriendSearch(friendFilter, 20, isOpen);
   const { results: peopleResults, isSearching: isSearchingPeople } = useUserSearch(peopleQuery);
@@ -40,7 +43,9 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const {
     planDate, setPlanDate, planTime, setPlanTime, visibility, setVisibility,
     note, setNote, invitees, toggleInvitee, isSubmitting, submit,
-  } = useCreatePlan({ placeId, eventId }, isOpen, onClose);
+  } = useCreatePlan({ placeId, eventId }, isOpen, setCreated);
+
+  const close = () => { setCreated(null); onClose(); };
 
   const handleSendRequest = async (targetId: string) => {
     if (!user) return;
@@ -64,20 +69,23 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-          onClick={(e) => { e.stopPropagation(); onClose(); }}>
+          onClick={(e) => { e.stopPropagation(); close(); }}>
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
             className="bg-lg-surface rounded-2xl shadow-xl w-full max-w-md overflow-hidden max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-lg-surface-2">
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-lg-text">Crear plan</h3>
+                <h3 className="text-base font-bold text-lg-text">{created ? '¡Plan listo!' : 'Crear plan'}</h3>
                 <p className="text-xs text-lg-dim truncate">{targetName}</p>
               </div>
-              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-lg-surface-2 transition-colors shrink-0">
+              <button onClick={close} aria-label="Cerrar" className="p-1.5 rounded-lg hover:bg-lg-surface-2 transition-colors shrink-0">
                 <X className="w-4 h-4 text-lg-dim" />
               </button>
             </div>
 
+            {created ? (
+              <PlanShareView targetName={targetName} placeId={placeId} eventId={eventId} summary={created} onDone={close} />
+            ) : (<>
             <div className="p-5 space-y-4 overflow-y-auto">
               <PushEnableBanner />
               <div className="grid grid-cols-2 gap-3">
@@ -189,11 +197,12 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 Crear plan
               </button>
-              <button onClick={onClose}
+              <button onClick={close}
                 className="flex-1 py-2.5 bg-lg-surface-2 text-lg-dim rounded-xl font-semibold text-sm hover:bg-lg-surface-2 transition-all">
                 Cancelar
               </button>
             </div>
+            </>)}
           </motion.div>
         </motion.div>
       )}
