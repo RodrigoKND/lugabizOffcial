@@ -48,4 +48,4 @@ export interface NavigationButtonsProps {
   showNext: boolean;
 }
 
-export interface SuccessScreenProps {}
+export type SuccessScreenProps = Record<string, never>;
