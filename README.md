@@ -1,4 +1,6 @@
 
+
+[![CI/CD](https://github.com/RodrigoKND/lugabizOffcial/actions/workflows/ci.yml/badge.svg)](https://github.com/RodrigoKND/lugabizOffcial/actions/workflows/ci.yml)
 # Lugabiz
 
 !["Lugabiz interfaz home"](https://lugabiz.vercel.app/welcome_to_lugabiz.webp)
