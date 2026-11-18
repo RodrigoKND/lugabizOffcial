@@ -30,8 +30,6 @@ skills-lock.json
 .agents
 NEW_DB_SCHEMA.md
 
-# Tests (local, no se suben)
-/test/
 
 supabase_schema.sql
 supabase_migration_surveys.sql
