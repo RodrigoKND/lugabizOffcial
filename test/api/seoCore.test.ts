@@ -74,7 +74,7 @@ describe('resolveRoute', () => {
   });
   it('rutas públicas, privadas y desconocidas', () => {
     expect(core.resolveRoute('/').kind).toBe('static');
-    expect(core.resolveRoute('/comunidad').kind).toBe('static');
+    expect(core.resolveRoute('/comunidad').kind).toBe('private');
     expect(core.resolveRoute('/admin').kind).toBe('private');
     expect(core.resolveRoute('/edit-place/abc').kind).toBe('private');
     expect(core.resolveRoute('/share/place/abc').kind).toBe('private');
