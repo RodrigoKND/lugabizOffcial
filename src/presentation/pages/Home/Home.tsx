@@ -22,6 +22,8 @@ import { usePendingsurveys } from '@presentation/hooks/useSurveys';
 import { usePersonalizedSections, type HomeSection } from '@presentation/hooks/home/usePersonalizedSections';
 import PostsFeed from '@presentation/components/features/posts/PostsFeed';
 import Cartelera from '@presentation/components/features/cartelera/Cartelera';
+import { usePlaceVerdictTotals } from '@presentation/hooks/home/usePlaceVerdictTotals';
+import ContextCards from '@presentation/components/features/home/ContextCards';
 import OwnerBanner from '@presentation/components/features/home/OwnerBanner';
 
 const Home: React.FC = () => {
@@ -35,6 +37,7 @@ const Home: React.FC = () => {
   } = useHomeEvents(events, user?.id);
 
   const { trendingPlaces, trendingLoading } = useTrendingPlaces();
+  const verdictTotals = usePlaceVerdictTotals();
 
   const recentPlaces = useMemo(() => getRecentPlaces(10), [getRecentPlaces]);
   const hasContent = places.length > 0 || events.length > 0 || trendingPlaces.length > 0;
@@ -105,7 +108,9 @@ const Home: React.FC = () => {
           <EmptyHomeState onPublish={() => navigate('/add-place')} />
         )}
 
-        <Cartelera events={sortedActiveEvents} places={places} />
+        <Cartelera events={sortedActiveEvents} places={places} totals={verdictTotals} />
+
+        <ContextCards places={places} coords={storedCoords} totals={verdictTotals} />
 
         <OwnerBanner onLogin={() => setShowAuthModal(true)} />
 

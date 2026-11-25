@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, Users, Star, Megaphone, BarChart3 } from 'lucide-react';
 import { Place, Event, MarketSurvey } from '@domain/entities';
 import StatCard from './StatCard';
+import OwnerInsightsPanel from './insights/OwnerInsightsPanel';
 
 interface DashboardTabProps {
   myPlaces: Place[];
@@ -20,6 +21,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ myPlaces, myEvents, mySurve
 
   return (
     <div className="space-y-4">
+      <OwnerInsightsPanel />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard icon={MapPin} label="Lugares" value={myPlaces.length} />
         <StatCard icon={Calendar} label="Eventos" value={myEvents.length} />

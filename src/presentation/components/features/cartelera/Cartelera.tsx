@@ -1,15 +1,16 @@
 import { useBillboards } from '@presentation/hooks/home/useBillboards';
 import BillboardScreen from './BillboardScreen';
-import type { BillboardEvent, BillboardPlace } from './billboards';
+import type { BillboardEvent, BillboardPlace, PlaceTotals } from './billboards';
 
 interface CarteleraProps {
   events: BillboardEvent[];
   places: BillboardPlace[];
+  totals?: PlaceTotals;
 }
 
 // Cartelera de Cochabamba: pantallas grandes que se recorren con el dedo. Sin datos, no se pinta.
-export default function Cartelera({ events, places }: CarteleraProps) {
-  const billboards = useBillboards(events, places);
+export default function Cartelera({ events, places, totals }: CarteleraProps) {
+  const billboards = useBillboards(events, places, totals);
 
   if (!billboards.length) return null;
 

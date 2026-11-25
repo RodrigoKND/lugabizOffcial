@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  buildBillboards, MAX_BILLBOARDS,
+  buildBillboards, rankFeatured, MAX_BILLBOARDS,
   type BillboardEvent, type BillboardPlace,
 } from '@/presentation/components/features/cartelera/billboards';
 
@@ -78,5 +78,45 @@ describe('buildBillboards — mezcla', () => {
 
   it('sin datos devuelve vacío', () => {
     expect(buildBillboards([], [], NOW)).toEqual([]);
+  });
+});
+
+describe('rankFeatured (reacciones)', () => {
+  const totals = (jallalla: number, bien = 0, ahi = 0) => ({ jallalla, bien, ahi });
+
+  it('sin totales ordena como siempre: puntuación y reseñas', () => {
+    const out = rankFeatured([pl('a', { rating: 4.2 }), pl('b', { rating: 4.9, reviewCount: 40 })], NOW);
+    expect(out.map(p => p.id)).toEqual(['b', 'a']);
+  });
+
+  it('con totales, lo muy querido supera a lo mejor puntuado sin votos', () => {
+    const out = rankFeatured(
+      [pl('sinVotos', { rating: 4.9, reviewCount: 80 }), pl('querido', { rating: 4.2 })],
+      NOW, { querido: totals(12) },
+    );
+    expect(out[0].id).toBe('querido');
+  });
+
+  it('lo que la gente califica "Ahí nomás" baja de lugar', () => {
+    const out = rankFeatured(
+      [pl('mal', { rating: 4.9, reviewCount: 80 }), pl('neutro', { rating: 4.5 })],
+      NOW, { mal: totals(0, 0, 15) },
+    );
+    expect(out.map(p => p.id)).toEqual(['neutro', 'mal']);
+  });
+
+  it('un lugar con pocas reseñas pero muy querido entra aunque su puntuación sea baja', () => {
+    const out = rankFeatured([pl('chico', { rating: 3.5, reviewCount: 2 })], NOW, { chico: totals(15) });
+    expect(out.map(p => p.id)).toEqual(['chico']);
+  });
+
+  it('un lugar poco querido y con puntuación baja sigue fuera', () => {
+    expect(rankFeatured([pl('x', { rating: 3.5 })], NOW, { x: totals(0, 2, 6) })).toEqual([]);
+  });
+
+  it('buildBillboards usa los totales y la rotación diaria no entierra a los mejores', () => {
+    const places = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(id => pl(id));
+    const out = buildBillboards([], places, NOW, { h: totals(20) });
+    expect(out.map(b => b.id)).toContain('place-h');
   });
 });

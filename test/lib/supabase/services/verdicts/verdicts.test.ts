@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { rowsToSummaries, verdictsService } from '@/lib/supabase/services/verdicts/verdicts';
+import { rowsToSummaries, rowsToTotals, verdictsService } from '@/lib/supabase/services/verdicts/verdicts';
 
 const rpc = vi.hoisted(() => vi.fn());
 vi.mock('@lib/supabase', () => ({ supabase: { rpc } }));
@@ -37,5 +37,25 @@ describe('verdictsService.cast', () => {
   it('lanza el error del servidor para que el hook revierta', async () => {
     rpc.mockResolvedValue({ error: new Error('rls') });
     await expect(verdictsService.cast('place', 'p1', 'bien')).rejects.toThrow('rls');
+  });
+});
+
+describe('totales por lugar', () => {
+  beforeEach(() => { rpc.mockReset(); });
+
+  it('convierte las filas (bigint como texto) en un mapa por lugar', () => {
+    expect(rowsToTotals([{ target_id: 'p1', jallalla: '4', bien: 2, ahi: '0' }])).toEqual({ p1: { jallalla: 4, bien: 2, ahi: 0 } });
+  });
+
+  it('getPlaceTotals llama al RPC con la ventana y el límite', async () => {
+    rpc.mockResolvedValue({ data: [{ target_id: 'p1', jallalla: 1, bien: 0, ahi: 0 }], error: null });
+    const totals = await verdictsService.getPlaceTotals(30, 60);
+    expect(rpc).toHaveBeenCalledWith('get_place_verdict_totals', { p_days: 30, p_limit: 60 });
+    expect(totals.p1.jallalla).toBe(1);
+  });
+
+  it('lanza el error del servidor (el hook lo ignora y la cartelera sigue igual)', async () => {
+    rpc.mockResolvedValue({ data: null, error: new Error('x') });
+    await expect(verdictsService.getPlaceTotals()).rejects.toThrow('x');
   });
 });
