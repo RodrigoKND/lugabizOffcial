@@ -12,6 +12,7 @@ import UserSearchResultItem from './UserSearchResultItem';
 import PushEnableBanner from './PushEnableBanner';
 import PlanShareView from './PlanShareView';
 import type { PlanSummary } from '@presentation/hooks/social/planShare';
+import type { PlanDefaults } from '@presentation/hooks/social/useCreatePlan';
 
 interface CreatePlanModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface CreatePlanModalProps {
   targetName: string;
   placeId?: string;
   eventId?: string;
+  defaults?: PlanDefaults;
 }
 
 const VISIBILITY_OPTIONS: { value: PlanVisibility; label: string; hint: string }[] = [
@@ -27,7 +29,7 @@ const VISIBILITY_OPTIONS: { value: PlanVisibility; label: string; hint: string }
   { value: 'public', label: 'Público', hint: 'Cualquiera lo puede ver en el lugar/evento' },
 ];
 
-const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targetName, placeId, eventId }) => {
+const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targetName, placeId, eventId, defaults }) => {
   const { user } = useAuth();
   useLockBodyScroll(isOpen);
   const [friendFilter, setFriendFilter] = useState('');
@@ -43,7 +45,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, targ
   const {
     planDate, setPlanDate, planTime, setPlanTime, visibility, setVisibility,
     note, setNote, invitees, toggleInvitee, isSubmitting, submit,
-  } = useCreatePlan({ placeId, eventId }, isOpen, setCreated);
+  } = useCreatePlan({ placeId, eventId }, isOpen, setCreated, defaults);
 
   const close = () => { setCreated(null); onClose(); };
 

@@ -5,6 +5,7 @@ import type { PlaceInfoCardProps } from '@domain/entities/PlaceDetailTypes';
 import { directionsUrl } from '@infrastructure/utils/directions';
 import { SocialLinksRow } from '@presentation/components/reusables';
 import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
+import GroupPickButton from '@presentation/components/features/social/pick/GroupPickButton';
 import ReportFakePlaceAction from './ReportFakePlaceAction';
 
 const SECONDARY_BTN = 'flex h-12 flex-1 min-w-[7.5rem] items-center justify-center gap-2 rounded-lg px-4 text-sm font-bold transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lg-text';
@@ -38,6 +39,8 @@ export default function PlaceInfoCard({ place, isPlaceSaved, user, onShare, onTo
         </button>
         <PlanButton targetName={place.name} placeId={place.id} variant="detail" theme="light" className="!h-12 flex-1 min-w-[7.5rem] !rounded-lg !py-0 !font-bold" />
       </div>
+
+      <GroupPickButton draft={{ key: `place:${place.id}`, placeId: place.id, name: place.name, image: place.image }} className="w-full" />
 
       <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-lg-text">{place.description}</p>
 

@@ -7,6 +7,7 @@ import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
 import DocPicker from './DocPicker';
 import StatusBadge from './StatusBadge';
+import { userFacingMessage } from '@infrastructure/utils/userFacingError';
 
 interface Props {
   isOpen: boolean;
@@ -65,7 +66,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
       setVerifyTarget(created); setDocFiles([]); setView('verify');
       toast.success('Negocio registrado');
     } catch (e) {
-      toast.error(e?.message ?? 'No se pudo registrar el negocio.');
+      toast.error(userFacingMessage(e, 'No se pudo registrar el negocio.'));
     } finally {
       setBusy(false);
     }
@@ -105,7 +106,7 @@ const MyBusinessesModal: React.FC<Props> = ({ isOpen, onClose }) => {
       toast.success('Documentos enviados a revisión');
       setView('list'); setVerifyTarget(null); setDocFiles([]);
     } catch (e) {
-      toast.error(e?.message ?? 'No se pudieron enviar los documentos.');
+      toast.error(userFacingMessage(e, 'No se pudieron enviar los documentos.'));
     } finally {
       setBusy(false);
     }

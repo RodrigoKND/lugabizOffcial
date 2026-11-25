@@ -10,6 +10,13 @@ interface PlanTarget {
   eventId?: string;
 }
 
+// Valores iniciales (p. ej. el ganador de una votación): solo rellenan campos que sigan vacíos.
+export interface PlanDefaults {
+  planDate?: string;
+  planTime?: string;
+  invitees?: UserSearchResult[];
+}
+
 // Formatea un Date como YYYY-MM-DD en hora local — toISOString() lo pasa a UTC
 // y corre la fecha un día atrás en husos UTC-negativos (ej. Bolivia).
 function toLocalDateInput(date: Date): string {
@@ -24,7 +31,7 @@ function toLocalDateInput(date: Date): string {
 // `isOpen` gatilla la precarga de fecha/hora cada vez que el modal se abre
 // (y no solo la primera vez), para que reabrir tras crear un plan también
 // las traiga precargadas.
-export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: (summary: PlanSummary) => void) {
+export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: (summary: PlanSummary) => void, defaults?: PlanDefaults) {
   const { user } = useAuth();
   const [planDate, setPlanDate] = useState('');
   const [planTime, setPlanTime] = useState('');
@@ -32,6 +39,13 @@ export function useCreatePlan(target: PlanTarget, isOpen: boolean, onCreated?: (
   const [note, setNote] = useState('');
   const [invitees, setInvitees] = useState<UserSearchResult[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !defaults) return;
+    if (defaults.planDate) setPlanDate((prev) => prev || defaults.planDate!);
+    if (defaults.planTime) setPlanTime((prev) => prev || defaults.planTime!);
+    if (defaults.invitees?.length) setInvitees((prev) => (prev.length ? prev : defaults.invitees!));
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Si el plan es sobre un evento, precargamos su fecha/hora de inicio (el
   // usuario puede editarlas igual antes de crear el plan). Solo pisa los

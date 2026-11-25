@@ -21,6 +21,7 @@ import { marketSurveysService } from '@lib/supabase/services/surveys';
 const PlaceDetail = lazy(() => import('@presentation/pages/Places/PlaceDetail'));
 const AddPlace = lazy(() => import('@presentation/pages/Places/formAddNewPlace/AddPlace'));
 const Profile = lazy(() => import('@presentation/pages/User/Profile'));
+const GroupPickPage = lazy(() => import('@presentation/pages/Plans/GroupPickPage'));
 const EventDetailPage = lazy(() => import('@presentation/pages/Events/EventDetailPage'));
 const EventFeedPage = lazy(() => import('@presentation/pages/Events/EventFeedPage'));
 const EditEventPage = lazy(() => import('@presentation/pages/Events/EditEventPage'));
@@ -270,6 +271,7 @@ function AppRoutes() {
                   <Route path="/place/:id" element={<PlaceDetail />} />
                   <Route path="/add-place" element={<AddPlace />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/votacion/:id" element={<GroupPickPage />} />
                   <Route path="/event/:id" element={<EventDetailPage />} />
                   <Route path="/events/feed" element={<EventFeedPage />} />
                   <Route path="/edit-event/:id" element={<EditEventPage />} />

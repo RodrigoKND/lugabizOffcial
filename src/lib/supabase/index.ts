@@ -31,3 +31,4 @@ export { usernameService } from '@lib/supabase/services/user/username';
 export { placeFakeReportsService } from '@lib/supabase/services/places/placeFakeReports';
 export { friendshipsService } from '@lib/supabase/services/social/friendships';
 export { plansService } from '@lib/supabase/services/social/plans';
+export { groupPicksService } from '@lib/supabase/services/social/groupPicks';

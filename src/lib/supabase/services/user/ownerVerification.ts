@@ -1,4 +1,6 @@
 import { supabase } from '@lib/supabase/client';
+import { resizeImageFile } from '@infrastructure/utils/imageResize';
+import { userFacingMessage } from '@infrastructure/utils/userFacingError';
 
 const BUCKET = 'verification-docs';
 const FUNCTION_NAME = 'owner-verification';
@@ -47,16 +49,50 @@ function mapRow(r: Record<string, unknown>): OwnerVerification {
   };
 }
 
+// Cuando la función responde 4xx/5xx, supabase-js solo dice "Edge Function returned a non-2xx status code";
+// el mensaje real (en español, pensado para la persona) viene en el cuerpo de la respuesta.
+async function serverMessage(error: unknown): Promise<string> {
+  const context = (error as { context?: unknown } | null)?.context;
+  if (context instanceof Response) {
+    try {
+      const body = await context.clone().json();
+      if (typeof body?.error === 'string') return body.error;
+    } catch { /* el cuerpo no era JSON */ }
+  }
+  return error instanceof Error ? error.message : '';
+}
+
+// Llama a la edge function y devuelve su respuesta. Cualquier fallo sale como Error con un mensaje apto para mostrar:
+// el detalle técnico (red, 5xx, permisos) queda solo en la consola.
+async function invoke<T>(body: Record<string, unknown>, fallback: string): Promise<T> {
+  const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, { body });
+  if (error) {
+    console.error('[ownerVerification:invoke]', body.action, error);
+    throw new Error(userFacingMessage(await serverMessage(error), fallback));
+  }
+  const payload = data as Record<string, unknown> | null;
+  if (payload?.error) {
+    console.error('[ownerVerification:invoke]', body.action, payload.error);
+    throw new Error(userFacingMessage(String(payload.error), fallback));
+  }
+  return payload as T;
+}
+
 async function uploadDoc(userId: string, kind: VerificationKind, slot: string, file: File): Promise<string> {
-  const ext = file.name.split('.').pop() || 'jpg';
+  // Las fotos de celular pesan varios MB: se reducen antes de subir (más rápido y el análisis de IA las acepta).
+  const prepared = await resizeImageFile(file);
+  const ext = prepared.name.split('.').pop() || 'jpg';
   // El primer segmento DEBE ser el userId (lo exige la RLS del bucket privado).
   const path = `${userId}/${kind}/${slot}-${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(BUCKET).upload(path, prepared, {
     cacheControl: '3600',
     upsert: true,
-    contentType: file.type,
+    contentType: prepared.type,
   });
-  if (error) throw error;
+  if (error) {
+    console.error('[ownerVerification:uploadDoc]', error);
+    throw new Error('No pudimos subir tus fotos. Revisa tu conexión e intenta de nuevo.');
+  }
   return path;
 }
 
@@ -83,23 +119,19 @@ export const ownerVerificationService = {
     docPaths.push(await uploadDoc(userId, 'identity', 'ci-front', params.ciFrontFile));
     if (params.ciBackFile) docPaths.push(await uploadDoc(userId, 'identity', 'ci-back', params.ciBackFile));
 
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: {
-        action: 'precheck-identity',
-        businessName: params.businessName,
-        fullName: params.fullName,
-        docPaths,
-        selfiePath: docPaths[0],
-        ciPath: docPaths[1],
-      },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo analizar la verificación.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    const data = await invoke<Record<string, unknown>>({
+      action: 'precheck-identity',
+      businessName: params.businessName,
+      fullName: params.fullName,
+      docPaths,
+      selfiePath: docPaths[0],
+      ciPath: docPaths[1],
+    }, 'No pudimos revisar tus fotos. Intenta de nuevo en un momento.');
     return {
-      verdict: (data as Record<string, unknown>).verdict as IdentityPrecheck['verdict'],
-      message: (data as Record<string, unknown>).message as string,
-      extracted: ((data as Record<string, unknown>).extracted ?? {}) as Record<string, unknown>,
-      aiScore: (data as Record<string, unknown>).aiScore as number | null,
+      verdict: data.verdict as IdentityPrecheck['verdict'],
+      message: data.message as string,
+      extracted: (data.extracted ?? {}) as Record<string, unknown>,
+      aiScore: data.aiScore as number | null,
       docPaths,
     };
   },
@@ -113,19 +145,15 @@ export const ownerVerificationService = {
     params: { businessName: string; precheck: IdentityPrecheck },
   ): Promise<OwnerVerification> {
     const { docPaths, verdict, extracted, aiScore, message } = params.precheck;
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: {
-        action: 'submit-identity',
-        businessName: params.businessName,
-        docPaths,
-        selfiePath: docPaths[0],
-        ciPath: docPaths[1],
-        verdict, extracted, aiScore, message,
-      },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo enviar la verificación.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
-    return mapRow((data as Record<string, unknown>).verification as Record<string, unknown>);
+    const data = await invoke<Record<string, unknown>>({
+      action: 'submit-identity',
+      businessName: params.businessName,
+      docPaths,
+      selfiePath: docPaths[0],
+      ciPath: docPaths[1],
+      verdict, extracted, aiScore, message,
+    }, 'No pudimos enviar tu verificación. Intenta de nuevo en un momento.');
+    return mapRow(data.verification as Record<string, unknown>);
   },
 
   /** Envía documentos de negocio (NIT/SEPREC/licencia) de UN negocio concreto para su insignia dorada. */
@@ -137,12 +165,11 @@ export const ownerVerificationService = {
     for (let i = 0; i < params.docFiles.length; i++) {
       docPaths.push(await uploadDoc(userId, 'business_docs', `${params.businessId}-doc${i}`, params.docFiles[i]));
     }
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'submit-business-docs', businessId: params.businessId, businessName: params.businessName, docPaths },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudieron enviar los documentos.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
-    return mapRow((data as Record<string, unknown>).verification as Record<string, unknown>);
+    const data = await invoke<Record<string, unknown>>(
+      { action: 'submit-business-docs', businessId: params.businessId, businessName: params.businessName, docPaths },
+      'No pudimos enviar tus documentos. Intenta de nuevo en un momento.',
+    );
+    return mapRow(data.verification as Record<string, unknown>);
   },
 
   /** Descarta el borrador de identidad en el servidor (al reintentar fotos). */
@@ -165,12 +192,8 @@ export const ownerVerificationService = {
 
   /** Lista las solicitudes pendientes con URLs firmadas de los documentos. */
   async listPending(): Promise<PendingVerification[]> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'admin-list' },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo cargar la cola.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
-    return (((data as Record<string, unknown>).pending as Record<string, unknown>[]) || []).map((r: Record<string, unknown>) => ({
+    const data = await invoke<Record<string, unknown>>({ action: 'admin-list' }, 'No se pudo cargar la cola.');
+    return ((data.pending as Record<string, unknown>[]) || []).map((r: Record<string, unknown>) => ({
       ...mapRow(r),
       userName: r.user_name,
       userEmail: r.user_email,
@@ -181,11 +204,7 @@ export const ownerVerificationService = {
 
   /** Aprueba o rechaza una solicitud (admin). */
   async review(verificationId: string, decision: 'approve' | 'reject', notes?: string): Promise<void> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: decision === 'approve' ? 'admin-approve' : 'admin-reject', verificationId, notes },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo procesar la decisión.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    await invoke({ action: decision === 'approve' ? 'admin-approve' : 'admin-reject', verificationId, notes }, 'No se pudo procesar la decisión.');
   },
 
   /**
@@ -194,10 +213,6 @@ export const ownerVerificationService = {
    * casos el dueño recibe aviso in-app y por email (si el correo está configurado).
    */
   async revokeBadge(params: { target: 'business_docs' | 'identity'; businessId?: string; ownerId?: string; notes?: string }): Promise<void> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, {
-      body: { action: 'admin-revoke', ...params },
-    });
-    if (error) throw new Error(error.message ?? 'No se pudo retirar la insignia.');
-    if ((data as Record<string, unknown>)?.error) throw new Error((data as Record<string, unknown>).error as string);
+    await invoke({ action: 'admin-revoke', ...params }, 'No se pudo retirar la insignia.');
   },
 };

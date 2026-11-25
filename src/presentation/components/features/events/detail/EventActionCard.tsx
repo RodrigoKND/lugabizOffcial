@@ -2,6 +2,7 @@ import { Users, XCircle, CheckCircle2 } from 'lucide-react';
 import { EVENT_STATUS } from '@constants/steps';
 import type { EventDetailSidebarProps } from '@domain/entities/props/EventSidebarProps';
 import { PlanButton, PlansCountBadge } from '@presentation/components/features/social';
+import GroupPickButton from '@presentation/components/features/social/pick/GroupPickButton';
 import { EventStatusBadge } from './EventStatusBadge';
 import { formatPrice, CouponsSection, StatusBlock } from './sidebar';
 import { spotsLabel } from './sidebar/spots';
@@ -44,6 +45,7 @@ export default function EventActionCard({ event, eventStatus, isAttending, isFul
           </button>
         )}
         <PlanButton targetName={event.name} eventId={event.id} variant="detail" theme="light" className="w-full" />
+        <GroupPickButton draft={{ key: `event:${event.id}`, eventId: event.id, name: event.name, image: event.image }} className="w-full" />
       </div>
     </aside>
   );

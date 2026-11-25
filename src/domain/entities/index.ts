@@ -32,3 +32,7 @@ export {
   type PlanVisibility, type PlanRsvpStatus, type PlanParticipantRole,
   type PlanParticipant, type Plan, type CreatePlanData,
 } from './Plan';
+export {
+  type GroupPickStatus, type GroupPickMember, type GroupPickOption, type GroupPickVote, type GroupPick,
+  type GroupPickDetail, type GroupPickSummary, type GroupPickTarget, type CreateGroupPickData,
+} from './GroupPick';

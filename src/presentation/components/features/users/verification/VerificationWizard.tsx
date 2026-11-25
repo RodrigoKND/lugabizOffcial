@@ -7,6 +7,7 @@ import { ownerVerificationService, type OwnerVerification, type IdentityPrecheck
 import FilePicker from './FilePicker';
 import { verdictStyles } from './verdictStyles';
 import type { Step } from './VerificationWizard.types';
+import { userFacingMessage } from '@infrastructure/utils/userFacingError';
 
 interface Props {
   isOpen: boolean;
@@ -95,7 +96,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
       setPrecheck(result);
       setStep('review');
     } catch (e) {
-      toast.error(e?.message ?? 'No se pudo analizar. Intentá de nuevo.');
+      toast.error(userFacingMessage(e, 'No se pudo analizar. Intenta de nuevo.'));
       setStep('identity');
     }
   };
@@ -118,7 +119,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
       // admin aprueba la identidad. Mientras tanto la solicitud queda "en revisión".
       setStep('done');
     } catch (e) {
-      toast.error(e?.message ?? 'No se pudo enviar la verificación.');
+      toast.error(userFacingMessage(e, 'No se pudo enviar la verificación.'));
       setStep('review');
     }
   };
@@ -244,7 +245,7 @@ const VerificationWizard: React.FC<Props> = ({ isOpen, onClose }) => {
                     {verdictStyles[precheck.verdict].icon}
                     <div className="min-w-0">
                       <p className={`text-sm font-semibold ${verdictStyles[precheck.verdict].text}`}>
-                        {precheck.verdict === 'fail' ? 'No podemos continuar' : 'Verificación correcta'}
+                        {({ fail: 'No podemos continuar', warn: 'Lo revisará una persona', ok: 'Verificación correcta' } as const)[precheck.verdict]}
                       </p>
                       <p className="text-xs text-lg-dim mt-0.5">{precheck.message}</p>
                     </div>

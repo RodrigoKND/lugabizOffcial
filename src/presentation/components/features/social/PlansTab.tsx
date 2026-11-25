@@ -8,6 +8,7 @@ import PlanCard from './PlanCard';
 import CancelPlanModal from './CancelPlanModal';
 import PlanDetailModal from './PlanDetailModal';
 import PushEnableBanner from './PushEnableBanner';
+import GroupPicksList from './pick/GroupPicksList';
 
 const PlansTab: React.FC = () => {
   const { user } = useAuth();
@@ -37,6 +38,7 @@ const PlansTab: React.FC = () => {
     return (
       <div className="space-y-3">
         <PushEnableBanner />
+        <GroupPicksList />
         <div className="bg-lg-surface rounded-2xl p-12 text-center border border-lg-surface-2">
           <CalendarCheck2 className="w-10 h-10 text-primary-300 mx-auto mb-3" />
           <h3 className="text-base font-bold text-lg-text mb-1">Sin planes todavía</h3>
@@ -49,6 +51,7 @@ const PlansTab: React.FC = () => {
   return (
     <div className="space-y-5">
       <PushEnableBanner />
+      <GroupPicksList />
 
       {pendingInvites.length > 0 && (
         <div className="space-y-2">
