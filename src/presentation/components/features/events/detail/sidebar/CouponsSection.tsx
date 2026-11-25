@@ -2,15 +2,16 @@ import { Ticket } from 'lucide-react';
 
 export function CouponsSection({ coupons }: { coupons: Array<{ code: string; description: string }> }) {
   return (
-    <div className="mb-6 -mt-3 p-3 bg-lg-surface-2 border border-lg-surface-2 rounded-xl space-y-1.5">
-      <p className="text-[11px] font-semibold text-lg-accent uppercase tracking-wider flex items-center gap-1.5">
-        <Ticket className="w-3.5 h-3.5" /> Cupones activos
-      </p>
-      {coupons.map((c, i) => (
-        <p key={i} className="text-xs text-lg-dim">
-          <span className="font-mono font-bold text-lg-accent">{c.code}</span> — {c.description}
+    <section aria-label="Cupones activos" className="mt-3 space-y-2 rounded-lg bg-lg-surface-2 p-3">
+      <h2 className="flex items-center gap-1.5 text-xs font-bold text-lg-accent">
+        <Ticket className="h-4 w-4" /> Cupones activos
+      </h2>
+      {coupons.map(c => (
+        <p key={c.code} className="text-sm text-lg-text">
+          <span className="rounded bg-lg-maiz px-1.5 py-0.5 font-mono text-xs font-bold text-lg-ink">{c.code}</span>{' '}
+          <span className="text-lg-dim">{c.description}</span>
         </p>
       ))}
-    </div>
+    </section>
   );
 }

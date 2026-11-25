@@ -6,7 +6,7 @@ function StarBar({ star, count, max }: { star: number; count: number; max: numbe
   return (
     <div className="flex items-center gap-2">
       <span className="text-[12px] text-lg-dim w-4 text-right shrink-0">{star}</span>
-      <Star className="w-3 h-3 text-amber-400 shrink-0" />
+      <Star className="w-3 h-3 fill-lg-maiz text-lg-maiz shrink-0" />
       <div className="flex-1 h-2 bg-lg-surface-2 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}

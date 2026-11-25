@@ -1,10 +1,10 @@
 export function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="bg-amber-50 p-2.5 rounded-xl">{icon}</div>
-      <div className="min-w-0">
-        <p className="text-xs font-semibold text-lg-dim uppercase">{label}</p>
-        <p className="text-sm font-medium text-lg-text break-words">{value}</p>
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-lg-surface-2 text-lg-accent [&>svg]:h-5 [&>svg]:w-5">{icon}</div>
+      <div className="min-w-0 pt-0.5">
+        <p className="text-xs font-bold text-lg-dim">{label}</p>
+        <p className="break-words text-sm font-semibold text-lg-text">{value}</p>
       </div>
     </div>
   );

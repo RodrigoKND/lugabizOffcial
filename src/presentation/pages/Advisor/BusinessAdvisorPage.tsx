@@ -9,6 +9,7 @@ import {
 import { useSmartBack } from '@presentation/hooks/useSmartBack'
 import { businessAdvisorService, type BusinessAdvisorReport } from '@lib/supabase/services/ai/businessAdvisorService'
 import { searchAddress, reverseGeocode, type GeoResult } from '@lib/geocoding/geocodingService'
+import AdvisorRoadmap from '@presentation/components/features/advisor/AdvisorRoadmap'
 
 function storedCoords(): { lat?: number; lng?: number } {
   try {
@@ -107,6 +108,8 @@ export default function BusinessAdvisorPage() {
   const [error, setError] = useState<string | null>(null)
   const [report, setReport] = useState<BusinessAdvisorReport | null>(null)
   const [tab, setTab] = useState<Tab>('veredicto')
+  // Primero el camino (roadmap); las pestañas del informe quedan como "detalle".
+  const [view, setView] = useState<'road' | 'detail'>('road')
 
   const canAnalyze = useMemo(() => !!location && !loading, [location, loading])
 
@@ -153,7 +156,7 @@ export default function BusinessAdvisorPage() {
       const r = await businessAdvisorService.analyze({
         idea: idea.trim() || undefined, lat: location.lat, lng: location.lng, city: location.city,
       })
-      setReport(r); setTab('veredicto')
+      setReport(r); setTab('veredicto'); setView('road')
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'No se pudo completar el análisis. Intentá de nuevo.')
     } finally { setLoading(false) }
@@ -227,7 +230,19 @@ export default function BusinessAdvisorPage() {
           </div>
         )}
 
-        {report && <ReportView report={report} tab={tab} setTab={setTab} />}
+        {report && view === 'road' && (
+          <AdvisorRoadmap report={report} onOpenDetail={t => { setTab(t); setView('detail') }} />
+        )}
+
+        {report && view === 'detail' && (
+          <>
+            <button onClick={() => setView('road')}
+              className="mb-3 h-11 rounded-xl bg-lg-surface-2 px-4 text-[13px] font-bold text-lg-text">
+              ← Volver al camino
+            </button>
+            <ReportView report={report} tab={tab} setTab={setTab} />
+          </>
+        )}
       </main>
     </div>
   )

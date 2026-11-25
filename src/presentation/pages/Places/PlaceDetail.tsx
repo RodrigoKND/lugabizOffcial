@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSearchParams, useLocation, Link } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { useSmartBack } from '@presentation/hooks';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Star, X, TrendingUp, BarChart3, Loader2, LogIn } from 'lucide-react';
+import { ArrowLeft, X, BarChart3, Loader2 } from 'lucide-react';
 import { usePlaces, useAuth } from '@presentation/context';
 import { latLngToCell, areCellsNearby } from '@infrastructure/utils/h3';
 import { ReviewSection } from '@presentation/components/features';
@@ -18,6 +17,9 @@ import PlaceLocationCard from '@presentation/components/features/places/detail/P
 import PlaceSurveyModal from '@presentation/components/features/places/detail/PlaceSurveyModal';
 import PlaceSurveyStats from '@presentation/components/features/places/detail/PlaceSurveyStats';
 import HiddenPlaceBanner from '@presentation/components/features/places/detail/HiddenPlaceBanner';
+import PlaceReviewStrip from '@presentation/components/features/places/detail/PlaceReviewStrip';
+import RelatedPlacesRow from '@presentation/components/features/places/detail/RelatedPlacesRow';
+import PlaceLoginGate from '@presentation/components/features/places/detail/PlaceLoginGate';
 
 const PlaceDetail: React.FC = () => {
   const goBack = useSmartBack('/');
@@ -85,49 +87,29 @@ const PlaceDetail: React.FC = () => {
   });
 
   if (isLoadingPlace || isAuthLoading) return (
-    <div className="min-h-screen bg-lg-ground flex items-center justify-center">
+    <div role="status" aria-label="Cargando lugar" className="min-h-screen bg-lg-ground flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-lg-accent" />
     </div>
   );
-  if (!place && !user) return (
-    <div className="min-h-screen bg-lg-ground flex items-center justify-center px-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-lg-surface ring-1 ring-lg-surface-2 rounded-3xl shadow-[0_2px_12px_rgba(80,50,140,0.08)] p-8 max-w-sm w-full text-center">
-        <div className="w-14 h-14 rounded-2xl bg-lg-surface-2 flex items-center justify-center mx-auto mb-4">
-          <LogIn className="w-7 h-7 text-lg-accent" />
-        </div>
-        <h2 className="text-lg font-bold text-lg-text mb-2">Inicia sesión</h2>
-        <p className="text-sm text-lg-dim mb-6 leading-relaxed">
-          Necesitas iniciar sesión para ver los detalles de este lugar.
-        </p>
-        <Link to="/?auth=login"
-          className="w-full py-3 bg-lg-accent text-lg-ink rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-lg-accent transition-colors">
-          <LogIn className="w-4 h-4" /> Iniciar sesión
-        </Link>
-        <button onClick={() => navigate('/')} className="mt-3 w-full py-2.5 text-lg-dim text-sm hover:text-lg-dim transition-colors">
-          Volver al inicio
-        </button>
-      </motion.div>
-    </div>
-  );
+  if (!place && !user) return <PlaceLoginGate onHome={() => navigate('/')} />;
   if (!place) return <PlaceNotFound />;
 
   return (
-    <div className="min-h-screen bg-lg-ground">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <motion.div initial={{ y: -10 }} animate={{ y: 0 }} className="mb-6">
+    <div className="min-h-screen bg-lg-ground text-lg-text">
+      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+        <nav className="mb-4">
           {isModal ? (
-            <button onClick={goBack}
-              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-lg-surface ring-1 ring-lg-surface-2 hover:bg-lg-surface-2 transition-colors text-lg-dim">
-              <X className="w-5 h-5" />
+            <button onClick={goBack} aria-label="Cerrar"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-lg-surface text-lg-dim transition-colors hover:bg-lg-surface-2 hover:text-lg-text focus-visible:outline-2 focus-visible:outline-lg-accent">
+              <X className="h-5 w-5" />
             </button>
           ) : (
-            <button onClick={goBack} className="inline-flex items-center gap-2 text-lg-dim hover:text-lg-text transition-colors font-medium">
-              <ArrowLeft className="w-5 h-5" />
-              Volver
+            <button onClick={goBack}
+              className="group flex h-11 items-center gap-2 rounded-lg pr-3 font-bold text-lg-dim transition-colors hover:text-lg-text focus-visible:outline-2 focus-visible:outline-lg-accent">
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" /> Volver
             </button>
           )}
-        </motion.div>
+        </nav>
 
         {place.hidden && (
           <div className="mb-6">
@@ -135,9 +117,9 @@ const PlaceDetail: React.FC = () => {
           </div>
         )}
 
-        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-3 space-y-4">
+        {/* Celular: portada → acciones → ubicación → reseñas. Escritorio: portada y reseñas a la izquierda, acciones y ubicación a la derecha. */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-5">
+          <div className="order-1 lg:col-span-3 lg:col-start-1 lg:row-start-1">
             <PlaceImageSection
               place={place}
               user={user}
@@ -152,29 +134,9 @@ const PlaceDetail: React.FC = () => {
               onPrev={prevImage}
               onNext={nextImage}
             />
+          </div>
 
-            {reviews.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {reviews.slice(0, 5).map((review) => (
-                  <div key={review.id} className="flex items-center gap-2 bg-lg-surface ring-1 ring-lg-surface-2 rounded-2xl px-4 py-2 shrink-0 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
-                    <img src={review.userAvatar || '/avatar.png'} alt="" className="w-8 h-8 rounded-full object-cover" />
-                    <div>
-                      <p className="text-xs font-semibold text-lg-text">{review.userName}</p>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span className="text-xs text-lg-dim">{review.rating}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <ReviewSection placeId={place.id} reviews={reviews} hasMore={hasMoreReviews} onLoadMore={loadMoreReviews} />
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-2 space-y-4">
+          <div className="order-2 space-y-4 lg:col-span-2 lg:col-start-4 lg:row-span-2 lg:row-start-1">
             <PlaceInfoCard
               place={place}
               isPlaceSaved={isPlaceSaved}
@@ -182,65 +144,30 @@ const PlaceDetail: React.FC = () => {
               onShare={sharePlace}
               onToggleSave={() => toggleSavedPlace(place.id)}
             />
-            <PlaceLocationCard
-              address={place.address}
-              latitude={place.latitude}
-              longitude={place.longitude}
-            />
+            <PlaceLocationCard address={place.address} latitude={place.latitude} longitude={place.longitude} />
 
-            {/* Stats de encuestas — visible solo para el dueño del lugar */}
+            {/* Stats de encuestas: visible solo para el dueño del lugar */}
             {user?.id === place.userId && (
-              <div className="bg-lg-surface ring-1 ring-lg-surface-2 rounded-2xl p-4 shadow-[0_2px_12px_rgba(80,50,140,0.08)]">
-                <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="w-4 h-4 text-lg-accent" />
-                  <h3 className="font-semibold text-sm text-lg-text">Estadísticas de encuestas</h3>
-                </div>
+              <section aria-label="Estadísticas de encuestas" className="rounded-xl border-2 border-lg-surface-2 bg-lg-surface p-4">
+                <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-lg-text">
+                  <BarChart3 className="h-4 w-4 text-lg-accent" /> Estadísticas de encuestas
+                </h2>
                 <PlaceSurveyStats placeId={place.id} />
-              </div>
+              </section>
             )}
-          </motion.div>
+          </div>
+
+          <div className="order-3 space-y-4 lg:col-span-3 lg:col-start-1 lg:row-start-2">
+            <PlaceReviewStrip reviews={reviews} />
+            <ReviewSection placeId={place.id} reviews={reviews} hasMore={hasMoreReviews} onLoadMore={loadMoreReviews} />
+          </div>
         </div>
 
-        {relatedPlaces.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="mt-10 pt-6 border-t border-lg-surface-2">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-lg-accent" />
-              <h3 className="font-semibold text-[15px] text-lg-text">
-                Más de {place.category?.name}
-              </h3>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide mb-24">
-              {relatedPlaces.map(p => (
-                <Link
-                  key={p.id}
-                  to={`/place/${p.id}`}
-                  state={{ background: isModal ? routerLocation.state.background : routerLocation }}
-                  className="group shrink-0 w-32 rounded-xl overflow-hidden bg-lg-surface border border-lg-surface-2 shadow-xs hover:shadow-md transition-all active:scale-[0.97]"
-                >
-                  <div className="aspect-square relative overflow-hidden bg-lg-surface-2">
-                    {p.image ? (
-                      <img src={p.image} alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-primary-300" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-1.5 left-2 right-2">
-                      <p className="text-white font-bold text-[11px] leading-tight truncate">{p.name}</p>
-                      <div className="flex items-center gap-0.5 mt-0.5">
-                        <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                        <span className="text-white/80 text-[10px]">{p.rating.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        <RelatedPlacesRow
+          places={relatedPlaces}
+          categoryName={place.category?.name}
+          backgroundLocation={isModal ? routerLocation.state.background : routerLocation}
+        />
       </div>
 
       <PlaceSurveyModal

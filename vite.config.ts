@@ -9,7 +9,22 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: false,
+    setupFiles: ['./test/setup.ts'],
     include: ['test/**/*.{test,spec}.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text-summary', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      include: [
+        'src/lib/**/*.{ts,tsx}',
+        'src/domain/**/*.{ts,tsx}',
+        'src/presentation/hooks/**/*.{ts,tsx}',
+        'src/infrastructure/utils/**/*.{ts,tsx}',
+      ],
+      exclude: ['**/*.d.ts', '**/index.ts', '**/types.ts'],
+      // Ratchet: línea base medida 2026-11-21 (6.6/69.4/45.6). Solo subir.
+      thresholds: { lines: 6, statements: 6, branches: 65, functions: 45 },
+    },
   },
   resolve: {
     alias: {

@@ -7,6 +7,9 @@
   --color-lg-dim: #b8a6d6;
   --color-lg-accent: #b794ff;
   --color-lg-ink: #1b0b2e;
+  /* Colores planos de cartel (maíz y chicha/ladrillo de Cochabamba). Tinta siempre lg-ink. */
+  --color-lg-maiz: #ffc83d;
+  --color-lg-coral: #ff7a59;
 
   --font-display: 'Archivo', 'Arial Narrow', sans-serif;
   --font-body: 'Figtree', -apple-system, 'Segoe UI', sans-serif;
@@ -53,6 +56,18 @@
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
+}
+
+/* Trama de puntos de flyer impreso sobre la foto del cartel */
+@utility poster-halftone {
+  background-image: radial-gradient(circle, rgb(27 11 46 / 0.4) 1px, transparent 1.6px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
+}
+
+/* Sombra dura de cartel pegado (sin blur) */
+@utility poster-shadow {
+  box-shadow: 4px 4px 0 0 var(--color-lg-accent);
 }
 
 /* Etiqueta tipo calcomanía (texto, sin ilustraciones) */

@@ -1,5 +1,5 @@
 import { XCircle } from 'lucide-react';
-import { EVENT_STATUS, type EventStatusType } from '@constants/steps';
+import { EVENT_STATUS } from '@constants/steps';
 import type { EventStatus } from '@domain/entities/EventDetailTypes';
 import { CountdownTimer } from '@presentation/components/features/events/modal/CountdownTimer';
 
@@ -9,24 +9,27 @@ interface EventStatusBadgeProps {
   timeStart: string;
 }
 
-const STATUS_UI: Record<string, { className: string; label: string; dot?: boolean }> = {
-  [EVENT_STATUS.FINISHED]: { className: 'bg-red-50 text-red-600 border-red-100', label: 'Evento Finalizado' },
-  [EVENT_STATUS.ONGOING]: { className: 'bg-green-50 text-green-600 border-green-100', label: 'En Curso', dot: true },
-};
-
+// Antes: cuenta regresiva. Durante: "En curso" en maíz. Después: "Finalizado" apagado. Sin animaciones que distraigan.
 export function EventStatusBadge({ eventStatus, dateStart, timeStart }: EventStatusBadgeProps) {
   if (eventStatus === EVENT_STATUS.UPCOMING) {
     return <CountdownTimer endDate={dateStart} time={timeStart} />;
   }
 
-  const config = STATUS_UI[eventStatus];
-  if (!config) return null;
+  if (eventStatus === EVENT_STATUS.ONGOING) {
+    return (
+      <div className="mb-4 inline-flex h-9 items-center gap-2 rounded-full bg-lg-maiz px-3 text-xs font-black uppercase text-lg-ink">
+        <span className="h-2 w-2 rounded-full bg-lg-ink" aria-hidden="true" /> En curso
+      </div>
+    );
+  }
 
-  return (
-    <div className={`mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${config.className}`}>
-      {config.dot && <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />}
-      {!config.dot && <XCircle className="w-3.5 h-3.5" />}
-      {config.label}
-    </div>
-  );
+  if (eventStatus === EVENT_STATUS.FINISHED) {
+    return (
+      <div className="mb-4 inline-flex h-9 items-center gap-1.5 rounded-full bg-lg-surface-2 px-3 text-xs font-black uppercase text-lg-dim">
+        <XCircle className="h-4 w-4" /> Finalizado
+      </div>
+    );
+  }
+
+  return null;
 }

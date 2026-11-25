@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
+import { SearchX } from 'lucide-react';
 
 export default function PlaceNotFound() {
   return (
-    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-6xl mb-4">🦕</div>
-        <h2 className="text-xl font-bold text-lg-text mb-4">Lugar no encontrado</h2>
-        <Link to="/" className="bg-amber-500 text-white px-6 py-3 rounded-2xl font-medium hover:bg-amber-600 transition-colors">
-          Volver al inicio
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-lg-ground px-6 text-center">
+      <SearchX className="h-12 w-12 text-lg-accent" aria-hidden="true" />
+      <h1 className="font-flyer-sm text-3xl text-lg-text">Lugar no encontrado</h1>
+      <p className="max-w-xs text-sm text-lg-dim">Puede que ya no exista o que el enlace esté mal.</p>
+      <Link to="/" className="flex h-12 items-center rounded-lg bg-lg-accent px-6 font-bold text-lg-ink transition-transform active:scale-95">
+        Volver al inicio
+      </Link>
     </div>
   );
 }

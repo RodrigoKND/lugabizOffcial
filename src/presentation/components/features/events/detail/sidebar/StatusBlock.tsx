@@ -1,6 +1,6 @@
 export function StatusBlock({ icon, text, className }: { icon: React.ReactNode; text: string; className?: string }) {
   return (
-    <div className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 cursor-not-allowed ${className || 'bg-lg-surface-2 text-lg-dim border border-lg-surface-2'}`}>
+    <div role="status" className={`flex h-14 w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg text-base font-bold [&>svg]:h-5 [&>svg]:w-5 ${className || 'bg-lg-surface-2 text-lg-dim'}`}>
       {icon} {text}
     </div>
   );

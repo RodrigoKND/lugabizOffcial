@@ -3,12 +3,12 @@ import { Map, MapMarker, MarkerContent } from '@presentation/components/ui/map';
 import { MapPinIcon } from '@icons/index';
 
 const SNAP_ZOOM = 15;
-const MAP_HEIGHT = 160;
+const MAP_HEIGHT = 176;
 
 export function LocationMapSection({ coords }: { coords: [number, number] }) {
   return (
     <>
-      <div className="rounded-2xl overflow-hidden border border-lg-surface-2" style={{ height: `${MAP_HEIGHT}px` }}>
+      <div className="overflow-hidden rounded-lg border-2 border-lg-surface-2" style={{ height: `${MAP_HEIGHT}px` }}>
         <Map center={[coords[1], coords[0]]} zoom={SNAP_ZOOM} style={{ width: '100%', height: '100%' }}>
           <MapMarker longitude={coords[1]} latitude={coords[0]}>
             <MarkerContent>
@@ -23,9 +23,9 @@ export function LocationMapSection({ coords }: { coords: [number, number] }) {
         href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-transparent hover:bg-purple-50 text-purple-600 rounded-xl text-sm font-semibold transition-all border border-purple-200"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-lg-accent px-4 text-sm font-bold text-lg-ink transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lg-text"
       >
-        <Navigation className="w-4 h-4" /> Cómo llegar
+        <Navigation className="h-4 w-4" /> Cómo llegar
       </a>
     </>
   );

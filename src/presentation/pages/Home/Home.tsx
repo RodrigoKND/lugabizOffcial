@@ -21,6 +21,8 @@ import { useOnboardingAlerts } from '@presentation/hooks/onboarding/useOnboardin
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
 import { usePersonalizedSections, type HomeSection } from '@presentation/hooks/home/usePersonalizedSections';
 import PostsFeed from '@presentation/components/features/posts/PostsFeed';
+import Cartelera from '@presentation/components/features/cartelera/Cartelera';
+import OwnerBanner from '@presentation/components/features/home/OwnerBanner';
 
 const Home: React.FC = () => {
   const { getRecentPlaces, isLoading, places, events } = usePlaces();
@@ -102,6 +104,10 @@ const Home: React.FC = () => {
         {!isLoading && !hasContent && (
           <EmptyHomeState onPublish={() => navigate('/add-place')} />
         )}
+
+        <Cartelera events={sortedActiveEvents} places={places} />
+
+        <OwnerBanner onLogin={() => setShowAuthModal(true)} />
 
         {recommendedPlaces.length > 0 && (
           <ScrollRow title="Recomendado para ti" icon={<Star className="w-5 h-5 fill-lg-accent text-lg-accent" />}

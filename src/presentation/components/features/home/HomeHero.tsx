@@ -11,7 +11,9 @@ const HomeHero: React.FC = () => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 0.5 }}
-    className="relative overflow-hidden bg-lg-ground"
+    // overflow-x-clip (no hidden): recorta lo decorativo que sobresale a los lados pero deja salir el desplegable de resultados hacia abajo.
+    // z-20: el desplegable debe quedar sobre el bento y el resto del contenido, que vienen después.
+    className="relative z-20 overflow-x-clip bg-lg-ground"
   >
     <FeedbackStrip />
     <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-9 pb-6 sm:pb-8 grid md:grid-cols-[1.25fr_1fr] gap-8 items-center">

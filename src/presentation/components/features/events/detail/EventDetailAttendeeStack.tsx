@@ -18,17 +18,17 @@ export default function EventDetailAttendeeStack({ attendees }: Props) {
   return (
     <>
       <button onClick={() => setShowModal(true)}
-        className="group flex items-center gap-3 bg-lg-surface rounded-2xl px-4 py-3 border border-lg-surface-2 hover:border-lg-surface-2 transition-all w-fit">
+        className="group flex items-center gap-3 bg-lg-surface rounded-xl px-4 py-3 border-2 border-lg-surface-2 hover:border-lg-accent transition-colors w-fit min-h-11">
         <div className="flex -space-x-2">
           {visible.map((a, i) => (
             <div key={a.id} className="relative"
               style={{ zIndex: maxStack - i }}>
               <img src={a.userAvatar || '/avatar.png'} alt=""
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-white" />
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-lg-surface" />
             </div>
           ))}
           {remainder > 0 && (
-            <div className="w-8 h-8 rounded-full bg-lg-surface-2 text-lg-accent ring-2 ring-white flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-lg-surface-2 text-lg-accent ring-2 ring-lg-surface flex items-center justify-center text-xs font-bold">
               +{remainder}
             </div>
           )}
@@ -45,7 +45,7 @@ export default function EventDetailAttendeeStack({ attendees }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-lg-ground/80 flex items-center justify-center p-4"
             onClick={() => setShowModal(false)}
           >
             <motion.div
@@ -53,7 +53,7 @@ export default function EventDetailAttendeeStack({ attendees }: Props) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-lg-surface rounded-3xl w-full max-w-sm max-h-[70vh] overflow-hidden shadow-2xl"
+              className="bg-lg-surface rounded-xl border-2 border-lg-text w-full max-w-sm max-h-[70vh] overflow-hidden shadow-2xl"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-lg-surface-2">
                 <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ export default function EventDetailAttendeeStack({ attendees }: Props) {
                   <h3 className="font-bold text-lg-text text-sm">Asistentes ({attendees.length})</h3>
                 </div>
                 <button onClick={() => setShowModal(false)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-lg-surface-2 transition-colors">
+                  aria-label="Cerrar lista" className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-lg-surface-2 transition-colors">
                   <X className="w-4 h-4 text-lg-dim" />
                 </button>
               </div>

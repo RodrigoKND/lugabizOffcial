@@ -46,3 +46,10 @@ supabase/lugabiz_complete_schema.sql
 supabase/.temp/*
 # Crawler de eventos (local, no se sube: incluye scripts, salidas y credenciales)
 scripts/crawler-eventos/
+coverage
+
+# Playwright
+e2e/.results
+e2e/.report
+test-results
+playwright-report

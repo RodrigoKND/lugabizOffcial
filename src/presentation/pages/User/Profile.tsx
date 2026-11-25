@@ -6,6 +6,7 @@ import { useAuth, usePlaces } from '@presentation/context';
 import { EventForm, OwnerAnnouncement, CreateSurveyModal, SurveyStats } from '@presentation/components/features';
 import { ProfileHeader, ProfileTabs, SavedPlacesTab, MyEventsTab, AttendingEventsTab, DashboardTab, AdminTab, EditProfileModal, VerificationWizard, MyBusinessesModal } from '@presentation/components/features/users';
 import { FriendsTab, PlansTab } from '@presentation/components/features/social';
+import JourneyCard from '@presentation/components/features/users/journey/JourneyCard';
 import ConfirmDialog from '@presentation/components/ui/ConfirmDialog';
 import { MarketSurvey, ProfileTab, TabId } from '@domain/entities';
 import { eventsService, ownerBusinessesService } from '@lib/supabase';
@@ -146,6 +147,14 @@ const Profile: React.FC = () => {
           onEventCreate={() => setShowEventForm(true)}
           onToggleMobileMenu={() => setShowMobileMenu(!showMobileMenu)}
           onLogout={logout}
+        />
+
+        <JourneyCard
+          user={user}
+          placesCount={myPlacesArr.length}
+          docsApproved={principalDocsApproved}
+          onVerify={() => setShowVerification(true)}
+          onManageBusinesses={() => setShowBusinesses(true)}
         />
 
         <ProfileTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />

@@ -9,7 +9,8 @@ import EventDetailNavbar from '@presentation/components/features/events/detail/E
 import EventDetailHero from '@presentation/components/features/events/detail/EventDetailHero';
 import EventDetailInfo from '@presentation/components/features/events/detail/EventDetailInfo';
 import EventDetailAttendeeStack from '@presentation/components/features/events/detail/EventDetailAttendeeStack';
-import EventDetailSidebar from '@presentation/components/features/events/detail/EventDetailSidebar';
+import EventActionCard from '@presentation/components/features/events/detail/EventActionCard';
+import EventPlaceCard from '@presentation/components/features/events/detail/EventPlaceCard';
 
 const EventDetailPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,16 +35,11 @@ const EventDetailPage: React.FC = () => {
     } : undefined,
   });
 
-  if (isLoading) {
-    return <EventDetailLoading />;
-  }
-
-  if (!event) {
-    return <EventDetailNotFound />;
-  }
+  if (isLoading) return <EventDetailLoading />;
+  if (!event) return <EventDetailNotFound />;
 
   return (
-    <section className="min-h-screen bg-[#f7f5fb] text-stone-800 pb-24 md:pb-0">
+    <section className="min-h-screen bg-lg-ground text-lg-text pb-24 md:pb-8">
       <EventDetailNavbar
         event={event}
         isLiked={isLiked}
@@ -53,26 +49,29 @@ const EventDetailPage: React.FC = () => {
         onEdit={() => navigate(`/edit-event/${event.id}`)}
         onDelete={() => setShowDeleteConfirm(true)}
       />
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3 space-y-6">
-            <EventDetailHero event={event} onShare={handleShare} />
-            <EventDetailInfo event={event} formattedDate={formattedDate} />
-            {user?.id === event.userId && attendees.length > 0 && (
-              <EventDetailAttendeeStack attendees={attendees} />
-            )}
+
+      {/* Celular: portada → acción → historia → lugar. Escritorio: portada e historia a la izquierda, acción y lugar a la derecha. */}
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-5">
+          <div className="order-1 lg:col-span-3 lg:col-start-1 lg:row-start-1">
+            <EventDetailHero event={event} formattedDate={formattedDate} />
           </div>
-          <div className="lg:col-span-2 space-y-4">
-            <EventDetailSidebar
+          <div className="order-2 lg:col-span-2 lg:col-start-4 lg:row-start-1">
+            <EventActionCard
               event={event}
               eventStatus={eventStatus}
               isAttending={isAttending}
               isFull={isFull}
               attendeeCount={attendeeCount}
-              formattedDate={formattedDate}
-              hasCoords={hasCoords}
               onAttend={handleAttend}
             />
+          </div>
+          <div className="order-3 space-y-6 lg:col-span-3 lg:col-start-1 lg:row-start-2">
+            <EventDetailInfo event={event} />
+            {user?.id === event.userId && attendees.length > 0 && <EventDetailAttendeeStack attendees={attendees} />}
+          </div>
+          <div className="order-4 lg:col-span-2 lg:col-start-4 lg:row-start-2">
+            <EventPlaceCard event={event} formattedDate={formattedDate} hasCoords={hasCoords} />
           </div>
         </div>
       </div>

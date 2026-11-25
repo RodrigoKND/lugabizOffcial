@@ -2,7 +2,7 @@
 export const PHRASES = [
   "¡Ta' pues!",
   'Vamos pues',
-  'Jallalla',
+  '¡Al palo!',
   'Al toque',
   'Bien nomás',
   'Qué rico',

@@ -26,6 +26,7 @@ export {
 } from './AdminPanelTypes';
 export { type Report, type CreateReportData, type FlaggedContent } from './Report';
 export { type BusinessPost, type CreatePostData, type FlashOffer, type PostReactionCounts } from './Post';
+export { type VerdictKey, type VerdictTarget, type VerdictSummary, VERDICT_KEYS, EMPTY_VERDICT_SUMMARY } from './Verdict';
 export { type FriendshipStatus, type Friendship, type UserSearchResult, type FriendOption } from './Friendship';
 export {
   type PlanVisibility, type PlanRsvpStatus, type PlanParticipantRole,
