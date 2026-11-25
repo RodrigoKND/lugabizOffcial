@@ -5,6 +5,7 @@ import { useAuth } from '@presentation/context/AuthContext';
 import { supabase } from '@lib/supabase/client';
 import { pushServerFetch } from '@lib/pushServer';
 import { latLngToCell, getNearbyCells } from '@infrastructure/utils/h3';
+import { isNativeApp } from '@infrastructure/native/platform';
 
 const TRACKING_INTERVAL = 5 * 60 * 1000;
 // Bbox de ~5.5km: pre-filtra la query antes de afinar con H3
@@ -16,6 +17,8 @@ export function useUserTracking() {
   const lastTrackedRef = useRef(0);
 
   useEffect(() => {
+    // Dentro de la app el rastreo lo hace la capa nativa (segundo plano + aviso local): aquí sería duplicado.
+    if (isNativeApp()) return;
     const geoStarted = sessionStorage.getItem('_lugabiz_geo_started');
     if (geoStarted === 'true') {
       startWatching();
@@ -32,7 +35,7 @@ export function useUserTracking() {
   }, [position?.lat, position?.lon]);
 
   useEffect(() => {
-    if (!user?.id || !position) return;
+    if (isNativeApp() || !user?.id || !position) return;
 
     const now = Date.now();
     if (now - lastTrackedRef.current < TRACKING_INTERVAL) return;

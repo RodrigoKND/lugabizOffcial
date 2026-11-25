@@ -35,6 +35,23 @@ export const pushSubscriptionsService = {
       .eq('provider', 'fcm');
   },
 
+  /**
+   * Guarda el token de un teléfono (app Capacitor). Usa provider 'capacitor' (no 'fcm'): `save()` borra las filas
+   * 'fcm' del usuario al registrar un navegador, y no debe llevarse el token del teléfono.
+   */
+  async saveNative(userId: string, token: string, platform: 'ios' | 'android'): Promise<void> {
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .upsert({
+        user_id: userId,
+        endpoint: `native:${token}`,
+        subscription: { type: 'native', platform },
+        provider: 'capacitor',
+        fcm_token: token,
+      }, { onConflict: 'endpoint' });
+    if (error) throw error;
+  },
+
   async getByUserIds(userIds: string[]): Promise<PushSubscriptionRow[]> {
     if (userIds.length === 0) return [];
     const { data, error } = await supabase

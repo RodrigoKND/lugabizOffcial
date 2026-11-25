@@ -1,5 +1,8 @@
 import { supabase } from '@lib/supabase';
 import { User } from '@domain/entities';
+import { Browser } from '@capacitor/browser';
+import { isNativeApp } from '@infrastructure/native/platform';
+import { NATIVE_AUTH_REDIRECT } from '@infrastructure/native/authCallback';
 
 export const authService = {
   async signUp(name: string, email: string, password: string) {
@@ -31,6 +34,16 @@ export const authService = {
   },
 
   async signInWithGoogle() {
+    // En la app, Google no permite iniciar sesión dentro del WebView: se abre el navegador del sistema y se vuelve por un enlace propio.
+    if (isNativeApp()) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: NATIVE_AUTH_REDIRECT, skipBrowserRedirect: true },
+      });
+      if (error) throw error;
+      if (data?.url) await Browser.open({ url: data.url });
+      return data;
+    }
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

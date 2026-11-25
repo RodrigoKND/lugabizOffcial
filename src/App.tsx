@@ -12,6 +12,7 @@ import { useEventNotifications } from '@presentation/hooks/useEventNotifications
 import { usePushNotifications } from '@presentation/hooks/usePushNotifications';
 import { usePendingsurveys } from '@presentation/hooks/useSurveys';
 import { useUserTracking } from '@presentation/hooks/geo/useUserTracking';
+import { useNativeApp } from '@presentation/hooks/native/useNativeApp';
 import { marketSurveysService } from '@lib/supabase/services/surveys';
 
 // Solo Home carga eager (es la landing). El resto de las páginas se parte en
@@ -42,6 +43,7 @@ function EventNotificationsManager() {
   useEventNotifications();
   const { enablePushNotifications } = usePushNotifications();
   useUserTracking();
+  useNativeApp();
   return (
     <PushCtx.Provider value={{ enable: enablePushNotifications }}>
       <PushEnableBanner />
