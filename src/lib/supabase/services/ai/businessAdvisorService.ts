@@ -1,4 +1,4 @@
-import { supabase } from '@lib/supabase/client'
+import { invokeAdvisor } from './advisorInvoke'
 
 export interface AdvisorVerdict {
   score: number
@@ -89,9 +89,6 @@ const FUNCTION_NAME = 'business-advisor'
 
 export const businessAdvisorService = {
   async analyze(params: AnalyzeParams): Promise<BusinessAdvisorReport> {
-    const { data, error } = await supabase.functions.invoke(FUNCTION_NAME, { body: params })
-    if (error) throw new Error(error.message ?? 'No se pudo conectar con el asesor.')
-    if (!data || (data as Record<string, unknown>).error) throw new Error(((data as Record<string, unknown>)?.error as string) ?? 'No se pudo analizar la oportunidad.')
-    return data as BusinessAdvisorReport
+    return invokeAdvisor<BusinessAdvisorReport>(FUNCTION_NAME, params)
   },
 }
